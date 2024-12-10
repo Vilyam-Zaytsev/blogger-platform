@@ -11,7 +11,12 @@ type BlogViewModel = {
     websiteUrl: string
 };
 
+type URIParamsBlogIdModel = {
+    id: string
+};
+
 export {
     BlogInputModel,
-    BlogViewModel
+    BlogViewModel,
+    URIParamsBlogIdModel
 };

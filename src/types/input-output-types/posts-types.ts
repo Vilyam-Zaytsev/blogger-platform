@@ -14,7 +14,12 @@ type PostViewModel = {
     blogName: string,
 };
 
+type URIParamsPostIdModel = {
+    id: string
+};
+
 export {
     PostInputModel,
-    PostViewModel
+    PostViewModel,
+    URIParamsPostIdModel
 };
