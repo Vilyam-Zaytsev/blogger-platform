@@ -1,5 +1,5 @@
-import {BlogInputModel} from "../../blogs/types/blogs-types";
-import {PostInputModel} from "../../posts/types/posts-types";
+import {BlogInputModel} from "./blogs-types";
+import {PostInputModel} from "./posts-types";
 
 type FieldNameType = keyof BlogInputModel | keyof PostInputModel;
 

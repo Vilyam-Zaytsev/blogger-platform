@@ -1,4 +1,4 @@
-import {DBType} from "./types/db-type";
+import {DBType} from "../types/db-types/db-type";
 
 const db: DBType = {
     blogs: [],
