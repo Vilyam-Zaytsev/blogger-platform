@@ -6,7 +6,7 @@ const blogsController = {
     getBlogs: (
         req: Request,
         res: Response<BlogViewModel[]>) => {
-        const blogs: BlogViewModel[] = blogsRepository.getBlogs();
+        const blogs: BlogViewModel[] = blogsRepository.getAllBlogs();
 
         res
             .status(200)

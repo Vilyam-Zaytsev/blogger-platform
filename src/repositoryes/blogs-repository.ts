@@ -3,11 +3,21 @@ import {BlogDbType} from "../types/db-types/blog-db-type";
 import {db} from "../db/db";
 
 const blogsRepository = {
-    getBlogs(): BlogViewModel[] {
+    getAllBlogs(): BlogViewModel[] {
         const allBlogs: BlogViewModel[] = db.blogs
             .map(b => this.mapToViewModel({...b}));
 
         return allBlogs;
+    },
+    getBlogById(blogId: string): BlogViewModel {
+        const foundBlog: BlogDbType | undefined = db.blogs
+            .find(b => b.id === blogId);
+
+        if (!foundBlog) {
+            return; // Placeholder: logic will be implemented later.
+        }
+
+        return this.mapToViewModel(foundBlog);
     },
     mapToViewModel(blog: BlogDbType): BlogViewModel {
         const blogForOutput = {
