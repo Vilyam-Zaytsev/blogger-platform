@@ -29,6 +29,22 @@ const blogsRepository = {
 
         return this.mapToViewModel(newBlog);
     },
+    updateExistingBlog(blogId: string, blogData: BlogInputModel): boolean {
+        const foundBlog: BlogDbType | undefined = db.blogs
+            .find(b => b.id === blogId);
+
+        if (!foundBlog) return false;
+
+        const updatedBlog = {
+            ...foundBlog,
+            ...blogData
+        };
+
+        db.blogs = db.blogs
+            .map(b => b.id === updatedBlog.id ? updatedBlog : b);
+
+        return true;
+    },
     mapToViewModel(blog: BlogDbType): BlogViewModel {
         const blogForOutput = {
             id: blog.id,
