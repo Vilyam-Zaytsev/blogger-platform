@@ -43,7 +43,7 @@ const blogsRepository = {
 
         return true;
     },
-    deleteBlogById(blogId): boolean {
+    deleteBlogById(blogId: string): boolean {
         const foundBlog: BlogDbType | undefined = this.findBlogToDb(blogId);
 
         if (!foundBlog) return false;
@@ -62,8 +62,8 @@ const blogsRepository = {
 
         return blogForOutput;
     },
-    findBlogToDb(blogId): BlogDbType | undefined {
-        db.blogs
+    findBlogToDb(blogId: string): BlogDbType | undefined {
+        return db.blogs
             .find(b => b.id === blogId);
     }
 };
