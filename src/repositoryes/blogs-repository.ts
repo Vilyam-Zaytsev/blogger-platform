@@ -10,8 +10,7 @@ const blogsRepository = {
         return allBlogs;
     },
     getBlogById(blogId: string): BlogViewModel | undefined {
-        const foundBlog: BlogDbType | undefined = db.blogs
-            .find(b => b.id === blogId);
+        const foundBlog: BlogDbType | undefined = this.findBlogToDb(blogId);
 
         if (foundBlog) {
             return this.mapToViewModel(foundBlog);
@@ -30,8 +29,7 @@ const blogsRepository = {
         return this.mapToViewModel(newBlog);
     },
     updateExistingBlog(blogId: string, blogData: BlogInputModel): boolean {
-        const foundBlog: BlogDbType | undefined = db.blogs
-            .find(b => b.id === blogId);
+        const foundBlog: BlogDbType | undefined = this.findBlogToDb(blogId);
 
         if (!foundBlog) return false;
 
@@ -45,6 +43,15 @@ const blogsRepository = {
 
         return true;
     },
+    deleteBlogById(blogId): boolean {
+        const foundBlog: BlogDbType | undefined = this.findBlogToDb(blogId);
+
+        if (!foundBlog) return false;
+
+        db.blogs = db.blogs.filter(b => b.id !== blogId);
+
+        return true;
+    },
     mapToViewModel(blog: BlogDbType): BlogViewModel {
         const blogForOutput = {
             id: blog.id,
@@ -55,6 +62,10 @@ const blogsRepository = {
 
         return blogForOutput;
     },
+    findBlogToDb(blogId): BlogDbType | undefined {
+        db.blogs
+            .find(b => b.id === blogId);
+    }
 };
 
 export {blogsRepository};
