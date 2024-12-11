@@ -9,15 +9,15 @@ const blogsRepository = {
 
         return allBlogs;
     },
-    getBlogById(blogId: string): BlogViewModel {
+    getBlogById(blogId: string): BlogViewModel | undefined {
         const foundBlog: BlogDbType | undefined = db.blogs
             .find(b => b.id === blogId);
 
-        if (!foundBlog) {
-            return; // Placeholder: logic will be implemented later.
+        if (foundBlog) {
+            return this.mapToViewModel(foundBlog);
         }
 
-        return this.mapToViewModel(foundBlog);
+        return foundBlog;
     },
     mapToViewModel(blog: BlogDbType): BlogViewModel {
         const blogForOutput = {
