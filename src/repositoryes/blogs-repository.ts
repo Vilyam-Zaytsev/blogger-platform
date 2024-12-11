@@ -1,4 +1,4 @@
-import {BlogViewModel} from "../types/input-output-types/blogs-types";
+import {BlogInputModel, BlogViewModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {db} from "../db/db";
 
@@ -18,6 +18,16 @@ const blogsRepository = {
         }
 
         return foundBlog;
+    },
+    createNewBlog(blogData: BlogInputModel): BlogViewModel {
+        const newBlog: BlogDbType = {
+            id: String(Math.floor(new Date().getTime())),
+            ...blogData
+        };
+
+        db.blogs = [...db.blogs, newBlog];
+
+        return this.mapToViewModel(newBlog);
     },
     mapToViewModel(blog: BlogDbType): BlogViewModel {
         const blogForOutput = {
