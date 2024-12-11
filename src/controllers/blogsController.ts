@@ -1,10 +1,16 @@
 import {Request, Response} from "express";
+import {BlogViewModel} from "../types/input-output-types/blogs-types";
+import {blogsRepository} from "../repositoryes/blogs-repository";
 
 const blogsController = {
     getBlogs: (
         req: Request,
-        res: Response) => {
+        res: Response<BlogViewModel[]>) => {
+        const blogs: BlogViewModel[] = blogsRepository.getBlogs();
 
+        res
+            .status(200)
+            .json(blogs);
     },
     getBlog: (
         req: Request,
