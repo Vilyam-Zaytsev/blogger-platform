@@ -3,9 +3,9 @@ import {agent} from "supertest";
 
 const req = agent(app);
 
-const console_log = (responseBody: any, statusCode: any) => {
+const console_log = (responseBody: any, statusCode: number, descriptions: string) => {
     console.log(
-        'Test 1: get(/blogs)\n',
+        descriptions,
         JSON.stringify({
             ResponseBody: responseBody,
             StatusCode: statusCode,
