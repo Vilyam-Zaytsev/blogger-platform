@@ -20,7 +20,7 @@ const blogsRepository = {
     },
     createNewBlog(blogData: BlogInputModel): BlogViewModel {
         const newBlog: BlogDbType = {
-            id: String(Math.floor(new Date().getTime())),
+            id: String(Math.floor(Date.now() + Math.random())),
             ...blogData
         };
 
