@@ -11,7 +11,7 @@ describe('/blogs', () => {
 
         console_log(res.body, res.status, 'Test 1: get(/blogs)\n');
     });
-    it('should create a new blog', async () => {
+    it('should create a ne  w blog', async () => {
         const res = await req
             .post(SETTINGS.PATH.BLOGS)
             .send(blog1)
