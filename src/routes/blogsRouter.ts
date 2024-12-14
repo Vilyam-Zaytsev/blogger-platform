@@ -5,6 +5,7 @@ import {
     blogNameInputValidator,
     blogWebsiteUrlInputValidator
 } from "../middlewares/blog-middlewares/blogValidators";
+import {inputCheckErrorsMiddleware} from "../middlewares/global-middlewares/inputCheckErrorsMiddleware";
 
 const blogsRouter = Router();
 
@@ -14,6 +15,7 @@ blogsRouter.post('/',
     blogNameInputValidator,
     blogDescriptionInputValidator,
     blogWebsiteUrlInputValidator,
+    inputCheckErrorsMiddleware,
     blogsController.createBlog);
 
 blogsRouter.put('/:id', blogsController.updateBlog);
