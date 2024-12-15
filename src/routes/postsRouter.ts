@@ -2,6 +2,7 @@ import {Router} from "express";
 import {postsController} from '../controllers/postsController';
 import {authMiddleware} from "../middlewares/global-middlewares/authorization-middleware";
 import {
+    postBlogIdInputValidator,
     postContentInputValidator,
     postShortDescriptionInputValidator,
     postTitleInputValidator
@@ -17,10 +18,21 @@ postsRouter.post('/',
     postTitleInputValidator,
     postShortDescriptionInputValidator,
     postContentInputValidator,
+    postBlogIdInputValidator,
     inputCheckErrorsMiddleware,
     postsController.createPost
 );
-postsRouter.put('/:id', postsController.updatePost);
-postsRouter.delete('/:id', postsController.deletePost);
+postsRouter.put('/:id',
+    authMiddleware,
+    postTitleInputValidator,
+    postShortDescriptionInputValidator,
+    postContentInputValidator,
+    inputCheckErrorsMiddleware,
+    postsController.updatePost
+);
+postsRouter.delete('/:id',
+    authMiddleware,
+    postsController.deletePost
+);
 
 export {postsRouter};
