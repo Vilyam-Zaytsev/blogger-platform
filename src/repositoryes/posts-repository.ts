@@ -30,7 +30,7 @@ const postsRepository = {
         //
         // return this.mapToViewModel(newPost);
     },
-    updateExistingPost(blogId: string, blogData: BlogInputModel): boolean {
+    updateExistingPost(postId: string, postData: PostInputModel): boolean {
     //     const foundBlog: BlogDbType | undefined = this.findBlogToDb(blogId);
     //
     //     if (!foundBlog) return false;

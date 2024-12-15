@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
 import {BlogInputModel, BlogViewModel} from "../types/input-output-types/blogs-types";
 import {blogsRepository} from "../repositoryes/blogs-repository";
-import {RequestWithParams, RequestWithParamsAndBody} from "../types/input-output-types/request-types";
+import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/input-output-types/request-types";
 
 const blogsController = {
     getBlogs: (
@@ -28,10 +28,10 @@ const blogsController = {
 
         res
             .status(200)
-            .json(foundBlog)
+            .json(foundBlog);
     },
     createBlog: (
-        req: Request<BlogInputModel>,
+        req: RequestWithBody<BlogInputModel>,
         res: Response<BlogViewModel>) => {
         const dataCreatingBlog = {
             name: req.body.name,
