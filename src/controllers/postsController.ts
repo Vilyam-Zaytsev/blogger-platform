@@ -36,7 +36,7 @@ const postsController = {
             title: req.body.title,
             shortDescription: req.body.shortDescription,
             content: req.body.content,
-            blogId: req.body.blogId
+            blogId: req.body.blogId,
         };
         const createdPost: PostViewModel = postsRepository
             .createNewPost(dataCreatingPost);

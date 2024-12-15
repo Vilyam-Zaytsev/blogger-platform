@@ -3,6 +3,7 @@ import {BlogDbType} from "../types/db-types/blog-db-type";
 import {db} from "../db/db";
 import {PostDbType} from "../types/db-types/post-db-type";
 import {PostInputModel, PostViewModel} from "../types/input-output-types/posts-types";
+import {blogsRepository} from "./blogs-repository";
 
 const postsRepository = {
     getAllPosts(): PostViewModel[] {
@@ -21,38 +22,39 @@ const postsRepository = {
         return foundPost;
     },
     createNewPost(postData: PostInputModel): PostViewModel {
-        // const newPost: PostDbType = {
-        //     id: String(Math.floor(Date.now() + Math.random())),
-        //     ...postData
-        // };
-        //
-        // db.posts = [...db.posts, newPost];
-        //
-        // return this.mapToViewModel(newPost);
+        const newPost: PostDbType = {
+            id: String(Math.floor(Date.now() + Math.random())),
+            ...postData,
+            blogName: blogsRepository.findBlogToDb(postData.blogId)!.name
+        };
+
+        db.posts = [...db.posts, newPost];
+
+        return this.mapToViewModel(newPost);
     },
     updateExistingPost(postId: string, postData: PostInputModel): boolean {
-    //     const foundBlog: BlogDbType | undefined = this.findBlogToDb(blogId);
-    //
-    //     if (!foundBlog) return false;
-    //
-    //     const updatedBlog = {
-    //         ...foundBlog,
-    //         ...blogData
-    //     };
-    //
-    //     db.blogs = db.blogs
-    //         .map(b => b.id === updatedBlog.id ? updatedBlog : b);
-    //
-    //     return true;
+        const foundPost: PostDbType | undefined = this.findPostToDb(postId);
+
+        if (!foundPost) return false;
+
+        const updatedPost = {
+            ...foundPost,
+            ...postData
+        };
+
+        db.posts = db.posts
+            .map(p => p.id === updatedPost.id ? updatedPost : p);
+
+        return true;
     },
-    deletePostById(blogId: string): boolean {
-    //     const foundBlog: BlogDbType | undefined = this.findBlogToDb(blogId);
-    //
-    //     if (!foundBlog) return false;
-    //
-    //     db.blogs = db.blogs.filter(b => b.id !== blogId);
-    //
-    //     return true;
+    deletePostById(postId: string): boolean {
+        const foundPost: PostDbType | undefined = this.findPostToDb(postId);
+
+        if (!foundPost) return false;
+
+        db.posts = db.posts.filter(p => p.id !== postId);
+
+        return true;
     },
     mapToViewModel(post: PostDbType): PostViewModel {
         const postForOutput: PostViewModel = {
