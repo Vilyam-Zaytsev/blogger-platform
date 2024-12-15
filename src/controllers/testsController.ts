@@ -1,5 +1,6 @@
 import {Request, Response} from "express";
 import {db} from "../db/db";
+import {SETTINGS} from "../settings";
 
 const testsController = {
     deleteAllData: (
@@ -9,7 +10,7 @@ const testsController = {
             db.posts = [];
 
             res
-                .status(204)
+                .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
                 .json({'message': 'All data has been deleted.'});
         }
 };

@@ -2,6 +2,7 @@ import {Request, Response} from "express";
 import {BlogInputModel, BlogViewModel} from "../types/input-output-types/blogs-types";
 import {blogsRepository} from "../repositoryes/blogs-repository";
 import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/input-output-types/request-types";
+import {SETTINGS} from "../settings";
 
 const blogsController = {
     getBlogs: (
@@ -11,7 +12,7 @@ const blogsController = {
             .getAllBlogs();
 
         res
-            .status(200)
+            .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(blogs);
     },
     getBlog: (
@@ -22,12 +23,12 @@ const blogsController = {
 
         if (!foundBlog) {
             res
-                .status(404)
+                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
                 .end();
         }
 
         res
-            .status(200)
+            .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(foundBlog);
     },
     createBlog: (
@@ -42,7 +43,7 @@ const blogsController = {
             .createNewBlog(dataCreatingBlog);
 
         res
-            .status(201)
+            .status(SETTINGS.HTTP_STATUSES.CREATED_201)
             .json(createdBlog);
     },
     updateBlog: (
@@ -58,12 +59,12 @@ const blogsController = {
 
         if (!updatedBlog) {
             res
-                .status(404)
+                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
                 .end();
         }
 
         res
-            .status(204)
+            .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
             .end();
     },
     deleteBlog: (
@@ -74,12 +75,12 @@ const blogsController = {
 
         if (!isDeletedBlog) {
             res
-                .status(404)
+                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
                 .end();
         }
 
         res
-            .status(204)
+            .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
             .end();
     },
 };

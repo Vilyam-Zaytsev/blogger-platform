@@ -2,6 +2,7 @@ import {Request, Response} from "express";
 import {PostInputModel, PostViewModel} from "../types/input-output-types/posts-types";
 import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/input-output-types/request-types";
 import {postsRepository} from "../repositoryes/posts-repository";
+import {SETTINGS} from "../settings";
 
 const postsController = {
     getPosts: (
@@ -10,7 +11,7 @@ const postsController = {
         const posts: PostViewModel[] = postsRepository.getAllPosts();
 
         res
-            .status(200)
+            .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(posts);
     },
     getPost: (
@@ -21,12 +22,12 @@ const postsController = {
 
         if (!foundPost) {
             res
-                .status(404)
+                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
                 .end();
         }
 
         res
-            .status(200)
+            .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(foundPost);
     },
     createPost: (
@@ -42,7 +43,7 @@ const postsController = {
             .createNewPost(dataCreatingPost);
 
         res
-            .status(201)
+            .status(SETTINGS.HTTP_STATUSES.CREATED_201)
             .json(createdPost);
     },
     updatePost: (
@@ -59,12 +60,12 @@ const postsController = {
 
         if (!updatedPost) {
             res
-                .status(404)
+                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
                 .end();
         }
 
         res
-            .status(204)
+            .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
             .end();
     },
     deletePost: (
@@ -75,12 +76,12 @@ const postsController = {
 
         if (!isDeletedPost) {
             res
-                .status(404)
+                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
                 .end();
         }
 
         res
-            .status(204)
+            .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
             .end();
     },
 };

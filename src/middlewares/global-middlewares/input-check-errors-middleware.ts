@@ -1,6 +1,7 @@
 import {validationResult} from "express-validator";
 import {Request, Response, NextFunction} from "express";
 import {FieldNameType} from "../../types/input-output-types/output-errors-type";
+import {SETTINGS} from "../../settings";
 
 const inputCheckErrorsMiddleware = (
     req: Request,
@@ -12,7 +13,7 @@ const inputCheckErrorsMiddleware = (
         const errors = e.array({onlyFirstError: true}) as { path: FieldNameType, msg: string }[];
 
         res
-            .status(400)
+            .status(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400)
             .json({
                 errorsMessages: errors.map(e => ({field: e.path, message: e.msg}))
             });
