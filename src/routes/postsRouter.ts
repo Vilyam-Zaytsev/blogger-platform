@@ -27,6 +27,7 @@ postsRouter.put('/:id',
     postTitleInputValidator,
     postShortDescriptionInputValidator,
     postContentInputValidator,
+    postBlogIdInputValidator,
     inputCheckErrorsMiddleware,
     postsController.updatePost
 );
