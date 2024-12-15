@@ -33,18 +33,28 @@ const blogsController = {
     createBlog: (
         req: Request<BlogInputModel>,
         res: Response<BlogViewModel>) => {
+        const dataCreatingBlog = {
+            name: req.body.name,
+            description: req.body.description,
+            websiteUrl: req.body.websiteUrl
+        };
         const createdBlog: BlogViewModel = blogsRepository
-            .createNewBlog(req.body);
+            .createNewBlog(dataCreatingBlog);
 
         res
             .status(201)
             .json(createdBlog);
     },
     updateBlog: (
-        req: RequestWithParamsAndBody<{id: string}, BlogInputModel>,
+        req: RequestWithParamsAndBody<{ id: string }, BlogInputModel>,
         res: Response) => {
+        const dataUpdatingBlog = {
+            name: req.body.name,
+            description: req.body.description,
+            websiteUrl: req.body.websiteUrl
+        };
         const updatedBlog: boolean = blogsRepository
-            .updateExistingBlog(req.params.id, req.body);
+            .updateExistingBlog(req.params.id, dataUpdatingBlog);
 
         if (!updatedBlog) {
             res
@@ -57,7 +67,7 @@ const blogsController = {
             .end();
     },
     deleteBlog: (
-        req: RequestWithParams<{id: string}>,
+        req: RequestWithParams<{ id: string }>,
         res: Response) => {
         const isDeletedBlog: boolean = blogsRepository
             .deleteBlogById(req.params.id);

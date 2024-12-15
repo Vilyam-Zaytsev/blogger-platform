@@ -7,6 +7,8 @@ const blogsRepository = {
         const allBlogs: BlogViewModel[] = db.blogs
             .map(b => this.mapToViewModel({...b}));
 
+        console.log(db.blogs)
+
         return allBlogs;
     },
     getBlogById(blogId: string): BlogViewModel | undefined {
