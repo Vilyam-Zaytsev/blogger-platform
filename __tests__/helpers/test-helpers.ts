@@ -11,9 +11,21 @@ const console_log = (responseBody: any, statusCode: number, descriptions: string
             StatusCode: statusCode,
         }, null, 2),
     );
+};
+
+const generateRandomString = (length: number) => {
+    const chars: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    let result = '';
+
+    for (let i = 0; i < length; i++) {
+        result += chars[Math.floor(Math.random() * chars.length)];
+    }
+
+    return result;
 }
 
 export {
     req,
-    console_log
+    console_log,
+    generateRandomString
 };

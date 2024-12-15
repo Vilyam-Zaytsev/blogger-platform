@@ -1,33 +1,33 @@
 import {DBType} from "../../src/types/db-types/db-type";
 import {BlogDbType} from "../../src/types/db-types/blog-db-type";
 
-const blog1: BlogDbType = {
+const blog_one: BlogDbType = {
     id: String(Math.floor(new Date().getTime())),
-    name: 'blog1',
-    description: 'description1',
-    websiteUrl: 'https://blog1.com'
+    name: 'BLOG_ONE',
+    description: 'DESCRIPTION_ONE',
+    websiteUrl: 'https://blog-one.com'
 } as const;
 
-const blog2: BlogDbType = {
+const blog_two: BlogDbType = {
     id: String(Math.floor(new Date().getTime())),
-    name: 'blog2',
-    description: 'description2',
-    websiteUrl: 'https://blog2.com'
+    name: 'BLOG_TWO',
+    description: 'DESCRIPTION_TWO',
+    websiteUrl: 'https://blog-two.com'
 } as const;
 
-const dbTest1: DBType = {
-    blogs: [blog1],
+const dbTest_one: DBType = {
+    blogs: [blog_one],
     posts: []
 } as const;
 
-const dbTest2: DBType = {
-    blogs: [],
+const dbTest_two: DBType = {
+    blogs: [blog_one, blog_two],
     posts: []
 } as const;
 
 export {
-    blog1,
-    blog2,
-    dbTest1,
-    dbTest2
+    blog_one,
+    blog_two,
+    dbTest_one,
+    dbTest_two
 }
