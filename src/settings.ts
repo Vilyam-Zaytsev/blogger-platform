@@ -9,6 +9,10 @@ const SETTINGS = {
         POSTS: '/posts',
         TESTS: '/testing/all-data',
     },
+    ADMIN_DATA: {
+        LOGIN: 'admin',
+        PASSWORD: 'qwerty'
+    }
 };
 
 export {SETTINGS};
