@@ -7,8 +7,6 @@ const blogsRepository = {
         const allBlogs: BlogViewModel[] = db.blogs
             .map(b => this.mapToViewModel({...b}));
 
-        console.log(db.blogs)
-
         return allBlogs;
     },
     getBlogById(blogId: string): BlogViewModel | undefined {
@@ -55,7 +53,7 @@ const blogsRepository = {
         return true;
     },
     mapToViewModel(blog: BlogDbType): BlogViewModel {
-        const blogForOutput = {
+        const blogForOutput: BlogViewModel = {
             id: blog.id,
             name: blog.name,
             description: blog.description,

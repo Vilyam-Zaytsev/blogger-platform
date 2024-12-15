@@ -1,13 +1,19 @@
 import {Request, Response} from "express";
+import {PostViewModel} from "../types/input-output-types/posts-types";
+import {RequestWithParams} from "../types/input-output-types/request-types";
 
 const postsController = {
     getPosts: (
         req: Request,
-        res: Response) => {
+        res: Response<PostViewModel[]>) => {
+        const posts: PostViewModel[] = postsRepositiry.getAllPosts();
 
+        res
+            .status(200)
+            .json(posts);
     },
     getPost: (
-        req: Request,
+        req: RequestWithParams<{ id: string }>,
         res: Response) => {
 
     },
