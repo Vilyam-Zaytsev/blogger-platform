@@ -1,6 +1,6 @@
 import {clearDb, console_log, encodingAdminDataInBase64, generateRandomString, req} from './helpers/test-helpers';
 import {SETTINGS} from "../src/settings";
-import {blog_one} from "./helpers/datasets-for-tests";
+import {blog_1} from "./helpers/datasets-for-tests";
 import {db} from "../src/db/db";
 import {blogsTestManager} from "./helpers/blogs-test-manager";
 
@@ -9,21 +9,21 @@ describe('/blogs', () => {
         it('should create a new blog, the user is authenticated.', async () => {
             const res = await blogsTestManager.createBlog(
                 {
-                    name: blog_one.name,
-                    description: blog_one.description,
-                    websiteUrl: blog_one.websiteUrl
+                    name: blog_1.name,
+                    description: blog_1.description,
+                    websiteUrl: blog_1.websiteUrl
                 },
                 encodingAdminDataInBase64(
                     SETTINGS.ADMIN_DATA.LOGIN,
                     SETTINGS.ADMIN_DATA.PASSWORD
                 )
-            )
+            );
 
             expect(res.body).toEqual({
                 id: expect.any(String),
-                name: blog_one.name,
-                description: blog_one.description,
-                websiteUrl: blog_one.websiteUrl
+                name: blog_1.name,
+                description: blog_1.description,
+                websiteUrl: blog_1.websiteUrl
             });
 
             expect(res.body).toEqual(db.blogs[0]);
@@ -35,9 +35,9 @@ describe('/blogs', () => {
 
             const res = await blogsTestManager.createBlog(
                 {
-                    name: blog_one.name,
-                    description: blog_one.description,
-                    websiteUrl: blog_one.websiteUrl
+                    name: blog_1.name,
+                    description: blog_1.description,
+                    websiteUrl: blog_1.websiteUrl
                 },
                 'incorect-adminData',
                 SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401
@@ -200,8 +200,8 @@ describe('/blogs', () => {
 
             const res = await blogsTestManager.createBlog(
                 {
-                    name: blog_one.name,
-                    description: blog_one.description,
+                    name: blog_1.name,
+                    description: blog_1.description,
                     websiteUrl: generateRandomString(10)
                 },
                 encodingAdminDataInBase64(
@@ -227,29 +227,72 @@ describe('/blogs', () => {
         });
     });
     describe('GET /blogs', () => {
-        it('should create a new blog, the user is authenticated.', async () => {
-            const res = await blogsTestManager.createBlog(
+        it('should return an empty array.', async () => {
+            const res = await req
+                .get(SETTINGS.PATH.BLOGS)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200, [])
+
+            console_log(res.body, res.status, 'Test 1: get(/blogs)\n');
+        });
+        it('should return an array with a single blog.', async () => {
+            const res_1 = await blogsTestManager.createBlog(
                 {
-                    name: blog_one.name,
-                    description: blog_one.description,
-                    websiteUrl: blog_one.websiteUrl
+                    name: blog_1.name,
+                    description: blog_1.description,
+                    websiteUrl: blog_1.websiteUrl
                 },
                 encodingAdminDataInBase64(
                     SETTINGS.ADMIN_DATA.LOGIN,
                     SETTINGS.ADMIN_DATA.PASSWORD
                 )
-            )
+            );
 
-            expect(res.body).toEqual({
-                id: expect.any(String),
-                name: blog_one.name,
-                description: blog_one.description,
-                websiteUrl: blog_one.websiteUrl
-            });
+            const res_2 = await req
+                .get(SETTINGS.PATH.BLOGS)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-            expect(res.body).toEqual(db.blogs[0]);
+            expect(res_2.body[0]).toEqual(res_1.body);
+            expect(db.blogs.length).toEqual(1);
 
-            console_log(res.body, res.status, 'Test 1: post(/blogs)\n');
+
+            console_log(res_2.body, res_2.status, 'Test 2: get(/blogs)\n');
+        });
+        it('should return an array with a two blogs.', async () => {
+            clearDb();
+
+            const res_1 = await blogsTestManager.createBlog(
+                {
+                    name: blog_1.name,
+                    description: blog_1.description,
+                    websiteUrl: blog_1.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+            const res_2 = await blogsTestManager.createBlog(
+                {
+                    name: blog_1.name,
+                    description: blog_1.description,
+                    websiteUrl: blog_1.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+
+            const res_3 = await req
+                .get(SETTINGS.PATH.BLOGS)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(res_3.body[0]).toEqual(res_1.body);
+            expect(res_3.body[1]).toEqual(res_2.body);
+            expect(db.blogs.length).toEqual(2);
+
+
+            console_log(res_3.body, res_3.status, 'Test 3: get(/blogs)\n');
         });
     })
 
