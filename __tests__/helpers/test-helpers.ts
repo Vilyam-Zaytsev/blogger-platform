@@ -1,5 +1,6 @@
 import  {app} from '../../src/app';
 import {agent} from "supertest";
+import {db} from "../../src/db/db";
 
 const req = agent(app);
 
@@ -22,10 +23,30 @@ const generateRandomString = (length: number) => {
     }
 
     return result;
-}
+};
+
+const encodingAdminDataInBase64 = (login: string, password: string) => {
+    const adminData = `${login}:${password}`;
+    const adminDataBase64 = Buffer.from(adminData).toString('base64');
+
+    return `Basic ${adminDataBase64}`;
+};
+
+const clearDb = (clearBlogs = true, clearPosts = true ) => {
+   if (clearBlogs) {
+       db.blogs = [];
+   }
+   if (clearPosts) {
+       db.posts = [];
+   }
+
+   return;
+};
 
 export {
     req,
     console_log,
-    generateRandomString
+    generateRandomString,
+    encodingAdminDataInBase64,
+    clearDb
 };
