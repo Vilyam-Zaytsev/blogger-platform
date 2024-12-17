@@ -20,7 +20,9 @@ const SETTINGS = {
         BAD_REQUEST_400: 400,
         UNAUTHORIZED_401: 401,
         NOT_FOUND_404: 404
-    }
+    },
+    MONGO_URL: process.env.MONGO_URL || 'localhost:27017',
+    DB_NAME: process.env.DB_NAME
 };
 
 export {SETTINGS};
