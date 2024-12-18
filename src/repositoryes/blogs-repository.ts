@@ -1,71 +1,102 @@
 import {BlogInputModel, BlogViewModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
-import {db} from "../db/db";
+import {blogsCollection} from "../db/mongoDb";
+import {ObjectId} from "mongodb";
 
 const blogsRepository = {
-    getAllBlogs(): BlogViewModel[] {
-        const allBlogs: BlogViewModel[] = db.blogs
-            .map(b => this.mapToViewModel({...b}));
-
-        return allBlogs;
-    },
-    getBlogById(blogId: string): BlogViewModel | undefined {
-        const foundBlog: BlogDbType | undefined = this.findBlogToDb(blogId);
-
-        if (foundBlog) {
-            return this.mapToViewModel(foundBlog);
+    async findBlogs(): Promise<BlogViewModel[]> {
+        try {
+            return await blogsCollection
+                .find({}, {
+                    projection: {
+                        _id: 0,
+                        id: 1,
+                        name: 1,
+                        description: 1,
+                        websiteUrl: 1,
+                        createdAt: 1,
+                        isMembership: 1,
+                    }
+                })
+                .toArray() as BlogViewModel[];
+        } catch (error) {
+            console.error(error);
+            throw new Error('Failed to fetch blogs');
         }
-
-        return foundBlog;
     },
-    createNewBlog(blogData: BlogInputModel): BlogViewModel {
-        const newBlog: BlogDbType = {
-            id: String(Math.floor(Date.now() + Math.random())),
-            ...blogData
-        };
-
-        db.blogs = [...db.blogs, newBlog];
-
-        return this.mapToViewModel(newBlog);
+    async findBlogById(blogId: string): Promise<BlogViewModel | null> {
+        try {
+            return await blogsCollection
+                .findOne({id: blogId}, {
+                    projection: {
+                        _id: 0,
+                        id: 1,
+                        name: 1,
+                        description: 1,
+                        websiteUrl: 1,
+                        createdAt: 1,
+                        isMembership: 1,
+                    }
+                });
+        } catch (error) {
+            console.error(error);
+            throw new Error('Failed to fetch blog');
+        }
     },
-    updateExistingBlog(blogId: string, blogData: BlogInputModel): boolean {
-        const foundBlog: BlogDbType | undefined = this.findBlogToDb(blogId);
+    async createBlog(blogData: BlogInputModel): Promise<BlogViewModel> {
+        try {
+            const newBlog: BlogDbType = {
+                _id: new ObjectId(),
+                id: String(Math.floor(Date.now() + Math.random())),
+                createdAt: new Date().toISOString(),
+                isMembership: false,
+                ...blogData
+            };
 
-        if (!foundBlog) return false;
+            const result = await blogsCollection.insertOne(newBlog);
 
-        const updatedBlog = {
-            ...foundBlog,
-            ...blogData
-        };
-
-        db.blogs = db.blogs
-            .map(b => b.id === updatedBlog.id ? updatedBlog : b);
-
-        return true;
+            return this.mapToViewModel(newBlog);
+        } catch (error) {
+            console.error(error);
+            throw new Error('Failed to create a blog');
+        }
     },
-    deleteBlogById(blogId: string): boolean {
-        const foundBlog: BlogDbType | undefined = this.findBlogToDb(blogId);
+    async updateBlog(blogId: string, blogData: BlogInputModel): Promise<boolean> {
+        try {
+            const result = await blogsCollection.updateOne({id: blogId}, {$set: {...blogData}});
 
-        if (!foundBlog) return false;
+            return result.matchedCount === 1;
+        } catch (error) {
+            console.error(error);
+            throw new Error('Failed to update a blog')
+        }
+    },
+    async deleteBlogById(blogId: string): Promise<boolean> {
+        try {
+            const result = await blogsCollection.deleteOne({id: blogId});
 
-        db.blogs = db.blogs.filter(b => b.id !== blogId);
-
-        return true;
+            return result.deletedCount === 1;
+        } catch (error) {
+            console.error(error);
+            throw new Error('Failed to delete a blog')
+        }
     },
     mapToViewModel(blog: BlogDbType): BlogViewModel {
         const blogForOutput: BlogViewModel = {
             id: blog.id,
             name: blog.name,
             description: blog.description,
-            websiteUrl: blog.websiteUrl
+            websiteUrl: blog.websiteUrl,
+            createdAt: blog.createdAt,
+            isMembership: blog.isMembership
         };
 
         return blogForOutput;
     },
-    findBlogToDb(blogId: string): BlogDbType | undefined {
-        return db.blogs
-            .find(b => b.id === blogId);
-    }
+    // async findBlogToDb(blogId: string): BlogDbType | undefined {
+    //     return db.blogs
+    //         .find(b => b.id === blogId);
+    // }
 };
 
 export {blogsRepository};

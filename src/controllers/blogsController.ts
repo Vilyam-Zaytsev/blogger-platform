@@ -1,87 +1,103 @@
 import {Request, Response} from "express";
-import {BlogInputModel, BlogViewModel} from "../types/input-output-types/blogs-types";
+import {BlogInputModel, BlogViewModel, URIParamsBlogIdModel} from "../types/input-output-types/blogs-types";
 import {blogsRepository} from "../repositoryes/blogs-repository";
 import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/input-output-types/request-types";
 import {SETTINGS} from "../settings";
 
 const blogsController = {
-    getBlogs: (
+    getBlogs: async (
         req: Request,
         res: Response<BlogViewModel[]>) => {
-        const blogs: BlogViewModel[] = blogsRepository
-            .getAllBlogs();
+        try {
+            const blogs: BlogViewModel[] = await blogsRepository.findBlogs();
 
-        res
-            .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(blogs);
-    },
-    getBlog: (
-        req: RequestWithParams<{ id: string }>,
-        res: Response) => {
-        const foundBlog: BlogViewModel | undefined = blogsRepository
-            .getBlogById(req.params.id);
-
-        if (!foundBlog) {
             res
-                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                .end();
+                .status(SETTINGS.HTTP_STATUSES.OK_200)
+                .json(blogs);
+        } catch (error) {
+            console.error(error);
         }
-
-        res
-            .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(foundBlog);
     },
-    createBlog: (
+    getBlog: async (
+        req: RequestWithParams<URIParamsBlogIdModel>,
+        res: Response) => {
+        try {
+            const foundBlog: BlogViewModel | null = await blogsRepository.findBlogById(req.params.id);
+
+            if (!foundBlog) {
+                res
+                    .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
+                    .end();
+            }
+
+            res
+                .status(SETTINGS.HTTP_STATUSES.OK_200)
+                .json(foundBlog);
+        } catch (error) {
+            console.error(error);
+        }
+    },
+    createBlog: async (
         req: RequestWithBody<BlogInputModel>,
         res: Response<BlogViewModel>) => {
-        const dataCreatingBlog = {
-            name: req.body.name,
-            description: req.body.description,
-            websiteUrl: req.body.websiteUrl
-        };
-        const createdBlog: BlogViewModel = blogsRepository
-            .createNewBlog(dataCreatingBlog);
+        try {
+            const dataCreatingBlog = {
+                name: req.body.name,
+                description: req.body.description,
+                websiteUrl: req.body.websiteUrl
+            };
+            const createdBlog: BlogViewModel = await blogsRepository.createBlog(dataCreatingBlog);
 
-        res
-            .status(SETTINGS.HTTP_STATUSES.CREATED_201)
-            .json(createdBlog);
-    },
-    updateBlog: (
-        req: RequestWithParamsAndBody<{ id: string }, BlogInputModel>,
-        res: Response) => {
-        const dataUpdatingBlog = {
-            name: req.body.name,
-            description: req.body.description,
-            websiteUrl: req.body.websiteUrl
-        };
-        const updatedBlog: boolean = blogsRepository
-            .updateExistingBlog(req.params.id, dataUpdatingBlog);
-
-        if (!updatedBlog) {
             res
-                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
+                .status(SETTINGS.HTTP_STATUSES.CREATED_201)
+                .json(createdBlog);
+        } catch (error) {
+            console.error(error);
+        }
+    },
+    updateBlog: async (
+        req: RequestWithParamsAndBody<URIParamsBlogIdModel, BlogInputModel>,
+        res: Response) => {
+        try {
+            const dataUpdatingBlog = {
+                name: req.body.name,
+                description: req.body.description,
+                websiteUrl: req.body.websiteUrl
+            };
+            const updatedBlog: boolean = await blogsRepository.updateBlog(req.params.id, dataUpdatingBlog);
+
+            if (!updatedBlog) {
+                res
+                    .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
+                    .end();
+            }
+
+            res
+                .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
                 .end();
+        } catch (error) {
+            console.error(error);
         }
 
-        res
-            .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
-            .end();
     },
-    deleteBlog: (
-        req: RequestWithParams<{ id: string }>,
+    deleteBlog: async (
+        req: RequestWithParams<URIParamsBlogIdModel>,
         res: Response) => {
-        const isDeletedBlog: boolean = blogsRepository
-            .deleteBlogById(req.params.id);
+        try {
+            const isDeletedBlog: boolean = await blogsRepository.deleteBlogById(req.params.id);
 
-        if (!isDeletedBlog) {
+            if (!isDeletedBlog) {
+                res
+                    .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
+                    .end();
+            }
+
             res
-                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
+                .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
                 .end();
+        } catch (error) {
+            console.error(error);
         }
-
-        res
-            .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
-            .end();
     },
 };
 
