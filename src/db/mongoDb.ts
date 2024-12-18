@@ -7,14 +7,11 @@ let blogsCollection: Collection<BlogDbType>;
 let postsCollection: Collection<PostDbType>;
 
 async function runDb(url: string) {
-    console.log(1)
-
     let client = new MongoClient(url);
     let db = client.db(SETTINGS.DB_NAME);
 
-    blogsCollection = db.collection<BlogDbType>('blogs');
+    blogsCollection = db.collection('blogs');
     postsCollection = db.collection<PostDbType>('posts');
-
     try {
         await client.connect();
         await db.command({ping: 1});
