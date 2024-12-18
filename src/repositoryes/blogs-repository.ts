@@ -53,7 +53,7 @@ const blogsRepository = {
                 ...blogData
             };
 
-            const result = await blogsCollection.insertOne(newBlog);
+            await blogsCollection.insertOne(newBlog);
 
             return this.mapToViewModel(newBlog);
         } catch (error) {
@@ -82,7 +82,7 @@ const blogsRepository = {
         }
     },
     mapToViewModel(blog: BlogDbType): BlogViewModel {
-        const blogForOutput: BlogViewModel = {
+        return  {
             id: blog.id,
             name: blog.name,
             description: blog.description,
@@ -90,8 +90,6 @@ const blogsRepository = {
             createdAt: blog.createdAt,
             isMembership: blog.isMembership
         };
-
-        return blogForOutput;
     },
     // async findBlogToDb(blogId: string): BlogDbType | undefined {
     //     return db.blogs
