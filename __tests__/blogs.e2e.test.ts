@@ -1,6 +1,6 @@
 import {clearDb, console_log, encodingAdminDataInBase64, generateRandomString, req} from './helpers/test-helpers';
 import {SETTINGS} from "../src/settings";
-import {blog_1} from "./helpers/datasets-for-tests";
+import {blog_1, blog_2, dbTest_2} from "./helpers/datasets-for-tests";
 import {blogsTestManager} from "./helpers/blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
@@ -19,7 +19,6 @@ beforeAll(async () => {
 
     const db = client.db();
     setBlogsCollection(db.collection<BlogDbType>('blogs'));
-    // blogsCollection = db.collection<BlogDbType>('blogs');
 });
 
 afterAll(async () => {
@@ -280,14 +279,12 @@ describe('/blogs', () => {
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(res_2.body[0]).toEqual(res_1.body);
-            // expect(db.blogs.length).toEqual(1);
+            expect(res_2.body.length).toEqual(1);
 
 
             console_log(res_2.body, res_2.status, 'Test 2: get(/blogs)\n');
         });
         it('should return an array with a two blogs.', async () => {
-            clearDb();
-
             const res_1 = await blogsTestManager.createBlog(
                 {
                     name: blog_1.name,
@@ -301,9 +298,9 @@ describe('/blogs', () => {
             );
             const res_2 = await blogsTestManager.createBlog(
                 {
-                    name: blog_1.name,
-                    description: blog_1.description,
-                    websiteUrl: blog_1.websiteUrl
+                    name: blog_2.name,
+                    description: blog_2.description,
+                    websiteUrl: blog_2.websiteUrl
                 },
                 encodingAdminDataInBase64(
                     SETTINGS.ADMIN_DATA.LOGIN,
@@ -317,10 +314,53 @@ describe('/blogs', () => {
 
             expect(res_3.body[0]).toEqual(res_1.body);
             expect(res_3.body[1]).toEqual(res_2.body);
-            // expect(db.blogs.length).toEqual(2);
-
+            expect(res_3.body.length).toEqual(2);
 
             console_log(res_3.body, res_3.status, 'Test 3: get(/blogs)\n');
+        });
+        it('should return blog found by id.', async () => {
+            const res_1 = await blogsTestManager.createBlog(
+                {
+                    name: blog_1.name,
+                    description: blog_1.description,
+                    websiteUrl: blog_1.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+            const res_2 = await req
+                .get(`${SETTINGS.PATH.BLOGS}/${res_1.body.id}`)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(res_1.body).toEqual(res_2.body);
+
+            console_log(res_2.body, res_2.status, 'Test 3: get(/blogs)\n');
+        });
+        it('should return error 404 not found.', async () => {
+            const res_1 = await blogsTestManager.createBlog(
+                {
+                    name: blog_1.name,
+                    description: blog_1.description,
+                    websiteUrl: blog_1.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+            const res_2 = await req
+                .get(`${SETTINGS.PATH.BLOGS}/${(res_1.body.id + 1)}`)
+                .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
+
+            // const res_3 = await req
+            //     .get(`${SETTINGS.PATH.BLOGS}/${res_1.body.id}`)
+            //     .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
+            //
+            // expect(res_1.body).toEqual(res_3.body);
+
+            console_log(res_2.body, res_2.status, 'Test 3: get(/blogs)\n');
         });
     });
 });

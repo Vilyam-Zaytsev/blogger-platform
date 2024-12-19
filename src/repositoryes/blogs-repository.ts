@@ -48,9 +48,9 @@ const blogsRepository = {
             const newBlog: BlogDbType = {
                 _id: new ObjectId(),
                 id: String(Math.floor(Date.now() + Math.random())),
+                ...blogData,
                 createdAt: new Date().toISOString(),
                 isMembership: false,
-                ...blogData
             };
 
             await blogsCollection.insertOne(newBlog);

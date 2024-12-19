@@ -27,7 +27,9 @@ const blogsController = {
             if (!foundBlog) {
                 res
                     .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                    .end();
+                    .json({});
+
+                return;
             }
 
             res
