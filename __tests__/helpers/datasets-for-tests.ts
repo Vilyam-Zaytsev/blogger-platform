@@ -3,7 +3,7 @@ import {BlogDbType} from "../../src/types/db-types/blog-db-type";
 import {ObjectId} from "mongodb";
 
 const blog_1: BlogDbType = {
-    _id: ObjectId,
+    _id: new ObjectId(),
     id: String(Math.floor(new Date().getTime())),
     name: 'BLOG_ONE',
     description: 'DESCRIPTION_ONE',
@@ -13,7 +13,7 @@ const blog_1: BlogDbType = {
 } as const;
 
 const blog_2: BlogDbType = {
-    _id: ObjectId,
+    _id: new ObjectId(),
     id: String(Math.floor(new Date().getTime())),
     name: 'BLOG_TWO',
     description: 'DESCRIPTION_TWO',

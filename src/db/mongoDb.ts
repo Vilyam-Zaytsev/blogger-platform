@@ -6,6 +6,14 @@ import {PostDbType} from "../types/db-types/post-db-type";
 let blogsCollection: Collection<BlogDbType>;
 let postsCollection: Collection<PostDbType>;
 
+const setBlogsCollection = (collection: Collection<BlogDbType>) => {
+    blogsCollection = collection;
+};
+
+const setPostsCollection = (collection: Collection<PostDbType>) => {
+    postsCollection = collection;
+};
+
 async function runDb(url: string) {
     let client = new MongoClient(url);
     let db = client.db(SETTINGS.DB_NAME);
@@ -29,6 +37,8 @@ async function runDb(url: string) {
 }
 
 export {
+    setBlogsCollection,
+    setPostsCollection,
     blogsCollection,
     postsCollection,
     runDb

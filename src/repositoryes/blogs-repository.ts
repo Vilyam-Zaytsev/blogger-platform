@@ -4,7 +4,7 @@ import {blogsCollection} from "../db/mongoDb";
 import {ObjectId} from "mongodb";
 
 const blogsRepository = {
-    async findBlogs(): Promise<BlogViewModel[]> {
+    async findBlogs(): Promise<BlogViewModel[] | []> {
         try {
             return await blogsCollection
                 .find({}, {
