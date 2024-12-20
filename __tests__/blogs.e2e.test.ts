@@ -1,13 +1,40 @@
 import {clearDb, console_log, encodingAdminDataInBase64, generateRandomString, req} from './helpers/test-helpers';
 import {SETTINGS} from "../src/settings";
-import {blog_1} from "./helpers/datasets-for-tests";
-import {db} from "../src/db/db";
+import {blog_1, blog_2, dbTest_2} from "./helpers/datasets-for-tests";
 import {blogsTestManager} from "./helpers/blogs-test-manager";
+import {MongoMemoryServer} from "mongodb-memory-server";
+import {MongoClient} from "mongodb";
+import {blogsCollection, setBlogsCollection} from "../src/db/mongoDb";
+import {BlogDbType} from "../src/types/db-types/blog-db-type";
+
+let mongoServer: MongoMemoryServer;
+let client: MongoClient;
+
+beforeAll(async () => {
+    mongoServer = await MongoMemoryServer.create();
+    const uri = mongoServer.getUri();
+
+    client = new MongoClient(uri);
+    await client.connect();
+
+    const db = client.db();
+    setBlogsCollection(db.collection<BlogDbType>('blogs'));
+});
+
+afterAll(async () => {
+    await client.close();
+    await mongoServer.stop();
+});
+
+beforeEach(async () => {
+    await blogsCollection.deleteMany({});
+});
+
 
 describe('/blogs', () => {
     describe('POST /blogs', () => {
         it('should create a new blog, the user is authenticated.', async () => {
-            const res = await blogsTestManager.createBlog(
+            const res_1 = await blogsTestManager.createBlog(
                 {
                     name: blog_1.name,
                     description: blog_1.description,
@@ -19,20 +46,24 @@ describe('/blogs', () => {
                 )
             );
 
-            expect(res.body).toEqual({
+            expect(res_1.body).toEqual({
                 id: expect.any(String),
                 name: blog_1.name,
                 description: blog_1.description,
-                websiteUrl: blog_1.websiteUrl
+                websiteUrl: blog_1.websiteUrl,
+                isMembership: blog_1.isMembership,
+                createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
             });
 
-            expect(res.body).toEqual(db.blogs[0]);
+            const res_2 = await req
+                .get(`${SETTINGS.PATH.BLOGS}/${res_1.body.id}`)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-            console_log(res.body, res.status, 'Test 1: post(/blogs)\n');
+            expect(res_1.body).toEqual(res_2.body);
+
+            console_log(res_1.body, res_1.status, 'Test 1: post(/blogs)\n');
         });
         it('should not create a blog if the user is not authenticated.', async () => {
-            clearDb();
-
             const res = await blogsTestManager.createBlog(
                 {
                     name: blog_1.name,
@@ -43,13 +74,13 @@ describe('/blogs', () => {
                 SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401
             );
 
-            expect(db.blogs.length).toEqual(0);
+            await req
+                .get(SETTINGS.PATH.BLOGS)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
 
             console_log(res.body, res.status, 'Test 2: post(/blogs)\n');
         });
         it('should not create a blog if the data in the request body is incorrect.', async () => {
-            clearDb();
-
             const res = await blogsTestManager.createBlog(
                 {},
                 encodingAdminDataInBase64(
@@ -59,7 +90,10 @@ describe('/blogs', () => {
                 SETTINGS.HTTP_STATUSES.BAD_REQUEST_400
             );
 
-            expect(db.blogs.length).toEqual(0);
+            await req
+                .get(SETTINGS.PATH.BLOGS)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
+
             expect(res.body).toEqual(
                 {
                     errorsMessages: [
@@ -82,8 +116,6 @@ describe('/blogs', () => {
             console_log(res.body, res.status, 'Test 3: post(/blogs)\n');
         });
         it('should not create a blog if the data in the request body is incorrect.', async () => {
-            clearDb();
-
             const res = await blogsTestManager.createBlog(
                 {
                     name: '   ',
@@ -97,7 +129,10 @@ describe('/blogs', () => {
                 SETTINGS.HTTP_STATUSES.BAD_REQUEST_400
             );
 
-            expect(db.blogs.length).toEqual(0);
+            await req
+                .get(SETTINGS.PATH.BLOGS)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
+
             expect(res.body).toEqual(
                 {
                     errorsMessages: [
@@ -120,8 +155,6 @@ describe('/blogs', () => {
             console_log(res.body, res.status, 'Test 4: post(/blogs)\n');
         });
         it('should not create a blog if the data in the request body is incorrect.', async () => {
-            clearDb();
-
             const res = await blogsTestManager.createBlog(
                 {
                     name: generateRandomString(16),
@@ -135,7 +168,10 @@ describe('/blogs', () => {
                 SETTINGS.HTTP_STATUSES.BAD_REQUEST_400
             );
 
-            expect(db.blogs.length).toEqual(0);
+            await req
+                .get(SETTINGS.PATH.BLOGS)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
+
             expect(res.body).toEqual(
                 {
                     errorsMessages: [
@@ -158,8 +194,6 @@ describe('/blogs', () => {
             console_log(res.body, res.status, 'Test 5: post(/blogs)\n');
         });
         it('should not create a blog if the data in the request body is incorrect.', async () => {
-            clearDb();
-
             const res = await blogsTestManager.createBlog(
                 {
                     name: 123,
@@ -173,7 +207,10 @@ describe('/blogs', () => {
                 SETTINGS.HTTP_STATUSES.BAD_REQUEST_400
             );
 
-            expect(db.blogs.length).toEqual(0);
+            await req
+                .get(SETTINGS.PATH.BLOGS)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
+
             expect(res.body).toEqual(
                 {
                     errorsMessages: [
@@ -196,8 +233,6 @@ describe('/blogs', () => {
             console_log(res.body, res.status, 'Test 6: post(/blogs)\n');
         });
         it('should not create a blog if the data in the request body is incorrect.', async () => {
-            clearDb();
-
             const res = await blogsTestManager.createBlog(
                 {
                     name: blog_1.name,
@@ -211,7 +246,10 @@ describe('/blogs', () => {
                 SETTINGS.HTTP_STATUSES.BAD_REQUEST_400
             );
 
-            expect(db.blogs.length).toEqual(0);
+            await req
+                .get(SETTINGS.PATH.BLOGS)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
+
             expect(res.body).toEqual(
                 {
                     errorsMessages: [
@@ -252,14 +290,12 @@ describe('/blogs', () => {
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(res_2.body[0]).toEqual(res_1.body);
-            expect(db.blogs.length).toEqual(1);
+            expect(res_2.body.length).toEqual(1);
 
 
             console_log(res_2.body, res_2.status, 'Test 2: get(/blogs)\n');
         });
         it('should return an array with a two blogs.', async () => {
-            clearDb();
-
             const res_1 = await blogsTestManager.createBlog(
                 {
                     name: blog_1.name,
@@ -273,9 +309,9 @@ describe('/blogs', () => {
             );
             const res_2 = await blogsTestManager.createBlog(
                 {
-                    name: blog_1.name,
-                    description: blog_1.description,
-                    websiteUrl: blog_1.websiteUrl
+                    name: blog_2.name,
+                    description: blog_2.description,
+                    websiteUrl: blog_2.websiteUrl
                 },
                 encodingAdminDataInBase64(
                     SETTINGS.ADMIN_DATA.LOGIN,
@@ -289,12 +325,60 @@ describe('/blogs', () => {
 
             expect(res_3.body[0]).toEqual(res_1.body);
             expect(res_3.body[1]).toEqual(res_2.body);
-            expect(db.blogs.length).toEqual(2);
-
+            expect(res_3.body.length).toEqual(2);
 
             console_log(res_3.body, res_3.status, 'Test 3: get(/blogs)\n');
         });
+        it('should return blog found by id.', async () => {
+            const res_1 = await blogsTestManager.createBlog(
+                {
+                    name: blog_1.name,
+                    description: blog_1.description,
+                    websiteUrl: blog_1.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+            const res_2 = await req
+                .get(`${SETTINGS.PATH.BLOGS}/${res_1.body.id}`)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(res_1.body).toEqual(res_2.body);
+
+            console_log(res_2.body, res_2.status, 'Test 3: get(/blogs)\n');
+        });
+        it('should return error 404 not found.', async () => {
+            const res_1 = await blogsTestManager.createBlog(
+                {
+                    name: blog_1.name,
+                    description: blog_1.description,
+                    websiteUrl: blog_1.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+            const res_2 = await req
+                .get(`${SETTINGS.PATH.BLOGS}/${(res_1.body.id + 1)}`)
+                .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
+
+            const res_3 = await req
+                .get(`${SETTINGS.PATH.BLOGS}/${res_1.body.id}`)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(res_1.body).toEqual(res_3.body);
+
+            console_log(res_2.body, res_2.status, 'Test 3: get(/blogs)\n');
+        });
+    });
+    describe('PUT /blogs', () => {
     })
-
-
 });
+
+
+
+
+

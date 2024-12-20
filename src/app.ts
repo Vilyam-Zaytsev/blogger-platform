@@ -1,7 +1,7 @@
 import express, {Response, Request} from 'express';
 import {SETTINGS} from "./settings";
 import {blogsRouter} from "./routes/blogsRouter";
-import {postsRouter} from "./routes/postsRouter";
+// import {postsRouter} from "./routes/postsRouter";
 import {testsRouter} from "./routes/testsRouter";
 
 
@@ -15,7 +15,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use(SETTINGS.PATH.BLOGS, blogsRouter);
-app.use(SETTINGS.PATH.POSTS, postsRouter);
+// app.use(SETTINGS.PATH.POSTS, postsRouter);
 app.use(SETTINGS.PATH.TESTS, testsRouter);
 
 export {app};
