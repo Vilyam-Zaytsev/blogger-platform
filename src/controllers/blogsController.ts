@@ -14,6 +14,8 @@ const blogsController = {
             res
                 .status(SETTINGS.HTTP_STATUSES.OK_200)
                 .json(blogs);
+
+            return;
         } catch (error) {
             console.error(error);
         }
@@ -71,12 +73,14 @@ const blogsController = {
             if (!updatedBlog) {
                 res
                     .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                    .end();
+                    .json({});
+
+                return;
             }
 
             res
                 .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
-                .end();
+                .json({});
         } catch (error) {
             console.error(error);
         }
@@ -86,17 +90,19 @@ const blogsController = {
         req: RequestWithParams<URIParamsBlogIdModel>,
         res: Response) => {
         try {
-            const isDeletedBlog: boolean = await blogsRepository.deleteBlogById(req.params.id);
+            const isDeletedBlog: boolean = await blogsRepository.deleteBlog(req.params.id);
 
             if (!isDeletedBlog) {
                 res
                     .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                    .end();
+                    .json({});
+
+                return;
             }
 
             res
                 .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
-                .end();
+                .json({});
         } catch (error) {
             console.error(error);
         }

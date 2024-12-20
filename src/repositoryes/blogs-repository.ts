@@ -71,7 +71,7 @@ const blogsRepository = {
             throw new Error('Failed to update a blog')
         }
     },
-    async deleteBlogById(blogId: string): Promise<boolean> {
+    async deleteBlog(blogId: string): Promise<boolean> {
         try {
             const result = await blogsCollection.deleteOne({id: blogId});
 
@@ -91,10 +91,14 @@ const blogsRepository = {
             isMembership: blog.isMembership
         };
     },
-    // async findBlogToDb(blogId: string): BlogDbType | undefined {
-    //     return db.blogs
-    //         .find(b => b.id === blogId);
-    // }
+    async findBlogToDb(blogId: string): Promise<BlogDbType | null> {
+        try {
+            return await blogsCollection.findOne({id: blogId});
+        } catch (error) {
+            console.error(error);
+            throw new Error('Failed to fetch blog');
+        }
+    }
 };
 
 export {blogsRepository};
