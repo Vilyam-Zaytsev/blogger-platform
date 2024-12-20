@@ -21,7 +21,7 @@ const SETTINGS = {
         UNAUTHORIZED_401: 401,
         NOT_FOUND_404: 404
     },
-    MONGO_URL: process.env.MONGO_URL,
+    MONGO_URL: process.env.MONGO_URL || 'mongodb://localhost:27017',
     DB_NAME: process.env.DB_NAME
 };
 
