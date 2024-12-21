@@ -58,6 +58,8 @@ const dbTest_2: DBType = {
 export {
     blog_1,
     blog_2,
+    post_1,
+    post_2,
     dbTest_1,
     dbTest_2
 }
