@@ -18,7 +18,7 @@ async function runDb(url: string) {
     let client = new MongoClient(url);
     let db = client.db(SETTINGS.DB_NAME);
 
-    blogsCollection = db.collection('blogs');
+    blogsCollection = db.collection<BlogDbType>('blogs');
     postsCollection = db.collection<PostDbType>('posts');
     try {
         await client.connect();

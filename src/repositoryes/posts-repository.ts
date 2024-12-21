@@ -54,6 +54,10 @@ const postsRepository = {
                 blogName: (await blogsRepository.findBlogToDb(postData.blogId))!.name,
                 createdAt: new Date().toISOString(),
             }
+
+            await postsCollection.insertOne(newPost);
+
+            return this.mapToViewModel(newPost);
         } catch (error) {
             console.error(error);
             throw  new Error('Failed to create a post');

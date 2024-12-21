@@ -22,7 +22,7 @@ const SETTINGS = {
         NOT_FOUND_404: 404
     },
     MONGO_URL: process.env.MONGO_URL || 'mongodb://localhost:27017',
-    DB_NAME: process.env.DB_NAME
+    DB_NAME: process.env.DB_NAME || 'blogger-platform-dev-local'
 };
 
 export {SETTINGS};
