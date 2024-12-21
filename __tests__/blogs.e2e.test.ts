@@ -1,4 +1,4 @@
-import {clearDb, console_log, encodingAdminDataInBase64, generateRandomString, req} from './helpers/test-helpers';
+import {console_log, encodingAdminDataInBase64, generateRandomString, req} from './helpers/test-helpers';
 import {SETTINGS} from "../src/settings";
 import {blog_1, blog_2, dbTest_2} from "./helpers/datasets-for-tests";
 import {blogsTestManager} from "./helpers/blogs-test-manager";
@@ -903,7 +903,7 @@ describe('/blogs', () => {
 
             expect(res_1.body).toEqual(res_3.body);
 
-            console_log(res_2.body, res_2.status, 'Test 2: post(/blogs)\n');
+            console_log(res_2.body, res_2.status, 'Test 3: post(/blogs)\n');
         });
-    })
+    });
 });
