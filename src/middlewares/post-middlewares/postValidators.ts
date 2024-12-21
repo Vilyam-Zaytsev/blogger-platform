@@ -27,8 +27,10 @@ const postBlogIdInputValidator =
         .trim()
         .custom(async (blogId) => {
             const blog: BlogViewModel | null = await blogsRepository.findBlog(blogId);
-
-            return !!blog;
+            if (!blog) {
+                throw new Error('A blog with such an ID does not exist.');
+            }
+            return true;
         }).withMessage('A blog with such an ID does not exist.');
 
 export {
