@@ -1,18 +1,23 @@
 import {Request, Response} from "express";
 import {db} from "../db/db";
 import {SETTINGS} from "../settings";
+import {blogsCollection, postsCollection} from "../db/mongoDb";
 
 const testsController = {
-    deleteAllData: (
+    deleteAllData: async (
         req: Request,
         res: Response) => {
-            db.blogs = [];
-            db.posts = [];
+        try {
+            const resultBlogsDeletion = await blogsCollection.deleteMany();
+            const resultPostsDeletion = await postsCollection.deleteMany();
 
             res
                 .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
-                .json({'message': 'All data has been deleted.'});
+                .json({});
+        } catch (error) {
+            console.error(error);
         }
+    }
 };
 
 export {testsController};
