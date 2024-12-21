@@ -1,5 +1,4 @@
 import {Request, Response} from "express";
-import {db} from "../db/db";
 import {SETTINGS} from "../settings";
 import {blogsCollection, postsCollection} from "../db/mongoDb";
 
