@@ -24,7 +24,7 @@ const blogsController = {
         req: RequestWithParams<URIParamsBlogIdModel>,
         res: Response) => {
         try {
-            const foundBlog: BlogViewModel | null = await blogsRepository.findBlogById(req.params.id);
+            const foundBlog: BlogViewModel | null = await blogsRepository.findBlog(req.params.id);
 
             if (!foundBlog) {
                 res

@@ -24,7 +24,7 @@ const blogsRepository = {
             throw new Error('Failed to fetch blogs');
         }
     },
-    async findBlogById(blogId: string): Promise<BlogViewModel | null> {
+    async findBlog(blogId: string): Promise<BlogViewModel | null> {
         try {
             return await blogsCollection
                 .findOne({id: blogId}, {
