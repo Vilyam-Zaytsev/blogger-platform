@@ -1,24 +1,14 @@
+import {blogsRepository} from "../repositoryes/blogs-repository";
 import {BlogInputModel, BlogViewModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
-import {blogsCollection} from "../db/mongoDb";
 import {InsertOneResult, ObjectId} from "mongodb";
+import {blogsCollection} from "../db/mongoDb";
 
-const blogsRepository = {
+
+const blogsService = {
     async findBlogs(): Promise<BlogViewModel[] | []> {
         try {
-            return await blogsCollection
-                .find({}, {
-                    projection: {
-                        _id: 0,
-                        id: 1,
-                        name: 1,
-                        description: 1,
-                        websiteUrl: 1,
-                        createdAt: 1,
-                        isMembership: 1,
-                    }
-                })
-                .toArray() as BlogViewModel[];
+            return await blogsRepository.findBlogs();
         } catch (error) {
             console.error(error);
             throw new Error('Failed to fetch blogs');
@@ -26,29 +16,27 @@ const blogsRepository = {
     },
     async findBlog(blogId: string): Promise<BlogViewModel | null> {
         try {
-            return await blogsCollection
-                .findOne({id: blogId}, {
-                    projection: {
-                        _id: 0,
-                        id: 1,
-                        name: 1,
-                        description: 1,
-                        websiteUrl: 1,
-                        createdAt: 1,
-                        isMembership: 1,
-                    }
-                });
+            return await blogsRepository.findBlog(blogId)
         } catch (error) {
             console.error(error);
             throw new Error('Failed to fetch blog');
         }
     },
-    async createBlog(newBlog: BlogDbType){
+    async createBlog(blogData: BlogInputModel): Promise<BlogViewModel> {
         try {
-            return  await blogsCollection.insertOne(newBlog);
+            const newBlog: BlogDbType = {
+                _id: new ObjectId(),
+                id: String(Math.floor(Date.now() + Math.random())),
+                ...blogData,
+                createdAt: new Date().toISOString(),
+                isMembership: false,
+            };
+
+            const result= await blogsRepository.createBlog(newBlog);
+
+            if (result.acknowledged) return this.mapToViewModel(newBlog);
         } catch (error) {
             console.error(error);
-
             throw new Error('Failed to create a blog');
         }
     },
@@ -72,6 +60,7 @@ const blogsRepository = {
             throw new Error('Failed to delete a blog')
         }
     },
+
     async findBlogToDb(blogId: string): Promise<BlogDbType | null> {
         try {
             return await blogsCollection.findOne({id: blogId});
@@ -82,4 +71,4 @@ const blogsRepository = {
     }
 };
 
-export {blogsRepository};
+export {blogsService};
