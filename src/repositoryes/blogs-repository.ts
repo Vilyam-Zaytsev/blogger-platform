@@ -71,6 +71,14 @@ const blogsRepository = {
             throw new Error('Failed to delete a blog')
         }
     },
+    // async findBlogToDb(blogId: string): Promise<BlogDbType | null> {
+    //     try {
+    //         return await blogsCollection.findOne({id: blogId});
+    //     } catch (error) {
+    //         console.error(error);
+    //         throw new Error('Failed to fetch blog');
+    //     }
+    // }
 };
 
 export {blogsRepository};

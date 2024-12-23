@@ -1,6 +1,7 @@
 import {PostDbType} from "../types/db-types/post-db-type";
 import {PostInputModel, PostViewModel} from "../types/input-output-types/posts-types";
-import {blogsRepository} from "./blogs-repository";
+// import {blogsRepository} from "./blogs-repository";
+import {blogsService} from '../services/blogs-service';
 import {postsCollection} from "../db/mongoDb";
 import {ObjectId} from "mongodb";
 
@@ -51,7 +52,7 @@ const postsRepository = {
                 _id: new ObjectId(),
                 id: String(Math.floor(Date.now() + Math.random())),
                     ...postData,
-                blogName: (await blogsRepository.findBlogToDb(postData.blogId))!.name,
+                blogName: (await blogsService.findBlogToDb(postData.blogId))!.name,
                 createdAt: new Date().toISOString(),
             }
 
