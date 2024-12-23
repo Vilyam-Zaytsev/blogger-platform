@@ -1,7 +1,6 @@
 import {BlogInputModel, BlogViewModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {blogsCollection} from "../db/mongoDb";
-import {InsertOneResult, ObjectId} from "mongodb";
 
 const blogsRepository = {
     async findBlogs(): Promise<BlogViewModel[] | []> {
@@ -72,14 +71,6 @@ const blogsRepository = {
             throw new Error('Failed to delete a blog')
         }
     },
-    async findBlogToDb(blogId: string): Promise<BlogDbType | null> {
-        try {
-            return await blogsCollection.findOne({id: blogId});
-        } catch (error) {
-            console.error(error);
-            throw new Error('Failed to fetch blog');
-        }
-    }
 };
 
 export {blogsRepository};

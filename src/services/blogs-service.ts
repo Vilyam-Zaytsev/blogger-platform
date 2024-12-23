@@ -1,7 +1,7 @@
 import {blogsRepository} from "../repositoryes/blogs-repository";
 import {BlogInputModel, BlogViewModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
-import {InsertOneResult, ObjectId} from "mongodb";
+import {ObjectId} from "mongodb";
 import {blogsCollection} from "../db/mongoDb";
 
 
@@ -32,9 +32,9 @@ const blogsService = {
                 isMembership: false,
             };
 
-            const result= await blogsRepository.createBlog(newBlog);
+            const result = await blogsRepository.createBlog(newBlog);
 
-            if (result.acknowledged) return this.mapToViewModel(newBlog);
+            return this.mapToViewModel(newBlog);
         } catch (error) {
             console.error(error);
             throw new Error('Failed to create a blog');
@@ -42,9 +42,7 @@ const blogsService = {
     },
     async updateBlog(blogId: string, blogData: BlogInputModel): Promise<boolean> {
         try {
-            const result = await blogsCollection.updateOne({id: blogId}, {$set: {...blogData}});
-
-            return result.matchedCount === 1;
+            return await blogsRepository.updateBlog(blogId, blogData);
         } catch (error) {
             console.error(error);
             throw new Error('Failed to update a blog')
@@ -52,15 +50,22 @@ const blogsService = {
     },
     async deleteBlog(blogId: string): Promise<boolean> {
         try {
-            const result = await blogsCollection.deleteOne({id: blogId});
-
-            return result.deletedCount === 1;
+            return await blogsRepository.deleteBlog(blogId);
         } catch (error) {
             console.error(error);
             throw new Error('Failed to delete a blog')
         }
     },
-
+    mapToViewModel(blog: BlogDbType): BlogViewModel {
+        return {
+            id: blog.id,
+            name: blog.name,
+            description: blog.description,
+            websiteUrl: blog.websiteUrl,
+            createdAt: blog.createdAt,
+            isMembership: blog.isMembership
+        };
+    },
     async findBlogToDb(blogId: string): Promise<BlogDbType | null> {
         try {
             return await blogsCollection.findOne({id: blogId});
