@@ -1,15 +1,15 @@
 import {Request, Response} from "express";
 import {BlogInputModel, BlogViewModel, URIParamsBlogIdModel} from "../types/input-output-types/blogs-types";
-import {blogsRepository} from "../repositoryes/blogs-repository";
 import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/input-output-types/request-types";
 import {SETTINGS} from "../settings";
+import {blogsService} from "../services/blogs-service";
 
 const blogsController = {
     getBlogs: async (
         req: Request,
         res: Response<BlogViewModel[]>) => {
         try {
-            const blogs: BlogViewModel[] = await blogsRepository.findBlogs();
+            const blogs: BlogViewModel[] = await blogsService.findBlogs();
 
             res
                 .status(SETTINGS.HTTP_STATUSES.OK_200)
@@ -24,7 +24,7 @@ const blogsController = {
         req: RequestWithParams<URIParamsBlogIdModel>,
         res: Response) => {
         try {
-            const foundBlog: BlogViewModel | null = await blogsRepository.findBlog(req.params.id);
+            const foundBlog: BlogViewModel | null = await blogsService.findBlog(req.params.id);
 
             if (!foundBlog) {
                 res
@@ -50,7 +50,7 @@ const blogsController = {
                 description: req.body.description,
                 websiteUrl: req.body.websiteUrl
             };
-            const createdBlog: BlogViewModel = await blogsRepository.createBlog(dataCreatingBlog);
+            const createdBlog: BlogViewModel = await blogsService.createBlog(dataCreatingBlog);
 
             res
                 .status(SETTINGS.HTTP_STATUSES.CREATED_201)
@@ -68,7 +68,7 @@ const blogsController = {
                 description: req.body.description,
                 websiteUrl: req.body.websiteUrl
             };
-            const updatedBlog: boolean = await blogsRepository.updateBlog(req.params.id, dataUpdatingBlog);
+            const updatedBlog: boolean = await blogsService.updateBlog(req.params.id, dataUpdatingBlog);
 
             if (!updatedBlog) {
                 res
@@ -90,7 +90,7 @@ const blogsController = {
         req: RequestWithParams<URIParamsBlogIdModel>,
         res: Response) => {
         try {
-            const isDeletedBlog: boolean = await blogsRepository.deleteBlog(req.params.id);
+            const isDeletedBlog: boolean = await blogsService.deleteBlog(req.params.id);
 
             if (!isDeletedBlog) {
                 res
