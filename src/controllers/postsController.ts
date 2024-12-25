@@ -1,28 +1,28 @@
 import {Request, Response} from "express";
-import {PostInputModel, PostViewModel} from "../types/input-output-types/posts-types";
+import {PostInputModel, PostViewModel, URIParamsPostIdModel} from "../types/input-output-types/posts-types";
 import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/input-output-types/request-types";
 import {postsRepository} from "../repositoryes/posts-repository";
 import {SETTINGS} from "../settings";
+import {qPostsRepository} from "../repositoryes/qPosts-repository";
+import {WithId} from "mongodb";
+import {PostDbType} from "../types/db-types/post-db-type";
 
 const postsController = {
     getPosts: async (
         req: Request,
         res: Response<PostViewModel[]>) => {
-        try {
-            const posts: PostViewModel[] = await postsRepository.findPosts();
+            const posts: PostViewModel[] = await qPostsRepository
+                .findPostsAndMapToViewModel();
 
             res
                 .status(SETTINGS.HTTP_STATUSES.OK_200)
                 .json(posts);
-        } catch (error) {
-            console.error(error);
-        }
     },
     getPost: async (
-        req: RequestWithParams<{ id: string }>,
-        res: Response) => {
-        try {
-            const foundPost: PostViewModel | null = await postsRepository.findPostById(req.params.id);
+        req: RequestWithParams<URIParamsPostIdModel>,
+        res: Response<PostViewModel | {}>) => {
+            const foundPost: WithId<PostDbType> | null = await qPostsRepository
+                .findPost(req.params.id);
 
             if (!foundPost) {
                 res
@@ -32,15 +32,12 @@ const postsController = {
                 return;
             }
 
+            const post: PostViewModel = qPostsRepository
+                .mapToViewModel(foundPost);
+
             res
                 .status(SETTINGS.HTTP_STATUSES.OK_200)
-                .json(foundPost);
-
-            return;
-        } catch (error) {
-            console.error(error);
-        }
-
+                .json(post);
     },
     createPost: async (
         req: RequestWithBody<PostInputModel>,

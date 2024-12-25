@@ -1,8 +1,4 @@
-import {ObjectId} from "mongodb";
-
 type PostDbType = {
-    _id: ObjectId,
-    id: string,
     title: string,
     shortDescription: string,
     content: string,
