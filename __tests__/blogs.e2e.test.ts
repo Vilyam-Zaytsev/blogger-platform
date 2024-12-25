@@ -3,7 +3,7 @@ import {SETTINGS} from "../src/settings";
 import {blog_1, blog_2} from "./helpers/datasets-for-tests";
 import {blogsTestManager} from "./helpers/blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
-import {MongoClient} from "mongodb";
+import {MongoClient, ObjectId} from "mongodb";
 import {blogsCollection, setBlogsCollection} from "../src/db/mongoDb";
 import {BlogDbType} from "../src/types/db-types/blog-db-type";
 
@@ -362,7 +362,8 @@ describe('/blogs', () => {
                 )
             );
             const res_2 = await req
-                .get(`${SETTINGS.PATH.BLOGS}/${(res_1.body.id + 1)}`)
+                .get(`${SETTINGS.PATH.BLOGS}/${new ObjectId()}`)
+                // .get(`${SETTINGS.PATH.BLOGS}/${(res_1.body.id + 1)}`)
                 .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
             const res_3 = await req
@@ -387,6 +388,8 @@ describe('/blogs', () => {
                     SETTINGS.ADMIN_DATA.PASSWORD
                 ),
             );
+
+            console.log(res_1.body)
 
             expect(res_1.body).toEqual({
                 id: expect.any(String),
@@ -888,7 +891,7 @@ describe('/blogs', () => {
             });
 
             const res_2 = await req
-                .delete(`${SETTINGS.PATH.BLOGS}/${res_1.body.id}1`)
+                .delete(`${SETTINGS.PATH.BLOGS}/${new ObjectId()}`)
                 .set({
                     'Authorization': encodingAdminDataInBase64(
                         SETTINGS.ADMIN_DATA.LOGIN,

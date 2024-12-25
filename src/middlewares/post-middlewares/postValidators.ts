@@ -1,6 +1,6 @@
 import {body} from "express-validator";
-import {blogsRepository} from "../../repositoryes/blogs-repository";
-import {BlogViewModel} from "../../types/input-output-types/blogs-types";
+import {qBlogsRepository} from "../../repositoryes/qBlogs-repository";
+import {BlogDbType} from "../../types/db-types/blog-db-type";
 
 const postTitleInputValidator =
     body('title')
@@ -26,7 +26,7 @@ const postBlogIdInputValidator =
         .isString().withMessage('The "blogId" field must be of the string type.')
         .trim()
         .custom(async (blogId) => {
-            const blog: BlogViewModel | null = await blogsRepository.findBlog(blogId);
+            const blog: BlogDbType | null = await qBlogsRepository.findBlog(blogId);
             if (!blog) {
                 throw new Error('A blog with such an ID does not exist.');
             }
