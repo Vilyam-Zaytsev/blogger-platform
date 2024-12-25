@@ -11,20 +11,18 @@ const blogsController = {
     getBlogs: async (
         req: Request,
         res: Response<BlogViewModel[]>) => {
-        const blogs: WithId<BlogDbType>[] = await qBlogsRepository.findBlogs();
-        const blogsViewModel: BlogViewModel[] = blogs.map(b => qBlogsRepository.mapToViewModel(b));
+        const blogs: BlogViewModel[] = await qBlogsRepository.findBlogsAndMapToViewModel();
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(blogsViewModel);
+            .json(blogs);
 
         return;
     },
     getBlog: async (
         req: RequestWithParams<URIParamsBlogIdModel>,
-        res: Response) => {
-        try {
-            const foundBlog: BlogViewModel | null = await blogsService.findBlog(req.params.id);
+        res: Response<BlogViewModel | {}>) => {
+            const foundBlog: WithId<BlogDbType> | null = await qBlogsRepository.findBlog(req.params.id);
 
             if (!foundBlog) {
                 res
@@ -34,12 +32,12 @@ const blogsController = {
                 return;
             }
 
+            const blog: BlogViewModel = qBlogsRepository
+                .mapToViewModel(foundBlog);
+
             res
                 .status(SETTINGS.HTTP_STATUSES.OK_200)
-                .json(foundBlog);
-        } catch (error) {
-            console.error(error);
-        }
+                .json(blog);
     },
     createBlog: async (
         req: RequestWithBody<BlogInputModel>,
@@ -49,24 +47,25 @@ const blogsController = {
             description: req.body.description,
             websiteUrl: req.body.websiteUrl
         };
-        const blogId: InsertOneResult = await blogsService.createBlog(dataCreatingBlog);
+        const result: InsertOneResult = await blogsService
+            .createBlog(dataCreatingBlog);
 
-        const createdBlog: BlogViewModel = await qBlogsRepository.findAndMapToViewModel(blogId);
+        const blog: BlogViewModel = await qBlogsRepository.findBlogAndMapToViewModel(result.insertedId);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
-            .json(createdBlog);
+            .json(blog);
     },
     updateBlog: async (
         req: RequestWithParamsAndBody<URIParamsBlogIdModel, BlogInputModel>,
         res: Response) => {
-        try {
-            const dataUpdatingBlog = {
+            const data = {
                 name: req.body.name,
                 description: req.body.description,
                 websiteUrl: req.body.websiteUrl
             };
-            const updatedBlog: boolean = await blogsService.updateBlog(req.params.id, dataUpdatingBlog);
+            const updatedBlog: boolean = await blogsService
+                .updateBlog(req.params.id, data);
 
             if (!updatedBlog) {
                 res
@@ -79,16 +78,12 @@ const blogsController = {
             res
                 .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
                 .json({});
-        } catch (error) {
-            console.error(error);
-        }
-
     },
     deleteBlog: async (
         req: RequestWithParams<URIParamsBlogIdModel>,
         res: Response) => {
-        try {
-            const isDeletedBlog: boolean = await blogsService.deleteBlog(req.params.id);
+            const isDeletedBlog: boolean = await blogsService
+                .deleteBlog(req.params.id);
 
             if (!isDeletedBlog) {
                 res
@@ -101,9 +96,6 @@ const blogsController = {
             res
                 .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
                 .json({});
-        } catch (error) {
-            console.error(error);
-        }
     },
 };
 
