@@ -3,22 +3,22 @@ import {BlogInputModel, BlogViewModel, URIParamsBlogIdModel} from "../types/inpu
 import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/input-output-types/request-types";
 import {SETTINGS} from "../settings";
 import {blogsService} from "../services/blogs-service";
+import {InsertOneResult, WithId} from "mongodb";
+import {qBlogsRepository} from "../repositoryes/qBlogs-repository";
+import {BlogDbType} from "../types/db-types/blog-db-type";
 
 const blogsController = {
     getBlogs: async (
         req: Request,
         res: Response<BlogViewModel[]>) => {
-        try {
-            const blogs: BlogViewModel[] = await blogsService.findBlogs();
+        const blogs: WithId<BlogDbType>[] = await qBlogsRepository.findBlogs();
+        const blogsViewModel: BlogViewModel[] = blogs.map(b => qBlogsRepository.mapToViewModel(b));
 
-            res
-                .status(SETTINGS.HTTP_STATUSES.OK_200)
-                .json(blogs);
+        res
+            .status(SETTINGS.HTTP_STATUSES.OK_200)
+            .json(blogsViewModel);
 
-            return;
-        } catch (error) {
-            console.error(error);
-        }
+        return;
     },
     getBlog: async (
         req: RequestWithParams<URIParamsBlogIdModel>,
@@ -44,20 +44,18 @@ const blogsController = {
     createBlog: async (
         req: RequestWithBody<BlogInputModel>,
         res: Response<BlogViewModel>) => {
-        try {
-            const dataCreatingBlog = {
-                name: req.body.name,
-                description: req.body.description,
-                websiteUrl: req.body.websiteUrl
-            };
-            const createdBlog: BlogViewModel = await blogsService.createBlog(dataCreatingBlog);
+        const dataCreatingBlog = {
+            name: req.body.name,
+            description: req.body.description,
+            websiteUrl: req.body.websiteUrl
+        };
+        const blogId: InsertOneResult = await blogsService.createBlog(dataCreatingBlog);
 
-            res
-                .status(SETTINGS.HTTP_STATUSES.CREATED_201)
-                .json(createdBlog);
-        } catch (error) {
-            console.error(error);
-        }
+        const createdBlog: BlogViewModel = await qBlogsRepository.findAndMapToViewModel(blogId);
+
+        res
+            .status(SETTINGS.HTTP_STATUSES.CREATED_201)
+            .json(createdBlog);
     },
     updateBlog: async (
         req: RequestWithParamsAndBody<URIParamsBlogIdModel, BlogInputModel>,

@@ -1,7 +1,7 @@
 import {blogsRepository} from "../repositoryes/blogs-repository";
 import {BlogInputModel, BlogViewModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
-import {ObjectId} from "mongodb";
+import {InsertOneResult, ObjectId} from "mongodb";
 import {blogsCollection} from "../db/mongoDb";
 
 
@@ -22,19 +22,17 @@ const blogsService = {
             throw new Error('Failed to fetch blog');
         }
     },
-    async createBlog(blogData: BlogInputModel): Promise<BlogViewModel> {
+    async createBlog(blogData: BlogInputModel): Promise<InsertOneResult> {
         try {
             const newBlog: BlogDbType = {
-                _id: new ObjectId(),
-                id: String(Math.floor(Date.now() + Math.random())),
                 ...blogData,
                 createdAt: new Date().toISOString(),
                 isMembership: false,
             };
 
-            const result = await blogsRepository.createBlog(newBlog);
+            const result: InsertOneResult = await blogsRepository.createBlog(newBlog);
 
-            return this.mapToViewModel(newBlog);
+            return result.insertedId;
         } catch (error) {
             console.error(error);
             throw new Error('Failed to create a blog');
@@ -56,24 +54,7 @@ const blogsService = {
             throw new Error('Failed to delete a blog')
         }
     },
-    mapToViewModel(blog: BlogDbType): BlogViewModel {
-        return {
-            id: blog.id,
-            name: blog.name,
-            description: blog.description,
-            websiteUrl: blog.websiteUrl,
-            createdAt: blog.createdAt,
-            isMembership: blog.isMembership
-        };
-    },
-    async findBlogToDb(blogId: string): Promise<BlogDbType | null> {
-        try {
-            return await blogsCollection.findOne({id: blogId});
-        } catch (error) {
-            console.error(error);
-            throw new Error('Failed to fetch blog');
-        }
-    }
+
 };
 
 export {blogsService};

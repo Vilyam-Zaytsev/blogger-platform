@@ -1,6 +1,7 @@
 import {BlogInputModel, BlogViewModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {blogsCollection} from "../db/mongoDb";
+import {InsertOneResult} from "mongodb";
 
 const blogsRepository = {
     async findBlogs(): Promise<BlogViewModel[] | []> {
@@ -23,26 +24,16 @@ const blogsRepository = {
             throw new Error('Failed to fetch blogs');
         }
     },
-    async findBlog(blogId: string): Promise<BlogViewModel | null> {
+    async findBlog(id: string): Promise<BlogViewModel | null> {
         try {
             return await blogsCollection
-                .findOne({id: blogId}, {
-                    projection: {
-                        _id: 0,
-                        id: 1,
-                        name: 1,
-                        description: 1,
-                        websiteUrl: 1,
-                        createdAt: 1,
-                        isMembership: 1,
-                    }
-                });
+                .findOne({_id: id});
         } catch (error) {
             console.error(error);
             throw new Error('Failed to fetch blog');
         }
     },
-    async createBlog(newBlog: BlogDbType){
+    async createBlog(newBlog: BlogDbType): Promise<InsertOneResult> {
         try {
             return  await blogsCollection.insertOne(newBlog);
         } catch (error) {
