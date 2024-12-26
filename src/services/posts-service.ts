@@ -1,27 +1,28 @@
-import {blogsRepository} from "../repositoryes/blogs-repository";
-import {BlogInputModel} from "../types/input-output-types/blogs-types";
-import {BlogDbType} from "../types/db-types/blog-db-type";
+import {PostDbType} from "../types/db-types/post-db-type";
+import {PostInputModel} from "../types/input-output-types/posts-types";
 import {InsertOneResult} from "mongodb";
+import {qBlogsRepository} from "../repositoryes/qBlogs-repository";
+import {postsRepository} from "../repositoryes/posts-repository";
 
+const postsService = {
+    async createPost(data: PostInputModel): Promise<InsertOneResult> {
+        const newPost: PostDbType = {
+            ...data,
+            blogName: (await qBlogsRepository.findBlog(data.blogId))!.name,
+            createdAt: new Date().toISOString(),
+        }
 
-const blogsService = {
-    async createBlog(blogData: BlogInputModel): Promise<InsertOneResult> {
-            const newBlog: BlogDbType = {
-                ...blogData,
-                createdAt: new Date().toISOString(),
-                isMembership: false,
-            };
-
-            return await blogsRepository
-                .createBlog(newBlog);
+        return await postsRepository
+            .createPost(newPost);
     },
-    async updateBlog(id: string, data: BlogInputModel): Promise<boolean> {
-            return await blogsRepository.updateBlog(id, data);
+    async updatePost(id: string, data: PostInputModel): Promise<boolean> {
+        return await postsRepository
+            .updatePost(id, data);
     },
-    async deleteBlog(id: string): Promise<boolean> {
-            return await blogsRepository.deleteBlog(id);
+    async deletePost(id: string): Promise<boolean> {
+        return await postsRepository
+            .deletePost(id);
     },
-
 };
 
-export {blogsService};
+export {postsService};

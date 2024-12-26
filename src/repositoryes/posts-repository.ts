@@ -1,108 +1,25 @@
 import {PostDbType} from "../types/db-types/post-db-type";
-import {PostInputModel, PostViewModel} from "../types/input-output-types/posts-types";
-// import {blogsRepository} from "./blogs-repository";
+import {PostInputModel} from "../types/input-output-types/posts-types";
 import {postsCollection} from "../db/mongoDb";
-import {ObjectId} from "mongodb";
-import {qBlogsRepository} from "./qBlogs-repository";
+import {InsertOneResult, ObjectId} from "mongodb";
 
 const postsRepository = {
-    async findPosts(): Promise<PostViewModel[] | []> {
-        try {
-            return await postsCollection
-                .find({}, {
-                    projection: {
-                        _id: 0,
-                        id: 1,
-                        title: 1,
-                        shortDescription: 1,
-                        content: 1,
-                        blogId: 1,
-                        blogName: 1,
-                        createdAt: 1
-                    }
-                }).toArray() as PostViewModel[];
-        } catch (error) {
-            console.error(error);
-            throw new Error('Failed to fetch posts');
-        }
+    async createPost(newPost: PostDbType): Promise<InsertOneResult> {
+            return  await postsCollection
+                .insertOne(newPost);
     },
-    async findPostById(postId: string): Promise<PostViewModel | null> {
-        try {
-            return await postsCollection
-                .findOne({id: postId}, {
-                    projection: {
-                        _id: 0,
-                        id: 1,
-                        title: 1,
-                        shortDescription: 1,
-                        content: 1,
-                        blogId: 1,
-                        blogName: 1,
-                        createdAt: 1
-                    }
-                });
-        } catch (error) {
-            console.error(error);
-            throw new Error('Failed to fetch post');
-        }
-    },
-    async createPost(postData: PostInputModel): Promise<PostViewModel> {
-        try {
-            const newPost: PostDbType = {
-                _id: new ObjectId(),
-                id: String(Math.floor(Date.now() + Math.random())),
-                    ...postData,
-                blogName: (await qBlogsRepository.findBlog(postData.blogId))!.name,
-                createdAt: new Date().toISOString(),
-            }
-
-            await postsCollection.insertOne(newPost);
-
-            return this.mapToViewModel(newPost);
-        } catch (error) {
-            console.error(error);
-            throw  new Error('Failed to create a post');
-        }
-    },
-    async updatePost(postId: string, postData: PostInputModel): Promise<boolean> {
-        try {
-            const result = await postsCollection.updateOne({id: postId}, {$set: {...postData}});
+    async updatePost(id: string, data: PostInputModel): Promise<boolean> {
+            const result = await postsCollection
+                .updateOne({_id: new ObjectId(id)}, {$set: {...data}});
 
             return result.matchedCount === 1;
-        } catch (error) {
-            console.error(error);
-            throw new Error('Failed to update a post')
-        }
     },
-    async deletePost(postId: string): Promise<boolean> {
-        try {
-            const result = await postsCollection.deleteOne({id: postId});
+    async deletePost(id: string): Promise<boolean> {
+            const result = await postsCollection
+                .deleteOne({_id: new ObjectId(id)});
 
             return result.deletedCount === 1;
-        } catch (error) {
-            console.error(error);
-            throw new Error('Failed to delete a post');
-        }
     },
-    mapToViewModel(post: PostDbType): PostViewModel {
-        return {
-            id: post.id,
-            title: post.title,
-            shortDescription: post.shortDescription,
-            content: post.content,
-            blogId: post.blogId,
-            blogName: post.blogName,
-            createdAt: post.createdAt
-        };
-    },
-    async findPostToDb(postId: string): Promise< PostDbType | null> {
-        try {
-        return await postsCollection.findOne({id: postId});
-        } catch (error) {
-            console.error(error);
-            throw new Error('Failed to fetch post')
-        }
-    }
 };
 
 export {postsRepository};

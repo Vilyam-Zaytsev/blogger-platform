@@ -1,11 +1,8 @@
 import {PostDbType} from "../types/db-types/post-db-type";
-import {PostInputModel, PostViewModel} from "../types/input-output-types/posts-types";
-// import {blogsRepository} from "./blogs-repository";
-import {blogsCollection, postsCollection} from "../db/mongoDb";
+import {PostViewModel} from "../types/input-output-types/posts-types";
+import {postsCollection} from "../db/mongoDb";
 import {ObjectId, WithId} from "mongodb";
-import {qBlogsRepository} from "./qBlogs-repository";
-import {BlogViewModel} from "../types/input-output-types/blogs-types";
-import {BlogDbType} from "../types/db-types/blog-db-type";
+
 
 const qPostsRepository = {
     async findPosts(): Promise<PostDbType[]> {

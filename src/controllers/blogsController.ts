@@ -16,33 +16,31 @@ const blogsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(blogs);
-
-        return;
     },
     getBlog: async (
         req: RequestWithParams<URIParamsBlogIdModel>,
         res: Response<BlogViewModel | {}>) => {
-            const foundBlog: WithId<BlogDbType> | null = await qBlogsRepository.findBlog(req.params.id);
+        const foundBlog: WithId<BlogDbType> | null = await qBlogsRepository.findBlog(req.params.id);
 
-            if (!foundBlog) {
-                res
-                    .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                    .json({});
-
-                return;
-            }
-
-            const blog: BlogViewModel = qBlogsRepository
-                .mapToViewModel(foundBlog);
-
+        if (!foundBlog) {
             res
-                .status(SETTINGS.HTTP_STATUSES.OK_200)
-                .json(blog);
+                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
+                .json({});
+
+            return;
+        }
+
+        const blog: BlogViewModel = qBlogsRepository
+            .mapToViewModel(foundBlog);
+
+        res
+            .status(SETTINGS.HTTP_STATUSES.OK_200)
+            .json(blog);
     },
     createBlog: async (
         req: RequestWithBody<BlogInputModel>,
         res: Response<BlogViewModel>) => {
-        const dataCreatingBlog = {
+        const dataCreatingBlog: BlogInputModel = {
             name: req.body.name,
             description: req.body.description,
             websiteUrl: req.body.websiteUrl
@@ -59,43 +57,43 @@ const blogsController = {
     updateBlog: async (
         req: RequestWithParamsAndBody<URIParamsBlogIdModel, BlogInputModel>,
         res: Response) => {
-            const data = {
-                name: req.body.name,
-                description: req.body.description,
-                websiteUrl: req.body.websiteUrl
-            };
-            const updatedBlog: boolean = await blogsService
-                .updateBlog(req.params.id, data);
+        const data = {
+            name: req.body.name,
+            description: req.body.description,
+            websiteUrl: req.body.websiteUrl
+        };
+        const updatedBlog: boolean = await blogsService
+            .updateBlog(req.params.id, data);
 
-            if (!updatedBlog) {
-                res
-                    .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                    .json({});
-
-                return;
-            }
-
+        if (!updatedBlog) {
             res
-                .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
+                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
                 .json({});
+
+            return;
+        }
+
+        res
+            .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
+            .json({});
     },
     deleteBlog: async (
         req: RequestWithParams<URIParamsBlogIdModel>,
         res: Response) => {
-            const isDeletedBlog: boolean = await blogsService
-                .deleteBlog(req.params.id);
+        const isDeletedBlog: boolean = await blogsService
+            .deleteBlog(req.params.id);
 
-            if (!isDeletedBlog) {
-                res
-                    .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                    .json({});
-
-                return;
-            }
-
+        if (!isDeletedBlog) {
             res
-                .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
+                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
                 .json({});
+
+            return;
+        }
+
+        res
+            .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
+            .json({});
     },
 };
 
