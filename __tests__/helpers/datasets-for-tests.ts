@@ -19,41 +19,39 @@ const blog_2: BlogDbType = {
     isMembership: false
 } as const;
 
-// const post_1: PostDbType = {
-//     _id: new ObjectId(),
-//     id: String(Math.floor(new Date().getTime())),
-//     title: 'POST_ONE',
-//     shortDescription: 'SHORT_DESCRIPTION_POST_ONE',
-//     content: 'CONTENT_POST_ONE',
-//     // blogId: blog_1._id,
-//     blogName: blog_1.name,
-//     createdAt: new Date().toISOString(),
-// } as const;
-//
-// const post_2: PostDbType = {
-//     _id: new ObjectId(),
-//     id: String(Math.floor(new Date().getTime())),
-//     title: 'POST_TWO',
-//     shortDescription: 'SHORT_DESCRIPTION_POST_TWO',
-//     content: 'CONTENT_POST_TWO',
-//     blogId: blog_2.id,
-//     blogName: blog_2.name,
-//     createdAt: new Date().toISOString(),
-// } as const;
+const post_1: PostDbType = {
+    title: 'POST_ONE',
+    shortDescription: 'SHORT_DESCRIPTION_POST_ONE',
+    content: 'CONTENT_POST_ONE',
+    blogId: '',
+    blogName: blog_1.name,
+    createdAt: new Date().toISOString(),
+} as const;
+
+const post_2: PostDbType = {
+    title: 'POST_TWO',
+    shortDescription: 'SHORT_DESCRIPTION_POST_TWO',
+    content: 'CONTENT_POST_TWO',
+    blogId: '',
+    blogName: blog_2.name,
+    createdAt: new Date().toISOString(),
+} as const;
 
 const dbTest_1: DBType = {
     blogs: [blog_1],
-    posts: []
+    posts: [post_1]
 } as const;
 
 const dbTest_2: DBType = {
     blogs: [blog_1, blog_2],
-    posts: []
+    posts: [post_1, post_2]
 } as const;
 
 export {
     blog_1,
     blog_2,
+    post_1,
+    post_2,
     dbTest_1,
     dbTest_2
 }

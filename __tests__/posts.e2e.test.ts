@@ -3,7 +3,7 @@ import {SETTINGS} from "../src/settings";
 import {blog_1, blog_2, post_1, post_2} from "./helpers/datasets-for-tests";
 import {blogsTestManager} from "./helpers/blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
-import {MongoClient} from "mongodb";
+import {MongoClient, ObjectId} from "mongodb";
 import {blogsCollection, postsCollection, setBlogsCollection, setPostsCollection} from "../src/db/mongoDb";
 import {BlogDbType} from "../src/types/db-types/blog-db-type";
 import {PostDbType} from "../src/types/db-types/post-db-type";
@@ -626,7 +626,7 @@ describe('/posts', () => {
             });
 
             const resGetPost_1 = await req
-                .get(`${SETTINGS.PATH.POSTS}/${resCreatePost.body.id}1`)
+                .get(`${SETTINGS.PATH.POSTS}/${new ObjectId()}`)
                 .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
             const resGetPost_2 = await req
@@ -1325,7 +1325,7 @@ describe('/posts', () => {
             });
 
             const resDeletePost = await req
-                .delete(`${SETTINGS.PATH.POSTS}/${resCreatePost.body.id}1`)
+                .delete(`${SETTINGS.PATH.POSTS}/${new ObjectId()}`)
                 .set({
                     'Authorization': encodingAdminDataInBase64(
                         SETTINGS.ADMIN_DATA.LOGIN,
