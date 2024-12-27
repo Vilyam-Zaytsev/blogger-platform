@@ -2,8 +2,6 @@ import {BlogInputModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {blogsCollection} from "../db/mongoDb";
 import {InsertOneResult, ObjectId, WithId} from "mongodb";
-import {blogsService} from "../services/blogs-service";
-import {blogsController} from "../controllers/blogsController";
 
 const blogsRepository = {
     async findBlogs(

@@ -2,6 +2,7 @@ import {blogsRepository} from "../repositoryes/blogs-repository";
 import {BlogInputModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {InsertOneResult, WithId} from "mongodb";
+import {PaginationResponse} from "../types/input-output-types/pagination-types";
 
 
 const blogsService = {
@@ -11,7 +12,7 @@ const blogsService = {
         sortDirection,
         pageNumber,
         pageSize
-    ){
+    ): Promise<PaginationResponse<BlogDbType>> {
         const blogs: WithId<BlogDbType>[] = await blogsRepository
             .findBlogs(
                 searchNameTerm,

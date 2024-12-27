@@ -8,11 +8,12 @@ import {qBlogsRepository} from "../repositoryes/qBlogs-repository";
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {paginationParams} from "../helpers/pagination-params";
 import {QueryParamsModel} from "../types/input-output-types/query-params-types";
+import {PaginationResponse} from "../types/input-output-types/pagination-types";
 
 const blogsController = {
     getBlogs: async (
         req: Request,
-        res: Response<BlogViewModel[]>) => {
+        res: Response<PaginationResponse<BlogDbType>>) => {
         const {
             searchNameTerm,
             sortBy,
@@ -21,7 +22,7 @@ const blogsController = {
             pageSize
         }: QueryParamsModel = paginationParams(req.query);
 
-        const blogs: BlogViewModel[] = await blogsService
+        const blogs: PaginationResponse<BlogDbType> = await blogsService
             .findBlogs(
                 searchNameTerm,
                 sortBy,
