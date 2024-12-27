@@ -1,10 +1,37 @@
 import {blogsRepository} from "../repositoryes/blogs-repository";
 import {BlogInputModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
-import {InsertOneResult} from "mongodb";
+import {InsertOneResult, WithId} from "mongodb";
 
 
 const blogsService = {
+    async findBlogs(
+        searchNameTerm,
+        sortBy,
+        sortDirection,
+        pageNumber,
+        pageSize
+    ){
+        const blogs: WithId<BlogDbType>[] = await blogsRepository
+            .findBlogs(
+                searchNameTerm,
+                sortBy,
+                sortDirection,
+                pageNumber,
+                pageSize
+            );
+
+        const blogCount: number = await blogsRepository
+            .getBlogsCount(searchNameTerm);
+
+        return {
+            pageCount: Math.ceil(blogCount / pageSize),
+            page: pageNumber,
+            pageSize,
+            totalCount: blogCount,
+            items: blogs,
+        };
+    },
     async createBlog(blogData: BlogInputModel): Promise<InsertOneResult> {
         const newBlog: BlogDbType = {
             ...blogData,
