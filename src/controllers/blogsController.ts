@@ -7,7 +7,6 @@ import {InsertOneResult, WithId} from "mongodb";
 import {qBlogsRepository} from "../repositoryes/qBlogs-repository";
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {paginationParams} from "../helpers/pagination-params";
-import {QueryParamsModel} from "../types/input-output-types/query-params-types";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
 
 const blogsController = {
@@ -15,20 +14,20 @@ const blogsController = {
         req: Request,
         res: Response<PaginationResponse<BlogDbType>>) => {
         const {
-            searchNameTerm,
+            pageNumber,
+            pageSize,
             sortBy,
             sortDirection,
-            pageNumber,
-            pageSize
-        }: QueryParamsModel = paginationParams(req.query);
+            searchNameTerm
+        } = paginationParams(req);
 
         const blogs: PaginationResponse<BlogDbType> = await blogsService
             .findBlogs(
-                searchNameTerm,
+                pageNumber,
+                pageSize,
                 sortBy,
                 sortDirection,
-                pageNumber,
-                pageSize
+                searchNameTerm
             );
 
         res

@@ -5,12 +5,12 @@ import {ObjectId, WithId} from "mongodb";
 
 const qBlogsRepository = {
     async findBlogs(
-        searchNameTerm,
-        sortBy,
-        sortDirection,
-        pageNumber,
-        pageSize
-    ): Promise<WithId<BlogDbType>[]> {
+        pageNumber: number,
+        pageSize: number,
+        sortBy: string,
+        sortDirection: 'asc' | 'desc',
+        searchNameTerm: string | null,
+    ) {
         await blogsCollection
             .find({})
             .toArray();

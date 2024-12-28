@@ -5,11 +5,11 @@ import {InsertOneResult, ObjectId, WithId} from "mongodb";
 
 const blogsRepository = {
     async findBlogs(
-        searchNameTerm,
-        sortBy,
-        sortDirection,
-        pageNumber,
-        pageSize
+        pageNumber: number,
+        pageSize: number,
+        sortBy: string,
+        sortDirection: 'asc' | 'desc',
+        searchNameTerm: string | null,
     ): Promise<WithId<BlogDbType>[]> {
         const search = searchNameTerm
             ? {name: {$regex: searchNameTerm, $options: 'i'}}

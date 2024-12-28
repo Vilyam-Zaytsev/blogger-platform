@@ -7,19 +7,19 @@ import {PaginationResponse} from "../types/input-output-types/pagination-types";
 
 const blogsService = {
     async findBlogs(
-        searchNameTerm,
-        sortBy,
-        sortDirection,
-        pageNumber,
-        pageSize
+        pageNumber: number,
+        pageSize: number,
+        sortBy: string,
+        sortDirection: 'asc' | 'desc',
+        searchNameTerm: string | null,
     ): Promise<PaginationResponse<BlogDbType>> {
         const blogs: WithId<BlogDbType>[] = await blogsRepository
             .findBlogs(
-                searchNameTerm,
+                pageNumber,
+                pageSize,
                 sortBy,
                 sortDirection,
-                pageNumber,
-                pageSize
+                searchNameTerm,
             );
 
         const blogCount: number = await blogsRepository
