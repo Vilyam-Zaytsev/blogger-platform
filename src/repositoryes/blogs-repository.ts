@@ -1,7 +1,7 @@
 import {BlogInputModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {blogsCollection} from "../db/mongoDb";
-import {InsertOneResult, ObjectId, WithId} from "mongodb";
+import {InsertOneResult, ObjectId, Sort, WithId} from "mongodb";
 
 const blogsRepository = {
     async findBlogs(
@@ -20,7 +20,7 @@ const blogsRepository = {
 
         return await blogsCollection
             .find(filter)
-            .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1})
+            .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as Sort)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
             .toArray()
