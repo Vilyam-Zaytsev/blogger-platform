@@ -27,12 +27,12 @@ const blogsRepository = {
             .toArray()
     },
     async getBlogsCount(searchNameTerm: string | null): Promise<number> {
-        const search = searchNameTerm
-            ? {name: {$regex: searchNameTerm, $options: 'i'}}
-            : {}
-        const filter: any = {
-            ...search
-        };
+        const filter: any = createFilter(
+            {
+                nameOfSearchField: 'name',
+                searchNameTerm
+            }
+        );
 
         return blogsCollection.countDocuments(filter);
     },

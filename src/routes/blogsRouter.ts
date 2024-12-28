@@ -3,6 +3,10 @@ import {blogsController} from '../controllers/blogsController';
 import {
     blogDescriptionInputValidator,
     blogNameInputValidator,
+    blogPageNumberInputValidator,
+    blogPageSizeInputValidator, blogSearchNameTermInputValidator,
+    blogSortByInputValidator,
+    blogSortDirectionInputValidator,
     blogWebsiteUrlInputValidator
 } from "../middlewares/blog-middlewares/blogValidators";
 import {inputCheckErrorsMiddleware} from "../middlewares/global-middlewares/input-check-errors-middleware";
@@ -10,7 +14,14 @@ import {authMiddleware} from "../middlewares/global-middlewares/authorization-mi
 
 const blogsRouter = Router();
 
-blogsRouter.get('/', blogsController.getBlogs);
+blogsRouter.get('/',
+    blogPageNumberInputValidator,
+    blogPageSizeInputValidator,
+    blogSortByInputValidator,
+    blogSortDirectionInputValidator,
+    blogSearchNameTermInputValidator,
+    blogsController.getBlogs
+);
 blogsRouter.get('/:id', blogsController.getBlog);
 blogsRouter.post('/',
     authMiddleware,
