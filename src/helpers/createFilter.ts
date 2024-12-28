@@ -8,6 +8,10 @@ const createFilter = (nameOfSearchField, id, searchNameTerm) => {
         ? {[nameOfSearchField]: {$regex: searchNameTerm, $options: 'i'}}
         : {};
 
+    return {
+        ...byId,
+        ...search
+    };
 };
 
 export {createFilter};
