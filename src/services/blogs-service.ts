@@ -3,6 +3,7 @@ import {BlogInputModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {InsertOneResult, WithId} from "mongodb";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
+import {qBlogsRepository} from "../repositoryes/qBlogs-repository";
 
 
 const blogsService = {
@@ -30,7 +31,7 @@ const blogsService = {
             page: pageNumber,
             pageSize,
             totalCount: blogCount,
-            items: blogs,
+            items: blogs.map(b => qBlogsRepository.mapToViewModel(b)),
         };
     },
     async createBlog(blogData: BlogInputModel): Promise<InsertOneResult> {
