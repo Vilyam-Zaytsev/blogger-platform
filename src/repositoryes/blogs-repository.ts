@@ -2,6 +2,7 @@ import {BlogInputModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {blogsCollection} from "../db/mongoDb";
 import {InsertOneResult, ObjectId, Sort, WithId} from "mongodb";
+import {createFilter} from "../helpers/createFilter";
 
 const blogsRepository = {
     async findBlogs(
@@ -11,12 +12,12 @@ const blogsRepository = {
         sortDirection: 'asc' | 'desc',
         searchNameTerm: string | null,
     ): Promise<WithId<BlogDbType>[]> {
-        const search = searchNameTerm
-            ? {name: {$regex: searchNameTerm, $options: 'i'}}
-            : {}
-        const filter: any = {
-            ...search
-        };
+        const filter: any = createFilter(
+            {
+                nameOfSearchField: 'name',
+                searchNameTerm
+            }
+        );
 
         return await blogsCollection
             .find(filter)

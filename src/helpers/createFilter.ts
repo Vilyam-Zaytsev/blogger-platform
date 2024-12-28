@@ -1,6 +1,15 @@
 import {ObjectId} from "mongodb";
 
-const createFilter = (nameOfSearchField, id, searchNameTerm) => {
+const createFilter = (
+    {
+        nameOfSearchField,
+        id = null,
+        searchNameTerm = null
+    }: {
+        nameOfSearchField: string,
+        id?: string | null,
+        searchNameTerm?: string | null
+    }) => {
     const byId = id
         ? {id: new ObjectId(id)}
         : {};
