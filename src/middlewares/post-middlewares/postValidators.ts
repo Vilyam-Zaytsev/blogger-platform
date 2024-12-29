@@ -43,7 +43,6 @@ const postBlogIdInputBodyValidator =
 
 const postBlogIdInputQueryValidator =
     query('blogId')
-        .optional()
         .isString()
         .withMessage('The "BlogId" field passed to the query parameter must be of a string type.')
         .trim()
