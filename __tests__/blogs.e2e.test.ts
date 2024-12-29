@@ -6,6 +6,7 @@ import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
 import {blogsCollection, setBlogsCollection} from "../src/db/mongoDb";
 import {BlogDbType} from "../src/types/db-types/blog-db-type";
+import {log} from "node:util";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -268,7 +269,15 @@ describe('/blogs', () => {
         it('should return an empty array.', async () => {
             const res = await req
                 .get(SETTINGS.PATH.BLOGS)
-                .expect(SETTINGS.HTTP_STATUSES.OK_200, [])
+                .expect(SETTINGS.HTTP_STATUSES.OK_200)
+
+            expect(res.body).toEqual({
+                "pageCount": 0,
+                "page": 1,
+                "pageSize": 10,
+                "totalCount": 0,
+                "items": []
+            })
 
             console_log(res.body, res.status, 'Test 1: get(/blogs)\n');
         });
@@ -289,8 +298,15 @@ describe('/blogs', () => {
                 .get(SETTINGS.PATH.BLOGS)
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-            expect(res_2.body[0]).toEqual(res_1.body);
-            expect(res_2.body.length).toEqual(1);
+            expect(res_2.body).toEqual({
+                "pageCount": 1,
+                "page": 1,
+                "pageSize": 10,
+                "totalCount": 1,
+                "items": [{...res_1.body}]
+            });
+            expect(res_2.body.items[0]).toEqual(res_1.body);
+            expect(res_2.body.items.length).toEqual(1);
 
 
             console_log(res_2.body, res_2.status, 'Test 2: get(/blogs)\n');

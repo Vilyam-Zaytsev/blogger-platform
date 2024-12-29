@@ -6,12 +6,29 @@ import {blogsService} from "../services/blogs-service";
 import {InsertOneResult, WithId} from "mongodb";
 import {qBlogsRepository} from "../repositoryes/qBlogs-repository";
 import {BlogDbType} from "../types/db-types/blog-db-type";
+import {paginationParams} from "../helpers/pagination-params";
+import {PaginationResponse} from "../types/input-output-types/pagination-types";
 
 const blogsController = {
     getBlogs: async (
         req: Request,
-        res: Response<BlogViewModel[]>) => {
-        const blogs: BlogViewModel[] = await qBlogsRepository.findBlogsAndMapToViewModel();
+        res: Response<PaginationResponse<BlogDbType>>) => {
+        const {
+            pageNumber,
+            pageSize,
+            sortBy,
+            sortDirection,
+            searchNameTerm
+        } = paginationParams(req);
+
+        const blogs: PaginationResponse<BlogDbType> = await blogsService
+            .findBlogs(
+                pageNumber,
+                pageSize,
+                sortBy,
+                sortDirection,
+                searchNameTerm
+            );
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
