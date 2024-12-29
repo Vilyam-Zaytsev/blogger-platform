@@ -17,7 +17,6 @@ import {
 import {SETTINGS} from "../settings";
 import {postsController} from "../controllers/postsController";
 import {
-    postBlogIdInputQueryValidator,
     postContentInputValidator,
     postShortDescriptionInputValidator,
     postTitleInputValidator
@@ -36,7 +35,10 @@ blogsRouter.get('/',
 );
 blogsRouter.get('/:id', blogsController.getBlog);
 blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
-    postBlogIdInputQueryValidator,
+    pageNumberInputValidator,
+    pageSizeInputValidator,
+    sortByInputValidator,
+    sortDirectionInputValidator,
     inputCheckErrorsMiddleware,
     postsController.getPosts
 );
@@ -45,7 +47,6 @@ blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
     postTitleInputValidator,
     postShortDescriptionInputValidator,
     postContentInputValidator,
-    postBlogIdInputQueryValidator,
     inputCheckErrorsMiddleware,
     postsController.createPost
 );

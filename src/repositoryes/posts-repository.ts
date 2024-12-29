@@ -16,7 +16,7 @@ const postsRepository = {
             {
                 blogId,
             }
-        );
+        )
 
         return await postsCollection
             .find(filter)
