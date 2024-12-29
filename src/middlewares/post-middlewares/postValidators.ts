@@ -49,11 +49,11 @@ const postBlogIdInputQueryValidator =
         .custom(async (blogId) => {
             const blog: BlogDbType | null = await qBlogsRepository.findBlog(blogId);
             if (!blog) {
-                throw new Error('A blog with such an ID does not exist.');
+                throw new Error('There is no blog with the ID passed to the query parameter.');
             }
             return true;
         })
-        .withMessage('A blog with such an ID does not exist.');
+        .withMessage('There is no blog with the ID passed to the query parameter.');
 
 export {
     postTitleInputValidator,
