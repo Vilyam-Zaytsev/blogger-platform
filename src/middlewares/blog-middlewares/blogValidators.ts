@@ -30,25 +30,9 @@ const blogWebsiteUrlInputValidator =
         .isURL()
         .withMessage('Invalid URL. The field must start with "https://" and match the pattern:' +
             ' "https://example.com/path".');
-const paramsIdInputValidator =
-    param('id')
-        .isString()
-        .withMessage('The "blogId" field must be of the string type.')
-        .trim()
-        .custom(async (id, {req}) => {
-            const blog: BlogDbType | null = await qBlogsRepository.findBlog(id);
-            if (!blog) {
-                throw new Error('A blog with such an ID does not exist.');
-            }
-            req.body.blogId = id
-
-            return true;
-        })
-        .withMessage('A blog with such an ID does not exist.');
 
 export {
     blogNameInputValidator,
     blogDescriptionInputValidator,
     blogWebsiteUrlInputValidator,
-    paramsIdInputValidator
 };

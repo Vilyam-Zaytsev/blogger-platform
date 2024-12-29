@@ -33,7 +33,6 @@ const postBlogIdInputValidator =
         .withMessage('The "blogId" field must be of the string type.')
         .trim()
         .custom(async (blogId) => {
-            console.log('xxx')
             const blog: BlogDbType | null = await qBlogsRepository.findBlog(blogId);
             if (!blog) {
                 throw new Error('A blog with such an ID does not exist.');
