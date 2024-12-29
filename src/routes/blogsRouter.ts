@@ -49,7 +49,6 @@ blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
     postTitleInputValidator,
     postShortDescriptionInputValidator,
     postContentInputValidator,
-    postBlogIdInputValidator,
     paramsIdInputValidator,
     inputCheckErrorsMiddleware,
     postsController.createPost
