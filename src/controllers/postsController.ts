@@ -6,7 +6,6 @@ import {qPostsRepository} from "../repositoryes/qPosts-repository";
 import {InsertOneResult, WithId} from "mongodb";
 import {PostDbType} from "../types/db-types/post-db-type";
 import {postsService} from "../services/posts-service";
-import {blogsService} from "../services/blogs-service";
 import {paginationParams} from "../helpers/pagination-params";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
 
