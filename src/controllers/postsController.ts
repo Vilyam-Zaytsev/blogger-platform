@@ -6,13 +6,28 @@ import {qPostsRepository} from "../repositoryes/qPosts-repository";
 import {InsertOneResult, WithId} from "mongodb";
 import {PostDbType} from "../types/db-types/post-db-type";
 import {postsService} from "../services/posts-service";
+import {blogsService} from "../services/blogs-service";
+import {paginationParams} from "../helpers/pagination-params";
+import {PaginationResponse} from "../types/input-output-types/pagination-types";
 
 const postsController = {
     getPosts: async (
         req: Request,
-        res: Response<PostViewModel[]>) => {
-        const posts: PostViewModel[] = await qPostsRepository
-            .findPostsAndMapToViewModel();
+        res: Response<PaginationResponse<PostDbType>>) => {
+        const {
+            pageNumber,
+            pageSize,
+            sortBy,
+            sortDirection
+        } = paginationParams(req);
+
+        const posts: PaginationResponse<PostDbType> = await postsService
+            .findPosts(
+            pageNumber,
+            pageSize,
+            sortBy,
+            sortDirection
+        );
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
