@@ -6,7 +6,6 @@ const authMiddleware = (
     res: Response,
     next: NextFunction
 ) => {
-    console.log('authMiddleware')
     const auth = req.headers['authorization'] as string;
     if (!auth) {
         res

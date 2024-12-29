@@ -31,7 +31,7 @@ const qBlogsRepository = {
     },
     async findBlogAndMapToViewModel(id: ObjectId): Promise<BlogViewModel> {
         const blog: WithId<BlogDbType> = await blogsCollection
-            .findOne({_id: new ObjectId(id)}) as WithId<BlogDbType>;
+            .findOne({_id: id}) as WithId<BlogDbType>;
 
         return this.mapToViewModel(blog);
     },

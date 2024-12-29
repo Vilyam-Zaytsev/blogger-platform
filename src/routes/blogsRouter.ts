@@ -22,6 +22,7 @@ import {
     postTitleInputValidator
 } from "../middlewares/post-middlewares/postValidators";
 import {addBlogIdToBody} from "../middlewares/global-middlewares/addBlogIdToBody";
+import {checkBlogId} from "../middlewares/global-middlewares/checkBlogId";
 
 const blogsRouter = Router();
 
@@ -45,6 +46,7 @@ blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
 );
 blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
     authMiddleware,
+    checkBlogId,
     addBlogIdToBody,
     postTitleInputValidator,
     postShortDescriptionInputValidator,
