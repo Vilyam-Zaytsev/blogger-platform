@@ -44,7 +44,7 @@ const postBlogIdInputBodyValidator =
 const postBlogIdInputQueryValidator =
     query('blogId')
         .isString()
-        .withMessage('The "blogId" field must be of the string type.')
+        .withMessage('The "BlogId" field passed to the query parameter must be of a string type.')
         .trim()
         .custom(async (blogId) => {
             const blog: BlogDbType | null = await qBlogsRepository.findBlog(blogId);
