@@ -36,8 +36,8 @@ blogsRouter.get('/',
 );
 blogsRouter.get('/:id', blogsController.getBlog);
 blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
-    // postBlogIdInputQueryValidator,
-    // inputCheckErrorsMiddleware,
+    postBlogIdInputQueryValidator,
+    inputCheckErrorsMiddleware,
     postsController.getPosts
 );
 blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
@@ -45,7 +45,7 @@ blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
     postTitleInputValidator,
     postShortDescriptionInputValidator,
     postContentInputValidator,
-    // postBlogIdInputQueryValidator,
+    postBlogIdInputQueryValidator,
     inputCheckErrorsMiddleware,
     postsController.createPost
 );
