@@ -8,10 +8,20 @@ import {
     postTitleInputValidator
 } from "../middlewares/post-middlewares/postValidators";
 import {inputCheckErrorsMiddleware} from "../middlewares/global-middlewares/input-check-errors-middleware";
+import {
+    pageNumberInputValidator,
+    pageSizeInputValidator, sortByInputValidator, sortDirectionInputValidator
+} from "../middlewares/global-middlewares/query-parameters-validator";
 
 const postsRouter = Router();
 
-postsRouter.get('/', postsController.getPosts);
+postsRouter.get('/',
+    pageNumberInputValidator,
+    pageSizeInputValidator,
+    sortByInputValidator,
+    sortDirectionInputValidator,
+    postsController.getPosts
+);
 postsRouter.get('/:id', postsController.getPost);
 postsRouter.post('/',
     authMiddleware,

@@ -23,14 +23,14 @@ const blogsService = {
                 searchNameTerm,
             );
 
-        const blogCount: number = await blogsRepository
+        const blogsCount: number = await blogsRepository
             .getBlogsCount(searchNameTerm);
 
         return {
-            pageCount: Math.ceil(blogCount / pageSize),
+            pageCount: Math.ceil(blogsCount / pageSize),
             page: pageNumber,
             pageSize,
-            totalCount: blogCount,
+            totalCount: blogsCount,
             items: blogs.map(b => qBlogsRepository.mapToViewModel(b)),
         };
     },

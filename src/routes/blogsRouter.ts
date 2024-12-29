@@ -3,23 +3,23 @@ import {blogsController} from '../controllers/blogsController';
 import {
     blogDescriptionInputValidator,
     blogNameInputValidator,
-    blogPageNumberInputValidator,
-    blogPageSizeInputValidator, blogSearchNameTermInputValidator,
-    blogSortByInputValidator,
-    blogSortDirectionInputValidator,
     blogWebsiteUrlInputValidator
 } from "../middlewares/blog-middlewares/blogValidators";
 import {inputCheckErrorsMiddleware} from "../middlewares/global-middlewares/input-check-errors-middleware";
 import {authMiddleware} from "../middlewares/global-middlewares/authorization-middleware";
+import {
+    pageNumberInputValidator,
+    pageSizeInputValidator, searchNameTermInputValidator, sortByInputValidator, sortDirectionInputValidator
+} from "../middlewares/global-middlewares/query-parameters-validator";
 
 const blogsRouter = Router();
 
 blogsRouter.get('/',
-    blogPageNumberInputValidator,
-    blogPageSizeInputValidator,
-    blogSortByInputValidator,
-    blogSortDirectionInputValidator,
-    blogSearchNameTermInputValidator,
+    pageNumberInputValidator,
+    pageSizeInputValidator,
+    sortByInputValidator,
+    sortDirectionInputValidator,
+    searchNameTermInputValidator,
     blogsController.getBlogs
 );
 blogsRouter.get('/:id', blogsController.getBlog);
