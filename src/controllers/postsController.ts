@@ -17,16 +17,18 @@ const postsController = {
             pageNumber,
             pageSize,
             sortBy,
-            sortDirection
+            sortDirection,
+            blogId
         } = paginationParams(req);
 
         const posts: PaginationResponse<PostDbType> = await postsService
             .findPosts(
-            pageNumber,
-            pageSize,
-            sortBy,
-            sortDirection
-        );
+                pageNumber,
+                pageSize,
+                sortBy,
+                sortDirection,
+                blogId
+            );
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)

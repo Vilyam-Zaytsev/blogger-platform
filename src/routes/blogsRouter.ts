@@ -9,8 +9,19 @@ import {inputCheckErrorsMiddleware} from "../middlewares/global-middlewares/inpu
 import {authMiddleware} from "../middlewares/global-middlewares/authorization-middleware";
 import {
     pageNumberInputValidator,
-    pageSizeInputValidator, searchNameTermInputValidator, sortByInputValidator, sortDirectionInputValidator
+    pageSizeInputValidator,
+    searchNameTermInputValidator,
+    sortByInputValidator,
+    sortDirectionInputValidator
 } from "../middlewares/global-middlewares/query-parameters-validator";
+import {SETTINGS} from "../settings";
+import {postsController} from "../controllers/postsController";
+import {
+    postBlogIdInputQueryValidator,
+    postContentInputValidator,
+    postShortDescriptionInputValidator,
+    postTitleInputValidator
+} from "../middlewares/post-middlewares/postValidators";
 
 const blogsRouter = Router();
 
@@ -20,9 +31,24 @@ blogsRouter.get('/',
     sortByInputValidator,
     sortDirectionInputValidator,
     searchNameTermInputValidator,
+    inputCheckErrorsMiddleware,
     blogsController.getBlogs
 );
 blogsRouter.get('/:id', blogsController.getBlog);
+blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
+    postBlogIdInputQueryValidator,
+    inputCheckErrorsMiddleware,
+    postsController.getPosts
+);
+blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
+    authMiddleware,
+    postTitleInputValidator,
+    postShortDescriptionInputValidator,
+    postContentInputValidator,
+    postBlogIdInputQueryValidator,
+    inputCheckErrorsMiddleware,
+    postsController.createPost
+);
 blogsRouter.post('/',
     authMiddleware,
     blogNameInputValidator,

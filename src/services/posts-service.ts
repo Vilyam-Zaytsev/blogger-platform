@@ -11,14 +11,16 @@ const postsService = {
         pageNumber: number,
         pageSize: number,
         sortBy: string,
-        sortDirection: 'asc' | 'desc'
+        sortDirection: 'asc' | 'desc',
+        blogId: string | null
     ): Promise<PaginationResponse<PostDbType>>{
         const posts: WithId<PostDbType>[] = await postsRepository
             .findPosts(
                 pageNumber,
                 pageSize,
                 sortBy,
-                sortDirection
+                sortDirection,
+                blogId
             );
 
         const postsCount: number = await postsRepository.getPostsCount();

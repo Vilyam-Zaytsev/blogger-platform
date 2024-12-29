@@ -2,7 +2,7 @@ import {Router} from "express";
 import {postsController} from '../controllers/postsController';
 import {authMiddleware} from "../middlewares/global-middlewares/authorization-middleware";
 import {
-    postBlogIdInputValidator,
+    postBlogIdInputBodyValidator,
     postContentInputValidator,
     postShortDescriptionInputValidator,
     postTitleInputValidator
@@ -20,6 +20,7 @@ postsRouter.get('/',
     pageSizeInputValidator,
     sortByInputValidator,
     sortDirectionInputValidator,
+    inputCheckErrorsMiddleware,
     postsController.getPosts
 );
 postsRouter.get('/:id', postsController.getPost);
@@ -28,7 +29,7 @@ postsRouter.post('/',
     postTitleInputValidator,
     postShortDescriptionInputValidator,
     postContentInputValidator,
-    postBlogIdInputValidator,
+    postBlogIdInputBodyValidator,
     inputCheckErrorsMiddleware,
     postsController.createPost
 );
@@ -37,7 +38,7 @@ postsRouter.put('/:id',
     postTitleInputValidator,
     postShortDescriptionInputValidator,
     postContentInputValidator,
-    postBlogIdInputValidator,
+    postBlogIdInputBodyValidator,
     inputCheckErrorsMiddleware,
     postsController.updatePost
 );
