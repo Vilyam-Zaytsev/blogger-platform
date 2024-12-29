@@ -1,4 +1,6 @@
-import {body} from "express-validator";
+import {body, param} from "express-validator";
+import {BlogDbType} from "../../types/db-types/blog-db-type";
+import {qBlogsRepository} from "../../repositoryes/qBlogs-repository";
 
 const blogNameInputValidator =
     body('name')
@@ -26,11 +28,25 @@ const blogWebsiteUrlInputValidator =
         .isURL()
         .withMessage('Invalid URL. The field must start with "https://" and match the pattern:' +
             ' "https://example.com/path".');
+const paramsIdInputValidator =
+    param('id')
+        .isString()
+        .withMessage('The "blogId" field must be of the string type.')
+        .trim()
+        .custom(async (id) => {
+            console.log('xxx')
 
-
+            const blog: BlogDbType | null = await qBlogsRepository.findBlog(id);
+            if (!blog) {
+                throw new Error('A blog with such an ID does not exist.');
+            }
+            return true;
+        })
+        .withMessage('A blog with such an ID does not exist.');
 
 export {
     blogNameInputValidator,
     blogDescriptionInputValidator,
     blogWebsiteUrlInputValidator,
+    paramsIdInputValidator
 };

@@ -3,7 +3,8 @@ import {blogsController} from '../controllers/blogsController';
 import {
     blogDescriptionInputValidator,
     blogNameInputValidator,
-    blogWebsiteUrlInputValidator
+    blogWebsiteUrlInputValidator,
+    paramsIdInputValidator
 } from "../middlewares/blog-middlewares/blogValidators";
 import {inputCheckErrorsMiddleware} from "../middlewares/global-middlewares/input-check-errors-middleware";
 import {authMiddleware} from "../middlewares/global-middlewares/authorization-middleware";
@@ -17,6 +18,7 @@ import {
 import {SETTINGS} from "../settings";
 import {postsController} from "../controllers/postsController";
 import {
+    postBlogIdInputValidator,
     postContentInputValidator,
     postShortDescriptionInputValidator,
     postTitleInputValidator
@@ -47,6 +49,8 @@ blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
     postTitleInputValidator,
     postShortDescriptionInputValidator,
     postContentInputValidator,
+    postBlogIdInputValidator,
+    paramsIdInputValidator,
     inputCheckErrorsMiddleware,
     postsController.createPost
 );
