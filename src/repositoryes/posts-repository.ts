@@ -1,6 +1,6 @@
 import {PostDbType} from "../types/db-types/post-db-type";
 import {PostInputModel} from "../types/input-output-types/posts-types";
-import {blogsCollection, postsCollection} from "../db/mongoDb";
+import {postsCollection} from "../db/mongoDb";
 import {InsertOneResult, ObjectId, Sort, WithId} from "mongodb";
 import {createFilter} from "../helpers/createFilter";
 
@@ -9,10 +9,17 @@ const postsRepository = {
         pageNumber: number,
         pageSize: number,
         sortBy: string,
-        sortDirection: 'asc' | 'desc'
+        sortDirection: 'asc' | 'desc',
+        blogId: string | null
     ): Promise<WithId<PostDbType>[]> {
+        const filter: any = createFilter(
+            {
+                blogId,
+            }
+        );
+
         return await postsCollection
-            .find({})
+            .find(filter)
             .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as Sort)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)

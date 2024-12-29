@@ -1,13 +1,16 @@
 import {Request} from "express";
 
 const paginationParams = (req: Request) => {
-    const pageNumber: number = req.query.pageNumber
+    const pageNumber: number =
+        req.query.pageNumber
         ? Number(req.query.pageNumber)
         : 1;
-    const pageSize: number = req.query.pageSize
+    const pageSize: number =
+        req.query.pageSize
         ? Number(req.query.pageSize)
         : 10;
-    const sortBy: string = req.query.sortBy
+    const sortBy: string =
+        req.query.sortBy
         ? String(req.query.sortBy)
         : 'createAt';
     const sortDirection: 'asc' | 'desc' =
@@ -18,13 +21,17 @@ const paginationParams = (req: Request) => {
         req.query.searchNameTerm
         ? String(req.query.searchNameTerm)
         : null;
+    const blogId: string | null = req.query.blogId
+        ? String(req.query.blogId)
+        : null;
 
     return {
         pageNumber,
         pageSize,
         sortBy,
         sortDirection,
-        searchNameTerm
+        searchNameTerm,
+        blogId
     };
 };
 

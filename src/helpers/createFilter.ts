@@ -2,18 +2,18 @@ import {ObjectId} from "mongodb";
 
 const createFilter = (
     {
-        nameOfSearchField,
-        id = null,
+        nameOfSearchField = null,
+        blogId = null,
         searchNameTerm = null
     }: {
-        nameOfSearchField: string,
-        id?: string | null,
+        nameOfSearchField?: string | null,
+        blogId?: string | null,
         searchNameTerm?: string | null
     }) => {
-    const byId = id
-        ? {id: new ObjectId(id)}
+    const byId = blogId
+        ? {blogId}
         : {};
-    const search = searchNameTerm
+    const search = searchNameTerm && nameOfSearchField
         ? {[nameOfSearchField]: {$regex: searchNameTerm, $options: 'i'}}
         : {};
 

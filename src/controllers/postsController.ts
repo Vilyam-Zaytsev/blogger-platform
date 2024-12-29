@@ -6,7 +6,6 @@ import {qPostsRepository} from "../repositoryes/qPosts-repository";
 import {InsertOneResult, WithId} from "mongodb";
 import {PostDbType} from "../types/db-types/post-db-type";
 import {postsService} from "../services/posts-service";
-import {blogsService} from "../services/blogs-service";
 import {paginationParams} from "../helpers/pagination-params";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
 
@@ -18,16 +17,18 @@ const postsController = {
             pageNumber,
             pageSize,
             sortBy,
-            sortDirection
+            sortDirection,
+            blogId
         } = paginationParams(req);
 
         const posts: PaginationResponse<PostDbType> = await postsService
             .findPosts(
-            pageNumber,
-            pageSize,
-            sortBy,
-            sortDirection
-        );
+                pageNumber,
+                pageSize,
+                sortBy,
+                sortDirection,
+                blogId
+            );
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
