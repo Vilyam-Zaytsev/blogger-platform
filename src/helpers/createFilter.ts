@@ -1,5 +1,3 @@
-import {ObjectId} from "mongodb";
-
 const createFilter = (
     {
         nameOfSearchField = null,
