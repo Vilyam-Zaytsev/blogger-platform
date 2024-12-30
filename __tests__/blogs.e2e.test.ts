@@ -284,8 +284,8 @@ describe('/blogs', () => {
         it('should return an array with a single blog.', async () => {
             const res_1 = await blogsTestManager.createBlog(
                 {
-                    name: blog_1.name,
-                    description: blog_1.description,
+                    name: `${blog_1.name}_1`,
+                    description: `${blog_1.description}_1`,
                     websiteUrl: blog_1.websiteUrl
                 },
                 encodingAdminDataInBase64(

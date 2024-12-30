@@ -4,34 +4,34 @@ import {ObjectId} from "mongodb";
 import {PostDbType} from "../../src/types/db-types/post-db-type";
 
 const blog_1: BlogDbType = {
-    name: 'BLOG_ONE',
-    description: 'DESCRIPTION_ONE',
-    websiteUrl: 'https://blog-one.com',
+    name: 'BLOG',
+    description: 'DESCRIPTION',
+    websiteUrl: 'https://blogs.com',
     createdAt: new Date().toISOString(),
     isMembership: false
 } as const;
 
 const blog_2: BlogDbType = {
-    name: 'BLOG_TWO',
-    description: 'DESCRIPTION_TWO',
-    websiteUrl: 'https://blog-two.com',
+    name: 'BLOG',
+    description: 'DESCRIPTION',
+    websiteUrl: 'https://blogs.com',
     createdAt: new Date().toISOString(),
     isMembership: false
 } as const;
 
 const post_1: PostDbType = {
-    title: 'POST_ONE',
-    shortDescription: 'SHORT_DESCRIPTION_POST_ONE',
-    content: 'CONTENT_POST_ONE',
+    title: 'POST',
+    shortDescription: 'SHORT_DESCRIPTION_POST',
+    content: 'CONTENT_POST',
     blogId: '',
     blogName: blog_1.name,
     createdAt: new Date().toISOString(),
 } as const;
 
 const post_2: PostDbType = {
-    title: 'POST_TWO',
-    shortDescription: 'SHORT_DESCRIPTION_POST_TWO',
-    content: 'CONTENT_POST_TWO',
+    title: 'POST',
+    shortDescription: 'SHORT_DESCRIPTION_POST',
+    content: 'CONTENT_POST',
     blogId: '',
     blogName: blog_2.name,
     createdAt: new Date().toISOString(),
