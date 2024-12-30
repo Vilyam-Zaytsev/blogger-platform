@@ -37,6 +37,8 @@ blogsRouter.get('/',
 );
 blogsRouter.get('/:id', blogsController.getBlog);
 blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
+    checkBlogId,
+    addBlogIdToBody,
     pageNumberInputValidator,
     pageSizeInputValidator,
     sortByInputValidator,

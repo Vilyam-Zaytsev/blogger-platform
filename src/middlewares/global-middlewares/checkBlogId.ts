@@ -4,8 +4,12 @@ import {SETTINGS} from "../../settings";
 import {BlogViewModel} from "../../types/input-output-types/blogs-types";
 import {qBlogsRepository} from "../../repositoryes/qBlogs-repository";
 
-const checkBlogId = async (req: Request, res: Response, next: NextFunction) => {
-    const {id} = req.body;
+const checkBlogId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const {id} = req.params;
 
     if (!id || !ObjectId.isValid(id)) {
         res
@@ -16,7 +20,7 @@ const checkBlogId = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const blog: BlogViewModel = await qBlogsRepository
-        .findBlogAndMapToViewModel(new ObjectId(req.body.id));
+        .findBlogAndMapToViewModel(new ObjectId(id));
 
     if (!blog) {
         res
