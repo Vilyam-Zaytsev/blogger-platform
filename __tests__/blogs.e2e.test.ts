@@ -38,54 +38,67 @@ beforeEach(async () => {
 
 
 describe('/blogs', () => {
-    // describe('POST /blogs', () => {
-    //     it('should create a new blog, the user is authenticated.', async () => {
-    //         const res_1 = await blogsTestManager.createBlog(
-    //             {
-    //                 name: blog_1.name,
-    //                 description: blog_1.description,
-    //                 websiteUrl: blog_1.websiteUrl
-    //             },
-    //             encodingAdminDataInBase64(
-    //                 SETTINGS.ADMIN_DATA.LOGIN,
-    //                 SETTINGS.ADMIN_DATA.PASSWORD
-    //             )
-    //         );
-    //
-    //         expect(res_1.body).toEqual({
-    //             id: expect.any(String),
-    //             name: blog_1.name,
-    //             description: blog_1.description,
-    //             websiteUrl: blog_1.websiteUrl,
-    //             isMembership: blog_1.isMembership,
-    //             createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
-    //         });
-    //
-    //         const res_2 = await req
-    //             .get(`${SETTINGS.PATH.BLOGS}/${res_1.body.id}`)
-    //             .expect(SETTINGS.HTTP_STATUSES.OK_200);
-    //
-    //         expect(res_1.body).toEqual(res_2.body);
-    //
-    //         console_log(res_1.body, res_1.status, 'Test 1: post(/blogs)\n');
-    //     });
-    //     it('should not create a blog if the user is not authenticated.', async () => {
-    //         const res = await blogsTestManager.createBlog(
-    //             {
-    //                 name: blog_1.name,
-    //                 description: blog_1.description,
-    //                 websiteUrl: blog_1.websiteUrl
-    //             },
-    //             'incorrect-adminData',
-    //             SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401
-    //         );
-    //
-    //         await req
-    //             .get(SETTINGS.PATH.BLOGS)
-    //             .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
-    //
-    //         console_log(res.body, res.status, 'Test 2: post(/blogs)\n');
-    //     });
+    describe('POST /blogs', () => {
+        it('should create a new blog, the user is authenticated.', async () => {
+            const res_post: Response[] = await blogsTestManager.createBlog(
+                1,
+                {
+                    name: blog.name,
+                    description: blog.description,
+                    websiteUrl: blog.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+
+            expect(res_post[0].body).toEqual({
+                id: expect.any(String),
+                name: `${blog.name}_1`,
+                description: `${blog.description}_1`,
+                websiteUrl: blog.websiteUrl,
+                isMembership: blog.isMembership,
+                createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+            });
+
+            const res_get = await req
+                .get(`${SETTINGS.PATH.BLOGS}/${res_post[0].body.id}`)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(res_post[0].body).toEqual(res_get.body);
+
+            console_log(res_post[0].body, res_post[0].status, 'Test 1: post(/blogs)\n');
+        });
+        it('should not create a blog if the user is not authenticated.', async () => {
+            const res_post: Response[] = await blogsTestManager.createBlog(
+                1,
+                {
+                    name: blog.name,
+                    description: blog.description,
+                    websiteUrl: blog.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    'incorrect_login',
+                    'incorrect_password'
+                ),
+                SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401
+            );
+
+            await req
+                .get(SETTINGS.PATH.BLOGS)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect({
+                pageCount: 0,
+                page: 1,
+                pageSize: 10,
+                totalCount: 0,
+                items: []
+            });
+
+            console_log(res_post[0].body, res_post[0].status, 'Test 2: post(/blogs)\n');
+        });
     //     it('should not create a blog if the data in the request body is incorrect.', async () => {
     //         const res = await blogsTestManager.createBlog(
     //             {},
@@ -268,7 +281,7 @@ describe('/blogs', () => {
     //         )
     //
     //         console_log(res.body, res.status, 'Test 7: post(/blogs)\n');
-    //     });
+        });
     // });
     describe('GET /blogs', () => {
         it('should return an empty array.', async () => {
