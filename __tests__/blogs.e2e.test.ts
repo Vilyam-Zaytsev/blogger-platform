@@ -813,124 +813,141 @@ describe('/blogs', () => {
             console_log(res_put.body, res_put.status, 'Test 7: put(/blogs)\n');
         });
     });
-    // describe('DELETE /blogs', () => {
-    //     it('should delete blog, the user is authenticated.', async () => {
-    //         const res_1 = await blogsTestManager.createBlog(
-    //             {
-    //                 name: blog_1.name,
-    //                 description: blog_1.description,
-    //                 websiteUrl: blog_1.websiteUrl
-    //             },
-    //             encodingAdminDataInBase64(
-    //                 SETTINGS.ADMIN_DATA.LOGIN,
-    //                 SETTINGS.ADMIN_DATA.PASSWORD
-    //             ),
-    //         );
-    //
-    //         expect(res_1.body).toEqual({
-    //             id: expect.any(String),
-    //             name: blog_1.name,
-    //             description: blog_1.description,
-    //             websiteUrl: blog_1.websiteUrl,
-    //             isMembership: blog_1.isMembership,
-    //             createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
-    //         });
-    //
-    //         const res_2 = await req
-    //             .delete(`${SETTINGS.PATH.BLOGS}/${res_1.body.id}`)
-    //             .set({
-    //                 'Authorization': encodingAdminDataInBase64(
-    //                     SETTINGS.ADMIN_DATA.LOGIN,
-    //                     SETTINGS.ADMIN_DATA.PASSWORD
-    //                 )
-    //             })
-    //             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    //
-    //         await req
-    //             .get(SETTINGS.PATH.BLOGS)
-    //             .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
-    //
-    //         console_log(res_2.body, res_2.status, 'Test 1: post(/blogs)\n');
-    //     });
-    //     it('should not delete blog, the user is not authenticated.', async () => {
-    //         const res_1 = await blogsTestManager.createBlog(
-    //             {
-    //                 name: blog_1.name,
-    //                 description: blog_1.description,
-    //                 websiteUrl: blog_1.websiteUrl
-    //             },
-    //             encodingAdminDataInBase64(
-    //                 SETTINGS.ADMIN_DATA.LOGIN,
-    //                 SETTINGS.ADMIN_DATA.PASSWORD
-    //             ),
-    //         );
-    //
-    //         expect(res_1.body).toEqual({
-    //             id: expect.any(String),
-    //             name: blog_1.name,
-    //             description: blog_1.description,
-    //             websiteUrl: blog_1.websiteUrl,
-    //             isMembership: blog_1.isMembership,
-    //             createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
-    //         });
-    //
-    //         const res_2 = await req
-    //             .delete(`${SETTINGS.PATH.BLOGS}/${res_1.body.id}`)
-    //             .set({
-    //                 'Authorization': encodingAdminDataInBase64(
-    //                     'incorrect_login',
-    //                     'incorrect_password'
-    //                 )
-    //             })
-    //             .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
-    //
-    //         const res_3 = await req
-    //             .get(`${SETTINGS.PATH.BLOGS}/${res_1.body.id}`)
-    //             .expect(SETTINGS.HTTP_STATUSES.OK_200);
-    //
-    //         expect(res_1.body).toEqual(res_3.body);
-    //
-    //         console_log(res_2.body, res_2.status, 'Test 2: post(/blogs)\n');
-    //     });
-    //     it('should return a 404 error if the blog was not found by the passed ID in the parameters.', async () => {
-    //         const res_1 = await blogsTestManager.createBlog(
-    //             {
-    //                 name: blog_1.name,
-    //                 description: blog_1.description,
-    //                 websiteUrl: blog_1.websiteUrl
-    //             },
-    //             encodingAdminDataInBase64(
-    //                 SETTINGS.ADMIN_DATA.LOGIN,
-    //                 SETTINGS.ADMIN_DATA.PASSWORD
-    //             ),
-    //         );
-    //
-    //         expect(res_1.body).toEqual({
-    //             id: expect.any(String),
-    //             name: blog_1.name,
-    //             description: blog_1.description,
-    //             websiteUrl: blog_1.websiteUrl,
-    //             isMembership: blog_1.isMembership,
-    //             createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
-    //         });
-    //
-    //         const res_2 = await req
-    //             .delete(`${SETTINGS.PATH.BLOGS}/${new ObjectId()}`)
-    //             .set({
-    //                 'Authorization': encodingAdminDataInBase64(
-    //                     SETTINGS.ADMIN_DATA.LOGIN,
-    //                     SETTINGS.ADMIN_DATA.PASSWORD
-    //                 )
-    //             })
-    //             .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
-    //
-    //         const res_3 = await req
-    //             .get(`${SETTINGS.PATH.BLOGS}/${res_1.body.id}`)
-    //             .expect(SETTINGS.HTTP_STATUSES.OK_200);
-    //
-    //         expect(res_1.body).toEqual(res_3.body);
-    //
-    //         console_log(res_2.body, res_2.status, 'Test 3: post(/blogs)\n');
-    //     });
-    // });
+    describe('DELETE /blogs', () => {
+        it('should delete blog, the user is authenticated.', async () => {
+            const res_post: Response[] = await blogsTestManager.createBlog(
+                1,
+                {
+                    name: blog.name,
+                    description: blog.description,
+                    websiteUrl: blog.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                ),
+            );
+
+            expect(res_post[0].body).toEqual({
+                id: expect.any(String),
+                name: `${blog.name}_1`,
+                description: `${blog.description}_1`,
+                websiteUrl: blog.websiteUrl,
+                isMembership: blog.isMembership,
+                createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+            });
+
+            const res_get = await req
+                .get(`${SETTINGS.PATH.BLOGS}/${res_post[0].body.id}`)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(res_get.body).toEqual(res_post[0].body);
+
+            const res_delete = await req
+                .delete(`${SETTINGS.PATH.BLOGS}/${res_post[0].body.id}`)
+                .set({
+                    'Authorization': encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                })
+                .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+
+            await req
+                .get(SETTINGS.PATH.BLOGS)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect({
+                pageCount: 0,
+                page: 1,
+                pageSize: 10,
+                totalCount: 0,
+                items: []
+            });
+
+            console_log(res_delete.body, res_delete.status, 'Test 1: delete(/blogs)\n');
+        });
+            it('should not delete blog, the user is not authenticated.', async () => {
+                const res_post: Response[] = await blogsTestManager.createBlog(
+                    1,
+                    {
+                        name: blog.name,
+                        description: blog.description,
+                        websiteUrl: blog.websiteUrl
+                    },
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    ),
+                );
+
+                expect(res_post[0].body).toEqual({
+                    id: expect.any(String),
+                    name: `${blog.name}_1`,
+                    description: `${blog.description}_1`,
+                    websiteUrl: blog.websiteUrl,
+                    isMembership: blog.isMembership,
+                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+                });
+
+                const res_delete = await req
+                    .delete(`${SETTINGS.PATH.BLOGS}/${res_post[0].body.id}`)
+                    .set({
+                        'Authorization': encodingAdminDataInBase64(
+                            'incorrect_login',
+                            'incorrect_password'
+                        )
+                    })
+                    .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+
+                const res_get = await req
+                    .get(`${SETTINGS.PATH.BLOGS}/${res_post[0].body.id}`)
+                    .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+                expect(res_post[0].body).toEqual(res_get.body);
+
+                console_log(res_delete.body, res_delete.status, 'Test 2: delete(/blogs)\n');
+            });
+            it('should return a 404 error if the blog was not found by the passed ID in the parameters.', async () => {
+                const res_post: Response[] = await blogsTestManager.createBlog(
+                    1,
+                    {
+                        name: blog.name,
+                        description: blog.description,
+                        websiteUrl: blog.websiteUrl
+                    },
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    ),
+                );
+
+                expect(res_post[0].body).toEqual({
+                    id: expect.any(String),
+                    name: `${blog.name}_1`,
+                    description: `${blog.description}_1`,
+                    websiteUrl: blog.websiteUrl,
+                    isMembership: blog.isMembership,
+                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+                });
+
+                const res_delete = await req
+                    .delete(`${SETTINGS.PATH.BLOGS}/${new ObjectId()}`)
+                    .set({
+                        'Authorization': encodingAdminDataInBase64(
+                            SETTINGS.ADMIN_DATA.LOGIN,
+                            SETTINGS.ADMIN_DATA.PASSWORD
+                        )
+                    })
+                    .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
+
+                const res_get = await req
+                    .get(`${SETTINGS.PATH.BLOGS}/${res_post[0].body.id}`)
+                    .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+                expect(res_post[0].body).toEqual(res_get.body);
+
+                console_log(res_delete.body, res_delete.status, 'Test 3: delete(/blogs)\n');
+            });
+    });
 });
