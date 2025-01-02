@@ -51,14 +51,7 @@ const postsTestManager = {
                             : ''
                         : dataPost.content
                     : null,
-            blogId:
-                dataPost.blogId
-                    ? typeof dataPost.blogId === 'string'
-                        ? dataPost.blogId.trim() !== ''
-                            ? `${dataPost.blogId}_${postNumber}`
-                            : ''
-                        : dataPost.blogId
-                    : null,
+            blogId: dataPost.blogId
         };
     },
 };
