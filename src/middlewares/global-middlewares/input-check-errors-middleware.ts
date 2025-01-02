@@ -9,8 +9,11 @@ const inputCheckErrorsMiddleware = (
     next: NextFunction
 ) => {
     const e = validationResult(req);
+
     if (!e.isEmpty()) {
         const errors = e.array({onlyFirstError: true}) as { path: FieldNameType, msg: string }[];
+
+        console.log(e)
 
         res
             .status(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400)

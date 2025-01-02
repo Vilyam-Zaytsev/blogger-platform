@@ -99,189 +99,198 @@ describe('/blogs', () => {
 
             console_log(res_post[0].body, res_post[0].status, 'Test 2: post(/blogs)\n');
         });
-    //     it('should not create a blog if the data in the request body is incorrect.', async () => {
-    //         const res = await blogsTestManager.createBlog(
-    //             {},
-    //             encodingAdminDataInBase64(
-    //                 SETTINGS.ADMIN_DATA.LOGIN,
-    //                 SETTINGS.ADMIN_DATA.PASSWORD
-    //             ),
-    //             SETTINGS.HTTP_STATUSES.BAD_REQUEST_400
-    //         );
-    //
-    //         await req
-    //             .get(SETTINGS.PATH.BLOGS)
-    //             .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
-    //
-    //         expect(res.body).toEqual(
-    //             {
-    //                 errorsMessages: [
-    //                     {
-    //                         field: 'name',
-    //                         message: 'The "name" field must be of the string type.'
-    //                     },
-    //                     {
-    //                         field: 'description',
-    //                         message: 'The "description" field must be of the string type.'
-    //                     },
-    //                     {
-    //                         field: 'websiteUrl',
-    //                         message: 'The "websiteUrl" field must be of the string type.'
-    //                     }
-    //                 ]
-    //             },
-    //         )
-    //
-    //         console_log(res.body, res.status, 'Test 3: post(/blogs)\n');
-    //     });
-    //     it('should not create a blog if the data in the request body is incorrect.', async () => {
-    //         const res = await blogsTestManager.createBlog(
-    //             {
-    //                 name: '   ',
-    //                 description: '   ',
-    //                 websiteUrl: '   '
-    //             },
-    //             encodingAdminDataInBase64(
-    //                 SETTINGS.ADMIN_DATA.LOGIN,
-    //                 SETTINGS.ADMIN_DATA.PASSWORD
-    //             ),
-    //             SETTINGS.HTTP_STATUSES.BAD_REQUEST_400
-    //         );
-    //
-    //         await req
-    //             .get(SETTINGS.PATH.BLOGS)
-    //             .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
-    //
-    //         expect(res.body).toEqual(
-    //             {
-    //                 errorsMessages: [
-    //                     {
-    //                         field: 'name',
-    //                         message: 'The length of the "name" field should be from 1 to 15.'
-    //                     },
-    //                     {
-    //                         field: 'description',
-    //                         message: 'The length of the "description" field should be from 1 to 500.'
-    //                     },
-    //                     {
-    //                         field: 'websiteUrl',
-    //                         message: 'The length of the "description" field should be from 1 to 100.'
-    //                     }
-    //                 ]
-    //             },
-    //         )
-    //
-    //         console_log(res.body, res.status, 'Test 4: post(/blogs)\n');
-    //     });
-    //     it('should not create a blog if the data in the request body is incorrect.', async () => {
-    //         const res = await blogsTestManager.createBlog(
-    //             {
-    //                 name: generateRandomString(16),
-    //                 description: generateRandomString(501),
-    //                 websiteUrl: generateRandomString(101)
-    //             },
-    //             encodingAdminDataInBase64(
-    //                 SETTINGS.ADMIN_DATA.LOGIN,
-    //                 SETTINGS.ADMIN_DATA.PASSWORD
-    //             ),
-    //             SETTINGS.HTTP_STATUSES.BAD_REQUEST_400
-    //         );
-    //
-    //         await req
-    //             .get(SETTINGS.PATH.BLOGS)
-    //             .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
-    //
-    //         expect(res.body).toEqual(
-    //             {
-    //                 errorsMessages: [
-    //                     {
-    //                         field: 'name',
-    //                         message: 'The length of the "name" field should be from 1 to 15.'
-    //                     },
-    //                     {
-    //                         field: 'description',
-    //                         message: 'The length of the "description" field should be from 1 to 500.'
-    //                     },
-    //                     {
-    //                         field: 'websiteUrl',
-    //                         message: 'The length of the "description" field should be from 1 to 100.'
-    //                     }
-    //                 ]
-    //             },
-    //         )
-    //
-    //         console_log(res.body, res.status, 'Test 5: post(/blogs)\n');
-    //     });
-    //     it('should not create a blog if the data in the request body is incorrect.', async () => {
-    //         const res = await blogsTestManager.createBlog(
-    //             {
-    //                 name: 123,
-    //                 description: 123,
-    //                 websiteUrl: 123
-    //             },
-    //             encodingAdminDataInBase64(
-    //                 SETTINGS.ADMIN_DATA.LOGIN,
-    //                 SETTINGS.ADMIN_DATA.PASSWORD
-    //             ),
-    //             SETTINGS.HTTP_STATUSES.BAD_REQUEST_400
-    //         );
-    //
-    //         await req
-    //             .get(SETTINGS.PATH.BLOGS)
-    //             .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
-    //
-    //         expect(res.body).toEqual(
-    //             {
-    //                 errorsMessages: [
-    //                     {
-    //                         field: 'name',
-    //                         message: 'The "name" field must be of the string type.'
-    //                     },
-    //                     {
-    //                         field: 'description',
-    //                         message: 'The "description" field must be of the string type.'
-    //                     },
-    //                     {
-    //                         field: 'websiteUrl',
-    //                         message: 'The "websiteUrl" field must be of the string type.'
-    //                     }
-    //                 ]
-    //             },
-    //         )
-    //
-    //         console_log(res.body, res.status, 'Test 6: post(/blogs)\n');
-    //     });
-    //     it('should not create a blog if the data in the request body is incorrect.', async () => {
-    //         const res = await blogsTestManager.createBlog(
-    //             {
-    //                 name: blog_1.name,
-    //                 description: blog_1.description,
-    //                 websiteUrl: generateRandomString(10)
-    //             },
-    //             encodingAdminDataInBase64(
-    //                 SETTINGS.ADMIN_DATA.LOGIN,
-    //                 SETTINGS.ADMIN_DATA.PASSWORD
-    //             ),
-    //             SETTINGS.HTTP_STATUSES.BAD_REQUEST_400
-    //         );
-    //
-    //         await req
-    //             .get(SETTINGS.PATH.BLOGS)
-    //             .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
-    //
-    //         expect(res.body).toEqual(
-    //             {
-    //                 errorsMessages: [
-    //                     {
-    //                         field: 'websiteUrl',
-    //                         message: 'Invalid URL. The field must start with "https://" and match the pattern: "https://example.com/path".'
-    //                     }
-    //                 ]
-    //             },
-    //         )
-    //
-    //         console_log(res.body, res.status, 'Test 7: post(/blogs)\n');
+        it('should not create a blog if the data in the request body is incorrect.', async () => {
+            const res_post: Response[] = await blogsTestManager.createBlog(
+                1,
+                {},
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                ),
+                SETTINGS.HTTP_STATUSES.BAD_REQUEST_400
+            );
+
+            await req
+                .get(SETTINGS.PATH.BLOGS)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect({
+                pageCount: 0,
+                page: 1,
+                pageSize: 10,
+                totalCount: 0,
+                items: []
+            });
+
+            expect(res_post[0].body).toEqual(
+                {
+                    errorsMessages: [
+                        {
+                            field: 'name',
+                            message: 'The "name" field must be of the string type.'
+                        },
+                        {
+                            field: 'description',
+                            message: 'The "description" field must be of the string type.'
+                        },
+                        {
+                            field: 'websiteUrl',
+                            message: 'The "websiteUrl" field must be of the string type.'
+                        }
+                    ]
+                },
+            )
+
+            console_log(res_post[0].body, res_post[0].status, 'Test 3: post(/blogs)\n');
         });
+        //     it('should not create a blog if the data in the request body is incorrect.', async () => {
+        //         const res = await blogsTestManager.createBlog(
+        //             {
+        //                 name: '   ',
+        //                 description: '   ',
+        //                 websiteUrl: '   '
+        //             },
+        //             encodingAdminDataInBase64(
+        //                 SETTINGS.ADMIN_DATA.LOGIN,
+        //                 SETTINGS.ADMIN_DATA.PASSWORD
+        //             ),
+        //             SETTINGS.HTTP_STATUSES.BAD_REQUEST_400
+        //         );
+        //
+        //         await req
+        //             .get(SETTINGS.PATH.BLOGS)
+        //             .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
+        //
+        //         expect(res.body).toEqual(
+        //             {
+        //                 errorsMessages: [
+        //                     {
+        //                         field: 'name',
+        //                         message: 'The length of the "name" field should be from 1 to 15.'
+        //                     },
+        //                     {
+        //                         field: 'description',
+        //                         message: 'The length of the "description" field should be from 1 to 500.'
+        //                     },
+        //                     {
+        //                         field: 'websiteUrl',
+        //                         message: 'The length of the "description" field should be from 1 to 100.'
+        //                     }
+        //                 ]
+        //             },
+        //         )
+        //
+        //         console_log(res.body, res.status, 'Test 4: post(/blogs)\n');
+        //     });
+        //     it('should not create a blog if the data in the request body is incorrect.', async () => {
+        //         const res = await blogsTestManager.createBlog(
+        //             {
+        //                 name: generateRandomString(16),
+        //                 description: generateRandomString(501),
+        //                 websiteUrl: generateRandomString(101)
+        //             },
+        //             encodingAdminDataInBase64(
+        //                 SETTINGS.ADMIN_DATA.LOGIN,
+        //                 SETTINGS.ADMIN_DATA.PASSWORD
+        //             ),
+        //             SETTINGS.HTTP_STATUSES.BAD_REQUEST_400
+        //         );
+        //
+        //         await req
+        //             .get(SETTINGS.PATH.BLOGS)
+        //             .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
+        //
+        //         expect(res.body).toEqual(
+        //             {
+        //                 errorsMessages: [
+        //                     {
+        //                         field: 'name',
+        //                         message: 'The length of the "name" field should be from 1 to 15.'
+        //                     },
+        //                     {
+        //                         field: 'description',
+        //                         message: 'The length of the "description" field should be from 1 to 500.'
+        //                     },
+        //                     {
+        //                         field: 'websiteUrl',
+        //                         message: 'The length of the "description" field should be from 1 to 100.'
+        //                     }
+        //                 ]
+        //             },
+        //         )
+        //
+        //         console_log(res.body, res.status, 'Test 5: post(/blogs)\n');
+        //     });
+        //     it('should not create a blog if the data in the request body is incorrect.', async () => {
+        //         const res = await blogsTestManager.createBlog(
+        //             {
+        //                 name: 123,
+        //                 description: 123,
+        //                 websiteUrl: 123
+        //             },
+        //             encodingAdminDataInBase64(
+        //                 SETTINGS.ADMIN_DATA.LOGIN,
+        //                 SETTINGS.ADMIN_DATA.PASSWORD
+        //             ),
+        //             SETTINGS.HTTP_STATUSES.BAD_REQUEST_400
+        //         );
+        //
+        //         await req
+        //             .get(SETTINGS.PATH.BLOGS)
+        //             .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
+        //
+        //         expect(res.body).toEqual(
+        //             {
+        //                 errorsMessages: [
+        //                     {
+        //                         field: 'name',
+        //                         message: 'The "name" field must be of the string type.'
+        //                     },
+        //                     {
+        //                         field: 'description',
+        //                         message: 'The "description" field must be of the string type.'
+        //                     },
+        //                     {
+        //                         field: 'websiteUrl',
+        //                         message: 'The "websiteUrl" field must be of the string type.'
+        //                     }
+        //                 ]
+        //             },
+        //         )
+        //
+        //         console_log(res.body, res.status, 'Test 6: post(/blogs)\n');
+        //     });
+        //     it('should not create a blog if the data in the request body is incorrect.', async () => {
+        //         const res = await blogsTestManager.createBlog(
+        //             {
+        //                 name: blog_1.name,
+        //                 description: blog_1.description,
+        //                 websiteUrl: generateRandomString(10)
+        //             },
+        //             encodingAdminDataInBase64(
+        //                 SETTINGS.ADMIN_DATA.LOGIN,
+        //                 SETTINGS.ADMIN_DATA.PASSWORD
+        //             ),
+        //             SETTINGS.HTTP_STATUSES.BAD_REQUEST_400
+        //         );
+        //
+        //         await req
+        //             .get(SETTINGS.PATH.BLOGS)
+        //             .expect(SETTINGS.HTTP_STATUSES.OK_200, []);
+        //
+        //         expect(res.body).toEqual(
+        //             {
+        //                 errorsMessages: [
+        //                     {
+        //                         field: 'websiteUrl',
+        //                         message: 'Invalid URL. The field must start with "https://" and match the pattern: "https://example.com/path".'
+        //                     }
+        //                 ]
+        //             },
+        //         )
+        //
+        //         console_log(res.body, res.status, 'Test 7: post(/blogs)\n');
+    });
     // });
     describe('GET /blogs', () => {
         it('should return an empty array.', async () => {
@@ -880,87 +889,87 @@ describe('/blogs', () => {
 
             console_log(res_delete.body, res_delete.status, 'Test 1: delete(/blogs)\n');
         });
-            it('should not delete blog, the user is not authenticated.', async () => {
-                const res_post: Response[] = await blogsTestManager.createBlog(
-                    1,
-                    {
-                        name: blog.name,
-                        description: blog.description,
-                        websiteUrl: blog.websiteUrl
-                    },
-                    encodingAdminDataInBase64(
+        it('should not delete blog, the user is not authenticated.', async () => {
+            const res_post: Response[] = await blogsTestManager.createBlog(
+                1,
+                {
+                    name: blog.name,
+                    description: blog.description,
+                    websiteUrl: blog.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                ),
+            );
+
+            expect(res_post[0].body).toEqual({
+                id: expect.any(String),
+                name: `${blog.name}_1`,
+                description: `${blog.description}_1`,
+                websiteUrl: blog.websiteUrl,
+                isMembership: blog.isMembership,
+                createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+            });
+
+            const res_delete = await req
+                .delete(`${SETTINGS.PATH.BLOGS}/${res_post[0].body.id}`)
+                .set({
+                    'Authorization': encodingAdminDataInBase64(
+                        'incorrect_login',
+                        'incorrect_password'
+                    )
+                })
+                .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+
+            const res_get = await req
+                .get(`${SETTINGS.PATH.BLOGS}/${res_post[0].body.id}`)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(res_post[0].body).toEqual(res_get.body);
+
+            console_log(res_delete.body, res_delete.status, 'Test 2: delete(/blogs)\n');
+        });
+        it('should return a 404 error if the blog was not found by the passed ID in the parameters.', async () => {
+            const res_post: Response[] = await blogsTestManager.createBlog(
+                1,
+                {
+                    name: blog.name,
+                    description: blog.description,
+                    websiteUrl: blog.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                ),
+            );
+
+            expect(res_post[0].body).toEqual({
+                id: expect.any(String),
+                name: `${blog.name}_1`,
+                description: `${blog.description}_1`,
+                websiteUrl: blog.websiteUrl,
+                isMembership: blog.isMembership,
+                createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+            });
+
+            const res_delete = await req
+                .delete(`${SETTINGS.PATH.BLOGS}/${new ObjectId()}`)
+                .set({
+                    'Authorization': encodingAdminDataInBase64(
                         SETTINGS.ADMIN_DATA.LOGIN,
                         SETTINGS.ADMIN_DATA.PASSWORD
-                    ),
-                );
+                    )
+                })
+                .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
-                expect(res_post[0].body).toEqual({
-                    id: expect.any(String),
-                    name: `${blog.name}_1`,
-                    description: `${blog.description}_1`,
-                    websiteUrl: blog.websiteUrl,
-                    isMembership: blog.isMembership,
-                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
-                });
+            const res_get = await req
+                .get(`${SETTINGS.PATH.BLOGS}/${res_post[0].body.id}`)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-                const res_delete = await req
-                    .delete(`${SETTINGS.PATH.BLOGS}/${res_post[0].body.id}`)
-                    .set({
-                        'Authorization': encodingAdminDataInBase64(
-                            'incorrect_login',
-                            'incorrect_password'
-                        )
-                    })
-                    .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+            expect(res_post[0].body).toEqual(res_get.body);
 
-                const res_get = await req
-                    .get(`${SETTINGS.PATH.BLOGS}/${res_post[0].body.id}`)
-                    .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
-                expect(res_post[0].body).toEqual(res_get.body);
-
-                console_log(res_delete.body, res_delete.status, 'Test 2: delete(/blogs)\n');
-            });
-            it('should return a 404 error if the blog was not found by the passed ID in the parameters.', async () => {
-                const res_post: Response[] = await blogsTestManager.createBlog(
-                    1,
-                    {
-                        name: blog.name,
-                        description: blog.description,
-                        websiteUrl: blog.websiteUrl
-                    },
-                    encodingAdminDataInBase64(
-                        SETTINGS.ADMIN_DATA.LOGIN,
-                        SETTINGS.ADMIN_DATA.PASSWORD
-                    ),
-                );
-
-                expect(res_post[0].body).toEqual({
-                    id: expect.any(String),
-                    name: `${blog.name}_1`,
-                    description: `${blog.description}_1`,
-                    websiteUrl: blog.websiteUrl,
-                    isMembership: blog.isMembership,
-                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
-                });
-
-                const res_delete = await req
-                    .delete(`${SETTINGS.PATH.BLOGS}/${new ObjectId()}`)
-                    .set({
-                        'Authorization': encodingAdminDataInBase64(
-                            SETTINGS.ADMIN_DATA.LOGIN,
-                            SETTINGS.ADMIN_DATA.PASSWORD
-                        )
-                    })
-                    .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
-
-                const res_get = await req
-                    .get(`${SETTINGS.PATH.BLOGS}/${res_post[0].body.id}`)
-                    .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
-                expect(res_post[0].body).toEqual(res_get.body);
-
-                console_log(res_delete.body, res_delete.status, 'Test 3: delete(/blogs)\n');
-            });
+            console_log(res_delete.body, res_delete.status, 'Test 3: delete(/blogs)\n');
+        });
     });
 });
