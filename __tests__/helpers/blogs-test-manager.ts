@@ -52,7 +52,6 @@ const blogsTestManager = {
                 : null
         }
     }
-
 };
 
 export {blogsTestManager};

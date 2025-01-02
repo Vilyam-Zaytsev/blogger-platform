@@ -19,14 +19,14 @@ const blog: BlogDbType = {
 //     isMembership: false
 // } as const;
 
-// const post_1: PostDbType = {
-//     title: 'POST',
-//     shortDescription: 'SHORT_DESCRIPTION_POST',
-//     content: 'CONTENT_POST',
-//     blogId: '',
-//     blogName: blog_1.name,
-//     createdAt: new Date().toISOString(),
-// } as const;
+const post: PostDbType = {
+    title: 'POST',
+    shortDescription: 'SHORT_DESCRIPTION_POST',
+    content: 'CONTENT_POST',
+    blogId: '',
+    blogName: blog.name,
+    createdAt: new Date().toISOString(),
+} as const;
 //
 // const post_2: PostDbType = {
 //     title: 'POST',
@@ -50,7 +50,7 @@ const blog: BlogDbType = {
 export {
     blog,
     // blog_2,
-    // post_1,
+    post,
     // post_2,
     // dbTest_1,
     // dbTest_2
