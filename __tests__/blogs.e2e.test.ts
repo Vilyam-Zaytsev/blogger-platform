@@ -1008,7 +1008,71 @@ describe('/blogs', () => {
             console_log(res_delete.body, res_delete.status, 'Test 3: delete(/blogs)\n');
         });
     });
-    // describe('pogination /blogs', () => {
-    //     it('')
-    // })
+    describe('pagination /blogs', () => {
+        it('should use default pagination values when none are provided by the client.', async () => {
+            const res_post: Response[] = await blogsTestManager.createBlog(
+                11,
+                {
+                    name: blog.name,
+                    description: blog.description,
+                    websiteUrl: blog.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+
+            for (let i = 0; i < res_post.length; i++) {
+                expect(res_post[i].body).toEqual({
+                    id: expect.any(String),
+                    name: `${blog.name}_${i + 1}`,
+                    description: `${blog.description}_${i + 1}`,
+                    websiteUrl: blog.websiteUrl,
+                    isMembership: blog.isMembership,
+                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+                });
+            }
+
+            let x = res_post
+                .sort((a: Response, b: Response) => {
+                    return a.body.createdAt > b.body.createdAt
+                        ? -1
+                        : a.body.createdAt < b.body.createdAt
+                            ? 1
+                            : -1
+                })
+                .map(r => r.body)
+                .filter((r, i) => i < 10 ? r : null)
+
+
+            const res_get = await req
+                .get(SETTINGS.PATH.BLOGS)
+                .query({sortBy: 'createdAt', sortDirection: 'asc'})
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(res_get.body).toEqual({
+                "pageCount": 2,
+                "page": 1,
+                "pageSize": 10,
+                "totalCount": 11,
+                "items": res_post
+                    .sort((a: Response, b: Response) => {
+                        return a.body.createdAt > b.body.createdAt
+                            ? -1
+                            : a.body.createdAt < b.body.createdAt
+                                ? 1
+                                : -1
+                    })
+                    .map(r => r.body)
+                    .filter((r, i) => i < 10 ? r : null)
+            });
+
+            for (let i = 0; i < res_get.body.items.length; i++) {
+                expect(res_get.body.items[i]).toEqual(x[i]);
+            }
+
+            console_log(res_get.body, res_get.status, 'Test 1: pagination(/blogs)\n');
+        })
+    })
 });
