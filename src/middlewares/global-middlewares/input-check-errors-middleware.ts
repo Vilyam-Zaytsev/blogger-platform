@@ -9,6 +9,7 @@ const inputCheckErrorsMiddleware = (
     next: NextFunction
 ) => {
     const e = validationResult(req);
+
     if (!e.isEmpty()) {
         const errors = e.array({onlyFirstError: true}) as { path: FieldNameType, msg: string }[];
 
