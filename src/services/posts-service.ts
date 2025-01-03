@@ -23,7 +23,7 @@ const postsService = {
                 blogId
             );
 
-        const postsCount: number = await postsRepository.getPostsCount();
+        const postsCount: number = await postsRepository.getPostsCount(blogId);
 
         return {
             pageCount: Math.ceil(postsCount / pageSize),

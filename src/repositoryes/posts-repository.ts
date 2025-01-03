@@ -25,7 +25,7 @@ const postsRepository = {
             .limit(pageSize)
             .toArray()
     },
-    async getPostsCount(blogId): Promise<number> {
+    async getPostsCount(blogId: string | null): Promise<number> {
         const filter: any = createFilter(
             {
                 blogId,
