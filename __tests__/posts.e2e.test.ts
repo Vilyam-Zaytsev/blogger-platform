@@ -1782,5 +1782,163 @@ describe('/posts', () => {
             console_log(res_GET_posts.body, res_GET_posts.status, 'Test 4: pagination(/posts)\n');
         });
     });
+    describe('GET /blogs/id/posts', () => {
+        it('should return all posts from a specific blog.', async () => {
+            const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
+                1,
+                {
+                    name: blog.name,
+                    description: blog.description,
+                    websiteUrl: blog.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+
+            expect(res_POST_blogs[0].body).toEqual({
+                id: expect.any(String),
+                name: `${blog.name}_1`,
+                description: `${blog.description}_1`,
+                websiteUrl: blog.websiteUrl,
+                isMembership: blog.isMembership,
+                createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+            });
+
+            const res_POST_posts: Response[] = await postsTestManager.createPost(
+                2,
+                {
+                    title: post.title,
+                    shortDescription: post.shortDescription,
+                    content: post.content,
+                    blogId: res_POST_blogs[0].body.id
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+
+            for (let i = 0; i < res_POST_posts.length; i++) {
+                expect(res_POST_posts[i].body).toEqual({
+                    id: expect.any(String),
+                    title: `${post.title}_${i + 1}`,
+                    shortDescription: `${post.shortDescription}_${i + 1}`,
+                    content: `${post.content}_${i + 1}`,
+                    blogId: res_POST_blogs[0].body.id,
+                    blogName: res_POST_blogs[0].body.name,
+                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+                });
+            }
+
+            const res_GET_posts = await req
+                .get(`${SETTINGS.PATH.BLOGS}/${res_POST_blogs[0].body.id}${SETTINGS.PATH.POSTS}`)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(res_GET_posts.body).toEqual({
+                pageCount: 1,
+                page: 1,
+                pageSize: 10,
+                totalCount: 2,
+                items: postsTestManager.filterAndSort(
+                    res_POST_posts.map(r => r.body)
+                )
+            })
+
+            expect(res_GET_posts.body.items.length).toEqual(2);
+
+            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 6: get(/blogs/id/posts)\n');
+        });
+        it('should return all entries from a specific blog using the pagination values provided by the client.', async () => {
+            const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
+                1,
+                {
+                    name: blog.name,
+                    description: blog.description,
+                    websiteUrl: blog.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+
+            expect(res_POST_blogs[0].body).toEqual({
+                id: expect.any(String),
+                name: `${blog.name}_1`,
+                description: `${blog.description}_1`,
+                websiteUrl: blog.websiteUrl,
+                isMembership: blog.isMembership,
+                createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+            });
+
+            const res_POST_posts: Response[] = await postsTestManager.createPost(
+                11,
+                {
+                    title: post.title,
+                    shortDescription: post.shortDescription,
+                    content: post.content,
+                    blogId: res_POST_blogs[0].body.id
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+
+            for (let i = 0; i < res_POST_posts.length; i++) {
+                expect(res_POST_posts[i].body).toEqual({
+                    id: expect.any(String),
+                    title: `${post.title}_${i + 1}`,
+                    shortDescription: `${post.shortDescription}_${i + 1}`,
+                    content: `${post.content}_${i + 1}`,
+                    blogId: res_POST_blogs[0].body.id,
+                    blogName: res_POST_blogs[0].body.name,
+                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+                });
+            }
+
+            const res_GET_posts = await req
+                .get(`${SETTINGS.PATH.BLOGS}/${res_POST_blogs[0].body.id}${SETTINGS.PATH.POSTS}`)
+                .query({
+                    sortBy: 'title',
+                    sortDirection: 'asc',
+                    pageNumber: 2,
+                    pageSize: 3
+                })
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(res_GET_posts.body).toEqual({
+                pageCount: 4,
+                page: 2,
+                pageSize: 3,
+                totalCount: 11,
+                items: postsTestManager.filterAndSort(
+                    res_POST_posts.map(r => r.body),
+                    'title',
+                    'asc',
+                    2,
+                    3
+                )
+            })
+
+            for (let i = 0; i < res_GET_posts.body.items.length; i++) {
+                expect(res_GET_posts.body.items[i]).toEqual(
+                    postsTestManager.filterAndSort(
+                        res_POST_posts.map(r => r.body),
+                        'title',
+                        'asc',
+                        2,
+                        3
+                    )[i]
+                );
+            }
+
+            expect(res_GET_posts.body.items.length).toEqual(3);
+
+            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 7: get(/blogs/id/posts)\n');
+        })
+    })
 
 });
