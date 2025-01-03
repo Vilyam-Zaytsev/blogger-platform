@@ -23,22 +23,22 @@ const blogsController = {
         res: Response<PaginationResponse<BlogDbType>>
     ) => {
 
-        const blogs: PaginationResponse<BlogDbType> = await qBlogsService
+        const foundBlogs: PaginationResponse<BlogDbType> = await qBlogsService
             .findBlogs(paginationParams(req));
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(blogs);
+            .json(foundBlogs);
     },
     getBlog: async (
         req: RequestWithParams<URIParamsBlogIdModel>,
         res: Response<BlogViewModel | {}>
     ) => {
 
-        const blog: BlogViewModel | null = await qBlogsService
+        const foundBlog: BlogViewModel | null = await qBlogsService
             .findBlog(req.params.id);
 
-        if (!blog) {
+        if (!foundBlog) {
             res
                 .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
                 .json({});
@@ -48,7 +48,7 @@ const blogsController = {
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(blog);
+            .json(foundBlog);
     },
     createAndInsertBlog: async (
         req: RequestWithBody<BlogInputModel>,
@@ -76,7 +76,7 @@ const blogsController = {
         res: Response<BlogViewModel | {}>
     ) => {
 
-        const dataForBlogUpdates = {
+        const dataForBlogUpdates: BlogInputModel = {
             name: req.body.name,
             description: req.body.description,
             websiteUrl: req.body.websiteUrl

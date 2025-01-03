@@ -54,7 +54,7 @@ blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
     postShortDescriptionInputValidator,
     postContentInputValidator,
     inputCheckErrorsMiddleware,
-    postsController.createPost
+    postsController.createAndInsertPost
 );
 blogsRouter.post('/',
     authMiddleware,
