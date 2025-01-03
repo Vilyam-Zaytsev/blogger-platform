@@ -3,23 +3,18 @@ import {BlogDbType} from "../types/db-types/blog-db-type";
 import {ObjectId, WithId} from "mongodb";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
 import {qBlogsRepository} from "../repositoryes/qBlogs-repository";
+import {sortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
 
 const qBlogsService = {
-    async findBlogs(
-        pageNumber: number,
-        pageSize: number,
-        sortBy: string,
-        sortDirection: 'asc' | 'desc',
-        searchNameTerm: string | null,
-    ): Promise<PaginationResponse<BlogDbType>> {
+    async findBlogs(sortQueryDto: sortQueryFilterType): Promise<PaginationResponse<BlogDbType>> {
+        const {
+            pageNumber  ,
+            pageSize    ,
+            searchNameTerm
+        } = sortQueryDto;
+
         const blogs: WithId<BlogDbType>[] = await qBlogsRepository
-            .findBlogs(
-                pageNumber,
-                pageSize,
-                sortBy,
-                sortDirection,
-                searchNameTerm,
-            );
+            .findBlogs(sortQueryDto);
 
         const blogsCount: number = await qBlogsRepository
             .getBlogsCount(searchNameTerm);
@@ -33,7 +28,9 @@ const qBlogsService = {
         };
     },
     async findBlog(id: string | ObjectId): Promise<BlogViewModel | null> {
-        const foundBlog: WithId<BlogDbType> | null = await qBlogsRepository.findBlog(id);
+
+        const foundBlog: WithId<BlogDbType> | null = await qBlogsRepository
+            .findBlog(id);
 
         if (!foundBlog) return null;
 

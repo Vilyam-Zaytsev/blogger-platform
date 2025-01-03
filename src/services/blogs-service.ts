@@ -35,6 +35,7 @@ const blogsService = {
     //     };
     // },
     async createBlog(blogData: BlogInputModel): Promise<InsertOneResult> {
+
         const newBlog: BlogDbType = {
             ...blogData,
             createdAt: new Date().toISOString(),

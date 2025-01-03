@@ -20,23 +20,11 @@ import {qBlogsService} from "../services/qBlogs-service";
 const blogsController = {
     getBlogs: async (
         req: Request,
-        res: Response<PaginationResponse<BlogDbType>>) => {
-        const {
-            pageNumber,
-            pageSize,
-            sortBy,
-            sortDirection,
-            searchNameTerm
-        } = paginationParams(req);
+        res: Response<PaginationResponse<BlogDbType>>
+    ) => {
 
         const blogs: PaginationResponse<BlogDbType> = await qBlogsService
-            .findBlogs(
-                pageNumber,
-                pageSize,
-                sortBy,
-                sortDirection,
-                searchNameTerm
-            );
+            .findBlogs(paginationParams(req));
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
@@ -44,8 +32,11 @@ const blogsController = {
     },
     getBlog: async (
         req: RequestWithParams<URIParamsBlogIdModel>,
-        res: Response<BlogViewModel | {}>) => {
-        const blog: BlogViewModel | null = await qBlogsService.findBlog(req.params.id);
+        res: Response<BlogViewModel | {}>
+    ) => {
+
+        const blog: BlogViewModel | null = await qBlogsService
+            .findBlog(req.params.id);
 
         if (!blog) {
             res
@@ -61,16 +52,20 @@ const blogsController = {
     },
     createAndInsertBlog: async (
         req: RequestWithBody<BlogInputModel>,
-        res: Response<BlogViewModel | {}>) => {
+        res: Response<BlogViewModel | {}>
+    ) => {
+
         const dataForCreatingBlog: BlogInputModel = {
             name: req.body.name,
             description: req.body.description,
             websiteUrl: req.body.websiteUrl
         };
+
         const result: InsertOneResult = await blogsService
             .createBlog(dataForCreatingBlog);
 
-        const createdBlog: BlogViewModel | null = await qBlogsService.findBlog(result.insertedId);
+        const createdBlog: BlogViewModel | null = await qBlogsService
+            .findBlog(result.insertedId);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
@@ -78,12 +73,15 @@ const blogsController = {
     },
     updateBlog: async (
         req: RequestWithParamsAndBody<URIParamsBlogIdModel, BlogInputModel>,
-        res: Response) => {
+        res: Response<BlogViewModel | {}>
+    ) => {
+
         const dataForBlogUpdates = {
             name: req.body.name,
             description: req.body.description,
             websiteUrl: req.body.websiteUrl
         };
+
         const updatedBlog: boolean = await blogsService
             .updateBlog(req.params.id, dataForBlogUpdates);
 
@@ -101,7 +99,9 @@ const blogsController = {
     },
     deleteBlog: async (
         req: RequestWithParams<URIParamsBlogIdModel>,
-        res: Response) => {
+        res: Response
+    ) => {
+
         const isDeletedBlog: boolean = await blogsService
             .deleteBlog(req.params.id);
 
