@@ -398,7 +398,9 @@ describe('/blogs', () => {
                 "page": 1,
                 "pageSize": 10,
                 "totalCount": res_post.length,
-                "items": [...res_post.map(r => r.body)]
+                "items": blogsTestManager.filterAndSort(
+                    res_post.map(r => r.body)
+                )
             });
 
             expect(res_get.body.items.length).toEqual(2);
