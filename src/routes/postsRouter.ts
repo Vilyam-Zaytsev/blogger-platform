@@ -31,7 +31,7 @@ postsRouter.post('/',
     postContentInputValidator,
     postBlogIdInputValidator,
     inputCheckErrorsMiddleware,
-    postsController.createPost
+    postsController.createAndInsertPost
 );
 postsRouter.put('/:id',
     authMiddleware,

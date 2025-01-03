@@ -2,42 +2,32 @@ import {Request, Response} from "express";
 import {PostInputModel, PostViewModel, URIParamsPostIdModel} from "../types/input-output-types/posts-types";
 import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/input-output-types/request-types";
 import {SETTINGS} from "../settings";
-import {qPostsRepository} from "../repositoryes/qPosts-repository";
 import {InsertOneResult, WithId} from "mongodb";
 import {PostDbType} from "../types/db-types/post-db-type";
 import {postsService} from "../services/posts-service";
 import {paginationParams} from "../helpers/pagination-params";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
+import {qPostsService} from "../services/qPosts-service";
 
 const postsController = {
     getPosts: async (
         req: Request,
-        res: Response<PaginationResponse<PostDbType>>) => {
-        const {
-            pageNumber,
-            pageSize,
-            sortBy,
-            sortDirection,
-            blogId
-        } = paginationParams(req);
+        res: Response<PaginationResponse<PostDbType>>
+    ) => {
 
-        const posts: PaginationResponse<PostDbType> = await postsService
-            .findPosts(
-                pageNumber,
-                pageSize,
-                sortBy,
-                sortDirection,
-                blogId
-            );
+        const foundPosts: PaginationResponse<PostDbType> = await qPostsService
+            .findPosts(paginationParams(req));
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(posts);
+            .json(foundPosts);
     },
     getPost: async (
         req: RequestWithParams<URIParamsPostIdModel>,
-        res: Response<PostViewModel | {}>) => {
-        const foundPost: WithId<PostDbType> | null = await qPostsRepository
+        res: Response<PostViewModel | {}>
+    ) => {
+
+        const foundPost: PostViewModel | null = await qPostsService
             .findPost(req.params.id);
 
         if (!foundPost) {
@@ -48,43 +38,46 @@ const postsController = {
             return;
         }
 
-        const post: PostViewModel = qPostsRepository
-            .mapToViewModel(foundPost);
-
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(post);
+            .json(foundPost);
     },
-    createPost: async (
+    createAndInsertPost: async (
         req: RequestWithBody<PostInputModel>,
-        res: Response<PostViewModel>) => {
-        const dataCreatingPost: PostInputModel = {
+        res: Response<PostViewModel>
+    ) => {
+
+        const dataForCreatingPost: PostInputModel = {
             title: req.body.title,
             shortDescription: req.body.shortDescription,
             content: req.body.content,
             blogId: req.body.blogId,
         };
-        const result: InsertOneResult = await postsService
-            .createPost(dataCreatingPost);
 
-        const post: PostViewModel = await qPostsRepository
-            .findPostAndMapToViewModel(result.insertedId);
+        const result: InsertOneResult = await postsService
+            .createPost(dataForCreatingPost);
+
+        const createdPost: PostViewModel | null = await qPostsService
+            .findPost(result.insertedId);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
-            .json(post);
+            .json(createdPost!);
     },
     updatePost: async (
         req: RequestWithParamsAndBody<URIParamsPostIdModel, PostInputModel>,
-        res: Response) => {
-        const dataUpdatingPost = {
+        res: Response<PostViewModel | {}>
+    ) => {
+
+        const dataForPostUpdates: PostInputModel = {
             title: req.body.title,
             shortDescription: req.body.shortDescription,
             content: req.body.content,
             blogId: req.body.blogId
         };
+
         const updatedPost: boolean = await postsService
-            .updatePost(req.params.id, dataUpdatingPost);
+            .updatePost(req.params.id, dataForPostUpdates);
 
         if (!updatedPost) {
             res
@@ -100,8 +93,10 @@ const postsController = {
     },
     deletePost: async (
         req: RequestWithParams<URIParamsPostIdModel>,
-        res: Response) => {
-        const isDeletedPost: boolean = await postsService.deletePost(req.params.id);
+        res: Response
+    ) => {
+        const isDeletedPost: boolean = await postsService
+            .deletePost(req.params.id);
 
         if (!isDeletedPost) {
             res
