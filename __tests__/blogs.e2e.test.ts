@@ -1056,62 +1056,207 @@ describe('/blogs', () => {
                 );
             }
 
+            expect(res_get.body.items.length).toEqual(10);
+
             console_log(res_get.body, res_get.status, 'Test 1: pagination(/blogs)\n');
         });
-        // it('should use client-provided pagination values to return the correct subset of data.', async () => {
-        //     const res_post: Response[] = await blogsTestManager.createBlog(
-        //         11,
-        //         {
-        //             name: blog.name,
-        //             description: blog.description,
-        //             websiteUrl: blog.websiteUrl
-        //         },
-        //         encodingAdminDataInBase64(
-        //             SETTINGS.ADMIN_DATA.LOGIN,
-        //             SETTINGS.ADMIN_DATA.PASSWORD
-        //         )
-        //     );
-        //
-        //     for (let i = 0; i < res_post.length; i++) {
-        //         expect(res_post[i].body).toEqual({
-        //             id: expect.any(String),
-        //             name: `${blog.name}_${i + 1}`,
-        //             description: `${blog.description}_${i + 1}`,
-        //             websiteUrl: blog.websiteUrl,
-        //             isMembership: blog.isMembership,
-        //             createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
-        //         });
-        //     }
-        //
-        //     const res_get = await req
-        //         .get(SETTINGS.PATH.BLOGS)
-        //         .query({
-        //             sortBy: 'name',
-        //             sortDirection: 'asc',
-        //             pageNumber: 3,
-        //             pageSize: 2
-        //         })
-        //         .expect(SETTINGS.HTTP_STATUSES.OK_200);
-        //
-        //     expect(res_get.body).toEqual({
-        //         "pageCount": 6,
-        //         "page": 3,
-        //         "pageSize": 2,
-        //         "totalCount": 11,
-        //         "items": blogsTestManager.filterAndSort(
-        //             res_post.map(r => r.body)
-        //         )
-        //     });
-        //
-        //     for (let i = 0; i < res_get.body.items.length; i++) {
-        //         expect(res_get.body.items[i]).toEqual(
-        //             blogsTestManager.filterAndSort(
-        //                 res_post.map(r => r.body)
-        //             )[i]
-        //         );
-        //     }
-        //
-        //     console_log(res_get.body, res_get.status, 'Test 2: pagination(/blogs)\n');
-        // });
+        it('should use client-provided pagination values to return the correct subset of data.', async () => {
+            const res_post: Response[] = await blogsTestManager.createBlog(
+                11,
+                {
+                    name: blog.name,
+                    description: blog.description,
+                    websiteUrl: blog.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+
+            for (let i = 0; i < res_post.length; i++) {
+                expect(res_post[i].body).toEqual({
+                    id: expect.any(String),
+                    name: `${blog.name}_${i + 1}`,
+                    description: `${blog.description}_${i + 1}`,
+                    websiteUrl: blog.websiteUrl,
+                    isMembership: blog.isMembership,
+                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+                });
+            }
+
+            const res_get = await req
+                .get(SETTINGS.PATH.BLOGS)
+                .query({
+                    sortBy: 'name',
+                    sortDirection: 'asc',
+                    pageNumber: 2,
+                    pageSize: 3
+                })
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(res_get.body).toEqual({
+                "pageCount": 4,
+                "page": 2,
+                "pageSize": 3,
+                "totalCount": 11,
+                "items": blogsTestManager.filterAndSort(
+                    res_post.map(r => r.body),
+                    'name',
+                    'asc',
+                    2,
+                    3
+                )
+            });
+
+            for (let i = 0; i < res_get.body.items.length; i++) {
+                expect(res_get.body.items[i]).toEqual(
+                    blogsTestManager.filterAndSort(
+                        res_post.map(r => r.body),
+                        'name',
+                        'asc',
+                        2,
+                        3
+                    )[i]
+                );
+            }
+
+            expect(res_get.body.items.length).toEqual(3);
+
+            console_log(res_get.body, res_get.status, 'Test 2: pagination(/blogs)\n');
+        });
+        it('should use client-provided pagination values to return the correct subset of data.', async () => {
+            const res_post: Response[] = await blogsTestManager.createBlog(
+                11,
+                {
+                    name: blog.name,
+                    description: blog.description,
+                    websiteUrl: blog.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+
+            for (let i = 0; i < res_post.length; i++) {
+                expect(res_post[i].body).toEqual({
+                    id: expect.any(String),
+                    name: `${blog.name}_${i + 1}`,
+                    description: `${blog.description}_${i + 1}`,
+                    websiteUrl: blog.websiteUrl,
+                    isMembership: blog.isMembership,
+                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+                });
+            }
+
+            const res_get = await req
+                .get(SETTINGS.PATH.BLOGS)
+                .query({
+                    sortBy: 'id',
+                    sortDirection: 'desc',
+                    pageNumber: 6,
+                    pageSize: 2
+                })
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(res_get.body).toEqual({
+                "pageCount": 6,
+                "page": 6,
+                "pageSize": 2,
+                "totalCount": 11,
+                "items": blogsTestManager.filterAndSort(
+                    res_post.map(r => r.body),
+                    'id',
+                    'desc',
+                    6,
+                    2
+                )
+            });
+
+            for (let i = 0; i < res_get.body.items.length; i++) {
+                expect(res_get.body.items[i]).toEqual(
+                    blogsTestManager.filterAndSort(
+                        res_post.map(r => r.body),
+                        'id',
+                        'desc',
+                        6,
+                        2
+                    )[i]
+                );
+            }
+
+            expect(res_get.body.items.length).toEqual(1);
+
+            console_log(res_get.body, res_get.status, 'Test 3: pagination(/blogs)\n');
+        });
+        it('should use client-provided pagination values to return the correct subset of data.', async () => {
+            const res_post: Response[] = await blogsTestManager.createBlog(
+                11,
+                {
+                    name: blog.name,
+                    description: blog.description,
+                    websiteUrl: blog.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+
+            for (let i = 0; i < res_post.length; i++) {
+                expect(res_post[i].body).toEqual({
+                    id: expect.any(String),
+                    name: `${blog.name}_${i + 1}`,
+                    description: `${blog.description}_${i + 1}`,
+                    websiteUrl: blog.websiteUrl,
+                    isMembership: blog.isMembership,
+                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+                });
+            }
+
+            const res_get = await req
+                .get(SETTINGS.PATH.BLOGS)
+                .query({
+                    searchNameTerm: 'G_1',
+                    sortBy: 'id',
+                    sortDirection: 'asc',
+                    pageNumber: 1,
+                    pageSize: 2
+                })
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(res_get.body).toEqual({
+                "pageCount": 2,
+                "page": 1,
+                "pageSize": 2,
+                "totalCount": 3,
+                "items": blogsTestManager.filterAndSort(
+                    res_post.map(r => r.body),
+                    'id',
+                    'asc',
+                    1,
+                    2,
+                    'G_1'
+                )
+            });
+
+            for (let i = 0; i < res_get.body.items.length; i++) {
+                expect(res_get.body.items[i]).toEqual(
+                    blogsTestManager.filterAndSort(
+                        res_post.map(r => r.body),
+                        'id',
+                        'asc',
+                        1,
+                        2,
+                        'G_1'
+                    )[i]
+                );
+            }
+
+            expect(res_get.body.items.length).toEqual(2);
+
+            console_log(res_get.body, res_get.status, 'Test 4: pagination(/blogs)\n');
+        });
     });
 });
