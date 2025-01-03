@@ -17,11 +17,11 @@ import {
 import {SETTINGS} from "../settings";
 import {postsController} from "../controllers/postsController";
 import {
+    postBlogIdInputValidator,
     postContentInputValidator,
     postShortDescriptionInputValidator,
     postTitleInputValidator
 } from "../middlewares/post-middlewares/postValidators";
-import {addBlogIdToBody} from "../middlewares/global-middlewares/addBlogIdToBody";
 import {checkBlogId} from "../middlewares/global-middlewares/checkBlogId";
 
 const blogsRouter = Router();
@@ -38,18 +38,17 @@ blogsRouter.get('/',
 blogsRouter.get('/:id', blogsController.getBlog);
 blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
     checkBlogId,
-    addBlogIdToBody,
     pageNumberInputValidator,
     pageSizeInputValidator,
     sortByInputValidator,
     sortDirectionInputValidator,
+    postBlogIdInputValidator,
     inputCheckErrorsMiddleware,
     postsController.getPosts
 );
 blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
     authMiddleware,
     checkBlogId,
-    addBlogIdToBody,
     postTitleInputValidator,
     postShortDescriptionInputValidator,
     postContentInputValidator,
