@@ -7,33 +7,33 @@ import {qBlogsRepository} from "../repositoryes/qBlogs-repository";
 
 
 const blogsService = {
-    async findBlogs(
-        pageNumber: number,
-        pageSize: number,
-        sortBy: string,
-        sortDirection: 'asc' | 'desc',
-        searchNameTerm: string | null,
-    ): Promise<PaginationResponse<BlogDbType>> {
-        const blogs: WithId<BlogDbType>[] = await blogsRepository
-            .findBlogs(
-                pageNumber,
-                pageSize,
-                sortBy,
-                sortDirection,
-                searchNameTerm,
-            );
-
-        const blogsCount: number = await blogsRepository
-            .getBlogsCount(searchNameTerm);
-
-        return {
-            pageCount: Math.ceil(blogsCount / pageSize),
-            page: pageNumber,
-            pageSize,
-            totalCount: blogsCount,
-            items: blogs.map(b => qBlogsRepository.mapToViewModel(b)),
-        };
-    },
+    // async findBlogs(
+    //     pageNumber: number,
+    //     pageSize: number,
+    //     sortBy: string,
+    //     sortDirection: 'asc' | 'desc',
+    //     searchNameTerm: string | null,
+    // ): Promise<PaginationResponse<BlogDbType>> {
+    //     const blogs: WithId<BlogDbType>[] = await blogsRepository
+    //         .findBlogs(
+    //             pageNumber,
+    //             pageSize,
+    //             sortBy,
+    //             sortDirection,
+    //             searchNameTerm,
+    //         );
+    //
+    //     const blogsCount: number = await blogsRepository
+    //         .getBlogsCount(searchNameTerm);
+    //
+    //     return {
+    //         pageCount: Math.ceil(blogsCount / pageSize),
+    //         page: pageNumber,
+    //         pageSize,
+    //         totalCount: blogsCount,
+    //         items: blogs.map(b => qBlogsRepository.mapToViewModel(b)),
+    //     };
+    // },
     async createBlog(blogData: BlogInputModel): Promise<InsertOneResult> {
         const newBlog: BlogDbType = {
             ...blogData,
@@ -42,7 +42,7 @@ const blogsService = {
         };
 
         return await blogsRepository
-            .createBlog(newBlog);
+            .insertBlog(newBlog);
     },
     async updateBlog(id: string, data: BlogInputModel): Promise<boolean> {
         return await blogsRepository

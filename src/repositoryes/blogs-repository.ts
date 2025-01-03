@@ -5,38 +5,28 @@ import {InsertOneResult, ObjectId, Sort, WithId} from "mongodb";
 import {createFilter} from "../helpers/createFilter";
 
 const blogsRepository = {
-    async findBlogs(
-        pageNumber: number,
-        pageSize: number,
-        sortBy: string,
-        sortDirection: 'asc' | 'desc',
-        searchNameTerm: string | null,
-    ): Promise<WithId<BlogDbType>[]> {
-        const filter: any = createFilter(
-            {
-                nameOfSearchField: 'name',
-                searchNameTerm
-            }
-        );
-
-        return await blogsCollection
-            .find(filter)
-            .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as Sort)
-            .skip((pageNumber - 1) * pageSize)
-            .limit(pageSize)
-            .toArray()
-    },
-    async getBlogsCount(searchNameTerm: string | null): Promise<number> {
-        const filter: any = createFilter(
-            {
-                nameOfSearchField: 'name',
-                searchNameTerm
-            }
-        );
-
-        return blogsCollection.countDocuments(filter);
-    },
-    async createBlog(newBlog: BlogDbType): Promise<InsertOneResult> {
+    // async findBlogs(
+    //     pageNumber: number,
+    //     pageSize: number,
+    //     sortBy: string,
+    //     sortDirection: 'asc' | 'desc',
+    //     searchNameTerm: string | null,
+    // ): Promise<WithId<BlogDbType>[]> {
+    //     const filter: any = createFilter(
+    //         {
+    //             nameOfSearchField: 'name',
+    //             searchNameTerm
+    //         }
+    //     );
+    //
+    //     return await blogsCollection
+    //         .find(filter)
+    //         .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as Sort)
+    //         .skip((pageNumber - 1) * pageSize)
+    //         .limit(pageSize)
+    //         .toArray()
+    // },
+    async insertBlog(newBlog: BlogDbType): Promise<InsertOneResult> {
         return await blogsCollection
             .insertOne(newBlog);
     },

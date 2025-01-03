@@ -1,7 +1,7 @@
-import {BlogViewModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {blogsCollection} from "../db/mongoDb";
-import {ObjectId, WithId} from "mongodb";
+import {ObjectId, Sort, WithId} from "mongodb";
+import {createFilter} from "../helpers/createFilter";
 
 const qBlogsRepository = {
     async findBlogs(
@@ -10,36 +10,34 @@ const qBlogsRepository = {
         sortBy: string,
         sortDirection: 'asc' | 'desc',
         searchNameTerm: string | null,
-    ) {
-        await blogsCollection
-            .find({})
-            .toArray();
+    ): Promise<WithId<BlogDbType>[]> {
+        const filter: any = createFilter(
+            {
+                nameOfSearchField: 'name',
+                searchNameTerm
+            }
+        );
+
+        return await blogsCollection
+            .find(filter)
+            .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as Sort)
+            .skip((pageNumber - 1) * pageSize)
+            .limit(pageSize)
+            .toArray()
     },
-    async findBlog(id: string): Promise<WithId<BlogDbType> | null> {
+    async getBlogsCount(searchNameTerm: string | null): Promise<number> {
+        const filter: any = createFilter(
+            {
+                nameOfSearchField: 'name',
+                searchNameTerm
+            }
+        );
+
+        return blogsCollection.countDocuments(filter);
+    },
+    async findBlog(id: string | ObjectId): Promise<WithId<BlogDbType> | null> {
         return await blogsCollection
             .findOne({_id: new ObjectId(id)});
-    },
-    mapToViewModel(blog: WithId<BlogDbType>): BlogViewModel {
-        return {
-            id: String(blog._id),
-            name: blog.name,
-            description: blog.description,
-            websiteUrl: blog.websiteUrl,
-            createdAt: blog.createdAt,
-            isMembership: blog.isMembership
-        };
-    },
-    async findBlogAndMapToViewModel(id: ObjectId): Promise<BlogViewModel> {
-        const blog: WithId<BlogDbType> = await blogsCollection
-            .findOne({_id: id}) as WithId<BlogDbType>;
-
-        return this.mapToViewModel(blog);
-    },
-    async findBlogsAndMapToViewModel(): Promise<BlogViewModel[]> {
-        return (await blogsCollection
-            .find({})
-            .toArray())
-            .map(b => this.mapToViewModel(b));
     },
 };
 
