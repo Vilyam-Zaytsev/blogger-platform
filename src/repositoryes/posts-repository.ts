@@ -25,8 +25,13 @@ const postsRepository = {
             .limit(pageSize)
             .toArray()
     },
-    async getPostsCount(): Promise<number> {
-        return postsCollection.countDocuments({});
+    async getPostsCount(blogId): Promise<number> {
+        const filter: any = createFilter(
+            {
+                blogId,
+            }
+        )
+        return postsCollection.countDocuments(filter);
     },
     async createPost(newPost: PostDbType): Promise<InsertOneResult> {
             return  await postsCollection

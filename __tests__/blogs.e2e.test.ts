@@ -1057,6 +1057,6 @@ describe('/blogs', () => {
             }
 
             console_log(res_get.body, res_get.status, 'Test 1: pagination(/blogs)\n');
-        })
-    })
+        });
+    });
 });
