@@ -11,7 +11,9 @@ const paginationParams = (req: Request) => {
             : 10;
     const sortBy: string =
         req.query.sortBy
-            ? String(req.query.sortBy)
+            ? req.query.sortBy === 'id'
+                ? '_id'
+                : String(req.query.sortBy)
             : 'createdAt';
     const sortDirection: 'asc' | 'desc' =
         req.query.sortDirection && String(req.query.sortDirection) === 'asc'
