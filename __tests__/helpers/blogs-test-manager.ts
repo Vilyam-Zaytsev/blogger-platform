@@ -1,6 +1,8 @@
 import {req} from "./test-helpers";
 import {SETTINGS} from "../../src/settings";
 import {Response} from "supertest";
+import {BlogDbType} from "../../src/types/db-types/blog-db-type";
+import {BlogViewModel} from "../../src/types/input-output-types/blogs-types";
 
 const blogsTestManager = {
     async createBlog(
@@ -51,6 +53,22 @@ const blogsTestManager = {
                     : dataBlog.description
                 : null
         }
+    },
+    filterAndSort(
+        items: BlogViewModel[],
+        sortBy: keyof BlogViewModel = 'createdAt',
+        sortDirection: string = 'desc',
+        pageSize: number = 10,
+    ) {
+        return items
+            .sort((a: BlogViewModel, b: BlogViewModel) => {
+                return a[sortBy] > b[sortBy]
+                    ? sortDirection === 'desc' ? -1 : 1
+                    : a[sortBy] < b[sortBy]
+                        ? sortDirection === 'desc' ? 1 : -1
+                        : sortDirection === 'desc' ? -1 : 1
+            })
+            .filter((b, i) => i < pageSize ? b : null)
     }
 };
 

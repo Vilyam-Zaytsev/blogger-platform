@@ -1034,21 +1034,8 @@ describe('/blogs', () => {
                 });
             }
 
-            let x = res_post
-                .sort((a: Response, b: Response) => {
-                    return a.body.createdAt > b.body.createdAt
-                        ? -1
-                        : a.body.createdAt < b.body.createdAt
-                            ? 1
-                            : -1
-                })
-                .map(r => r.body)
-                .filter((r, i) => i < 10 ? r : null)
-
-
             const res_get = await req
                 .get(SETTINGS.PATH.BLOGS)
-                .query({sortBy: 'createdAt', sortDirection: 'asc'})
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(res_get.body).toEqual({
@@ -1056,20 +1043,17 @@ describe('/blogs', () => {
                 "page": 1,
                 "pageSize": 10,
                 "totalCount": 11,
-                "items": res_post
-                    .sort((a: Response, b: Response) => {
-                        return a.body.createdAt > b.body.createdAt
-                            ? -1
-                            : a.body.createdAt < b.body.createdAt
-                                ? 1
-                                : -1
-                    })
-                    .map(r => r.body)
-                    .filter((r, i) => i < 10 ? r : null)
+                "items": blogsTestManager.filterAndSort(
+                    res_post.map(r => r.body)
+                )
             });
 
             for (let i = 0; i < res_get.body.items.length; i++) {
-                expect(res_get.body.items[i]).toEqual(x[i]);
+                expect(res_get.body.items[i]).toEqual(
+                    blogsTestManager.filterAndSort(
+                        res_post.map(r => r.body)
+                    )[i]
+                );
             }
 
             console_log(res_get.body, res_get.status, 'Test 1: pagination(/blogs)\n');
