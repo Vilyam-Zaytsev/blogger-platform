@@ -1,6 +1,8 @@
 import {req} from "./test-helpers";
 import {SETTINGS} from "../../src/settings";
 import {Response} from "supertest";
+import {BlogViewModel} from "../../src/types/input-output-types/blogs-types";
+import {PostViewModel} from "../../src/types/input-output-types/posts-types";
 
 const postsTestManager = {
     async createPost(
@@ -54,6 +56,28 @@ const postsTestManager = {
             blogId: dataPost.blogId
         };
     },
+    filterAndSort(
+        items: PostViewModel[],
+        sortBy: keyof PostViewModel = 'createdAt',
+        sortDirection: string = 'desc',
+        pageNumber: number = 1,
+        pageSize: number = 10,
+    ) {
+        let startIndex = (pageNumber - 1) * pageSize;
+        let finishIndex = startIndex + pageSize;
+
+        return items
+            .sort((a: PostViewModel, b: PostViewModel) => {
+                return a[sortBy] > b[sortBy]
+                    ? sortDirection === 'desc' ? -1 : 1
+                    : a[sortBy] < b[sortBy]
+                        ? sortDirection === 'desc' ? 1 : -1
+                        : sortDirection === 'desc' ? -1 : 1
+            })
+            .filter((b, i) => {
+                return i >= startIndex && i < finishIndex ? b : null;
+            })
+    }
 };
 
 export {postsTestManager};
