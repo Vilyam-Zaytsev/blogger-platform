@@ -2005,5 +2005,59 @@ describe('/posts', () => {
                 'Test 1: post(/blogs/:id/posts)\n'
             );
         });
+        it('should not create a post for a specific blog if the blog does not exist (return 404).', async () => {
+            const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
+                1,
+                {
+                    name: blog.name,
+                    description: blog.description,
+                    websiteUrl: blog.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+
+            expect(res_POST_blogs[0].body).toEqual({
+                id: expect.any(String),
+                name: `${blog.name}_1`,
+                description: `${blog.description}_1`,
+                websiteUrl: blog.websiteUrl,
+                isMembership: blog.isMembership,
+                createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+            });
+
+            const res_POST_posts: Response[] = await postsTestManager.createPost(
+                1,
+                {
+                    title: post.title,
+                    shortDescription: post.shortDescription,
+                    content: post.content,
+                    blogId: new ObjectId()
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                ),
+                SETTINGS.HTTP_STATUSES.NOT_FOUND_404
+            );
+
+            const res_GET_posts: Response = await req
+                .get(`${SETTINGS.PATH.BLOGS}/${res_POST_blogs[0].body.id}${SETTINGS.PATH.POSTS}`)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect({
+                pageCount: 0,
+                page: 1,
+                pageSize: 10,
+                totalCount: 0,
+                items: []
+            });
+
+
+
+            console_log(res_POST_posts[0].body, res_POST_posts[0].status, 'Test 1: post(/blogs/:id/posts)\n');
+        });
     });
 });
