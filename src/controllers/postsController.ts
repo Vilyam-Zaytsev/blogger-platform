@@ -25,6 +25,8 @@ const postsController = {
                 res
                     .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
                     .json({});
+
+                return;
             }
         }
 
@@ -67,6 +69,8 @@ const postsController = {
             res
                 .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
                 .json({});
+
+            return;
         }
 
         const dataForCreatingPost: PostInputModel = {
