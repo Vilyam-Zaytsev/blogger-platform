@@ -1939,6 +1939,71 @@ describe('/posts', () => {
 
             console_log(res_GET_posts.body, res_GET_posts.status, 'Test 7: get(/blogs/id/posts)\n');
         })
-    })
+    });
+    describe('POST /blogs/id/posts', () => {
+        it('should create a post for a specific blog.', async () => {
+            const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
+                1,
+                {
+                    name: blog.name,
+                    description: blog.description,
+                    websiteUrl: blog.websiteUrl
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
 
+            expect(res_POST_blogs[0].body).toEqual({
+                id: expect.any(String),
+                name: `${blog.name}_1`,
+                description: `${blog.description}_1`,
+                websiteUrl: blog.websiteUrl,
+                isMembership: blog.isMembership,
+                createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+            });
+
+            const res_POST_posts: Response[] = await postsTestManager.createPost(
+                11,
+                {
+                    title: post.title,
+                    shortDescription: post.shortDescription,
+                    content: post.content,
+                    blogId: res_POST_blogs[0].body.id
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+
+
+            for (let i = 0; i < res_POST_posts.length; i++) {
+                expect(res_POST_posts[i].body).toEqual({
+                    id: expect.any(String),
+                    title: `${post.title}_${i + 1}`,
+                    shortDescription: `${post.shortDescription}_${i + 1}`,
+                    content: `${post.content}_${i + 1}`,
+                    blogId: res_POST_blogs[0].body.id,
+                    blogName: res_POST_blogs[0].body.name,
+                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+                });
+            }
+
+            for (let i = 0; i < res_POST_posts.length; i++) {
+                const res_GET_post = await req
+                    .get(`${SETTINGS.PATH.POSTS}/${res_POST_posts[i].body.id}`)
+                    .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+                expect(res_POST_posts[i].body).toEqual(res_GET_post.body);
+            }
+
+            console_log(
+                res_POST_posts.map(r => r.body),
+                res_POST_posts[0].status,
+                'Test 1: post(/blogs/:id/posts)\n'
+            );
+        });
+    });
 });
