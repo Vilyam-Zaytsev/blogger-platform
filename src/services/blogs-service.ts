@@ -1,10 +1,9 @@
 import {blogsRepository} from "../repositoryes/blogs-repository";
 import {BlogInputModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
-import {InsertOneResult} from "mongodb";
 
 const blogsService = {
-    async createBlog(blogData: BlogInputModel): Promise<InsertOneResult> {
+    async createBlog(blogData: BlogInputModel): Promise<string> {
 
         const newBlog: BlogDbType = {
             ...blogData,
@@ -12,8 +11,10 @@ const blogsService = {
             isMembership: false,
         };
 
-        return await blogsRepository
+        const result =  await blogsRepository
             .insertBlog(newBlog);
+
+        return String(result.insertedId);
     },
     async updateBlog(id: string, data: BlogInputModel): Promise<boolean> {
         return await blogsRepository

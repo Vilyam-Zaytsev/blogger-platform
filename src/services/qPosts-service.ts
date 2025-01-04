@@ -3,32 +3,42 @@ import {PostViewModel} from "../types/input-output-types/posts-types";
 import {ObjectId, WithId} from "mongodb";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
 import {qPostsRepository} from "../repositoryes/qPosts-repository";
-import {sortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
+import {SortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
+import {qBlogsService} from "./qBlogs-service";
+import {BlogViewModel} from "../types/input-output-types/blogs-types";
 
 const qPostsService = {
-    async findPosts(sortQueryDto: sortQueryFilterType): Promise<PaginationResponse<PostDbType>>{
+    async findPosts(sortQueryDto: SortQueryFilterType, blogId?:string): Promise<PaginationResponse<PostDbType> | null>{
 
         const {
             pageNumber,
             pageSize,
-            blogId
         } = sortQueryDto;
 
+        if (blogId) {
+            if (!ObjectId.isValid(blogId)) return null;
+
+            const isExistBlog: BlogViewModel | null = await qBlogsService
+            .findBlog(blogId);
+
+            if (!isExistBlog) return null;
+        }
+
         const posts: WithId<PostDbType>[] = await qPostsRepository
-            .findPosts(sortQueryDto);
+            .findPosts(sortQueryDto, blogId);
 
         const postsCount: number = await qPostsRepository
             .getPostsCount(blogId);
 
         return {
-            pageCount: Math.ceil(postsCount / pageSize),
+            pagesCount: Math.ceil(postsCount / pageSize),
             page: pageNumber,
             pageSize,
             totalCount: postsCount,
             items: posts.map(p => this.mapToViewModel(p))
         };
     },
-    async findPost(id: string | ObjectId): Promise<PostViewModel | null> {
+    async findPost(id: string): Promise<PostViewModel | null> {
 
         const foundPost: WithId<PostDbType> | null = await qPostsRepository
             .findPost(id);

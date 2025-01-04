@@ -1,31 +1,28 @@
-import {Request} from "express";
+import {SortFilterType} from "../types/input-output-types/sort-filter-types";
+import {SortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
 
-const paginationParams = (req: Request) => {
+const paginationParams = (filter: SortFilterType): SortQueryFilterType => {
     const pageNumber: number =
-        req.query.pageNumber
-            ? Number(req.query.pageNumber)
+        filter.pageNumber
+            ? Number(filter.pageNumber)
             : 1;
     const pageSize: number =
-        req.query.pageSize
-            ? Number(req.query.pageSize)
+        filter.pageSize
+            ? Number(filter.pageSize)
             : 10;
     const sortBy: string =
-        req.query.sortBy
-            ? req.query.sortBy === 'id'
+        filter.sortBy
+            ? filter.sortBy === 'id'
                 ? '_id'
-                : String(req.query.sortBy)
+                : filter.sortBy
             : 'createdAt';
     const sortDirection: 'asc' | 'desc' =
-        req.query.sortDirection && String(req.query.sortDirection) === 'asc'
+        filter.sortDirection === 'asc'
             ? 'asc'
             : 'desc';
     const searchNameTerm: string | null =
-        req.query.searchNameTerm
-            ? String(req.query.searchNameTerm)
-            : null;
-    const blogId: string | null =
-        req.params.id
-            ? String(req.params.id)
+        filter.searchNameTerm
+            ? filter.searchNameTerm
             : null;
 
     return {
@@ -34,7 +31,6 @@ const paginationParams = (req: Request) => {
         sortBy,
         sortDirection,
         searchNameTerm,
-        blogId
     };
 };
 

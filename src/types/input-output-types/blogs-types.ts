@@ -13,12 +13,12 @@ type BlogViewModel = {
     isMembership: boolean
 };
 
-type URIParamsBlogIdModel = {
+type URIParamsBlogId = {
     id: string
 };
 
 export {
     BlogInputModel,
     BlogViewModel,
-    URIParamsBlogIdModel
+    URIParamsBlogId
 };

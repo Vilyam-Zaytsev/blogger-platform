@@ -335,7 +335,7 @@ describe('/blogs', () => {
                 .expect(SETTINGS.HTTP_STATUSES.OK_200)
 
             expect(res.body).toEqual({
-                "pageCount": 0,
+                "pagesCount": 0,
                 "page": 1,
                 "pageSize": 10,
                 "totalCount": 0,
@@ -363,7 +363,7 @@ describe('/blogs', () => {
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(res_get.body).toEqual({
-                "pageCount": 1,
+                "pagesCount": 1,
                 "page": 1,
                 "pageSize": 10,
                 "totalCount": 1,
@@ -394,7 +394,7 @@ describe('/blogs', () => {
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(res_get.body).toEqual({
-                "pageCount": 1,
+                "pagesCount": 1,
                 "page": 1,
                 "pageSize": 10,
                 "totalCount": res_post.length,
@@ -1041,7 +1041,7 @@ describe('/blogs', () => {
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(res_get.body).toEqual({
-                "pageCount": 2,
+                "pagesCount": 2,
                 "page": 1,
                 "pageSize": 10,
                 "totalCount": 11,
@@ -1098,11 +1098,11 @@ describe('/blogs', () => {
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(res_get.body).toEqual({
-                "pageCount": 4,
-                "page": 2,
-                "pageSize": 3,
-                "totalCount": 11,
-                "items": blogsTestManager.filterAndSort(
+                pagesCount: 4,
+                page: 2,
+                pageSize: 3,
+                totalCount: 11,
+                items: blogsTestManager.filterAndSort(
                     res_post.map(r => r.body),
                     'name',
                     'asc',
@@ -1163,11 +1163,11 @@ describe('/blogs', () => {
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(res_get.body).toEqual({
-                "pageCount": 6,
-                "page": 6,
-                "pageSize": 2,
-                "totalCount": 11,
-                "items": blogsTestManager.filterAndSort(
+                pagesCount: 6,
+                page: 6,
+                pageSize: 2,
+                totalCount: 11,
+                items: blogsTestManager.filterAndSort(
                     res_post.map(r => r.body),
                     'id',
                     'desc',
@@ -1229,11 +1229,11 @@ describe('/blogs', () => {
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(res_get.body).toEqual({
-                "pageCount": 2,
-                "page": 1,
-                "pageSize": 2,
-                "totalCount": 3,
-                "items": blogsTestManager.filterAndSort(
+                pagesCount: 2,
+                page: 1,
+                pageSize: 2,
+                totalCount: 3,
+                items: blogsTestManager.filterAndSort(
                     res_post.map(r => r.body),
                     'id',
                     'asc',
