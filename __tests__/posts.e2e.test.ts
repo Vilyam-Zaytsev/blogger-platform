@@ -571,7 +571,7 @@ describe('/posts', () => {
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(res_GET_posts.body).toEqual({
-                pageCount: 1,
+                pagesCount: 1,
                 page: 1,
                 pageSize: 10,
                 totalCount: 2,
@@ -1487,7 +1487,7 @@ describe('/posts', () => {
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(res_GET_posts.body).toEqual({
-                pageCount: 2,
+                pagesCount: 2,
                 page: 1,
                 pageSize: 10,
                 totalCount: 11,
@@ -1570,7 +1570,7 @@ describe('/posts', () => {
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(res_GET_posts.body).toEqual({
-                pageCount: 4,
+                pagesCount: 4,
                 page: 2,
                 pageSize: 3,
                 totalCount: 11,
@@ -1661,7 +1661,7 @@ describe('/posts', () => {
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(res_GET_posts.body).toEqual({
-                pageCount: 6,
+                pagesCount: 6,
                 page: 6,
                 pageSize: 2,
                 totalCount: 11,
@@ -1752,7 +1752,7 @@ describe('/posts', () => {
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(res_GET_posts.body).toEqual({
-                pageCount: 6,
+                pagesCount: 6,
                 page: 6,
                 pageSize: 2,
                 totalCount: 11,
@@ -1837,7 +1837,7 @@ describe('/posts', () => {
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(res_GET_posts.body).toEqual({
-                pageCount: 1,
+                pagesCount: 1,
                 page: 1,
                 pageSize: 10,
                 totalCount: 2,
@@ -1910,7 +1910,7 @@ describe('/posts', () => {
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(res_GET_posts.body).toEqual({
-                pageCount: 4,
+                pagesCount: 4,
                 page: 2,
                 pageSize: 3,
                 totalCount: 11,

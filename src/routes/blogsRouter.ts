@@ -17,12 +17,10 @@ import {
 import {SETTINGS} from "../settings";
 import {postsController} from "../controllers/postsController";
 import {
-    postBlogIdInputValidator,
     postContentInputValidator,
     postShortDescriptionInputValidator,
     postTitleInputValidator
 } from "../middlewares/post-middlewares/postValidators";
-import {checkBlogId} from "../middlewares/global-middlewares/checkBlogId";
 
 const blogsRouter = Router();
 
@@ -46,7 +44,6 @@ blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
 );
 blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
     authMiddleware,
-    // checkBlogId,
     postTitleInputValidator,
     postShortDescriptionInputValidator,
     postContentInputValidator,

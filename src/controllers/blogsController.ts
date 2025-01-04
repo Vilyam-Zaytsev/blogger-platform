@@ -1,4 +1,4 @@
-import {Request, Response} from "express";
+import {Response} from "express";
 import {
     BlogInputModel,
     BlogViewModel,
@@ -7,24 +7,32 @@ import {
 import {
     RequestWithBody,
     RequestWithParams,
-    RequestWithParamsAndBody
+    RequestWithParamsAndBody, RequestWithQuery
 } from "../types/input-output-types/request-types";
 import {SETTINGS} from "../settings";
 import {blogsService} from "../services/blogs-service";
-import {InsertOneResult} from "mongodb";
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {paginationParams} from "../helpers/pagination-params";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
 import {qBlogsService} from "../services/qBlogs-service";
+import {SortFilterType} from "../types/input-output-types/sort-filter-types";
 
 const blogsController = {
     getBlogs: async (
-        req: Request,
+        req: RequestWithQuery<SortFilterType>,
         res: Response<PaginationResponse<BlogDbType>>
     ) => {
 
+        const filter: SortFilterType = {
+            pageNumber: req.query.pageNumber,
+            pageSize: req.query.pageSize,
+            sortBy: req.query.sortBy,
+            sortDirection: req.query.sortDirection,
+            searchNameTerm: req.query.searchNameTerm
+        }
+
         const foundBlogs: PaginationResponse<BlogDbType> = await qBlogsService
-            .findBlogs(paginationParams(req));
+            .findBlogs(paginationParams(filter));
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
@@ -61,11 +69,11 @@ const blogsController = {
             websiteUrl: req.body.websiteUrl
         };
 
-        const result: InsertOneResult = await blogsService
+        const idCreatedBlog: string = await blogsService
             .createBlog(dataForCreatingBlog);
 
         const createdBlog: BlogViewModel | null = await qBlogsService
-            .findBlog(result.insertedId);
+            .findBlog(idCreatedBlog);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)

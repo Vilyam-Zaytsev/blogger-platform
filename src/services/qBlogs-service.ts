@@ -21,7 +21,7 @@ const qBlogsService = {
             .getBlogsCount(searchNameTerm);
 
         return {
-            pageCount: Math.ceil(blogsCount / pageSize),
+            pagesCount: Math.ceil(blogsCount / pageSize),
             page: pageNumber,
             pageSize,
             totalCount: blogsCount,

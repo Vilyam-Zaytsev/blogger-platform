@@ -1,13 +1,9 @@
 import {BlogInputModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {blogsCollection} from "../db/mongoDb";
-import {InsertOneResult, ObjectId, WithId} from "mongodb";
+import {InsertOneResult, ObjectId} from "mongodb";
 
 const blogsRepository = {
-    // async findBlog(id: string): Promise<WithId<BlogDbType> | null> {
-    //     return await blogsCollection
-    //         .findOne({_id: new ObjectId(id)});
-    // },
     async insertBlog(newBlog: BlogDbType): Promise<InsertOneResult> {
         return await blogsCollection
             .insertOne(newBlog);

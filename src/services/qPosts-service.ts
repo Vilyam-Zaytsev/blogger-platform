@@ -31,7 +31,7 @@ const qPostsService = {
             .getPostsCount(blogId);
 
         return {
-            pageCount: Math.ceil(postsCount / pageSize),
+            pagesCount: Math.ceil(postsCount / pageSize),
             page: pageNumber,
             pageSize,
             totalCount: postsCount,
