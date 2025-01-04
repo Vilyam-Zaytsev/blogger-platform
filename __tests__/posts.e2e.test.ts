@@ -1848,7 +1848,7 @@ describe('/posts', () => {
 
             expect(res_GET_posts.body.items.length).toEqual(2);
 
-            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 6: get(/blogs/id/posts)\n');
+            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 1: get(/blogs/id/posts)\n');
         });
         it('should return all entries from a specific blog using the pagination values provided by the client.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -1937,7 +1937,7 @@ describe('/posts', () => {
 
             expect(res_GET_posts.body.items.length).toEqual(3);
 
-            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 7: get(/blogs/id/posts)\n');
+            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 2: get(/blogs/id/posts)\n');
         })
     });
     describe('POST /blogs/id/posts', () => {
@@ -2034,16 +2034,16 @@ describe('/posts', () => {
                     title: post.title,
                     shortDescription: post.shortDescription,
                     content: post.content,
-                    blogId: new ObjectId()
                 },
                 encodingAdminDataInBase64(
                     SETTINGS.ADMIN_DATA.LOGIN,
                     SETTINGS.ADMIN_DATA.PASSWORD
                 ),
-                SETTINGS.HTTP_STATUSES.NOT_FOUND_404
+                SETTINGS.HTTP_STATUSES.NOT_FOUND_404,
+                `${SETTINGS.PATH.BLOGS}/${new ObjectId()}${SETTINGS.PATH.POSTS}`
             );
 
-            const res_GET_posts: Response = await req
+            await req
                 .get(`${SETTINGS.PATH.BLOGS}/${res_POST_blogs[0].body.id}${SETTINGS.PATH.POSTS}`)
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 

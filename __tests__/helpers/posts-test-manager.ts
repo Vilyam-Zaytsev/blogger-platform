@@ -10,12 +10,13 @@ const postsTestManager = {
         dataPost: any,
         adminData: string,
         statusCode: number = SETTINGS.HTTP_STATUSES.CREATED_201,
+        path: string = SETTINGS.PATH.POSTS
     ) {
         const responses: Response[] = [];
 
         for (let i = 0; i < numberOfPosts; i++) {
             const res: Response = await req
-                .post(SETTINGS.PATH.POSTS)
+                .post(path)
                 .send(this.formingPostData({...dataPost}, (i + 1)))
                 .set('Authorization', adminData)
                 .expect(statusCode);

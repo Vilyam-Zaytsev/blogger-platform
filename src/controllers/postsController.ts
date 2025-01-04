@@ -8,12 +8,25 @@ import {postsService} from "../services/posts-service";
 import {paginationParams} from "../helpers/pagination-params";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
 import {qPostsService} from "../services/qPosts-service";
+import {qBlogsService} from "../services/qBlogs-service";
+import {BlogViewModel} from "../types/input-output-types/blogs-types";
 
 const postsController = {
     getPosts: async (
         req: Request,
-        res: Response<PaginationResponse<PostDbType>>
+        res: Response<PaginationResponse<PostDbType> | {}>
     ) => {
+
+        if (req.body.blogId) {
+            const isExistBlog: BlogViewModel | null = await qBlogsService
+                .findBlog(req.body.blogId);
+
+            if (!isExistBlog) {
+                res
+                    .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
+                    .json({});
+            }
+        }
 
         const foundPosts: PaginationResponse<PostDbType> = await qPostsService
             .findPosts(paginationParams(req));
@@ -44,8 +57,17 @@ const postsController = {
     },
     createAndInsertPost: async (
         req: RequestWithBody<PostInputModel>,
-        res: Response<PostViewModel>
+        res: Response<PostViewModel | {}>
     ) => {
+
+        const isExistBlog: BlogViewModel | null = await qBlogsService
+            .findBlog(req.body.blogId);
+
+        if (!isExistBlog) {
+            res
+                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
+                .json({});
+        }
 
         const dataForCreatingPost: PostInputModel = {
             title: req.body.title,
