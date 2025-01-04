@@ -37,7 +37,6 @@ blogsRouter.get('/',
 );
 blogsRouter.get('/:id', blogsController.getBlog);
 blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
-    checkBlogId,
     pageNumberInputValidator,
     pageSizeInputValidator,
     sortByInputValidator,
@@ -47,7 +46,7 @@ blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
 );
 blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
     authMiddleware,
-    checkBlogId,
+    // checkBlogId,
     postTitleInputValidator,
     postShortDescriptionInputValidator,
     postContentInputValidator,

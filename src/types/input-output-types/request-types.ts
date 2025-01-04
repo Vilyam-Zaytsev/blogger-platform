@@ -1,11 +1,13 @@
 import {Request} from "express";
 
-type RequestWithBody<T> = Request<{}, {}, T>;
-type RequestWithParams<T> = Request<T>;
-type RequestWithParamsAndBody<T, B> = Request<T, {}, B>;
+type RequestWithBody<B> = Request<{}, {}, B>;
+type RequestWithParams<P> = Request<P>;
+type RequestWithParamsAndBody<P, B> = Request<P, {}, B>;
+type RequestWithParamsAndQuery<P, B> = Request<P, {}, {}, B>;
 
 export {
     RequestWithBody,
     RequestWithParams,
-    RequestWithParamsAndBody
+    RequestWithParamsAndBody,
+    RequestWithParamsAndQuery
 };

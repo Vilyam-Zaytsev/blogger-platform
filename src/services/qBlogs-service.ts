@@ -1,12 +1,12 @@
 import {BlogViewModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
-import {ObjectId, WithId} from "mongodb";
+import {WithId} from "mongodb";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
 import {qBlogsRepository} from "../repositoryes/qBlogs-repository";
-import {sortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
+import {SortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
 
 const qBlogsService = {
-    async findBlogs(sortQueryDto: sortQueryFilterType): Promise<PaginationResponse<BlogDbType>> {
+    async findBlogs(sortQueryDto: SortQueryFilterType): Promise<PaginationResponse<BlogDbType>> {
 
         const {
             pageNumber  ,
@@ -28,7 +28,7 @@ const qBlogsService = {
             items: blogs.map(b => this.mapToViewModel(b)),
         };
     },
-    async findBlog(id: string | ObjectId): Promise<BlogViewModel | null> {
+    async findBlog(id: string): Promise<BlogViewModel | null> {
 
         const foundBlog: WithId<BlogDbType> | null = await qBlogsRepository
             .findBlog(id);

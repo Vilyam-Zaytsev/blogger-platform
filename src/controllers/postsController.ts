@@ -1,37 +1,43 @@
-import {Request, Response} from "express";
+import {Response} from "express";
 import {PostInputModel, PostViewModel, URIParamsPostIdModel} from "../types/input-output-types/posts-types";
-import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/input-output-types/request-types";
+import {
+    RequestWithParams,
+    RequestWithParamsAndBody,
+    RequestWithParamsAndQuery
+} from "../types/input-output-types/request-types";
 import {SETTINGS} from "../settings";
-import {InsertOneResult, WithId} from "mongodb";
 import {PostDbType} from "../types/db-types/post-db-type";
 import {postsService} from "../services/posts-service";
 import {paginationParams} from "../helpers/pagination-params";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
 import {qPostsService} from "../services/qPosts-service";
-import {qBlogsService} from "../services/qBlogs-service";
-import {BlogViewModel} from "../types/input-output-types/blogs-types";
+import {URIParamsBlogId} from "../types/input-output-types/blogs-types";
+import {SortFilterType} from "../types/input-output-types/sort-filter-types";
 
 const postsController = {
     getPosts: async (
-        req: Request,
+        req: RequestWithParamsAndQuery<URIParamsBlogId, SortFilterType>,
         res: Response<PaginationResponse<PostDbType> | {}>
     ) => {
 
-        if (req.body.blogId) {
-            const isExistBlog: BlogViewModel | null = await qBlogsService
-                .findBlog(req.body.blogId);
-
-            if (!isExistBlog) {
-                res
-                    .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                    .json({});
-
-                return;
-            }
+        const filter: SortFilterType = {
+            pageNumber: req.query.pageNumber,
+            pageSize: req.query.pageSize,
+            sortBy: req.query.sortBy,
+            sortDirection: req.query.sortDirection,
+            searchNameTerm: req.query.searchNameTerm
         }
 
-        const foundPosts: PaginationResponse<PostDbType> = await qPostsService
-            .findPosts(paginationParams(req));
+        const blogId: string = req.params.id
+
+        const foundPosts: PaginationResponse<PostDbType> | null = await qPostsService
+            .findPosts(paginationParams(filter), blogId);
+
+        if (!foundPosts) {
+            res.sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
+
+            return;
+        }
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
@@ -39,7 +45,7 @@ const postsController = {
     },
     getPost: async (
         req: RequestWithParams<URIParamsPostIdModel>,
-        res: Response<PostViewModel | {}>
+        res: Response<PostViewModel>
     ) => {
 
         const foundPost: PostViewModel | null = await qPostsService
@@ -47,8 +53,7 @@ const postsController = {
 
         if (!foundPost) {
             res
-                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                .json({});
+                .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
 
             return;
         }
@@ -58,21 +63,9 @@ const postsController = {
             .json(foundPost);
     },
     createAndInsertPost: async (
-        req: RequestWithBody<PostInputModel>,
-        res: Response<PostViewModel | {}>
+        req: RequestWithParamsAndBody<URIParamsBlogId, PostInputModel>,
+        res: Response<PostViewModel>
     ) => {
-
-        const isExistBlog: BlogViewModel | null = await qBlogsService
-            .findBlog(req.body.blogId);
-
-        if (!isExistBlog) {
-            res
-                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                .json({});
-
-            return;
-        }
-
         const dataForCreatingPost: PostInputModel = {
             title: req.body.title,
             shortDescription: req.body.shortDescription,
@@ -80,11 +73,20 @@ const postsController = {
             blogId: req.body.blogId,
         };
 
-        const result: InsertOneResult = await postsService
-            .createPost(dataForCreatingPost);
+        const blogId: string = req.params.id;
+
+        const idCreatedPost: string | null = await postsService
+            .createPost(dataForCreatingPost, blogId);
+
+        if (!idCreatedPost) {
+            res
+                .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
+
+            return;
+        }
 
         const createdPost: PostViewModel | null = await qPostsService
-            .findPost(result.insertedId);
+            .findPost(idCreatedPost);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)

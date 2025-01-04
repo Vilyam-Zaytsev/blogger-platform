@@ -2,7 +2,7 @@ import {Request, Response} from "express";
 import {
     BlogInputModel,
     BlogViewModel,
-    URIParamsBlogIdModel
+    URIParamsBlogId
 } from "../types/input-output-types/blogs-types";
 import {
     RequestWithBody,
@@ -31,7 +31,7 @@ const blogsController = {
             .json(foundBlogs);
     },
     getBlog: async (
-        req: RequestWithParams<URIParamsBlogIdModel>,
+        req: RequestWithParams<URIParamsBlogId>,
         res: Response<BlogViewModel | {}>
     ) => {
 
@@ -72,7 +72,7 @@ const blogsController = {
             .json(createdBlog!);
     },
     updateBlog: async (
-        req: RequestWithParamsAndBody<URIParamsBlogIdModel, BlogInputModel>,
+        req: RequestWithParamsAndBody<URIParamsBlogId, BlogInputModel>,
         res: Response<BlogViewModel | {}>
     ) => {
 
@@ -98,7 +98,7 @@ const blogsController = {
             .json({});
     },
     deleteBlog: async (
-        req: RequestWithParams<URIParamsBlogIdModel>,
+        req: RequestWithParams<URIParamsBlogId>,
         res: Response
     ) => {
 
