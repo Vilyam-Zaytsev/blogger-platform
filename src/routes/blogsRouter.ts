@@ -42,7 +42,6 @@ blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
     pageSizeInputValidator,
     sortByInputValidator,
     sortDirectionInputValidator,
-    postBlogIdInputValidator,
     inputCheckErrorsMiddleware,
     postsController.getPosts
 );
@@ -52,7 +51,6 @@ blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
     postTitleInputValidator,
     postShortDescriptionInputValidator,
     postContentInputValidator,
-    postBlogIdInputValidator,
     inputCheckErrorsMiddleware,
     postsController.createAndInsertPost
 );
