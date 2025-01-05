@@ -1,8 +1,4 @@
-import {body, param} from "express-validator";
-import {Request} from "express";
-import {BlogDbType} from "../../types/db-types/blog-db-type";
-import {qBlogsRepository} from "../../repositoryes/qBlogs-repository";
-
+import {body} from "express-validator";
 
 const blogNameInputValidator =
     body('name')
