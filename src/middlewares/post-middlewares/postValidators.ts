@@ -1,4 +1,4 @@
-import {body, query} from "express-validator";
+import {body} from "express-validator";
 import {qBlogsRepository} from "../../repositoryes/qBlogs-repository";
 import {BlogDbType} from "../../types/db-types/blog-db-type";
 
