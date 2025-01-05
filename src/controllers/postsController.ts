@@ -17,7 +17,7 @@ import {SortFilterType} from "../types/input-output-types/sort-filter-types";
 const postsController = {
     getPosts: async (
         req: RequestWithParamsAndQuery<URIParamsBlogId, SortFilterType>,
-        res: Response<PaginationResponse<PostDbType> | {}>
+        res: Response<PaginationResponse<PostViewModel>>
     ) => {
 
         const filter: SortFilterType = {
@@ -30,7 +30,7 @@ const postsController = {
 
         const blogId: string = req.params.id
 
-        const foundPosts: PaginationResponse<PostDbType> | null = await qPostsService
+        const foundPosts: PaginationResponse<PostViewModel> | null = await qPostsService
             .findPosts(paginationParams(filter), blogId);
 
         if (!foundPosts) {

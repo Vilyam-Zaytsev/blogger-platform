@@ -8,7 +8,7 @@ import {qBlogsService} from "./qBlogs-service";
 import {BlogViewModel} from "../types/input-output-types/blogs-types";
 
 const qPostsService = {
-    async findPosts(sortQueryDto: SortQueryFilterType, blogId?:string): Promise<PaginationResponse<PostDbType> | null>{
+    async findPosts(sortQueryDto: SortQueryFilterType, blogId?:string): Promise<PaginationResponse<PostViewModel> | null>{
 
         const {
             pageNumber,

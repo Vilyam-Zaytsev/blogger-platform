@@ -6,6 +6,7 @@ const SETTINGS = {
     PORT: process.env.PORT || 3000,
     PATH: {
         AUTH: '/auth/login',
+        USERS: '/users',
         BLOGS: '/blogs',
         POSTS: '/posts',
         TESTS: '/testing/all-data',
