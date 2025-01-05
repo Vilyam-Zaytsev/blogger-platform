@@ -1,7 +1,8 @@
 import {Router} from "express";
+import {authController} from "../controllers/authController";
 
 const authRouter = Router();
 
-authRouter.delete('/', testsController.deleteAllData);
+authRouter.delete('/', authController.x);
 
 export {authRouter};
