@@ -31,7 +31,7 @@ const blogsController = {
             searchNameTerm: req.query.searchNameTerm
         }
 
-        const foundBlogs: PaginationResponse<BlogDbType> = await qBlogsService
+        const foundBlogs: PaginationResponse<BlogViewModel> = await qBlogsService
             .findBlogs(configPaginationAndSortParams(sortingAndPaginationParams));
 
         res
