@@ -5,7 +5,7 @@ import {PaginationAndSortFilterType, PaginationResponse} from "../types/input-ou
 import {qBlogsRepository} from "../repositoryes/qBlogs-repository";
 
 const qBlogsService = {
-    async findBlogs(sortQueryDto: PaginationAndSortFilterType): Promise<PaginationResponse<BlogDbType>> {
+    async findBlogs(sortQueryDto: PaginationAndSortFilterType): Promise<PaginationResponse<BlogViewModel>> {
 
         const {
             pageNumber  ,
