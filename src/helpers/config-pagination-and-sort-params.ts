@@ -1,5 +1,6 @@
 import {
     PaginationAndSortFilterType,
+    SortDirection,
     SortingAndPaginationParamsType
 } from "../types/input-output-types/pagination-sort-types";
 
@@ -18,10 +19,10 @@ const configPaginationAndSortParams = (params: SortingAndPaginationParamsType): 
                 ? '_id'
                 : params.sortBy
             : 'createdAt';
-    const sortDirection: 'asc' | 'desc' =
+    const sortDirection: SortDirection =
         params.sortDirection === 'asc'
-            ? 'asc'
-            : 'desc';
+            ? SortDirection.Ascending
+            : SortDirection.Descending;
     const searchNameTerm: string | null =
         params.searchNameTerm
             ? params.searchNameTerm

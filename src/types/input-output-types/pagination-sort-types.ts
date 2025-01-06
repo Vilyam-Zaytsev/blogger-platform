@@ -1,3 +1,8 @@
+enum SortDirection {
+    Ascending = 'asc',
+    Descending = 'desc'
+}
+
 type SortingAndPaginationParamsType = {
     pageNumber?: string,
     pageSize?: string,
@@ -12,7 +17,7 @@ type PaginationAndSortFilterType = {
     pageNumber: number,
     pageSize: number,
     sortBy: string,
-    sortDirection: 'asc' | 'desc',
+    sortDirection: SortDirection,
     searchNameTerm: string | null,
     searchLoginTerm: string | null,
     searchEmailTerm: string | null,
@@ -26,8 +31,11 @@ type PaginationResponse<T> = {
     items: T[];
 };
 
+
+
 export {
     SortingAndPaginationParamsType,
     PaginationAndSortFilterType,
-    PaginationResponse
+    PaginationResponse,
+    SortDirection
 };
