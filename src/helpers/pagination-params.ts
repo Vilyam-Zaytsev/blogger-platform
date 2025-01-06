@@ -39,6 +39,8 @@ const paginationParams = (filter: SortFilterType): SortQueryFilterType => {
         sortBy,
         sortDirection,
         searchNameTerm,
+        searchLoginTerm,
+        searchEmailTerm
     };
 };
 
