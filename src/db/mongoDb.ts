@@ -2,9 +2,12 @@ import {Collection, MongoClient} from "mongodb";
 import {SETTINGS} from "../settings";
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {PostDbType} from "../types/db-types/post-db-type";
+import {UserDbType} from "../types/db-types/user-db-type";
 
 let blogsCollection: Collection<BlogDbType>;
 let postsCollection: Collection<PostDbType>;
+
+let usersCollection: Collection<UserDbType>;
 
 const setBlogsCollection = (collection: Collection<BlogDbType>) => {
     blogsCollection = collection;
@@ -12,6 +15,10 @@ const setBlogsCollection = (collection: Collection<BlogDbType>) => {
 
 const setPostsCollection = (collection: Collection<PostDbType>) => {
     postsCollection = collection;
+};
+
+const setUserCollection = (collection: Collection<UserDbType>) => {
+    usersCollection = collection;
 };
 
 async function runDb(url: string) {
@@ -39,7 +46,9 @@ async function runDb(url: string) {
 export {
     setBlogsCollection,
     setPostsCollection,
+    setUserCollection,
     blogsCollection,
     postsCollection,
+    usersCollection,
     runDb
 };

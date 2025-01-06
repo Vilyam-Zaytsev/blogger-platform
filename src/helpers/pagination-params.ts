@@ -24,6 +24,14 @@ const paginationParams = (filter: SortFilterType): SortQueryFilterType => {
         filter.searchNameTerm
             ? filter.searchNameTerm
             : null;
+    const searchLoginTerm: string | null =
+        filter.searchLoginTerm
+            ? filter.searchLoginTerm
+            : null;
+    const searchEmailTerm: string | null =
+        filter.searchEmailTerm
+            ? filter.searchEmailTerm
+            : null;
 
     return {
         pageNumber,

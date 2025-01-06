@@ -9,9 +9,14 @@ type UserViewModel = {
     login: string,
     email: string,
     createdAt: string
-}
+};
+
+type URIParamsUserId = {
+    id: string
+};
 
 export {
     UserInputModel,
-    UserViewModel
+    UserViewModel,
+    URIParamsUserId
 };

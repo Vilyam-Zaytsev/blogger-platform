@@ -39,7 +39,7 @@ const qPostsRepository = {
         return postsCollection
             .countDocuments(filter);
     },
-    async findPost(id: string | ObjectId): Promise<WithId<PostDbType> | null> {
+    async findPost(id: string): Promise<WithId<PostDbType> | null> {
             return await postsCollection
                 .findOne({_id: new ObjectId(id)});
     },
