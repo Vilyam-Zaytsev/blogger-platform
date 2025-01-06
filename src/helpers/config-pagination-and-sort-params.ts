@@ -1,7 +1,7 @@
-import {PaginationAndSortFilterType} from "../types/input-output-types/sort-filter-types";
+import {SortingAndPaginationParamsType} from "../types/input-output-types/sort-filter-types";
 import {PaginationAndSortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
 
-const paginationAndSortParams = (filter: PaginationAndSortFilterType): PaginationAndSortQueryFilterType => {
+const configPaginationAndSortParams = (filter: SortingAndPaginationParamsType): PaginationAndSortQueryFilterType => {
     const pageNumber: number =
         filter.pageNumber
             ? Number(filter.pageNumber)
@@ -44,4 +44,4 @@ const paginationAndSortParams = (filter: PaginationAndSortFilterType): Paginatio
     };
 };
 
-export {paginationAndSortParams};
+export {configPaginationAndSortParams};

@@ -1,19 +1,19 @@
 import {Response, Request} from "express";
 import {RequestWithBody, RequestWithQuery} from "../types/input-output-types/request-types";
-import {PaginationAndSortFilterType} from "../types/input-output-types/sort-filter-types";
+import {SortingAndPaginationParamsType} from "../types/input-output-types/sort-filter-types";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
 import {URIParamsUserId, UserInputModel, UserViewModel} from "../types/input-output-types/user-types";
 import {userService} from "../services/user-service";
 import {qUserService} from "../services/qUserServise";
 import {SETTINGS} from "../settings";
-import {paginationAndSortParams} from "../helpers/pagination-and-sort-params";
+import {configPaginationAndSortParams} from "../helpers/config-pagination-and-sort-params";
 
 const usersController = {
     getUsers: async (
-        req: RequestWithQuery<PaginationAndSortFilterType>,
+        req: RequestWithQuery<SortingAndPaginationParamsType>,
         res: Response<PaginationResponse<UserViewModel>>
     ) => {
-        const filter: PaginationAndSortFilterType = {
+        const filter: SortingAndPaginationParamsType = {
             pageNumber: req.query.pageNumber,
             pageSize: req.query.pageSize,
             sortBy: req.query.sortBy,
@@ -23,7 +23,7 @@ const usersController = {
         };
 
         const foundUsers: PaginationResponse<UserViewModel> = await qUserService
-            .findUsers(paginationAndSortParams(filter));
+            .findUsers(configPaginationAndSortParams(filter));
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)

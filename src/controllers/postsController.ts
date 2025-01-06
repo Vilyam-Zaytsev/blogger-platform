@@ -8,19 +8,19 @@ import {
 import {SETTINGS} from "../settings";
 import {PostDbType} from "../types/db-types/post-db-type";
 import {postsService} from "../services/posts-service";
-import {paginationAndSortParams} from "../helpers/pagination-and-sort-params";
+import {configPaginationAndSortParams} from "../helpers/config-pagination-and-sort-params";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
 import {qPostsService} from "../services/qPosts-service";
 import {URIParamsBlogId} from "../types/input-output-types/blogs-types";
-import {PaginationAndSortFilterType} from "../types/input-output-types/sort-filter-types";
+import {SortingAndPaginationParamsType} from "../types/input-output-types/sort-filter-types";
 
 const postsController = {
     getPosts: async (
-        req: RequestWithParamsAndQuery<URIParamsBlogId, PaginationAndSortFilterType>,
+        req: RequestWithParamsAndQuery<URIParamsBlogId, SortingAndPaginationParamsType>,
         res: Response<PaginationResponse<PostViewModel>>
     ) => {
 
-        const filter: PaginationAndSortFilterType = {
+        const filter: SortingAndPaginationParamsType = {
             pageNumber: req.query.pageNumber,
             pageSize: req.query.pageSize,
             sortBy: req.query.sortBy,
@@ -31,7 +31,7 @@ const postsController = {
         const blogId: string = req.params.id
 
         const foundPosts: PaginationResponse<PostViewModel> | null = await qPostsService
-            .findPosts(paginationAndSortParams(filter), blogId);
+            .findPosts(configPaginationAndSortParams(filter), blogId);
 
         if (!foundPosts) {
             res.sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
