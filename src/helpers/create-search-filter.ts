@@ -15,11 +15,11 @@ const createSearchFilter = (searchFilter: SearchFilterType) => {
         : {};
     const search = nameOfSearchField
         ? searchNameTerm
-            ? {nameOfSearchField: {$regex: searchNameTerm, $options: 'i'}}
+            ? {[nameOfSearchField]: {$regex: searchNameTerm, $options: 'i'}}
             : searchLoginTerm
-                ? {nameOfSearchField: {$regex: searchLoginTerm, $options: 'i'}}
+                ? {[nameOfSearchField]: {$regex: searchLoginTerm, $options: 'i'}}
                 : searchEmailTerm
-                    ? {nameOfSearchField: {$regex: searchEmailTerm, $options: 'i'}}
+                    ? {[nameOfSearchField]: {$regex: searchEmailTerm, $options: 'i'}}
                     : {}
         : {};
 
