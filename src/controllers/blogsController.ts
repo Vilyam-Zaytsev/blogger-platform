@@ -59,7 +59,7 @@ const blogsController = {
     },
     createAndInsertBlog: async (
         req: RequestWithBody<BlogInputModel>,
-        res: Response<BlogViewModel | {}>
+        res: Response<BlogViewModel>
     ) => {
 
         const dataForCreatingBlog: BlogInputModel = {
