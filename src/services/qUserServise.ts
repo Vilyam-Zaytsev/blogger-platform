@@ -1,4 +1,4 @@
-import {SortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
+import {PaginationAndSortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
 import {UserViewModel} from "../types/input-output-types/user-types";
 import {WithId} from "mongodb";
@@ -6,7 +6,7 @@ import {UserDbType} from "../types/db-types/user-db-type";
 import {qUsersRepository} from "../repositoryes/qUsers-repository";
 
 const qUserService = {
-    async findUsers(sortQueryDto: SortQueryFilterType): Promise<PaginationResponse<UserViewModel>> {
+    async findUsers(sortQueryDto: PaginationAndSortQueryFilterType): Promise<PaginationResponse<UserViewModel>> {
 
         const {
             pageNumber,

@@ -1,4 +1,4 @@
-type SortFilterType = {
+type PaginationAndSortFilterType = {
     pageNumber?: string,
     pageSize?: string,
     sortBy?: string,
@@ -8,4 +8,4 @@ type SortFilterType = {
     searchEmailTerm?: string,
 };
 
-export {SortFilterType};
+export {PaginationAndSortFilterType};

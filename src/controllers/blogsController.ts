@@ -12,18 +12,18 @@ import {
 import {SETTINGS} from "../settings";
 import {blogsService} from "../services/blogs-service";
 import {BlogDbType} from "../types/db-types/blog-db-type";
-import {paginationParams} from "../helpers/pagination-params";
+import {paginationAndSortParams} from "../helpers/pagination-and-sort-params";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
 import {qBlogsService} from "../services/qBlogs-service";
-import {SortFilterType} from "../types/input-output-types/sort-filter-types";
+import {PaginationAndSortFilterType} from "../types/input-output-types/sort-filter-types";
 
 const blogsController = {
     getBlogs: async (
-        req: RequestWithQuery<SortFilterType>,
+        req: RequestWithQuery<PaginationAndSortFilterType>,
         res: Response<PaginationResponse<BlogDbType>>
     ) => {
 
-        const filter: SortFilterType = {
+        const filter: PaginationAndSortFilterType = {
             pageNumber: req.query.pageNumber,
             pageSize: req.query.pageSize,
             sortBy: req.query.sortBy,
@@ -32,7 +32,7 @@ const blogsController = {
         }
 
         const foundBlogs: PaginationResponse<BlogDbType> = await qBlogsService
-            .findBlogs(paginationParams(filter));
+            .findBlogs(paginationAndSortParams(filter));
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)

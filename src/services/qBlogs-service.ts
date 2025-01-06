@@ -3,10 +3,10 @@ import {BlogDbType} from "../types/db-types/blog-db-type";
 import {WithId} from "mongodb";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
 import {qBlogsRepository} from "../repositoryes/qBlogs-repository";
-import {SortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
+import {PaginationAndSortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
 
 const qBlogsService = {
-    async findBlogs(sortQueryDto: SortQueryFilterType): Promise<PaginationResponse<BlogDbType>> {
+    async findBlogs(sortQueryDto: PaginationAndSortQueryFilterType): Promise<PaginationResponse<BlogDbType>> {
 
         const {
             pageNumber  ,

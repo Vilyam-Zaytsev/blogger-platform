@@ -3,12 +3,12 @@ import {PostViewModel} from "../types/input-output-types/posts-types";
 import {ObjectId, WithId} from "mongodb";
 import {PaginationResponse} from "../types/input-output-types/pagination-types";
 import {qPostsRepository} from "../repositoryes/qPosts-repository";
-import {SortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
+import {PaginationAndSortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
 import {qBlogsService} from "./qBlogs-service";
 import {BlogViewModel} from "../types/input-output-types/blogs-types";
 
 const qPostsService = {
-    async findPosts(sortQueryDto: SortQueryFilterType, blogId?:string): Promise<PaginationResponse<PostViewModel> | null> {
+    async findPosts(sortQueryDto: PaginationAndSortQueryFilterType, blogId?:string): Promise<PaginationResponse<PostViewModel> | null> {
 
         const {
             pageNumber,
