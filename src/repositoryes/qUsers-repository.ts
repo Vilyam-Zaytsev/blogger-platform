@@ -2,7 +2,6 @@ import {SortQueryFilterType} from "../types/input-output-types/sort-query-filter
 import {ObjectId, Sort, WithId} from "mongodb";
 import {UserDbType} from "../types/db-types/user-db-type";
 import {usersCollection} from "../db/mongoDb";
-import {usersRepository} from "./users-repository";
 
 const qUsersRepository = {
     async findUsers(sortQueryDto: SortQueryFilterType): Promise<WithId<UserDbType>[]> {
@@ -11,6 +10,7 @@ const qUsersRepository = {
             pageSize,
             sortBy,
             sortDirection,
+            searchLoginTerm
         } = sortQueryDto;
 
         return await usersCollection
