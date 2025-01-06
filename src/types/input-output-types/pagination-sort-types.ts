@@ -3,6 +3,14 @@ enum SortDirection {
     Descending = 'desc'
 }
 
+type SearchFilterType = {
+    blogId?: string | null,
+    searchNameTerm?: string | null,
+    searchLoginTerm?: string | null,
+    searchEmailTerm?: string | null,
+    nameOfSearchField?: string | null
+}
+
 type SortingAndPaginationParamsType = {
     pageNumber?: string,
     pageSize?: string,
@@ -34,8 +42,9 @@ type PaginationResponse<T> = {
 
 
 export {
+    SortDirection,
+    SearchFilterType,
     SortingAndPaginationParamsType,
     PaginationAndSortFilterType,
     PaginationResponse,
-    SortDirection
 };

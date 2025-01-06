@@ -1,7 +1,7 @@
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {blogsCollection} from "../db/mongoDb";
 import {ObjectId, Sort, WithId} from "mongodb";
-import {createFilter} from "../helpers/createFilter";
+import {createSearchFilter} from "../helpers/create-search-filter";
 import {PaginationAndSortFilterType} from "../types/input-output-types/pagination-sort-types";
 
 const qBlogsRepository = {
@@ -15,7 +15,7 @@ const qBlogsRepository = {
             searchNameTerm
         } = sortQueryDto;
 
-        const filter: any = createFilter(
+        const filter: any = createSearchFilter(
             {
                 nameOfSearchField: 'name',
                 searchNameTerm
@@ -31,7 +31,7 @@ const qBlogsRepository = {
     },
     async getBlogsCount(searchNameTerm: string | null): Promise<number> {
 
-        const filter: any = createFilter(
+        const filter: any = createSearchFilter(
             {
                 nameOfSearchField: 'name',
                 searchNameTerm
