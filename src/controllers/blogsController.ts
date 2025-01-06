@@ -40,7 +40,7 @@ const blogsController = {
     },
     getBlog: async (
         req: RequestWithParams<URIParamsBlogId>,
-        res: Response<BlogViewModel | {}>
+        res: Response<BlogViewModel>
     ) => {
 
         const foundBlog: BlogViewModel | null = await qBlogsService
@@ -48,8 +48,7 @@ const blogsController = {
 
         if (!foundBlog) {
             res
-                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                .json({});
+                .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
 
             return;
         }
