@@ -2,10 +2,10 @@ import {BlogDbType} from "../types/db-types/blog-db-type";
 import {blogsCollection} from "../db/mongoDb";
 import {ObjectId, Sort, WithId} from "mongodb";
 import {createFilter} from "../helpers/createFilter";
-import {PaginationAndSortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
+import {PaginationAndSortFilterType} from "../types/input-output-types/pagination-sort-types";
 
 const qBlogsRepository = {
-    async findBlogs(sortQueryDto: PaginationAndSortQueryFilterType): Promise<WithId<BlogDbType>[]> {
+    async findBlogs(sortQueryDto: PaginationAndSortFilterType): Promise<WithId<BlogDbType>[]> {
 
         const {
             pageNumber,

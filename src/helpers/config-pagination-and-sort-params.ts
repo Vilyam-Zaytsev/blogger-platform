@@ -1,36 +1,38 @@
-import {SortingAndPaginationParamsType} from "../types/input-output-types/sort-filter-types";
-import {PaginationAndSortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
+import {
+    PaginationAndSortFilterType,
+    SortingAndPaginationParamsType
+} from "../types/input-output-types/pagination-sort-types";
 
-const configPaginationAndSortParams = (filter: SortingAndPaginationParamsType): PaginationAndSortQueryFilterType => {
+const configPaginationAndSortParams = (params: SortingAndPaginationParamsType): PaginationAndSortFilterType => {
     const pageNumber: number =
-        filter.pageNumber
-            ? Number(filter.pageNumber)
+        params.pageNumber
+            ? Number(params.pageNumber)
             : 1;
     const pageSize: number =
-        filter.pageSize
-            ? Number(filter.pageSize)
+        params.pageSize
+            ? Number(params.pageSize)
             : 10;
     const sortBy: string =
-        filter.sortBy
-            ? filter.sortBy === 'id'
+        params.sortBy
+            ? params.sortBy === 'id'
                 ? '_id'
-                : filter.sortBy
+                : params.sortBy
             : 'createdAt';
     const sortDirection: 'asc' | 'desc' =
-        filter.sortDirection === 'asc'
+        params.sortDirection === 'asc'
             ? 'asc'
             : 'desc';
     const searchNameTerm: string | null =
-        filter.searchNameTerm
-            ? filter.searchNameTerm
+        params.searchNameTerm
+            ? params.searchNameTerm
             : null;
     const searchLoginTerm: string | null =
-        filter.searchLoginTerm
-            ? filter.searchLoginTerm
+        params.searchLoginTerm
+            ? params.searchLoginTerm
             : null;
     const searchEmailTerm: string | null =
-        filter.searchEmailTerm
-            ? filter.searchEmailTerm
+        params.searchEmailTerm
+            ? params.searchEmailTerm
             : null;
 
     return {

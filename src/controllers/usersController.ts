@@ -1,7 +1,6 @@
 import {Response, Request} from "express";
 import {RequestWithBody, RequestWithQuery} from "../types/input-output-types/request-types";
-import {SortingAndPaginationParamsType} from "../types/input-output-types/sort-filter-types";
-import {PaginationResponse} from "../types/input-output-types/pagination-types";
+import {PaginationResponse, SortingAndPaginationParamsType} from "../types/input-output-types/pagination-sort-types";
 import {URIParamsUserId, UserInputModel, UserViewModel} from "../types/input-output-types/user-types";
 import {userService} from "../services/user-service";
 import {qUserService} from "../services/qUserServise";

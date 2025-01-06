@@ -9,10 +9,9 @@ import {SETTINGS} from "../settings";
 import {PostDbType} from "../types/db-types/post-db-type";
 import {postsService} from "../services/posts-service";
 import {configPaginationAndSortParams} from "../helpers/config-pagination-and-sort-params";
-import {PaginationResponse} from "../types/input-output-types/pagination-types";
+import {PaginationResponse, SortingAndPaginationParamsType} from "../types/input-output-types/pagination-sort-types";
 import {qPostsService} from "../services/qPosts-service";
 import {URIParamsBlogId} from "../types/input-output-types/blogs-types";
-import {SortingAndPaginationParamsType} from "../types/input-output-types/sort-filter-types";
 
 const postsController = {
     getPosts: async (

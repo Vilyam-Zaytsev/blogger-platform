@@ -2,11 +2,11 @@ import {PostDbType} from "../types/db-types/post-db-type";
 import {postsCollection} from "../db/mongoDb";
 import {ObjectId, Sort, WithId} from "mongodb";
 import {createFilter} from "../helpers/createFilter";
-import {PaginationAndSortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
+import {PaginationAndSortFilterType} from "../types/input-output-types/pagination-sort-types";
 
 
 const qPostsRepository = {
-    async findPosts(sortQueryDto: PaginationAndSortQueryFilterType, blogId?: string): Promise<WithId<PostDbType>[]> {
+    async findPosts(sortQueryDto: PaginationAndSortFilterType, blogId?: string): Promise<WithId<PostDbType>[]> {
 
         const {
             pageNumber,

@@ -1,12 +1,11 @@
 import {BlogViewModel} from "../types/input-output-types/blogs-types";
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {WithId} from "mongodb";
-import {PaginationResponse} from "../types/input-output-types/pagination-types";
+import {PaginationAndSortFilterType, PaginationResponse} from "../types/input-output-types/pagination-sort-types";
 import {qBlogsRepository} from "../repositoryes/qBlogs-repository";
-import {PaginationAndSortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
 
 const qBlogsService = {
-    async findBlogs(sortQueryDto: PaginationAndSortQueryFilterType): Promise<PaginationResponse<BlogDbType>> {
+    async findBlogs(sortQueryDto: PaginationAndSortFilterType): Promise<PaginationResponse<BlogDbType>> {
 
         const {
             pageNumber  ,

@@ -13,9 +13,9 @@ import {SETTINGS} from "../settings";
 import {blogsService} from "../services/blogs-service";
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {configPaginationAndSortParams} from "../helpers/config-pagination-and-sort-params";
-import {PaginationResponse} from "../types/input-output-types/pagination-types";
+import {PaginationResponse, SortingAndPaginationParamsType} from "../types/input-output-types/pagination-sort-types";
 import {qBlogsService} from "../services/qBlogs-service";
-import {SortingAndPaginationParamsType} from "../types/input-output-types/sort-filter-types";
+
 
 const blogsController = {
     getBlogs: async (
