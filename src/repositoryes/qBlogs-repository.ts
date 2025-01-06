@@ -41,7 +41,7 @@ const qBlogsRepository = {
         return blogsCollection
             .countDocuments(filter);
     },
-    async findBlog(id: string | ObjectId): Promise<WithId<BlogDbType> | null> {
+    async findBlog(id: string): Promise<WithId<BlogDbType> | null> {
         return await blogsCollection
             .findOne({_id: new ObjectId(id)});
     },
