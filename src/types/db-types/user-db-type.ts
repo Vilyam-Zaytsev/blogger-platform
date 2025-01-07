@@ -1,7 +1,8 @@
 type UserDbType = {
     login: string,
     email: string,
-    password: string,
+    passwordHash: string,
+    passwordSalt: string,
     createdAt: string
 };
 
