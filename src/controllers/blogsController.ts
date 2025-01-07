@@ -12,18 +12,18 @@ import {
 import {SETTINGS} from "../settings";
 import {blogsService} from "../services/blogs-service";
 import {BlogDbType} from "../types/db-types/blog-db-type";
-import {paginationParams} from "../helpers/pagination-params";
-import {PaginationResponse} from "../types/input-output-types/pagination-types";
+import {configPaginationAndSortParams} from "../helpers/config-pagination-and-sort-params";
+import {PaginationResponse, SortingAndPaginationParamsType} from "../types/input-output-types/pagination-sort-types";
 import {qBlogsService} from "../services/qBlogs-service";
-import {SortFilterType} from "../types/input-output-types/sort-filter-types";
+
 
 const blogsController = {
     getBlogs: async (
-        req: RequestWithQuery<SortFilterType>,
+        req: RequestWithQuery<SortingAndPaginationParamsType>,
         res: Response<PaginationResponse<BlogDbType>>
     ) => {
 
-        const filter: SortFilterType = {
+        const sortingAndPaginationParams: SortingAndPaginationParamsType = {
             pageNumber: req.query.pageNumber,
             pageSize: req.query.pageSize,
             sortBy: req.query.sortBy,
@@ -31,8 +31,8 @@ const blogsController = {
             searchNameTerm: req.query.searchNameTerm
         }
 
-        const foundBlogs: PaginationResponse<BlogDbType> = await qBlogsService
-            .findBlogs(paginationParams(filter));
+        const foundBlogs: PaginationResponse<BlogViewModel> = await qBlogsService
+            .findBlogs(configPaginationAndSortParams(sortingAndPaginationParams));
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
@@ -40,7 +40,7 @@ const blogsController = {
     },
     getBlog: async (
         req: RequestWithParams<URIParamsBlogId>,
-        res: Response<BlogViewModel | {}>
+        res: Response<BlogViewModel>
     ) => {
 
         const foundBlog: BlogViewModel | null = await qBlogsService
@@ -48,8 +48,7 @@ const blogsController = {
 
         if (!foundBlog) {
             res
-                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                .json({});
+                .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
 
             return;
         }
@@ -60,7 +59,7 @@ const blogsController = {
     },
     createAndInsertBlog: async (
         req: RequestWithBody<BlogInputModel>,
-        res: Response<BlogViewModel | {}>
+        res: Response<BlogViewModel>
     ) => {
 
         const dataForCreatingBlog: BlogInputModel = {
@@ -81,7 +80,7 @@ const blogsController = {
     },
     updateBlog: async (
         req: RequestWithParamsAndBody<URIParamsBlogId, BlogInputModel>,
-        res: Response<BlogViewModel | {}>
+        res: Response<BlogViewModel>
     ) => {
 
         const dataForBlogUpdates: BlogInputModel = {
@@ -95,15 +94,13 @@ const blogsController = {
 
         if (!updatedBlog) {
             res
-                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                .json({});
+                .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
             return;
         }
 
         res
-            .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
-            .json({});
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     },
     deleteBlog: async (
         req: RequestWithParams<URIParamsBlogId>,
@@ -115,15 +112,13 @@ const blogsController = {
 
         if (!isDeletedBlog) {
             res
-                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                .json({});
+                .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
             return;
         }
 
         res
-            .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
-            .json({});
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     },
 };
 

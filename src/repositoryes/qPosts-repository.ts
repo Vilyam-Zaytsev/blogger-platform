@@ -1,12 +1,12 @@
 import {PostDbType} from "../types/db-types/post-db-type";
 import {postsCollection} from "../db/mongoDb";
 import {ObjectId, Sort, WithId} from "mongodb";
-import {createFilter} from "../helpers/createFilter";
-import {SortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
+import {createSearchFilter} from "../helpers/create-search-filter";
+import {PaginationAndSortFilterType} from "../types/input-output-types/pagination-sort-types";
 
 
 const qPostsRepository = {
-    async findPosts(sortQueryDto: SortQueryFilterType, blogId?: string): Promise<WithId<PostDbType>[]> {
+    async findPosts(sortQueryDto: PaginationAndSortFilterType, blogId?: string): Promise<WithId<PostDbType>[]> {
 
         const {
             pageNumber,
@@ -15,7 +15,7 @@ const qPostsRepository = {
             sortDirection,
         } = sortQueryDto;
 
-        const filter: any = createFilter(
+        const filter: any = createSearchFilter(
             {
                 blogId,
             }
@@ -30,7 +30,7 @@ const qPostsRepository = {
     },
     async getPostsCount(blogId?: string ): Promise<number> {
 
-        const filter: any = createFilter(
+        const filter: any = createSearchFilter(
             {
                 blogId,
             }
@@ -39,7 +39,7 @@ const qPostsRepository = {
         return postsCollection
             .countDocuments(filter);
     },
-    async findPost(id: string | ObjectId): Promise<WithId<PostDbType> | null> {
+    async findPost(id: string): Promise<WithId<PostDbType> | null> {
             return await postsCollection
                 .findOne({_id: new ObjectId(id)});
     },

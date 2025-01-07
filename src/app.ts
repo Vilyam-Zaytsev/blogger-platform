@@ -4,6 +4,7 @@ import {blogsRouter} from "./routes/blogsRouter";
 import {postsRouter} from "./routes/postsRouter";
 import {testsRouter} from "./routes/testsRouter";
 import {authRouter} from "./routes/authRouter";
+import {usersRouter} from "./routes/usersRouter";
 
 
 const app = express();
@@ -16,6 +17,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use(SETTINGS.PATH.AUTH, authRouter);
+app.use(SETTINGS.PATH.USERS, usersRouter);
 app.use(SETTINGS.PATH.BLOGS, blogsRouter);
 app.use(SETTINGS.PATH.POSTS, postsRouter);
 app.use(SETTINGS.PATH.TESTS, testsRouter);

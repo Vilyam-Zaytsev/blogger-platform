@@ -1,11 +1,11 @@
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {blogsCollection} from "../db/mongoDb";
 import {ObjectId, Sort, WithId} from "mongodb";
-import {createFilter} from "../helpers/createFilter";
-import {SortQueryFilterType} from "../types/input-output-types/sort-query-filter-types";
+import {createSearchFilter} from "../helpers/create-search-filter";
+import {PaginationAndSortFilterType, SearchFieldName} from "../types/input-output-types/pagination-sort-types";
 
 const qBlogsRepository = {
-    async findBlogs(sortQueryDto: SortQueryFilterType): Promise<WithId<BlogDbType>[]> {
+    async findBlogs(sortQueryDto: PaginationAndSortFilterType): Promise<WithId<BlogDbType>[]> {
 
         const {
             pageNumber,
@@ -15,9 +15,9 @@ const qBlogsRepository = {
             searchNameTerm
         } = sortQueryDto;
 
-        const filter: any = createFilter(
+        const filter: any = createSearchFilter(
             {
-                nameOfSearchField: 'name',
+                nameOfSearchField: SearchFieldName.blog,
                 searchNameTerm
             }
         );
@@ -31,9 +31,9 @@ const qBlogsRepository = {
     },
     async getBlogsCount(searchNameTerm: string | null): Promise<number> {
 
-        const filter: any = createFilter(
+        const filter: any = createSearchFilter(
             {
-                nameOfSearchField: 'name',
+                nameOfSearchField: SearchFieldName.blog,
                 searchNameTerm
             }
         );
@@ -41,7 +41,7 @@ const qBlogsRepository = {
         return blogsCollection
             .countDocuments(filter);
     },
-    async findBlog(id: string | ObjectId): Promise<WithId<BlogDbType> | null> {
+    async findBlog(id: string): Promise<WithId<BlogDbType> | null> {
         return await blogsCollection
             .findOne({_id: new ObjectId(id)});
     },
