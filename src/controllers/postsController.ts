@@ -7,7 +7,7 @@ import {
 } from "../types/input-output-types/request-types";
 import {SETTINGS} from "../settings";
 import {postsService} from "../services/posts-service";
-import {configPaginationAndSortParams} from "../helpers/config-pagination-and-sort-params";
+import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
 import {PaginationResponse, SortingAndPaginationParamsType} from "../types/input-output-types/pagination-sort-types";
 import {qPostsService} from "../services/qPosts-service";
 import {URIParamsBlogId} from "../types/input-output-types/blogs-types";

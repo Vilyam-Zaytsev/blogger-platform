@@ -1,7 +1,7 @@
 import {BlogDbType} from "../types/db-types/blog-db-type";
 import {blogsCollection} from "../db/mongoDb";
 import {ObjectId, Sort, WithId} from "mongodb";
-import {createSearchFilter} from "../helpers/create-search-filter";
+import {createSearchFilter} from "../common/helpers/create-search-filter";
 import {PaginationAndSortFilterType, SearchFieldName} from "../types/input-output-types/pagination-sort-types";
 
 const qBlogsRepository = {

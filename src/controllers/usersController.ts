@@ -5,7 +5,7 @@ import {URIParamsUserId, UserInputModel, UserViewModel} from "../types/input-out
 import {userService} from "../services/user-service";
 import {qUserService} from "../services/qUserServise";
 import {SETTINGS} from "../settings";
-import {configPaginationAndSortParams} from "../helpers/config-pagination-and-sort-params";
+import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
 
 const usersController = {
     getUsers: async (

@@ -1,7 +1,7 @@
 import {PostDbType} from "../types/db-types/post-db-type";
 import {postsCollection} from "../db/mongoDb";
 import {ObjectId, Sort, WithId} from "mongodb";
-import {createSearchFilter} from "../helpers/create-search-filter";
+import {createSearchFilter} from "../common/helpers/create-search-filter";
 import {PaginationAndSortFilterType} from "../types/input-output-types/pagination-sort-types";
 
 
