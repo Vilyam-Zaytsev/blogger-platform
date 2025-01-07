@@ -6,7 +6,6 @@ import {
     RequestWithParamsAndQuery
 } from "../types/input-output-types/request-types";
 import {SETTINGS} from "../settings";
-import {PostDbType} from "../types/db-types/post-db-type";
 import {postsService} from "../services/posts-service";
 import {configPaginationAndSortParams} from "../helpers/config-pagination-and-sort-params";
 import {PaginationResponse, SortingAndPaginationParamsType} from "../types/input-output-types/pagination-sort-types";
@@ -19,7 +18,7 @@ const postsController = {
         res: Response<PaginationResponse<PostViewModel>>
     ) => {
 
-        const filter: SortingAndPaginationParamsType = {
+        const sortingAndPaginationParams: SortingAndPaginationParamsType = {
             pageNumber: req.query.pageNumber,
             pageSize: req.query.pageSize,
             sortBy: req.query.sortBy,
@@ -30,7 +29,7 @@ const postsController = {
         const blogId: string = req.params.id
 
         const foundPosts: PaginationResponse<PostViewModel> | null = await qPostsService
-            .findPosts(configPaginationAndSortParams(filter), blogId);
+            .findPosts(configPaginationAndSortParams(sortingAndPaginationParams), blogId);
 
         if (!foundPosts) {
             res.sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
@@ -93,7 +92,7 @@ const postsController = {
     },
     updatePost: async (
         req: RequestWithParamsAndBody<URIParamsPostIdModel, PostInputModel>,
-        res: Response<PostViewModel | {}>
+        res: Response<PostViewModel>
     ) => {
 
         const dataForPostUpdates: PostInputModel = {
@@ -108,15 +107,13 @@ const postsController = {
 
         if (!updatedPost) {
             res
-                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                .json({});
+                .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
 
             return;
         }
 
         res
-            .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
-            .json({});
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
     },
     deletePost: async (
         req: RequestWithParams<URIParamsPostIdModel>,
@@ -127,15 +124,13 @@ const postsController = {
 
         if (!isDeletedPost) {
             res
-                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                .json({});
+                .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
 
             return;
         }
 
         res
-            .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
-            .json({});
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
     },
 };
 
