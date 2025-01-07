@@ -80,7 +80,7 @@ const blogsController = {
     },
     updateBlog: async (
         req: RequestWithParamsAndBody<URIParamsBlogId, BlogInputModel>,
-        res: Response<BlogViewModel | {}>
+        res: Response<BlogViewModel>
     ) => {
 
         const dataForBlogUpdates: BlogInputModel = {
@@ -94,15 +94,13 @@ const blogsController = {
 
         if (!updatedBlog) {
             res
-                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                .json({});
+                .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
             return;
         }
 
         res
-            .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
-            .json({});
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     },
     deleteBlog: async (
         req: RequestWithParams<URIParamsBlogId>,
@@ -114,15 +112,13 @@ const blogsController = {
 
         if (!isDeletedBlog) {
             res
-                .status(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
-                .json({});
+                .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
             return;
         }
 
         res
-            .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
-            .json({});
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     },
 };
 
