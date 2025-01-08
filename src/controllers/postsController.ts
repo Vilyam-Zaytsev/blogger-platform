@@ -23,7 +23,6 @@ const postsController = {
             pageSize: req.query.pageSize,
             sortBy: req.query.sortBy,
             sortDirection: req.query.sortDirection,
-            searchNameTerm: req.query.searchNameTerm
         }
 
         const blogId: string = req.params.id

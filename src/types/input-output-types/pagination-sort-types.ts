@@ -5,6 +5,8 @@ enum SortDirection {
 
 enum SearchFieldName {
     blog = 'name',
+    userLogin = 'login',
+    userEmail = 'email'
 }
 
 type SearchFilterType = {

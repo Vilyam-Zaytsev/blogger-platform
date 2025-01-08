@@ -3,7 +3,7 @@ import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../types/inp
 import {PaginationResponse, SortingAndPaginationParamsType} from "../types/input-output-types/pagination-sort-types";
 import {URIParamsUserId, UserInputModel, UserViewModel} from "../types/input-output-types/user-types";
 import {userService} from "../services/user-service";
-import {qUserService} from "../services/qUserServise";
+import {qUserService} from "../services/qUser-servise";
 import {SETTINGS} from "../settings";
 import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
 import {qUsersRepository} from "../repositoryes/qUsers-repository";
@@ -14,7 +14,7 @@ const usersController = {
         res: Response<PaginationResponse<UserViewModel>>
     ) => {
 
-        const filter: SortingAndPaginationParamsType = {
+        const sortingAndPaginationParams: SortingAndPaginationParamsType = {
             pageNumber: req.query.pageNumber,
             pageSize: req.query.pageSize,
             sortBy: req.query.sortBy,
@@ -24,7 +24,7 @@ const usersController = {
         };
 
         const foundUsers: PaginationResponse<UserViewModel> = await qUserService
-            .findUsers(configPaginationAndSortParams(filter));
+            .findUsers(configPaginationAndSortParams(sortingAndPaginationParams));
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)

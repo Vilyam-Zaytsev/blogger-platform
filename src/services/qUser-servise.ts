@@ -12,13 +12,15 @@ const qUserService = {
         const {
             pageNumber,
             pageSize,
+            searchLoginTerm,
+            searchEmailTerm
         } = sortQueryDto;
 
         const users: WithId<UserDbType>[] = await qUsersRepository
             .findUsers(sortQueryDto);
 
         const usersCount: number = await qUsersRepository
-            .getUsersCount()
+            .getUsersCount(searchLoginTerm, searchEmailTerm)
 
         return {
             pagesCount: Math.ceil(usersCount / pageSize),

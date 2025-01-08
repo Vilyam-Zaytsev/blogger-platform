@@ -7,7 +7,12 @@ const authController = {
         req: RequestWithBody<LoginInputType>,
         res: Response
     ) => {
-        
+        const authParams: LoginInputType = {
+            loginOrEmail: req.body.loginOrEmail,
+            password: req.body.password
+        };
+
+
     }
 };
 
