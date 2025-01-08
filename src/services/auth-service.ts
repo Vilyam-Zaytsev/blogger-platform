@@ -7,7 +7,7 @@ const authService = {
     async login(authParamsDto: LoginInputType): Promise<boolean> {
         return this.checkUserCredentials(authParamsDto);
     },
-    async checkUserCredentials(authParamsDto: LoginInputType): boolean {
+    async checkUserCredentials(authParamsDto: LoginInputType): Promise<boolean> {
         const {
             loginOrEmail,
             password
