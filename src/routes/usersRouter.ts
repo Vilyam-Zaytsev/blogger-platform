@@ -20,7 +20,10 @@ usersRouter.post('/',
     inputCheckErrorsMiddleware,
     usersController.createAndInsertUser
 );
-usersRouter.delete('/:id', usersController.deleteUser);
+usersRouter.delete('/:id',
+    authMiddleware,
+    usersController.deleteUser
+);
 
 
 export {usersRouter};

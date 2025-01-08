@@ -1,6 +1,8 @@
 import {req} from "./test-helpers";
 import {SETTINGS} from "../../src/settings";
 import {Response} from "supertest";
+import {UserViewModel} from "../../src/types/input-output-types/user-types";
+import {SortDirection} from "../../src/types/input-output-types/pagination-sort-types";
 
 const usersTestManager = {
     async createUser(
@@ -54,28 +56,28 @@ const usersTestManager = {
                     : null,
         };
     },
-    // filterAndSort(
-    //     items: PostViewModel[],
-    //     sortBy: keyof PostViewModel = 'createdAt',
-    //     sortDirection: string = 'desc',
-    //     pageNumber: number = 1,
-    //     pageSize: number = 10,
-    // ) {
-    //     let startIndex = (pageNumber - 1) * pageSize;
-    //     let finishIndex = startIndex + pageSize;
-    //
-    //     return items
-    //         .sort((a: PostViewModel, b: PostViewModel) => {
-    //             return a[sortBy] > b[sortBy]
-    //                 ? sortDirection === 'desc' ? -1 : 1
-    //                 : a[sortBy] < b[sortBy]
-    //                     ? sortDirection === 'desc' ? 1 : -1
-    //                     : sortDirection === 'desc' ? -1 : 1
-    //         })
-    //         .filter((b, i) => {
-    //             return i >= startIndex && i < finishIndex ? b : null;
-    //         })
-    // }
+    filterAndSort(
+        items: UserViewModel[],
+        sortBy: keyof UserViewModel = 'createdAt',
+        sortDirection: SortDirection = SortDirection.Descending,
+        pageNumber: number = 1,
+        pageSize: number = 10,
+    ) {
+        let startIndex = (pageNumber - 1) * pageSize;
+        let finishIndex = startIndex + pageSize;
+
+        return items
+            .sort((a: UserViewModel, b: UserViewModel) => {
+                return a[sortBy] > b[sortBy]
+                    ? sortDirection === 'desc' ? -1 : 1
+                    : a[sortBy] < b[sortBy]
+                        ? sortDirection === 'desc' ? 1 : -1
+                        : sortDirection === 'desc' ? -1 : 1
+            })
+            .filter((b, i) => {
+                return i >= startIndex && i < finishIndex ? b : null;
+            })
+    }
 };
 
 export {usersTestManager};
