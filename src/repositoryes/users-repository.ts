@@ -1,5 +1,5 @@
 import {UserDbType} from "../types/db-types/user-db-type";
-import {InsertOneResult, ObjectId} from "mongodb";
+import {InsertOneResult, ObjectId, WithId} from "mongodb";
 import {usersCollection} from "../db/mongoDb";
 
 const usersRepository = {
@@ -12,6 +12,12 @@ const usersRepository = {
             .deleteOne({_id: new ObjectId(id)});
 
         return result.deletedCount === 1;
+    },
+    async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<UserDbType> | null> {
+        return usersCollection
+            .findOne({
+                $or: [{email: loginOrEmail}, {login: loginOrEmail}],
+            });
     }
 };
 

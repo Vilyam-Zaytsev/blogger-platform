@@ -7,6 +7,6 @@ const authService = {
 
     },
     async checkLogin(login: string): boolean {
-        // const user = await qUserService.
+        // const user = await userService.
     }
 }

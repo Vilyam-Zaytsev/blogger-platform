@@ -29,7 +29,7 @@ const userService = {
     async deleteUser(id: string): Promise<boolean> {
         return await usersRepository
             .deleteUser(id);
-    }
+    },
 };
 
 export {userService};
