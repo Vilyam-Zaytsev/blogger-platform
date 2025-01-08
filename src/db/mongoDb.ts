@@ -27,6 +27,7 @@ async function runDb(url: string) {
 
     blogsCollection = db.collection<BlogDbType>('blogs');
     postsCollection = db.collection<PostDbType>('posts');
+    usersCollection = db.collection<UserDbType>('users');
     try {
         await client.connect();
         await db.command({ping: 1});

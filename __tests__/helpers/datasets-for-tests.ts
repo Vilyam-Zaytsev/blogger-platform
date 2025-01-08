@@ -1,5 +1,6 @@
 import {BlogDbType} from "../../src/types/db-types/blog-db-type";
 import {PostDbType} from "../../src/types/db-types/post-db-type";
+import {UserDbType} from "../../src/types/db-types/user-db-type";
 
 const blog: BlogDbType = {
     name: 'BLOG',
@@ -18,7 +19,15 @@ const post: PostDbType = {
     createdAt: new Date().toISOString(),
 } as const;
 
+const user: UserDbType = {
+    login: 'user',
+    email: '@example.com',
+    passwordHash: 'hash',
+    createdAt: new Date().toISOString(),
+} as const;
+
 export {
     blog,
     post,
+    user
 }
