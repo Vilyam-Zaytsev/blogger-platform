@@ -1,7 +1,7 @@
 import {UserInputModel} from "../types/input-output-types/user-types";
 import {UserDbType} from "../types/db-types/user-db-type";
 import {usersRepository} from "../repositoryes/users-repository";
-import {bcryptServices} from "../common/services/bcryptServices";
+import {bcryptService} from "../common/services/bcryptService";
 
 const userService = {
     async createUser(data: UserInputModel): Promise<string> {
@@ -12,7 +12,7 @@ const userService = {
             password
         } = data;
 
-        const passwordHash = await bcryptServices.generateHash(password);
+        const passwordHash = await bcryptService.generateHash(password);
 
         const newUser: UserDbType = {
             login,
