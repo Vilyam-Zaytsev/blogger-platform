@@ -11,7 +11,7 @@ import {blogsTestManager} from "./helpers/blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
 import {blogsCollection, setBlogsCollection} from "../src/db/mongoDb";
-import {BlogDbType} from "../src/types/db-types/blog-db-type";
+import {BlogDbType} from "../src/blogs/types/blog-db-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;

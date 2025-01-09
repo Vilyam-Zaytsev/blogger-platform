@@ -1,4 +1,4 @@
-import {SearchFilterType} from "../../types/input-output-types/pagination-sort-types";
+import {SearchFilterType} from "../types/input-output-types/pagination-sort-types";
 
 const createSearchFilter = (searchFilter: SearchFilterType) => {
 

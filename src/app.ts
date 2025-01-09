@@ -1,10 +1,10 @@
 import express, {Response, Request} from 'express';
 import {SETTINGS} from "./settings";
-import {blogsRouter} from "./routes/blogsRouter";
-import {postsRouter} from "./routes/postsRouter";
-import {testsRouter} from "./routes/testsRouter";
-import {authRouter} from "./routes/authRouter";
-import {usersRouter} from "./routes/usersRouter";
+import {blogsRouter} from "./blogs/blogsRouter";
+import {postsRouter} from "./posts/postsRouter";
+import {testsRouter} from "./testsRouter";
+import {authRouter} from "./auth/authRouter";
+import {usersRouter} from "./users/usersRouter";
 
 
 const app = express();
