@@ -2,8 +2,8 @@ import {Response, Request} from "express";
 import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../types/input-output-types/request-types";
 import {PaginationResponse, SortingAndPaginationParamsType} from "../types/input-output-types/pagination-sort-types";
 import {URIParamsUserId, UserInputModel, UserViewModel} from "../types/input-output-types/user-types";
-import {userService} from "../services/user-service";
-import {qUserService} from "../services/qUser-servise";
+import {usersService} from "../services/users-service";
+import {qUserService} from "../services/qUsers-servise";
 import {SETTINGS} from "../settings";
 import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
 import {qUsersRepository} from "../repositoryes/qUsers-repository";
@@ -59,7 +59,7 @@ const usersController = {
             password: req.body.password
         };
 
-        const idCreatedUser: string = await userService
+        const idCreatedUser: string = await usersService
             .createUser(dataForCreatingUser);
 
         const createdUser: UserViewModel | null = await qUserService
@@ -74,7 +74,7 @@ const usersController = {
         res: Response
     ) => {
 
-        const isDeletedUser: boolean = await userService
+        const isDeletedUser: boolean = await usersService
             .deleteUser(req.params.id);
 
         if (!isDeletedUser) {

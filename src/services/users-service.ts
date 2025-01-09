@@ -3,7 +3,7 @@ import {UserDbType} from "../types/db-types/user-db-type";
 import {usersRepository} from "../repositoryes/users-repository";
 import {bcryptService} from "../common/services/bcryptService";
 
-const userService = {
+const usersService = {
     async createUser(data: UserInputModel): Promise<string> {
 
         const {
@@ -32,4 +32,4 @@ const userService = {
     },
 };
 
-export {userService};
+export {usersService};
