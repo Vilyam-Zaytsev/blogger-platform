@@ -38,6 +38,8 @@ const createUserSearchFilter = (
             : null;
     }
 
+    if (filter.$or.length < 1) return {};
+
     return filter;
 };
 
