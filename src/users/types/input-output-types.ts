@@ -1,7 +1,7 @@
 type UserInputModel = {
     login: string,
-    password: string,
     email: string
+    password: string,
 };
 
 type UserViewModel = {
