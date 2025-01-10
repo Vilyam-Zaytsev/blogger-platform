@@ -2,12 +2,11 @@ import {UserInputModel} from "../types/input-output-types";
 import {UserDbType} from "../types/user-db-type";
 import {usersRepository} from "../repositoryes/users-repository";
 import {bcryptService} from "../../common/services/bcryptService";
-import {MatchMode, UsersSearchFilterType} from "../../common/types/input-output-types/pagination-sort-types";
-import {createUserSearchFilter} from "../helpers/create-users-search-filter";
-import {FieldNameType} from "../../common/types/input-output-types/output-errors-type";
+import {ResultType} from "../../common/types/result-types/result-type";
+import {ResultStatusType} from "../../common/types/result-types/result-status-type";
 
 const usersService = {
-    async createUser(data: UserInputModel): Promise<string> {
+    async createUser(data: UserInputModel): Promise<ResultType<string | null>> {
 
         const {
             login,
@@ -15,7 +14,9 @@ const usersService = {
             password
         } = data;
 
-        // const isUser: boolean = await this.validateUserUniqueness(login, email);
+        const resultCandidateValidation: ResultType = await this.validateCandidateUniqueness(login, email);
+
+        if (resultCandidateValidation.status !== ResultStatusType.Success) return resultCandidateValidation
 
         const passwordHash = await bcryptService.generateHash(password);
 
@@ -29,27 +30,53 @@ const usersService = {
         const result = await usersRepository
             .insertUser(newUser);
 
-        return String(result.insertedId);
+        return {
+            status: ResultStatusType.Created,
+            data: String(result.insertedId)
+        }
     },
     async deleteUser(id: string): Promise<boolean> {
         return await usersRepository
             .deleteUser(id);
     },
-    // async validateUserUniqueness(login, email): Promise<boolean> {
-    //
-    //     const filter = createUserSearchFilter(
-    //         {
-    //             searchLoginTerm: login,
-    //             searchEmailTerm: email
-    //         },
-    //         MatchMode.Exact
-    //     );
-    //
-    //     const isUser = await usersRepository
-    //         .findByFilter(filter);
-    //
-    //     return !!isUser;
-    // },
+    async validateCandidateUniqueness(login: string, email: string): Promise<ResultType> {
+
+        const findByLogin = await usersRepository
+            .findByLoginOrEmail(login);
+
+        if (findByLogin) {
+            return {
+                status: ResultStatusType.BadRequest,
+                errorMessage: 'Login incorrect',
+                extensions: [{
+                    field: 'login',
+                    message: 'The user with this login already exists.',
+                }],
+                data: null
+            }
+        }
+
+        const findByEmail = await usersRepository
+            .findByLoginOrEmail(email);
+
+        if (findByEmail) {
+            return {
+                status: ResultStatusType.BadRequest,
+                errorMessage: 'Email incorrect',
+                extensions: [{
+                    field: 'email',
+                    message: 'The user with this email already exists.',
+                }],
+                data: null
+            }
+        }
+
+
+        return {
+            status: ResultStatusType.Success,
+            data: null
+        };
+    },
 
 };
 

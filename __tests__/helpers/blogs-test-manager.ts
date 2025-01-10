@@ -1,5 +1,5 @@
 import {req} from "./test-helpers";
-import {SETTINGS} from "../../src/settings";
+import {SETTINGS} from "../../src/common/settings";
 import {Response} from "supertest";
 import {BlogDbType} from "../../src/blogs/types/blog-db-type";
 import {BlogViewModel} from "../../src/blogs/types/input-output-types";

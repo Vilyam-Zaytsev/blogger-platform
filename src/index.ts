@@ -1,5 +1,5 @@
 import {app} from "./app";
-import {SETTINGS} from "./settings";
+import {SETTINGS} from "./common/settings";
 import {runDb} from "./db/mongoDb";
 
 const startApp = async () => {

@@ -4,9 +4,13 @@ import {PaginationResponse, SortingAndPaginationParamsType} from "../common/type
 import {URIParamsUserId, UserInputModel, UserViewModel} from "./types/input-output-types";
 import {usersService} from "./services/users-service";
 import {qUserService} from "./services/qUsers-servise";
-import {SETTINGS} from "../settings";
+import {SETTINGS} from "../common/settings";
 import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
 import {qUsersRepository} from "./repositoryes/qUsers-repository";
+import {ResultType} from "../common/types/result-types/result-type";
+import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
+import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
+import {OutputErrorsType} from "../common/types/input-output-types/output-errors-type";
 
 const usersController = {
     getUsers: async (
@@ -51,7 +55,7 @@ const usersController = {
     },
     createAndInsertUser: async (
         req: RequestWithBody<UserInputModel>,
-        res: Response<UserViewModel>
+        res: Response<UserViewModel | OutputErrorsType>
     ) => {
         const dataForCreatingUser: UserInputModel = {
             login: req.body.login,
@@ -59,11 +63,19 @@ const usersController = {
             password: req.body.password
         };
 
-        const idCreatedUser: string = await usersService
+        const result: ResultType<string | null> = await usersService
             .createUser(dataForCreatingUser);
 
+        if (!result.data) {
+            res
+                .status(mapResultStatusToHttpStatus(result.status))
+                .json(mapResultExtensionsToErrorMessage(result.extensions!));
+
+            return;
+        }
+
         const createdUser: UserViewModel | null = await qUserService
-            .findUser(idCreatedUser);
+            .findUser(result.data!);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)

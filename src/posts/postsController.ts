@@ -5,7 +5,7 @@ import {
     RequestWithParamsAndBody,
     RequestWithParamsAndQuery
 } from "../common/types/input-output-types/request-types";
-import {SETTINGS} from "../settings";
+import {SETTINGS} from "../common/settings";
 import {postsService} from "./services/posts-service";
 import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
 import {PaginationResponse, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";

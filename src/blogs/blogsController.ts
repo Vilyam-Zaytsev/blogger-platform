@@ -9,7 +9,7 @@ import {
     RequestWithParams,
     RequestWithParamsAndBody, RequestWithQuery
 } from "../common/types/input-output-types/request-types";
-import {SETTINGS} from "../settings";
+import {SETTINGS} from "../common/settings";
 import {blogsService} from "./services/blogs-service";
 import {BlogDbType} from "./types/blog-db-type";
 import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";

@@ -1,8 +1,8 @@
 import {ObjectId, Sort, WithId} from "mongodb";
 import {UserDbType} from "../types/user-db-type";
 import {usersCollection} from "../../db/mongoDb";
-import {PaginationAndSortFilterType, SearchFieldName} from "../../common/types/input-output-types/pagination-sort-types";
-import {createSearchFilter} from "../../common/helpers/create-search-filter";
+import {MatchMode, PaginationAndSortFilterType} from "../../common/types/input-output-types/pagination-sort-types";
+import {createUserSearchFilter} from "../helpers/create-users-search-filter";
 
 const qUsersRepository = {
     async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<WithId<UserDbType>[]> {
@@ -15,12 +15,12 @@ const qUsersRepository = {
             searchEmailTerm
         } = sortQueryDto;
 
-        const filter: any = createSearchFilter(
+        const filter: any = createUserSearchFilter(
             {
-                nameOfSearchField: searchLoginTerm ? SearchFieldName.userLogin : SearchFieldName.userEmail,
                 searchLoginTerm,
                 searchEmailTerm
-            }
+            },
+            MatchMode.Partial
         );
 
         return await usersCollection
@@ -39,14 +39,12 @@ const qUsersRepository = {
         searchEmailTerm: string | null
         ): Promise<number> {
 
-        const filter: any = createSearchFilter(
+        const filter: any = createUserSearchFilter(
             {
-                nameOfSearchField: searchLoginTerm
-                    ? SearchFieldName.userLogin
-                    : SearchFieldName.userEmail,
                 searchLoginTerm,
                 searchEmailTerm
-            }
+            },
+            MatchMode.Partial
         );
             return usersCollection
             .countDocuments(filter);

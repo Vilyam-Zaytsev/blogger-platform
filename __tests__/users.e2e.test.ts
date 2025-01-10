@@ -1,5 +1,5 @@
 import {console_log, encodingAdminDataInBase64, generateRandomString, req} from './helpers/test-helpers';
-import {SETTINGS} from "../src/settings";
+import {SETTINGS} from "../src/common/settings";
 import {user} from "./helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";

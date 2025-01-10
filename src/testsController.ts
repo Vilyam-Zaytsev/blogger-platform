@@ -1,5 +1,5 @@
 import {Request, Response} from "express";
-import {SETTINGS} from "./settings";
+import {SETTINGS} from "./common/settings";
 import {blogsCollection, postsCollection} from "./db/mongoDb";
 
 const testsController = {

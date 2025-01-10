@@ -1,5 +1,5 @@
 import express, {Response, Request} from 'express';
-import {SETTINGS} from "./settings";
+import {SETTINGS} from "./common/settings";
 import {blogsRouter} from "./blogs/blogsRouter";
 import {postsRouter} from "./posts/postsRouter";
 import {testsRouter} from "./testsRouter";

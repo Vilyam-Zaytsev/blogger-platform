@@ -1,5 +1,5 @@
 import {req} from "./test-helpers";
-import {SETTINGS} from "../../src/settings";
+import {SETTINGS} from "../../src/common/settings";
 import {Response} from "supertest";
 import {UserViewModel} from "../../src/users/types/input-output-types";
 import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";

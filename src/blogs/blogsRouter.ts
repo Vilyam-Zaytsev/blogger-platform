@@ -14,7 +14,7 @@ import {
     sortByInputValidator,
     sortDirectionInputValidator
 } from "../common/middlewares/query-parameters-validator";
-import {SETTINGS} from "../settings";
+import {SETTINGS} from "../common/settings";
 import {postsController} from "../posts/postsController";
 import {
     postContentInputValidator,

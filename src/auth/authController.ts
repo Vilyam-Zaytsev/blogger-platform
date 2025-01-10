@@ -2,7 +2,7 @@ import {Response} from "express";
 import {RequestWithBody} from "../common/types/input-output-types/request-types";
 import {LoginInputType} from "../common/types/input-output-types/login-types";
 import {authService} from "./auth-service";
-import {SETTINGS} from "../settings";
+import {SETTINGS} from "../common/settings";
 
 const authController = {
     login: async (

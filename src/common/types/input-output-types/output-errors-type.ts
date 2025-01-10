@@ -6,8 +6,8 @@ type FieldNameType = keyof BlogInputModel | keyof PostInputModel | keyof UserInp
 
 type OutputErrorsType = {
     errorsMessage: {
-        message: string,
         field: FieldNameType
+        message: string,
     }[]
 };
 

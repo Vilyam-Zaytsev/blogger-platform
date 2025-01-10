@@ -1,7 +1,7 @@
 import {validationResult} from "express-validator";
 import {Request, Response, NextFunction} from "express";
 import {FieldNameType} from "../types/input-output-types/output-errors-type";
-import {SETTINGS} from "../../settings";
+import {SETTINGS} from "../settings";
 
 const inputCheckErrorsMiddleware = (
     req: Request,
