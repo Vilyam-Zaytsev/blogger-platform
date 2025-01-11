@@ -1,8 +1,8 @@
 import {Collection, MongoClient} from "mongodb";
-import {SETTINGS} from "../settings";
-import {BlogDbType} from "../types/db-types/blog-db-type";
-import {PostDbType} from "../types/db-types/post-db-type";
-import {UserDbType} from "../types/db-types/user-db-type";
+import {SETTINGS} from "../common/settings";
+import {BlogDbType} from "../blogs/types/blog-db-type";
+import {PostDbType} from "../posts/types/post-db-type";
+import {UserDbType} from "../users/types/user-db-type";
 
 let blogsCollection: Collection<BlogDbType>;
 let postsCollection: Collection<PostDbType>;

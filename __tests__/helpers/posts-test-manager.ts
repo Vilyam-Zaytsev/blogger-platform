@@ -1,8 +1,8 @@
 import {req} from "./test-helpers";
-import {SETTINGS} from "../../src/settings";
+import {SETTINGS} from "../../src/common/settings";
 import {Response} from "supertest";
-import {BlogViewModel} from "../../src/types/input-output-types/blogs-types";
-import {PostViewModel} from "../../src/types/input-output-types/posts-types";
+import {BlogViewModel} from "../../src/blogs/types/input-output-types";
+import {PostViewModel} from "../../src/posts/types/input-output-types";
 
 const postsTestManager = {
     async createPost(

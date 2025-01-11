@@ -1,14 +1,14 @@
 import {console_log, encodingAdminDataInBase64, generateRandomString, req} from './helpers/test-helpers';
-import {SETTINGS} from "../src/settings";
+import {SETTINGS} from "../src/common/settings";
 import {user} from "./helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
 import {setUserCollection, usersCollection} from "../src/db/mongoDb";
 import {postsTestManager} from "./helpers/posts-test-manager";
 import {Response} from "supertest";
-import {UserDbType} from "../src/types/db-types/user-db-type";
+import {UserDbType} from "../src/users/types/user-db-type";
 import {usersTestManager} from "./helpers/users-test-manager";
-import {SortDirection} from "../src/types/input-output-types/pagination-sort-types";
+import {SortDirection} from "../src/common/types/input-output-types/pagination-sort-types";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;

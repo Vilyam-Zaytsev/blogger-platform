@@ -1,6 +1,6 @@
-import {BlogDbType} from "../../src/types/db-types/blog-db-type";
-import {PostDbType} from "../../src/types/db-types/post-db-type";
-import {UserDbType} from "../../src/types/db-types/user-db-type";
+import {BlogDbType} from "../../src/blogs/types/blog-db-type";
+import {PostDbType} from "../../src/posts/types/post-db-type";
+import {UserDbType} from "../../src/users/types/user-db-type";
 
 const blog: BlogDbType = {
     name: 'BLOG',

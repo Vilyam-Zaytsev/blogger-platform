@@ -1,12 +1,12 @@
 import {console_log, encodingAdminDataInBase64, generateRandomString, req} from './helpers/test-helpers';
-import {SETTINGS} from "../src/settings";
+import {SETTINGS} from "../src/common/settings";
 import {blog, post} from "./helpers/datasets-for-tests";
 import {blogsTestManager} from "./helpers/blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
 import {postsCollection, setBlogsCollection, setPostsCollection} from "../src/db/mongoDb";
-import {BlogDbType} from "../src/types/db-types/blog-db-type";
-import {PostDbType} from "../src/types/db-types/post-db-type";
+import {BlogDbType} from "../src/blogs/types/blog-db-type";
+import {PostDbType} from "../src/posts/types/post-db-type";
 import {postsTestManager} from "./helpers/posts-test-manager";
 import {Response} from "supertest";
 

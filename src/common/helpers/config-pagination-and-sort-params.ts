@@ -2,7 +2,7 @@ import {
     PaginationAndSortFilterType,
     SortDirection,
     SortingAndPaginationParamsType
-} from "../../types/input-output-types/pagination-sort-types";
+} from "../types/input-output-types/pagination-sort-types";
 
 const configPaginationAndSortParams = (params: SortingAndPaginationParamsType): PaginationAndSortFilterType => {
     const pageNumber: number =
