@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
-import {SETTINGS} from "./common/settings";
-import {blogsCollection, postsCollection, usersCollection} from "./db/mongoDb";
+import {SETTINGS} from "../common/settings";
+import {blogsCollection, postsCollection, usersCollection} from "../db/mongoDb";
 
 const testsController = {
     deleteAllData: async (

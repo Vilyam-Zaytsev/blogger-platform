@@ -36,7 +36,7 @@ beforeEach(async () => {
 
 describe('/users', () => {
     describe('POST /users', () => {
-        it('should create a new user, the creator is authenticated.', async () => {
+        it('should create a new user, the admin is authenticated.', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
                 1,
                 {
@@ -72,7 +72,7 @@ describe('/users', () => {
 
             console_log(resPost[0].body, resPost[0].status, 'Test 1: post(/users)\n');
         });
-        it('should not create a user if the creator is not authenticated.', async () => {
+        it('should not create a user if the admin is not authenticated.', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
                 1,
                 {
@@ -291,7 +291,7 @@ describe('/users', () => {
         });
     });
     describe('GET /users', () => {
-        it('should return an empty array.', async () => {
+        it('should return an empty array, the admin is authenticated.', async () => {
             const resGet = await req
                 .get(SETTINGS.PATH.USERS)
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);

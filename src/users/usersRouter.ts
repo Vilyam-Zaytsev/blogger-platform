@@ -10,7 +10,11 @@ import {authMiddleware} from "../common/middlewares/authorization-middleware";
 
 const usersRouter = Router();
 
-usersRouter.get('/', usersController.getUsers);
+usersRouter.get('/',
+    authMiddleware,
+
+    usersController.getUsers
+);
 usersRouter.get('/:id', usersController.getUser);
 usersRouter.post('/',
     authMiddleware,
