@@ -12,7 +12,6 @@ const usersRouter = Router();
 
 usersRouter.get('/',
     authMiddleware,
-
     usersController.getUsers
 );
 usersRouter.get('/:id', usersController.getUser);

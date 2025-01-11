@@ -70,7 +70,7 @@ describe('/users', () => {
             expect(resPost[0].body).toEqual(resGetById.body);
 
 
-            console_log(resPost[0].body, resPost[0].status, 'Test 1: post(/users)\n');
+            console_log(resPost[0].body, resPost[0].status, 'Test 1: post(/users)');
         });
         it('should not create a user if the admin is not authenticated.', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -99,7 +99,7 @@ describe('/users', () => {
                 items: []
             });
 
-            console_log(resPost[0].body, resPost[0].status, 'Test 2: post(/users)\n');
+            console_log(resPost[0].body, resPost[0].status, 'Test 2: post(/users)');
         });
         it('should not create a user if the data in the request body is incorrect.', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -143,7 +143,7 @@ describe('/users', () => {
                 items: []
             });
 
-            console_log(resPost[0].body, resPost[0].status, 'Test 3: post(/users)\n');
+            console_log(resPost[0].body, resPost[0].status, 'Test 3: post(/users)');
         });
         it('should not create a user if the data in the request body is incorrect.', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -191,7 +191,7 @@ describe('/users', () => {
                 items: []
             });
 
-            console_log(resPost[0].body, resPost[0].status, 'Test 4: post(/users)\n');
+            console_log(resPost[0].body, resPost[0].status, 'Test 4: post(/users)');
         });
         it('should not create a user if the data in the request body is incorrect.', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -239,7 +239,7 @@ describe('/users', () => {
                 items: []
             });
 
-            console_log(resPost[0].body, resPost[0].status, 'Test 5: post(/users)\n');
+            console_log(resPost[0].body, resPost[0].status, 'Test 5: post(/users)');
         });
         it('should not create a user if the data in the request body is incorrect.', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -287,13 +287,20 @@ describe('/users', () => {
                 items: []
             });
 
-            console_log(resPost[0].body, resPost[0].status, 'Test 6: post(/users)\n');
+            console_log(resPost[0].body, resPost[0].status, 'Test 6: post(/users)');
         });
     });
     describe('GET /users', () => {
         it('should return an empty array, the admin is authenticated.', async () => {
             const resGet = await req
                 .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect({
@@ -304,9 +311,23 @@ describe('/users', () => {
                 items: []
             });
 
-            console_log(resGet.body, resGet.status, 'Test 1: get(/users)\n');
+            console_log(resGet.body, resGet.status, 'Test 1: get(/users)');
         });
-        it('should return an array with a single user.', async () => {
+        it('should return a 401 error if the admin is not authenticated', async () => {
+            const resGet = await req
+                .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        'incorrect login',
+                        'incorrect password',
+                    )
+                )
+                .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+
+            console_log(resGet.body, resGet.status, 'Test 2: get(/users)');
+        });
+        it('should return an array with a single user, the admin is authenticated.', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
                 1,
                 {
@@ -329,14 +350,21 @@ describe('/users', () => {
 
             const resGet = await req
                 .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(resPost[0].body).toEqual(resGet.body.items[0]);
             expect(resGet.body.items.length).toEqual(1);
 
-            console_log(resGet.body, resGet.status, 'Test 2: get(/users)\n');
+            console_log(resGet.body, resGet.status, 'Test 3: get(/users)');
         });
-        it('should return an array with a two users.', async () => {
+        it('should return an array with a two users, the admin is authenticated..', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
                 2,
                 {
@@ -361,6 +389,13 @@ describe('/users', () => {
 
             const resGet = await req
                 .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(resGet.body).toEqual({
@@ -375,70 +410,70 @@ describe('/users', () => {
 
             expect(resGet.body.items.length).toEqual(2);
 
-            console_log(resGet.body, resGet.status, 'Test 3: get(/users)\n');
+            console_log(resGet.body, resGet.status, 'Test 4: get(/users)');
         });
         it('should return user found by id.', async () => {
-                const resPost: Response[] = await usersTestManager.createUser(
-                    1,
-                    {
-                        login: user.login,
-                        email: user.email,
-                        password: 'qwerty'
-                    },
-                    encodingAdminDataInBase64(
-                        SETTINGS.ADMIN_DATA.LOGIN,
-                        SETTINGS.ADMIN_DATA.PASSWORD
-                    )
-                );
+            const resPost: Response[] = await usersTestManager.createUser(
+                1,
+                {
+                    login: user.login,
+                    email: user.email,
+                    password: 'qwerty'
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
 
-                expect(resPost[0].body).toEqual({
-                    id: expect.any(String),
-                    login: `${user.login}_1`,
-                    email: `${user.login}_1${user.email}`,
-                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
-                });
-
-                const resGetById = await req
-                    .get(`${SETTINGS.PATH.USERS}/${resPost[0].body.id}`)
-                    .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
-                expect(resPost[0].body).toEqual(resGetById.body);
-
-                console_log(resGetById.body, resGetById.status, 'Test 4: get(/users)\n');
+            expect(resPost[0].body).toEqual({
+                id: expect.any(String),
+                login: `${user.login}_1`,
+                email: `${user.login}_1${user.email}`,
+                createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
             });
+
+            const resGetById = await req
+                .get(`${SETTINGS.PATH.USERS}/${resPost[0].body.id}`)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(resPost[0].body).toEqual(resGetById.body);
+
+            console_log(resGetById.body, resGetById.status, 'Test 5: get(/users)');
+        });
         it('should return error 404 not found.', async () => {
-                const resPost: Response[] = await usersTestManager.createUser(
-                    1,
-                    {
-                        login: user.login,
-                        email: user.email,
-                        password: 'qwerty'
-                    },
-                    encodingAdminDataInBase64(
-                        SETTINGS.ADMIN_DATA.LOGIN,
-                        SETTINGS.ADMIN_DATA.PASSWORD
-                    )
-                );
+            const resPost: Response[] = await usersTestManager.createUser(
+                1,
+                {
+                    login: user.login,
+                    email: user.email,
+                    password: 'qwerty'
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
 
-                expect(resPost[0].body).toEqual({
-                    id: expect.any(String),
-                    login: `${user.login}_1`,
-                    email: `${user.login}_1${user.email}`,
-                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
-                });
-
-                const resGetById_1 = await req
-                    .get(`${SETTINGS.PATH.USERS}/${new ObjectId()}`)
-                    .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
-
-                const resGetById_2 = await req
-                    .get(`${SETTINGS.PATH.USERS}/${resPost[0].body.id}`)
-                    .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
-                expect(resPost[0].body).toEqual(resGetById_2.body);
-
-                console_log(resGetById_1.body, resGetById_1.status, 'Test 5: get(/users)\n');
+            expect(resPost[0].body).toEqual({
+                id: expect.any(String),
+                login: `${user.login}_1`,
+                email: `${user.login}_1${user.email}`,
+                createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
             });
+
+            const resGetById_1 = await req
+                .get(`${SETTINGS.PATH.USERS}/${new ObjectId()}`)
+                .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
+
+            const resGetById_2 = await req
+                .get(`${SETTINGS.PATH.USERS}/${resPost[0].body.id}`)
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(resPost[0].body).toEqual(resGetById_2.body);
+
+            console_log(resGetById_1.body, resGetById_1.status, 'Test 6: get(/users)');
+        });
     });
     describe('DELETE /users', () => {
         it('should delete user, the admin is authenticated.', async () => {
@@ -581,12 +616,12 @@ describe('/users', () => {
             );
 
             for (let i = 0; i < resPost.length; i++) {
-            expect(resPost[i].body).toEqual({
-                id: expect.any(String),
-                login: `${user.login}_${i + 1}`,
-                email: `${user.login}_${i + 1}${user.email}`,
-                createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
-            });
+                expect(resPost[i].body).toEqual({
+                    id: expect.any(String),
+                    login: `${user.login}_${i + 1}`,
+                    email: `${user.login}_${i + 1}${user.email}`,
+                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+                });
             }
 
             const resGet = await req
