@@ -95,7 +95,7 @@ describe('/posts', () => {
                 expect(res_POST_posts[i].body).toEqual(res_GET_post.body);
             }
 
-            console_log(res_POST_posts[0].body, res_POST_posts[0].status, 'Test 1: post(/posts)\n');
+            console_log(res_POST_posts[0].body, res_POST_posts[0].status, 'Test 1: post(/posts)');
         });
         it('should not create a post if the user is not authenticated.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -147,7 +147,7 @@ describe('/posts', () => {
                 items: []
             });
 
-            console_log(res_POST_posts[0].body, res_POST_posts[0].status, 'Test 2: post(/posts)\n');
+            console_log(res_POST_posts[0].body, res_POST_posts[0].status, 'Test 2: post(/posts)');
         });
         it('should not create a post if the data in the request body is incorrect.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -217,7 +217,7 @@ describe('/posts', () => {
                 items: []
             });
 
-            console_log(res_POST_posts[0].body, res_POST_posts[0].status, 'Test 3: post(/posts)\n');
+            console_log(res_POST_posts[0].body, res_POST_posts[0].status, 'Test 3: post(/posts)');
         });
         it('should not create a post if the data in the request body is incorrect.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -292,7 +292,7 @@ describe('/posts', () => {
                 items: []
             });
 
-            console_log(res_POST_posts[0].body, res_POST_posts[0].status, 'Test 4: post(/posts)\n');
+            console_log(res_POST_posts[0].body, res_POST_posts[0].status, 'Test 4: post(/posts)');
         });
         it('should not create a post if the data in the request body is incorrect.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -367,7 +367,7 @@ describe('/posts', () => {
                 items: []
             });
 
-            console_log(res_POST_posts[0].body, res_POST_posts[0].status, 'Test 5: post(/posts)\n');
+            console_log(res_POST_posts[0].body, res_POST_posts[0].status, 'Test 5: post(/posts)');
         });
         it('should not create a post if the data in the request body is incorrect.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -442,7 +442,7 @@ describe('/posts', () => {
                 items: []
             });
 
-            console_log(res_POST_posts[0].body, res_POST_posts[0].status, 'Test 6: post(/posts)\n');
+            console_log(res_POST_posts[0].body, res_POST_posts[0].status, 'Test 6: post(/posts)');
         });
     });
     describe('GET /posts', () => {
@@ -459,7 +459,7 @@ describe('/posts', () => {
                 items: []
             });
 
-            console_log(res_get.body, res_get.status, 'Test 1: get(/posts)\n');
+            console_log(res_get.body, res_get.status, 'Test 1: get(/posts)');
         });
         it('should return an array with a single post.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -582,7 +582,7 @@ describe('/posts', () => {
 
             expect(res_GET_posts.body.items.length).toEqual(2);
 
-            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 3: get(/posts)\n');
+            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 3: get(/posts)');
         });
         it('should return post found by id.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -696,7 +696,7 @@ describe('/posts', () => {
 
             expect(res_GET_post_2.body).toEqual(res_POST_posts[0].body);
 
-            console_log(res_GET_post_1.body, res_GET_post_1.status, 'Test 5: get(/posts)\n');
+            console_log(res_GET_post_1.body, res_GET_post_1.status, 'Test 5: get(/posts)');
         });
     });
     describe('PUT /posts', () => {
@@ -781,7 +781,7 @@ describe('/posts', () => {
                 }
             )
 
-            console_log(res_UPDATE_post.body, res_UPDATE_post.status, 'Test 1: put(/posts)\n');
+            console_log(res_UPDATE_post.body, res_UPDATE_post.status, 'Test 1: put(/posts)');
         });
         it('should not update the post if the user has not been authenticated.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -855,7 +855,7 @@ describe('/posts', () => {
             expect(res_GET_post.body).toEqual(res_POST_posts[0].body);
 
 
-            console_log(res_UPDATE_post.body, res_UPDATE_post.status, 'Test 2: put(/posts)\n');
+            console_log(res_UPDATE_post.body, res_UPDATE_post.status, 'Test 2: put(/posts)');
         });
         it('should not update a post if the data in the request body is incorrect.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -942,7 +942,7 @@ describe('/posts', () => {
                 ]
             });
 
-            console_log(res_UPDATE_post.body, res_UPDATE_post.status, 'Test 3: put(/posts)\n');
+            console_log(res_UPDATE_post.body, res_UPDATE_post.status, 'Test 3: put(/posts)');
         });
         it('should not update a blog if the data in the request body is incorrect.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -1036,7 +1036,7 @@ describe('/posts', () => {
                 ]
             });
 
-            console_log(res_UPDATE_post.body, res_UPDATE_post.status, 'Test 4: put(/posts)\n');
+            console_log(res_UPDATE_post.body, res_UPDATE_post.status, 'Test 4: put(/posts)');
         });
         it('should not update a blog if the data in the request body is incorrect.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -1130,7 +1130,7 @@ describe('/posts', () => {
                 ]
             });
 
-            console_log(res_UPDATE_post.body, res_UPDATE_post.status, 'Test 5: put(/posts)\n');
+            console_log(res_UPDATE_post.body, res_UPDATE_post.status, 'Test 5: put(/posts)');
         });
         it('should not update a blog if the data in the request body is incorrect.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -1224,7 +1224,7 @@ describe('/posts', () => {
                 ]
             });
 
-            console_log(res_UPDATE_post.body, res_UPDATE_post.status, 'Test 6: put(/posts)\n');
+            console_log(res_UPDATE_post.body, res_UPDATE_post.status, 'Test 6: put(/posts)');
         });
     });
     describe('DELETE /posts', () => {
@@ -1297,7 +1297,7 @@ describe('/posts', () => {
                 items: []
             });
 
-            console_log(res_DELETE_post.body, res_DELETE_post.status, 'Test 1: delete(/posts)\n');
+            console_log(res_DELETE_post.body, res_DELETE_post.status, 'Test 1: delete(/posts)');
         });
         it('should not delete blog, the user is not authenticated.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -1362,7 +1362,7 @@ describe('/posts', () => {
 
             expect(res_POST_posts[0].body).toEqual(res_GET_post.body)
 
-            console_log(res_DELETE_post.body, res_DELETE_post.status, 'Test 2: delete(/posts)\n');
+            console_log(res_DELETE_post.body, res_DELETE_post.status, 'Test 2: delete(/posts)');
         });
         it('should return a 404 error if the blog was not found by the passed ID in the parameters.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -1430,7 +1430,7 @@ describe('/posts', () => {
             console_log(res_DALETE_post.body, res_DALETE_post.status, 'Test 3: delete(/posts)\n');
         });
     });
-    describe('pagination /posts', () => {
+    describe('pagination, sort /posts', () => {
         it('should use default pagination values when none are provided by the client.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
                 1,
@@ -1506,7 +1506,7 @@ describe('/posts', () => {
 
             expect(res_GET_posts.body.items.length).toEqual(10);
 
-            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 1: pagination(/posts)\n');
+            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 1: pagination(/posts)');
         });
         it('should use client-provided pagination values to return the correct subset of data.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -1597,7 +1597,7 @@ describe('/posts', () => {
 
             expect(res_GET_posts.body.items.length).toEqual(3);
 
-            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 2: pagination(/posts)\n');
+            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 2: pagination(/posts)');
         });
         it('should use client-provided pagination values to return the correct subset of data.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -1688,7 +1688,7 @@ describe('/posts', () => {
 
             expect(res_GET_posts.body.items.length).toEqual(1);
 
-            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 3: pagination(/posts)\n');
+            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 3: pagination(/posts)');
         });
         it('should use client-provided pagination values to return the correct subset of data.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -1779,7 +1779,7 @@ describe('/posts', () => {
 
             expect(res_GET_posts.body.items.length).toEqual(1);
 
-            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 4: pagination(/posts)\n');
+            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 4: pagination(/posts)');
         });
     });
     describe('GET /blogs/id/posts', () => {
@@ -1848,7 +1848,7 @@ describe('/posts', () => {
 
             expect(res_GET_posts.body.items.length).toEqual(2);
 
-            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 1: get(/blogs/id/posts)\n');
+            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 1: get(/blogs/id/posts)');
         });
         it('should return all entries from a specific blog using the pagination values provided by the client.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
@@ -1937,7 +1937,7 @@ describe('/posts', () => {
 
             expect(res_GET_posts.body.items.length).toEqual(3);
 
-            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 2: get(/blogs/id/posts)\n');
+            console_log(res_GET_posts.body, res_GET_posts.status, 'Test 2: get(/blogs/id/posts)');
         })
     });
     describe('POST /blogs/id/posts', () => {
@@ -2002,7 +2002,7 @@ describe('/posts', () => {
             console_log(
                 res_POST_posts.map(r => r.body),
                 res_POST_posts[0].status,
-                'Test 1: post(/blogs/:id/posts)\n'
+                'Test 1: post(/blogs/:id/posts)'
             );
         });
         it('should not create a post for a specific blog if the blog does not exist (return 404).', async () => {
@@ -2057,7 +2057,7 @@ describe('/posts', () => {
 
 
 
-            console_log(res_POST_posts[0].body, res_POST_posts[0].status, 'Test 1: post(/blogs/:id/posts)\n');
+            console_log(res_POST_posts[0].body, res_POST_posts[0].status, 'Test 2: post(/blogs/:id/posts)');
         });
     });
 });
