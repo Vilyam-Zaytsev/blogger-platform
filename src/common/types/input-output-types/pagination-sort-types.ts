@@ -28,7 +28,8 @@ type UsersSearchFilterType = {
 
 type FilterCondition =
     { login?: string | { $regex: string; $options: string } }
-    | { email?: string | { $regex: string; $options: string } };
+    | { email?: string | { $regex: string; $options: string } }
+    |{ name?: string | { $regex: string; $options: string } };
 
 type SortingAndPaginationParamsType = {
     pageNumber?: string,

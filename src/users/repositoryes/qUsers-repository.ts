@@ -2,7 +2,7 @@ import {ObjectId, Sort, WithId} from "mongodb";
 import {UserDbType} from "../types/user-db-type";
 import {usersCollection} from "../../db/mongoDb";
 import {MatchMode, PaginationAndSortFilterType} from "../../common/types/input-output-types/pagination-sort-types";
-import {createUserSearchFilter} from "../helpers/create-users-search-filter";
+import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
 
 const qUsersRepository = {
     async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<WithId<UserDbType>[]> {
@@ -15,7 +15,7 @@ const qUsersRepository = {
             searchEmailTerm
         } = sortQueryDto;
 
-        const filter: any = createUserSearchFilter(
+        const filter: any = createUsersSearchFilter(
             {
                 searchLoginTerm,
                 searchEmailTerm
@@ -39,7 +39,7 @@ const qUsersRepository = {
         searchEmailTerm: string | null
         ): Promise<number> {
 
-        const filter: any = createUserSearchFilter(
+        const filter: any = createUsersSearchFilter(
             {
                 searchLoginTerm,
                 searchEmailTerm

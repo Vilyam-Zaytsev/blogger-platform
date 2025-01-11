@@ -1,8 +1,11 @@
 import {BlogDbType} from "../types/blog-db-type";
 import {blogsCollection} from "../../db/mongoDb";
 import {ObjectId, Sort, WithId} from "mongodb";
-import {createSearchFilter} from "../../common/helpers/create-search-filter";
-import {PaginationAndSortFilterType, SearchFieldName} from "../../common/types/input-output-types/pagination-sort-types";
+import {
+    MatchMode,
+    PaginationAndSortFilterType,
+} from "../../common/types/input-output-types/pagination-sort-types";
+import {createBlogsSearchFilter} from "../helpers/create-blogs-search-filter";
 
 const qBlogsRepository = {
     async findBlogs(sortQueryDto: PaginationAndSortFilterType): Promise<WithId<BlogDbType>[]> {
@@ -15,11 +18,9 @@ const qBlogsRepository = {
             searchNameTerm
         } = sortQueryDto;
 
-        const filter: any = createSearchFilter(
-            {
-                nameOfSearchField: SearchFieldName.blog,
-                searchNameTerm
-            }
+        const filter: any = createBlogsSearchFilter(
+            {searchNameTerm},
+            MatchMode.Partial
         );
 
         return await blogsCollection
@@ -31,11 +32,9 @@ const qBlogsRepository = {
     },
     async getBlogsCount(searchNameTerm: string | null): Promise<number> {
 
-        const filter: any = createSearchFilter(
-            {
-                nameOfSearchField: SearchFieldName.blog,
-                searchNameTerm
-            }
+        const filter: any = createBlogsSearchFilter(
+            {searchNameTerm},
+            MatchMode.Partial
         );
 
         return blogsCollection
