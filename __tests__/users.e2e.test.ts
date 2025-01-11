@@ -59,6 +59,13 @@ describe('/users', () => {
 
             const resGet = await req
                 .get(`${SETTINGS.PATH.USERS}`)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(resGet.body.items.length).toEqual(1);
@@ -89,6 +96,13 @@ describe('/users', () => {
 
             await req
                 .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect({
@@ -133,6 +147,13 @@ describe('/users', () => {
 
             await req
                 .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect({
@@ -181,6 +202,13 @@ describe('/users', () => {
 
             await req
                 .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect({
@@ -229,6 +257,13 @@ describe('/users', () => {
 
             await req
                 .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect({
@@ -277,6 +312,13 @@ describe('/users', () => {
 
             await req
                 .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect({
@@ -509,6 +551,13 @@ describe('/users', () => {
 
             await req
                 .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect({
@@ -519,7 +568,7 @@ describe('/users', () => {
                 items: []
             });
 
-            console_log(resDelete.body, resDelete.status, 'Test 1: delete(/users)\n');
+            console_log(resDelete.body, resDelete.status, 'Test 1: delete(/users)');
         });
         it('should not delete user, the admin is not authenticated.', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -558,7 +607,7 @@ describe('/users', () => {
 
             expect(resPost[0].body).toEqual(resGetById.body);
 
-            console_log(resDelete.body, resDelete.status, 'Test 2: delete(/users)\n');
+            console_log(resDelete.body, resDelete.status, 'Test 2: delete(/users)');
         });
         it('should return a 404 error if the user was not found by the passed ID in the parameters.', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -593,17 +642,24 @@ describe('/users', () => {
 
             const resGet = await req
                 .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(resGet.body.items.length).toEqual(1)
 
-            console_log(resDelete.body, resDelete.status, 'Test 3: delete(/users)\n');
+            console_log(resDelete.body, resDelete.status, 'Test 3: delete(/users)');
         });
     });
-    describe('pagination /users', () => {
+    describe('pagination, sort, search in term /users', () => {
         it('should use default pagination values when none are provided by the client.', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
-                12,
+                11,
                 {
                     login: user.login,
                     email: user.email,
@@ -626,13 +682,20 @@ describe('/users', () => {
 
             const resGet = await req
                 .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             expect(resGet.body).toEqual({
                 pagesCount: 2,
                 page: 1,
                 pageSize: 10,
-                totalCount: 12,
+                totalCount: 11,
                 items: usersTestManager.filterAndSort(
                     resPost.map(r => r.body)
                 )
@@ -648,7 +711,7 @@ describe('/users', () => {
 
             expect(resGet.body.items.length).toEqual(10);
 
-            console_log(resGet.body, resGet.status, 'Test 1: pagination(/users)\n');
+            console_log(resGet.body, resGet.status, 'Test 1: pagination(/users)');
         });
         it('should use client-provided pagination values to return the correct subset of data.', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -675,6 +738,13 @@ describe('/users', () => {
 
             const resGet = await req
                 .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
                 .query({
                     sortBy: 'login',
                     sortDirection: 'asc',
@@ -692,6 +762,8 @@ describe('/users', () => {
                     resPost.map(r => r.body),
                     'login',
                     SortDirection.Ascending,
+                    null,
+                    null,
                     2,
                     3
                 )
@@ -703,6 +775,8 @@ describe('/users', () => {
                         resPost.map(r => r.body),
                         'login',
                         SortDirection.Ascending,
+                        null,
+                        null,
                         2,
                         3
                     )[i]
@@ -711,7 +785,7 @@ describe('/users', () => {
 
             expect(resGet.body.items.length).toEqual(3);
 
-            console_log(resGet.body, resGet.status, 'Test 2: pagination(/users)\n');
+            console_log(resGet.body, resGet.status, 'Test 2: pagination(/users)');
         });
         it('should use client-provided pagination values to return the correct subset of data.', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -738,6 +812,13 @@ describe('/users', () => {
 
             const resGet = await req
                 .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
                 .query({
                     sortBy: 'createdAt',
                     sortDirection: 'asc',
@@ -755,6 +836,8 @@ describe('/users', () => {
                     resPost.map(r => r.body),
                     'createdAt',
                     SortDirection.Ascending,
+                    null,
+                    null,
                     6,
                     2
                 )
@@ -766,6 +849,8 @@ describe('/users', () => {
                         resPost.map(r => r.body),
                         'createdAt',
                         SortDirection.Ascending,
+                        null,
+                        null,
                         6,
                         2
                     )[i]
@@ -774,7 +859,210 @@ describe('/users', () => {
 
             expect(resGet.body.items.length).toEqual(1);
 
-            console_log(resGet.body, resGet.status, 'Test 3: pagination(/users)\n');
+            console_log(resGet.body, resGet.status, 'Test 3: pagination(/users)');
+        });
+        it('should use the values provided by the client to search for users by the occurrence of the substring (the' +
+            ' "login" field).', async () => {
+            const resPost: Response[] = await usersTestManager.createUser(
+                11,
+                {
+                    login: user.login,
+                    email: user.email,
+                    password: 'qwerty'
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+
+            for (let i = 0; i < resPost.length; i++) {
+                expect(resPost[i].body).toEqual({
+                    id: expect.any(String),
+                    login: `${user.login}_${i + 1}`,
+                    email: `${user.login}_${i + 1}${user.email}`,
+                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+                });
+            }
+
+            const resGet = await req
+                .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
+                .query({
+                    searchLoginTerm: '_1',
+                })
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(resGet.body).toEqual({
+                pagesCount: 1,
+                page: 1,
+                pageSize: 10,
+                totalCount: 3,
+                items: usersTestManager.filterAndSort(
+                    resPost.map(r => r.body),
+                    'createdAt',
+                    SortDirection.Descending,
+                    '_1',
+                )
+            })
+
+            for (let i = 0; i < resGet.body.items.length; i++) {
+                expect(resGet.body.items[i]).toEqual(
+                    usersTestManager.filterAndSort(
+                        resPost.map(r => r.body),
+                        'createdAt',
+                        SortDirection.Descending,
+                        '_1',
+                    )[i]
+                );
+            }
+
+            expect(resGet.body.items.length).toEqual(3);
+
+            console_log(resGet.body, resGet.status, 'Test 4: search in term(/users)');
+        });
+        it('should use the values provided by the client to search for users by the occurrence of the substring (the' +
+            ' "email" field).', async () => {
+            const resPost: Response[] = await usersTestManager.createUser(
+                11,
+                {
+                    login: user.login,
+                    email: user.email,
+                    password: 'qwerty'
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+
+            for (let i = 0; i < resPost.length; i++) {
+                expect(resPost[i].body).toEqual({
+                    id: expect.any(String),
+                    login: `${user.login}_${i + 1}`,
+                    email: `${user.login}_${i + 1}${user.email}`,
+                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+                });
+            }
+
+            const resGet = await req
+                .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
+                .query({
+                    searchEmailTerm: '_1',
+                })
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(resGet.body).toEqual({
+                pagesCount: 1,
+                page: 1,
+                pageSize: 10,
+                totalCount: 3,
+                items: usersTestManager.filterAndSort(
+                    resPost.map(r => r.body),
+                    'createdAt',
+                    SortDirection.Descending,
+                    null,
+                    '_1',
+                )
+            })
+
+            for (let i = 0; i < resGet.body.items.length; i++) {
+                expect(resGet.body.items[i]).toEqual(
+                    usersTestManager.filterAndSort(
+                        resPost.map(r => r.body),
+                        'createdAt',
+                        SortDirection.Descending,
+                        null,
+                        '_1',
+                    )[i]
+                );
+            }
+
+            expect(resGet.body.items.length).toEqual(3);
+
+            console_log(resGet.body, resGet.status, 'Test 5: search in term(/users)');
+        });
+        it('should use the values provided by the client to search for users by the occurrence of the substring (the' +
+            ' "login" and "email" fields). ', async () => {
+            const resPost: Response[] = await usersTestManager.createUser(
+                11,
+                {
+                    login: user.login,
+                    email: user.email,
+                    password: 'qwerty'
+                },
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            );
+
+            for (let i = 0; i < resPost.length; i++) {
+                expect(resPost[i].body).toEqual({
+                    id: expect.any(String),
+                    login: `${user.login}_${i + 1}`,
+                    email: `${user.login}_${i + 1}${user.email}`,
+                    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+                });
+            }
+
+            const resGet = await req
+                .get(SETTINGS.PATH.USERS)
+                .set(
+                    'Authorization',
+                    encodingAdminDataInBase64(
+                        SETTINGS.ADMIN_DATA.LOGIN,
+                        SETTINGS.ADMIN_DATA.PASSWORD
+                    )
+                )
+                .query({
+                    searchLoginTerm: '_1',
+                    searchEmailTerm: '_7',
+                })
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(resGet.body).toEqual({
+                pagesCount: 1,
+                page: 1,
+                pageSize: 10,
+                totalCount: 4,
+                items: usersTestManager.filterAndSort(
+                    resPost.map(r => r.body),
+                    'createdAt',
+                    SortDirection.Descending,
+                    '_1',
+                    '_7'
+                )
+            })
+
+            for (let i = 0; i < resGet.body.items.length; i++) {
+                expect(resGet.body.items[i]).toEqual(
+                    usersTestManager.filterAndSort(
+                        resPost.map(r => r.body),
+                        'createdAt',
+                        SortDirection.Descending,
+                        '_1',
+                        '_7'
+                    )[i]
+                );
+            }
+
+            expect(resGet.body.items.length).toEqual(4);
+
+            console_log(resGet.body, resGet.status, 'Test 6: search in term(/users)');
         });
     });
 });

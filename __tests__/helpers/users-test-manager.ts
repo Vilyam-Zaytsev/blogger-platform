@@ -2,7 +2,7 @@ import {req} from "./test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {Response} from "supertest";
 import {UserViewModel} from "../../src/users/types/input-output-types";
-import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
+import {SortDirection, UsersSearchFilterType} from "../../src/common/types/input-output-types/pagination-sort-types";
 
 const usersTestManager = {
     async createUser(
@@ -60,23 +60,46 @@ const usersTestManager = {
         items: UserViewModel[],
         sortBy: keyof UserViewModel = 'createdAt',
         sortDirection: SortDirection = SortDirection.Descending,
+        searchLoginTerm: string | null = null,
+        searchEmailTerm: string | null = null,
         pageNumber: number = 1,
         pageSize: number = 10,
     ) {
         let startIndex = (pageNumber - 1) * pageSize;
         let finishIndex = startIndex + pageSize;
 
-        return items
-            .sort((a: UserViewModel, b: UserViewModel) => {
-                return a[sortBy] > b[sortBy]
-                    ? sortDirection === 'desc' ? -1 : 1
-                    : a[sortBy] < b[sortBy]
-                        ? sortDirection === 'desc' ? 1 : -1
-                        : sortDirection === 'desc' ? -1 : 1
-            })
-            .filter((b, i) => {
-                return i >= startIndex && i < finishIndex ? b : null;
-            })
+        if (searchLoginTerm || searchEmailTerm) {
+            return items
+                .filter(u =>
+                    u.login.includes(searchLoginTerm!)
+                        ? u
+                        : u.email.includes(searchEmailTerm!)
+                            ? u
+                            : null
+                )
+                .sort((a: UserViewModel, b: UserViewModel) => {
+                    return a[sortBy] > b[sortBy]
+                        ? sortDirection === 'desc' ? -1 : 1
+                        : a[sortBy] < b[sortBy]
+                            ? sortDirection === 'desc' ? 1 : -1
+                            : sortDirection === 'desc' ? -1 : 1
+                })
+                .filter((b, i) => {
+                    return i >= startIndex && i < finishIndex ? b : null;
+                });
+        } else {
+            return items
+                .sort((a: UserViewModel, b: UserViewModel) => {
+                    return a[sortBy] > b[sortBy]
+                        ? sortDirection === 'desc' ? -1 : 1
+                        : a[sortBy] < b[sortBy]
+                            ? sortDirection === 'desc' ? 1 : -1
+                            : sortDirection === 'desc' ? -1 : 1
+                })
+                .filter((b, i) => {
+                    return i >= startIndex && i < finishIndex ? b : null;
+                });
+        }
     }
 };
 
