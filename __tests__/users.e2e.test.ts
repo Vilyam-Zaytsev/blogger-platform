@@ -568,7 +568,7 @@ describe('/users', () => {
     describe('pagination /users', () => {
         it('should use default pagination values when none are provided by the client.', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
-                11,
+                12,
                 {
                     login: user.login,
                     email: user.email,
@@ -597,7 +597,7 @@ describe('/users', () => {
                 pagesCount: 2,
                 page: 1,
                 pageSize: 10,
-                totalCount: 11,
+                totalCount: 12,
                 items: usersTestManager.filterAndSort(
                     resPost.map(r => r.body)
                 )
