@@ -3,8 +3,6 @@ import {UserViewModel} from "../types/input-output-types";
 import {WithId} from "mongodb";
 import {UserDbType} from "../types/user-db-type";
 import {qUsersRepository} from "../repositoryes/qUsers-repository";
-import {strict} from "node:assert";
-import {req} from "../../../__tests__/helpers/test-helpers";
 
 const qUserService = {
     async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<PaginationResponse<UserViewModel>> {

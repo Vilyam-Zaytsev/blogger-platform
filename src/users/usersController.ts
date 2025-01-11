@@ -6,7 +6,6 @@ import {usersService} from "./services/users-service";
 import {qUserService} from "./services/qUsers-servise";
 import {SETTINGS} from "../common/settings";
 import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
-import {qUsersRepository} from "./repositoryes/qUsers-repository";
 import {ResultType} from "../common/types/result-types/result-type";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
