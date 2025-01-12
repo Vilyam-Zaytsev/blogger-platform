@@ -7,7 +7,7 @@ import {ResultType} from "../common/types/result-types/result-type";
 
 const authService = {
     async login(authParamsDto: LoginInputType): Promise<ResultType> {
-        const result: ResultType = await this.checkUserCredentials(authParamsDto);
+        const result: ResultType<UserDbType | null> = await this.checkUserCredentials(authParamsDto);
 
         if (result.status !== ResultStatusType.Success) return {
             status: ResultStatusType.Unauthorized,
@@ -19,9 +19,9 @@ const authService = {
             data: null
         } as ResultType;
 
-        
+// return result
     },
-    async checkUserCredentials(authParamsDto: LoginInputType): Promise<ResultType> {
+    async checkUserCredentials(authParamsDto: LoginInputType): Promise<ResultType<UserDbType | null>> {
         const {
             loginOrEmail,
             password
@@ -60,7 +60,7 @@ const authService = {
         return {
             status: ResultStatusType.Success,
             data: isUser
-        } as ResultType;
+        } as ResultType<UserDbType>;
     }
 };
 
