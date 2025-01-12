@@ -6,7 +6,7 @@ import {
     blogWebsiteUrlInputValidator
 } from "./middlewares/blogValidators";
 import {inputCheckErrorsMiddleware} from "../common/middlewares/input-check-errors-middleware";
-import {authMiddleware} from "../common/middlewares/authorization-middleware";
+import {baseAuthMiddleware} from "../common/middlewares/base-authorization-middleware";
 import {
     pageNumberInputValidator,
     pageSizeInputValidator,
@@ -43,7 +43,7 @@ blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
     postsController.getPosts
 );
 blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
-    authMiddleware,
+    baseAuthMiddleware,
     postTitleInputValidator,
     postShortDescriptionInputValidator,
     postContentInputValidator,
@@ -51,7 +51,7 @@ blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
     postsController.createAndInsertPost
 );
 blogsRouter.post('/',
-    authMiddleware,
+    baseAuthMiddleware,
     blogNameInputValidator,
     blogDescriptionInputValidator,
     blogWebsiteUrlInputValidator,
@@ -59,7 +59,7 @@ blogsRouter.post('/',
     blogsController.createAndInsertBlog
 );
 blogsRouter.put('/:id',
-    authMiddleware,
+    baseAuthMiddleware,
     blogNameInputValidator,
     blogDescriptionInputValidator,
     blogWebsiteUrlInputValidator,
@@ -67,7 +67,7 @@ blogsRouter.put('/:id',
     blogsController.updateBlog
 );
 blogsRouter.delete('/:id',
-    authMiddleware,
+    baseAuthMiddleware,
     blogsController.deleteBlog
 );
 
