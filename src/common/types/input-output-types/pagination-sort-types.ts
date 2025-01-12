@@ -8,19 +8,19 @@ enum MatchMode {
     Partial = 'partial',
 }
 
-enum SearchFieldName {
-    blog = 'name',
-    userLogin = 'login',
-    userEmail = 'email'
-}
+// enum SearchFieldName {
+//     blog = 'name',
+//     userLogin = 'login',
+//     userEmail = 'email'
+// }
 
-type SearchFilterType = {
-    blogId?: string | null,
-    searchNameTerm?: string | null,
-    searchLoginTerm?: string | null,
-    searchEmailTerm?: string | null,
-    nameOfSearchField?: SearchFieldName | null
-};
+// type SearchFilterType = {
+//     blogId?: string | null,
+//     searchNameTerm?: string | null,
+//     searchLoginTerm?: string | null,
+//     searchEmailTerm?: string | null,
+//     nameOfSearchField?: SearchFieldName | null
+// };
 type UsersSearchFilterType = {
     searchLoginTerm: string | null,
     searchEmailTerm: string | null,
@@ -28,7 +28,9 @@ type UsersSearchFilterType = {
 
 type FilterCondition =
     { login?: string | { $regex: string; $options: string } }
-    | { email?: string | { $regex: string; $options: string } };
+    | { email?: string | { $regex: string; $options: string } }
+    |{ name?: string | { $regex: string; $options: string } }
+    |{ blogId?: string | { $regex: string; $options: string } };
 
 type SortingAndPaginationParamsType = {
     pageNumber?: string,
@@ -62,8 +64,8 @@ type PaginationResponse<T> = {
 export {
     SortDirection,
     MatchMode,
-    SearchFieldName,
-    SearchFilterType,
+    // SearchFieldName,
+    // SearchFilterType,
     UsersSearchFilterType,
     FilterCondition,
     SortingAndPaginationParamsType,

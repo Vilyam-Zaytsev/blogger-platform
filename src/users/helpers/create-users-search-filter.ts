@@ -4,8 +4,7 @@ import {
     UsersSearchFilterType
 } from "../../common/types/input-output-types/pagination-sort-types";
 
-
-const createUserSearchFilter = (
+const createUsersSearchFilter = (
     searchFilter: UsersSearchFilterType,
     match: MatchMode
 ) => {
@@ -43,4 +42,4 @@ const createUserSearchFilter = (
     return filter;
 };
 
-export {createUserSearchFilter};
+export {createUsersSearchFilter};

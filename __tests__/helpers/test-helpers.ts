@@ -1,16 +1,16 @@
-import  {app} from '../../src/app';
+import {app} from '../../src/app';
 import {agent} from "supertest";
 
 const req = agent(app);
 
 const console_log = (responseBody: any, statusCode: number, descriptions: string) => {
     console.log(
-        descriptions,
+        `\x1b[4;36m***************${descriptions}***************\x1b[0m\n`,
         JSON.stringify({
             ResponseBody: responseBody,
             StatusCode: statusCode,
         }, null, 2),
-    );
+    )
 };
 
 const generateRandomString = (length: number) => {

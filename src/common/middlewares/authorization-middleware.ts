@@ -9,8 +9,7 @@ const authMiddleware = (
     const auth = req.headers['authorization'] as string;
     if (!auth) {
         res
-            .status(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401)
-            .end();
+            .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
 
         return;
     }
@@ -20,8 +19,7 @@ const authMiddleware = (
 
     if (auth.slice(6) !== adminDataBase64) {
         res
-            .status(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401)
-            .end();
+            .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
 
         return;
     }

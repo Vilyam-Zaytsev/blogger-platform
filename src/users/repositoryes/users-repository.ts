@@ -5,7 +5,7 @@ import {
     MatchMode,
     PaginationAndSortFilterType,
 } from "../../common/types/input-output-types/pagination-sort-types";
-import {createUserSearchFilter} from "../helpers/create-users-search-filter";
+import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
 
 const usersRepository = {
     async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<WithId<UserDbType>[]> {
@@ -18,7 +18,7 @@ const usersRepository = {
             searchEmailTerm
         } = sortQueryDto;
 
-        const filter: any = createUserSearchFilter(
+        const filter: any = createUsersSearchFilter(
             {
                 searchLoginTerm,
                 searchEmailTerm

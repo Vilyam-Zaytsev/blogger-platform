@@ -2,7 +2,7 @@ import express, {Response, Request} from 'express';
 import {SETTINGS} from "./common/settings";
 import {blogsRouter} from "./blogs/blogsRouter";
 import {postsRouter} from "./posts/postsRouter";
-import {testsRouter} from "./testsRouter";
+import {testsRouter} from "./autotest/testsRouter";
 import {authRouter} from "./auth/authRouter";
 import {usersRouter} from "./users/usersRouter";
 
