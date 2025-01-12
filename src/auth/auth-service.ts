@@ -6,8 +6,20 @@ import {ResultStatusType} from "../common/types/result-types/result-status-type"
 import {ResultType} from "../common/types/result-types/result-type";
 
 const authService = {
-    async login(authParamsDto: LoginInputType): Promise<boolean> {
+    async login(authParamsDto: LoginInputType): Promise<ResultType> {
         const result: ResultType = await this.checkUserCredentials(authParamsDto);
+
+        if (result.status !== ResultStatusType.Success) return {
+            status: ResultStatusType.Unauthorized,
+            errorMessage: 'auth data incorrect',
+            extensions: [{
+                field: 'Login, email, password',
+                message: 'Login, email or password incorrect.',
+            }],
+            data: null
+        } as ResultType;
+
+        
     },
     async checkUserCredentials(authParamsDto: LoginInputType): Promise<ResultType> {
         const {
@@ -27,7 +39,7 @@ const authService = {
                     message: 'There is no user with such data.',
                 }],
                 data: null
-            } as ResultType
+            } as ResultType;
         }
 
         const isPasswordCorrect = await bcryptService
@@ -42,13 +54,13 @@ const authService = {
                 message: 'Invalid password.',
             }],
                 data: null
-            } as ResultType
+            } as ResultType;
         }
 
         return {
             status: ResultStatusType.Success,
             data: isUser
-        } as ResultType
+        } as ResultType;
     }
 };
 
