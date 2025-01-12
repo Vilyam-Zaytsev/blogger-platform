@@ -1941,7 +1941,7 @@ describe('/posts', () => {
         })
     });
     describe('POST /blogs/id/posts', () => {
-        it('should create a post for a specific blog.', async () => {
+        it('should create a posts for a specific blog.', async () => {
             const res_POST_blogs: Response[] = await blogsTestManager.createBlog(
                 1,
                 {
@@ -1975,7 +1975,9 @@ describe('/posts', () => {
                 encodingAdminDataInBase64(
                     SETTINGS.ADMIN_DATA.LOGIN,
                     SETTINGS.ADMIN_DATA.PASSWORD
-                )
+                ),
+                SETTINGS.HTTP_STATUSES.CREATED_201,
+                `${SETTINGS.PATH.BLOGS}/${res_POST_blogs[0].body.id}${SETTINGS.PATH.POSTS}`
             );
 
 
