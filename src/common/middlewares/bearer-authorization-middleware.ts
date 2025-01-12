@@ -1,7 +1,9 @@
 import {Request, Response, NextFunction} from "express";
 import {SETTINGS} from "../settings";
 import {jwtService} from "../services/jwtService";
-import {qUserService} from "../../users/services/qUsers-servise";
+import {usersRepository} from "../../users/repositoryes/users-repository";
+import {UserDbType} from "../../users/types/user-db-type";
+import {IdType} from "../types/input-output-types/id-type";
 
 const bearerAuthorizationMiddleware = async (
     req: Request,
@@ -20,23 +22,29 @@ const bearerAuthorizationMiddleware = async (
     const payload= await jwtService
         .verifyToken(token);
 
+    console.log(payload)
+
     if (payload) {
         const {userId} = payload;
 
-        const isUser = await qUserService
+        const isUser: UserDbType | null = await usersRepository
             .findUser(userId);
 
         if (!isUser) {
             res
                 .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+
+            return;
         }
 
         req
-            .user = {id: userId};
+            .user = {id: userId} as IdType;
 
-        next();
+        return next();
     }
 
     res
         .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
-}
+};
+
+export {bearerAuthorizationMiddleware};

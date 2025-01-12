@@ -1,7 +1,9 @@
+import {IdType} from "./id-type";
+
 declare global {
     namespace Express {
         export interface Request {
-            user: {id: string} | undefined;
+            user?: IdType;
         }
     }
 }

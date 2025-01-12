@@ -7,6 +7,9 @@ import {ResultType} from "../common/types/result-types/result-type";
 import {jwtService} from "../common/services/jwtService";
 import {WithId} from "mongodb";
 import {OutputAccessTokenType} from "../common/types/input-output-types/output-access-token-type";
+import {qUserService} from "../users/services/qUsers-servise";
+import {PresentationView} from "../users/types/presentation-view";
+import {UserMeViewModel} from "../users/types/input-output-types";
 
 const authService = {
     async login(authParamsDto: LoginInputType): Promise<ResultType<OutputAccessTokenType | null>> {
@@ -28,6 +31,22 @@ const authService = {
         return {
             status: ResultStatusType.Success,
             data: {accessToken},
+        }
+    },
+    async me(userId: string): Promise<ResultType<UserMeViewModel | null>> {
+        if (!userId) {
+            return {
+                status: ResultStatusType.Unauthorized,
+                data: null
+            };
+        }
+
+        const me: UserMeViewModel = await qUserService
+            .findUser(userId, PresentationView.MeViewModal) as UserMeViewModel;
+
+        return {
+            status: ResultStatusType.Success,
+            data: me
         }
     },
     async checkUserCredentials(authParamsDto: LoginInputType): Promise<ResultType<WithId<UserDbType> | null>> {
