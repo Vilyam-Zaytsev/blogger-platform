@@ -4,10 +4,13 @@ import {UserDbType} from "../users/types/user-db-type";
 import {usersRepository} from "../users/repositoryes/users-repository";
 import {ResultStatusType} from "../common/types/result-types/result-status-type";
 import {ResultType} from "../common/types/result-types/result-type";
+import {jwtService} from "../common/services/jwtService";
+import {WithId} from "mongodb";
+import {OutputAccessTokenType} from "../common/types/input-output-types/output-access-token-type";
 
 const authService = {
-    async login(authParamsDto: LoginInputType): Promise<ResultType> {
-        const result: ResultType<UserDbType | null> = await this.checkUserCredentials(authParamsDto);
+    async login(authParamsDto: LoginInputType): Promise<ResultType<OutputAccessTokenType | null>> {
+        const result: ResultType<WithId<UserDbType> | null> = await this.checkUserCredentials(authParamsDto);
 
         if (result.status !== ResultStatusType.Success) return {
             status: ResultStatusType.Unauthorized,
@@ -19,15 +22,21 @@ const authService = {
             data: null
         } as ResultType;
 
-// return result
+        const accessToken = await jwtService
+            .createToken(result.data!._id.toString());
+
+        return {
+            status: ResultStatusType.Success,
+            data: {accessToken},
+        }
     },
-    async checkUserCredentials(authParamsDto: LoginInputType): Promise<ResultType<UserDbType | null>> {
+    async checkUserCredentials(authParamsDto: LoginInputType): Promise<ResultType<WithId<UserDbType> | null>> {
         const {
             loginOrEmail,
             password
         } = authParamsDto;
 
-        const isUser: UserDbType | null = await usersRepository
+        const isUser: WithId<UserDbType> | null = await usersRepository
             .findByLoginOrEmail(loginOrEmail);
 
         if (!isUser) {
@@ -60,7 +69,7 @@ const authService = {
         return {
             status: ResultStatusType.Success,
             data: isUser
-        } as ResultType<UserDbType>;
+        } as ResultType<WithId<UserDbType>>;
     }
 };
 
