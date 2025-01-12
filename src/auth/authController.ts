@@ -1,4 +1,4 @@
-import {Response} from "express";
+import {Response, Request} from "express";
 import {RequestWithBody} from "../common/types/input-output-types/request-types";
 import {LoginInputType} from "../common/types/input-output-types/login-types";
 import {authService} from "./auth-service";
@@ -33,6 +33,12 @@ const authController = {
         res
             .status(mapResultStatusToHttpStatus(ResultStatusType.Success))
             .json({...result.data!});
+    },
+    me: async (
+        req: Request,
+        res: Response
+    ) => {
+
     }
 };
 

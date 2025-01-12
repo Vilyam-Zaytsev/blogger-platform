@@ -13,9 +13,6 @@ authRouter.post(SETTINGS.PATH.AUTH.LOGIN,
     authController.login
 );
 authRouter.get(SETTINGS.PATH.AUTH.ME,
-    userLoginOrEmailInputValidator,
-    userPasswordInputValidator,
-    inputCheckErrorsMiddleware,
     authController.login
 );
 
