@@ -20,7 +20,7 @@ const createBlogsSearchFilter = (
             : null;
     } else if (match === MatchMode.Partial) {
         searchNameTerm
-            ? filter.$or.push({login: {$regex: searchNameTerm, $options: 'i'}})
+            ? filter.$or.push({name: {$regex: searchNameTerm, $options: 'i'}})
             : null;
     }
 
