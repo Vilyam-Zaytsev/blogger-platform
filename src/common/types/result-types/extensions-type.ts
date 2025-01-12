@@ -1,8 +1,7 @@
-// import {FieldNameType} from "../input-output-types/output-errors-type";
+import {FieldNameType} from "../input-output-types/output-errors-type";
 
 type ExtensionsType = {
-    // field: FieldNameType,
-    field: string,
+    field: FieldNameType,
     message: string
 }[];
 

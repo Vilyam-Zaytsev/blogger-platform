@@ -26,6 +26,8 @@ const authController = {
             res
                 .status(mapResultStatusToHttpStatus(result.status))
                 .json(mapResultExtensionsToErrorMessage(result.extensions!));
+
+            return;
         }
 
         res

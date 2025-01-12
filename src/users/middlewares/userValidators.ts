@@ -17,6 +17,12 @@ const userEmailInputValidator =
         .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
         .withMessage('The "email" field should be in the format: example@domain.com . Letters, numbers, hyphens, and dots are allowed.');
 
+const userLoginOrEmailInputValidator =
+    body('loginOrEmail')
+        .isString()
+        .withMessage('The "loginOrEmail" field must be of the string type.')
+        .isLength({min: 3, max: 100})
+        .withMessage('The length of the "loginOrEmail" field should be from 3 to 100.')
 
 const userPasswordInputValidator =
     body('password')
@@ -30,5 +36,6 @@ const userPasswordInputValidator =
 export {
     userLoginInputValidator,
     userEmailInputValidator,
+    userLoginOrEmailInputValidator,
     userPasswordInputValidator
 }

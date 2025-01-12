@@ -16,7 +16,7 @@ const authService = {
             status: ResultStatusType.Unauthorized,
             errorMessage: 'auth data incorrect',
             extensions: [{
-                field: 'Login, email, password',
+                field: 'loginOrEmailOrPassword',
                 message: 'Login, email or password incorrect.',
             }],
             data: null
