@@ -1,10 +1,10 @@
-import {Request, Response} from "express";
+import {Response} from "express";
 import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../common/types/input-output-types/request-types";
 import {
     PaginationResponse,
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
-import {URIParamsUserId, UserInputModel, UserViewModel} from "./types/input-output-types";
+import {UserInputModel, UserViewModel} from "./types/input-output-types";
 import {usersService} from "./services/users-service";
 import {qUserService} from "./services/qUsers-servise";
 import {SETTINGS} from "../common/settings";
@@ -14,6 +14,7 @@ import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-t
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
 import {OutputErrorsType} from "../common/types/input-output-types/output-errors-type";
 import {PresentationView} from "./types/presentation-view";
+import {IdType} from "../common/types/input-output-types/id-type";
 
 const usersController = {
     getUsers: async (
@@ -38,7 +39,7 @@ const usersController = {
             .json(foundUsers);
     },
     getUser: async (
-        req: RequestWithParams<URIParamsUserId>,
+        req: RequestWithParams<IdType>,
         res: Response<UserViewModel>
     ) => {
 
@@ -85,7 +86,7 @@ const usersController = {
             .json(createdUser!);
     },
     deleteUser: async (
-        req: Request<URIParamsUserId>,
+        req: RequestWithParams<IdType>,
         res: Response
     ) => {
 

@@ -16,13 +16,8 @@ type UserMeViewModel = {
     userId: string
 };
 
-type URIParamsUserId = {
-    id: string
-};
-
 export {
     UserInputModel,
     UserViewModel,
     UserMeViewModel,
-    URIParamsUserId
 };

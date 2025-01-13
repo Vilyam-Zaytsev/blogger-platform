@@ -15,12 +15,7 @@ type PostViewModel = {
     createdAt: string
 };
 
-type URIParamsPostIdModel = {
-    id: string
-};
-
 export {
     PostInputModel,
-    PostViewModel,
-    URIParamsPostIdModel
+    PostViewModel
 };
