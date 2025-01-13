@@ -16,7 +16,7 @@ app.get('/', (req: Request, res: Response) => {
         .json({version: '1.0'});
 });
 
-app.use(SETTINGS.PATH.AUTH, authRouter);
+app.use(SETTINGS.PATH.AUTH.BASE, authRouter);
 app.use(SETTINGS.PATH.USERS, usersRouter);
 app.use(SETTINGS.PATH.BLOGS, blogsRouter);
 app.use(SETTINGS.PATH.POSTS, postsRouter);

@@ -33,6 +33,10 @@ const usersRepository = {
             .limit(pageSize)
             .toArray();
     },
+    async findUser(id: string) : Promise<UserDbType | null> {
+        return usersCollection
+            .findOne({_id: new ObjectId(id)});
+    },
     async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<UserDbType> | null> {
         return usersCollection
             .findOne({

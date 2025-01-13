@@ -1,8 +1,12 @@
-import {PaginationAndSortFilterType, PaginationResponse} from "../../common/types/input-output-types/pagination-sort-types";
-import {UserViewModel} from "../types/input-output-types";
+import {
+    PaginationAndSortFilterType,
+    PaginationResponse
+} from "../../common/types/input-output-types/pagination-sort-types";
+import {UserMeViewModel, UserViewModel} from "../types/input-output-types";
 import {WithId} from "mongodb";
 import {UserDbType} from "../types/user-db-type";
 import {qUsersRepository} from "../repositoryes/qUsers-repository";
+import {PresentationView} from "../types/presentation-view";
 
 const qUserService = {
     async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<PaginationResponse<UserViewModel>> {
@@ -28,14 +32,21 @@ const qUserService = {
             items: users.map(u => this.mapToViewModel(u))
         };
     },
-    async findUser(id: string): Promise<UserViewModel | null> {
+    async findUser(id: string, desiredPresentationView: PresentationView): Promise<UserViewModel | UserMeViewModel | null> {
 
         const foundUser: WithId<UserDbType> | null= await qUsersRepository
             .findUser(id);
 
         if (!foundUser) return null;
 
-        return this.mapToViewModel(foundUser);
+
+        switch (desiredPresentationView) {
+            case PresentationView.ViewModal:
+                return this.mapToViewModel(foundUser);
+            case PresentationView.MeViewModal:
+                return this.mapToMeViewModel(foundUser);
+        }
+
     },
     mapToViewModel(user: WithId<UserDbType>): UserViewModel {
         return {
@@ -43,6 +54,13 @@ const qUserService = {
             login: user.login,
             email: user.email,
             createdAt: user.createdAt
+        };
+    },
+    mapToMeViewModel(user: WithId<UserDbType>): UserMeViewModel {
+        return {
+            email: user.email,
+            login: user.login,
+            userId: String(user._id),
         };
     },
 };

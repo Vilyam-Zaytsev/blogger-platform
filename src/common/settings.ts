@@ -5,7 +5,11 @@ dotenv.config();
 const SETTINGS = {
     PORT: process.env.PORT || 3000,
     PATH: {
-        AUTH: '/auth/login',
+        AUTH: {
+            BASE: '/auth',
+            LOGIN: '/login',
+            ME: '/me',
+        },
         USERS: '/users',
         BLOGS: '/blogs',
         POSTS: '/posts',

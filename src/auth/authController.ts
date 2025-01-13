@@ -1,5 +1,5 @@
 import {Response} from "express";
-import {RequestWithBody} from "../common/types/input-output-types/request-types";
+import {RequestWithBody, RequestWithUserId} from "../common/types/input-output-types/request-types";
 import {LoginInputType} from "../common/types/input-output-types/login-types";
 import {authService} from "./auth-service";
 import {ResultType} from "../common/types/result-types/result-type";
@@ -8,6 +8,8 @@ import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-t
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
 import {OutputAccessTokenType} from "../common/types/input-output-types/output-access-token-type";
 import {OutputErrorsType} from "../common/types/input-output-types/output-errors-type";
+import {IdType} from "../common/types/input-output-types/id-type";
+import {UserMeViewModel} from "../users/types/input-output-types";
 
 const authController = {
     login: async (
@@ -33,6 +35,27 @@ const authController = {
         res
             .status(mapResultStatusToHttpStatus(ResultStatusType.Success))
             .json({...result.data!});
+    },
+    me: async (
+        req: RequestWithUserId<IdType>,
+        res: Response<UserMeViewModel>
+    ) => {
+
+        const userId: string = req.user?.id as string;
+
+        const result = await authService
+            .me(userId);
+
+        if (result.status !== ResultStatusType.Success) {
+            res
+                .sendStatus(mapResultStatusToHttpStatus(result.status));
+
+            return;
+        }
+
+        res
+            .status(mapResultStatusToHttpStatus(result.status))
+            .json(result.data!);
     }
 };
 

@@ -6,17 +6,17 @@ import {
     userPasswordInputValidator
 } from "./middlewares/userValidators";
 import {inputCheckErrorsMiddleware} from "../common/middlewares/input-check-errors-middleware";
-import {authMiddleware} from "../common/middlewares/authorization-middleware";
+import {baseAuthMiddleware} from "../common/middlewares/base-authorization-middleware";
 
 const usersRouter = Router();
 
 usersRouter.get('/',
-    authMiddleware,
+    baseAuthMiddleware,
     usersController.getUsers
 );
 usersRouter.get('/:id', usersController.getUser);
 usersRouter.post('/',
-    authMiddleware,
+    baseAuthMiddleware,
     userLoginInputValidator,
     userEmailInputValidator,
     userPasswordInputValidator,
@@ -24,7 +24,7 @@ usersRouter.post('/',
     usersController.createAndInsertUser
 );
 usersRouter.delete('/:id',
-    authMiddleware,
+    baseAuthMiddleware,
     usersController.deleteUser
 );
 

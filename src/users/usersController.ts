@@ -1,6 +1,9 @@
-import {Response, Request} from "express";
+import {Request, Response} from "express";
 import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../common/types/input-output-types/request-types";
-import {PaginationResponse, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";
+import {
+    PaginationResponse,
+    SortingAndPaginationParamsType
+} from "../common/types/input-output-types/pagination-sort-types";
 import {URIParamsUserId, UserInputModel, UserViewModel} from "./types/input-output-types";
 import {usersService} from "./services/users-service";
 import {qUserService} from "./services/qUsers-servise";
@@ -10,6 +13,7 @@ import {ResultType} from "../common/types/result-types/result-type";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
 import {OutputErrorsType} from "../common/types/input-output-types/output-errors-type";
+import {PresentationView} from "./types/presentation-view";
 
 const usersController = {
     getUsers: async (
@@ -39,7 +43,7 @@ const usersController = {
     ) => {
 
         const foundUser: UserViewModel | null = await qUserService
-            .findUser(req.params.id);
+            .findUser(req.params.id, PresentationView.ViewModal) as UserViewModel;
 
         if (!foundUser) {
             res
@@ -74,7 +78,7 @@ const usersController = {
         }
 
         const createdUser: UserViewModel | null = await qUserService
-            .findUser(result.data!);
+            .findUser(result.data!, PresentationView.ViewModal) as UserViewModel;
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
