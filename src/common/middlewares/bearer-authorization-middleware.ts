@@ -22,8 +22,6 @@ const bearerAuthorizationMiddleware = async (
     const payload= await jwtService
         .verifyToken(token);
 
-    console.log(payload)
-
     if (payload) {
         const {userId} = payload;
 
