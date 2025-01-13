@@ -1,8 +1,7 @@
 import {Response} from "express";
 import {
     BlogInputModel,
-    BlogViewModel,
-    URIParamsBlogId
+    BlogViewModel
 } from "./types/input-output-types";
 import {
     RequestWithBody,
@@ -15,6 +14,7 @@ import {BlogDbType} from "./types/blog-db-type";
 import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
 import {PaginationResponse, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";
 import {qBlogsService} from "./services/qBlogs-service";
+import {IdType} from "../common/types/input-output-types/id-type";
 
 
 const blogsController = {
@@ -39,7 +39,7 @@ const blogsController = {
             .json(foundBlogs);
     },
     getBlog: async (
-        req: RequestWithParams<URIParamsBlogId>,
+        req: RequestWithParams<IdType>,
         res: Response<BlogViewModel>
     ) => {
 
@@ -79,7 +79,7 @@ const blogsController = {
             .json(createdBlog!);
     },
     updateBlog: async (
-        req: RequestWithParamsAndBody<URIParamsBlogId, BlogInputModel>,
+        req: RequestWithParamsAndBody<IdType, BlogInputModel>,
         res: Response<BlogViewModel>
     ) => {
 
@@ -103,7 +103,7 @@ const blogsController = {
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     },
     deleteBlog: async (
-        req: RequestWithParams<URIParamsBlogId>,
+        req: RequestWithParams<IdType>,
         res: Response
     ) => {
 

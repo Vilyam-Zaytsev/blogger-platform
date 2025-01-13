@@ -1,8 +1,8 @@
 import {
     FilterCondition,
     MatchMode,
-    UsersSearchFilterType
 } from "../../common/types/input-output-types/pagination-sort-types";
+import {UsersSearchFilterType} from "../types/users-search-filter-type";
 
 const createUsersSearchFilter = (
     searchFilter: UsersSearchFilterType,

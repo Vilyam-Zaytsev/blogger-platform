@@ -1,13 +1,16 @@
 import jwt from 'jsonwebtoken';
 import {SETTINGS} from "../settings";
+import {AccessTokenType} from "../../auth/types/access-token-type";
 
 const jwtService = {
-    async createToken(userId: string): Promise<string> {
-        return jwt.sign(
+    async createToken(userId: string): Promise<AccessTokenType> {
+        const accessToken: string = jwt.sign(
             {userId},
             SETTINGS.JWT_SECRET,
             {expiresIn: '48h'}
         );
+
+        return {accessToken};
     },
     async verifyToken(token: string): Promise<{userId: string} | null> {
         try {

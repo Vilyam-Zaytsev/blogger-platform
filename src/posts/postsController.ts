@@ -1,5 +1,5 @@
 import {Response} from "express";
-import {PostInputModel, PostViewModel, URIParamsPostIdModel} from "./types/input-output-types";
+import {PostInputModel, PostViewModel} from "./types/input-output-types";
 import {
     RequestWithParams,
     RequestWithParamsAndBody,
@@ -10,11 +10,11 @@ import {postsService} from "./services/posts-service";
 import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
 import {PaginationResponse, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";
 import {qPostsService} from "./services/qPosts-service";
-import {URIParamsBlogId} from "../blogs/types/input-output-types";
+import {IdType} from "../common/types/input-output-types/id-type";
 
 const postsController = {
     getPosts: async (
-        req: RequestWithParamsAndQuery<URIParamsBlogId, SortingAndPaginationParamsType>,
+        req: RequestWithParamsAndQuery<IdType, SortingAndPaginationParamsType>,
         res: Response<PaginationResponse<PostViewModel>>
     ) => {
 
@@ -41,7 +41,7 @@ const postsController = {
             .json(foundPosts);
     },
     getPost: async (
-        req: RequestWithParams<URIParamsPostIdModel>,
+        req: RequestWithParams<IdType>,
         res: Response<PostViewModel>
     ) => {
 
@@ -60,7 +60,7 @@ const postsController = {
             .json(foundPost);
     },
     createAndInsertPost: async (
-        req: RequestWithParamsAndBody<URIParamsBlogId, PostInputModel>,
+        req: RequestWithParamsAndBody<IdType, PostInputModel>,
         res: Response<PostViewModel>
     ) => {
         const dataForCreatingPost: PostInputModel = {
@@ -90,7 +90,7 @@ const postsController = {
             .json(createdPost!);
     },
     updatePost: async (
-        req: RequestWithParamsAndBody<URIParamsPostIdModel, PostInputModel>,
+        req: RequestWithParamsAndBody<IdType, PostInputModel>,
         res: Response<PostViewModel>
     ) => {
 
@@ -115,7 +115,7 @@ const postsController = {
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
     },
     deletePost: async (
-        req: RequestWithParams<URIParamsPostIdModel>,
+        req: RequestWithParams<IdType>,
         res: Response
     ) => {
         const isDeletedPost: boolean = await postsService

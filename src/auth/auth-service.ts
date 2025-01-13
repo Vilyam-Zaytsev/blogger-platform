@@ -1,18 +1,18 @@
 import {bcryptService} from "../common/services/bcryptService";
-import {LoginInputType} from "../common/types/input-output-types/login-types";
+import {LoginInputType} from "./types/login-input-type";
 import {UserDbType} from "../users/types/user-db-type";
 import {usersRepository} from "../users/repositoryes/users-repository";
 import {ResultStatusType} from "../common/types/result-types/result-status-type";
 import {ResultType} from "../common/types/result-types/result-type";
 import {jwtService} from "../common/services/jwtService";
 import {WithId} from "mongodb";
-import {OutputAccessTokenType} from "../common/types/input-output-types/output-access-token-type";
 import {qUserService} from "../users/services/qUsers-servise";
 import {PresentationView} from "../users/types/presentation-view";
 import {UserMeViewModel} from "../users/types/input-output-types";
+import {AccessTokenType} from "./types/access-token-type";
 
 const authService = {
-    async login(authParamsDto: LoginInputType): Promise<ResultType<OutputAccessTokenType | null>> {
+    async login(authParamsDto: LoginInputType): Promise<ResultType<AccessTokenType | null>> {
         const result: ResultType<WithId<UserDbType> | null> = await this.checkUserCredentials(authParamsDto);
 
         if (result.status !== ResultStatusType.Success) return {
@@ -25,12 +25,12 @@ const authService = {
             data: null
         } as ResultType;
 
-        const accessToken = await jwtService
+        const accessToken: AccessTokenType = await jwtService
             .createToken(result.data!._id.toString());
 
         return {
             status: ResultStatusType.Success,
-            data: {accessToken},
+            data: accessToken,
         }
     },
     async me(userId: string): Promise<ResultType<UserMeViewModel | null>> {
