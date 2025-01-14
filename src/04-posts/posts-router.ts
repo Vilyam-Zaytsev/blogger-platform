@@ -1,12 +1,12 @@
 import {Router} from "express";
-import {postsController} from './postsController';
+import {postsController} from './posts-controller';
 import {baseAuthMiddleware} from "../common/middlewares/base-authorization-middleware";
 import {
     postBlogIdInputValidator,
     postContentInputValidator,
     postShortDescriptionInputValidator,
     postTitleInputValidator
-} from "./middlewares/postValidators";
+} from "./middlewares/post-validators";
 import {inputCheckErrorsMiddleware} from "../common/middlewares/input-check-errors-middleware";
 import {
     pageNumberInputValidator,

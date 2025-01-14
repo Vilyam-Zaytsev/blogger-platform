@@ -9,7 +9,7 @@ import {SETTINGS} from "../common/settings";
 import {postsService} from "./services/posts-service";
 import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
 import {PaginationResponse, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";
-import {qPostsService} from "./services/qPosts-service";
+import {qPostsService} from "./services/posts-query-service";
 import {IdType} from "../common/types/input-output-types/id-type";
 
 const postsController = {
