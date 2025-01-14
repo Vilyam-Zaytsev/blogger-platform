@@ -1,7 +1,7 @@
 import {UserInputModel} from "../types/input-output-types";
 import {UserDbType} from "../types/user-db-type";
 import {usersRepository} from "../repositoryes/users-repository";
-import {bcryptService} from "../../common/services/bcryptService";
+import {bcryptService} from "../../common/services/bcrypt-service";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ResultStatusType} from "../../common/types/result-types/result-status-type";
 

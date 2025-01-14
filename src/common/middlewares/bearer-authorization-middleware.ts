@@ -1,6 +1,6 @@
 import {Request, Response, NextFunction} from "express";
 import {SETTINGS} from "../settings";
-import {jwtService} from "../services/jwtService";
+import {jwtService} from "../services/jwt-service";
 import {usersRepository} from "../../02-users/repositoryes/users-repository";
 import {UserDbType} from "../../02-users/types/user-db-type";
 import {IdType} from "../types/input-output-types/id-type";
