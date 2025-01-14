@@ -23,7 +23,7 @@ const authService = {
                 message: 'Login, email or password incorrect.',
             }],
             data: null
-        } as ResultType;
+        };
 
         const accessToken: AccessTokenType = await jwtService
             .createToken(result.data!._id.toString());
@@ -33,6 +33,7 @@ const authService = {
             data: accessToken,
         }
     },
+    //TODO: Remove
     async me(userId: string): Promise<ResultType<UserMeViewModel | null>> {
         if (!userId) {
             return {
