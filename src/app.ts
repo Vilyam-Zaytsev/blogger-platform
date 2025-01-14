@@ -1,6 +1,6 @@
 import express, {Response, Request} from 'express';
 import {SETTINGS} from "./common/settings";
-import {blogsRouter} from "./03-blogs/blogsRouter";
+import {blogsRouter} from "./03-blogs/blogs-router";
 import {postsRouter} from "./04-posts/postsRouter";
 import {testsRouter} from "./autotest/testsRouter";
 import {authRouter} from "./01-auth/auth-router";

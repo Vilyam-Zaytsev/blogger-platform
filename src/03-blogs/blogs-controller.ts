@@ -13,7 +13,7 @@ import {blogsService} from "./services/blogs-service";
 import {BlogDbType} from "./types/blog-db-type";
 import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
 import {PaginationResponse, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";
-import {qBlogsService} from "./services/qBlogs-service";
+import {qBlogsService} from "./services/blogs-query-service";
 import {IdType} from "../common/types/input-output-types/id-type";
 
 

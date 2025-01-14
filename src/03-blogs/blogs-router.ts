@@ -1,10 +1,10 @@
 import {Router} from "express";
-import {blogsController} from './blogsController';
+import {blogsController} from './blogs-controller';
 import {
     blogDescriptionInputValidator,
     blogNameInputValidator,
     blogWebsiteUrlInputValidator
-} from "./middlewares/blogValidators";
+} from "./middlewares/blog-validators";
 import {inputCheckErrorsMiddleware} from "../common/middlewares/input-check-errors-middleware";
 import {baseAuthMiddleware} from "../common/middlewares/base-authorization-middleware";
 import {

@@ -3,7 +3,7 @@ import {PostViewModel} from "../types/input-output-types";
 import {ObjectId, WithId} from "mongodb";
 import {PaginationAndSortFilterType, PaginationResponse} from "../../common/types/input-output-types/pagination-sort-types";
 import {qPostsRepository} from "../repositoryes/qPosts-repository";
-import {qBlogsService} from "../../03-blogs/services/qBlogs-service";
+import {qBlogsService} from "../../03-blogs/services/blogs-query-service";
 import {BlogViewModel} from "../../03-blogs/types/input-output-types";
 
 const qPostsService = {

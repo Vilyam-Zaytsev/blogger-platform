@@ -2,7 +2,7 @@ import {BlogViewModel} from "../types/input-output-types";
 import {BlogDbType} from "../types/blog-db-type";
 import {WithId} from "mongodb";
 import {PaginationAndSortFilterType, PaginationResponse} from "../../common/types/input-output-types/pagination-sort-types";
-import {qBlogsRepository} from "../repositoryes/qBlogs-repository";
+import {qBlogsRepository} from "../repositoryes/blogs-query-repository";
 
 const qBlogsService = {
     async findBlogs(sortQueryDto: PaginationAndSortFilterType): Promise<PaginationResponse<BlogViewModel>> {
