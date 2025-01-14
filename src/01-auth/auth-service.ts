@@ -6,13 +6,11 @@ import {ResultStatusType} from "../common/types/result-types/result-status-type"
 import {ResultType} from "../common/types/result-types/result-type";
 import {jwtService} from "../common/services/jwt-service";
 import {WithId} from "mongodb";
-import {qUserService} from "../02-users/services/users-query-servise";
-import {PresentationView} from "../02-users/types/presentation-view";
-import {UserMeViewModel} from "../02-users/types/input-output-types";
 import {AccessTokenType} from "./types/access-token-type";
 
 const authService = {
     async login(authParamsDto: LoginInputType): Promise<ResultType<AccessTokenType | null>> {
+
         const result: ResultType<WithId<UserDbType> | null> = await this.checkUserCredentials(authParamsDto);
 
         if (result.status !== ResultStatusType.Success) return {
@@ -26,30 +24,15 @@ const authService = {
         };
 
         const accessToken: AccessTokenType = await jwtService
-            .createToken(result.data!._id.toString());
+            .createToken(String(result.data!._id));
 
         return {
             status: ResultStatusType.Success,
+            extensions: [],
             data: accessToken,
         }
     },
-    //TODO: Remove
-    async me(userId: string): Promise<ResultType<UserMeViewModel | null>> {
-        if (!userId) {
-            return {
-                status: ResultStatusType.Unauthorized,
-                data: null
-            };
-        }
 
-        const me: UserMeViewModel = await qUserService
-            .findUser(userId, PresentationView.MeViewModal) as UserMeViewModel;
-
-        return {
-            status: ResultStatusType.Success,
-            data: me
-        }
-    },
     async checkUserCredentials(authParamsDto: LoginInputType): Promise<ResultType<WithId<UserDbType> | null>> {
         const {
             loginOrEmail,
@@ -68,28 +51,29 @@ const authService = {
                     message: 'There is no user with such data.',
                 }],
                 data: null
-            } as ResultType;
+            };
         }
 
-        const isPasswordCorrect = await bcryptService
+        const isPasswordCorrect: boolean = await bcryptService
             .checkPassword(password, isUser.passwordHash);
 
         if (!isPasswordCorrect) {
-           return  {
+            return {
                 status: ResultStatusType.BadRequest,
-                    errorMessage: 'password incorrect',
+                errorMessage: 'password incorrect',
                 extensions: [{
-                field: 'password',
-                message: 'Invalid password.',
-            }],
+                    field: 'password',
+                    message: 'Invalid password.',
+                }],
                 data: null
-            } as ResultType;
+            };
         }
 
         return {
             status: ResultStatusType.Success,
+            extensions: [],
             data: isUser
-        } as ResultType<WithId<UserDbType>>;
+        };
     }
 };
 

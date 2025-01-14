@@ -32,6 +32,7 @@ const usersService = {
 
         return {
             status: ResultStatusType.Created,
+            extensions: [],
             data: String(result.insertedId)
         }
     },
@@ -74,6 +75,7 @@ const usersService = {
 
         return {
             status: ResultStatusType.Success,
+            extensions: [],
             data: null
         };
     },

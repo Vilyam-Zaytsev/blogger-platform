@@ -10,12 +10,16 @@ import {OutputErrorsType} from "../common/types/input-output-types/output-errors
 import {IdType} from "../common/types/input-output-types/id-type";
 import {UserMeViewModel} from "../02-users/types/input-output-types";
 import {AccessTokenType} from "./types/access-token-type";
+import {qUserService} from "../02-users/services/users-query-servise";
+import {PresentationView} from "../02-users/types/presentation-view";
+import {SETTINGS} from "../common/settings";
 
 const authController = {
     login: async (
         req: RequestWithBody<LoginInputType>,
         res: Response<OutputErrorsType | AccessTokenType>
     ) => {
+
         const authParams: LoginInputType = {
             loginOrEmail: req.body.loginOrEmail,
             password: req.body.password
@@ -41,22 +45,20 @@ const authController = {
         res: Response<UserMeViewModel>
     ) => {
 
-        const userId: string = req.user?.id as string;
+        const userId: string = String(req.user?.id);
 
-        const result = await authService
-            .me(userId);
-
-        if (result.status !== ResultStatusType.Success) {
+        if (!userId) {
             res
-                .sendStatus(mapResultStatusToHttpStatus(result.status));
-
-            return;
+                .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
         }
 
+        const me: UserMeViewModel = await qUserService
+            .findUser(userId, PresentationView.MeViewModal) as UserMeViewModel;
+
         res
-            .status(mapResultStatusToHttpStatus(result.status))
-            .json(result.data!);
-    }
+            .status(SETTINGS.HTTP_STATUSES.OK_200)
+            .json(me);
+    },
 };
 
 export {authController};

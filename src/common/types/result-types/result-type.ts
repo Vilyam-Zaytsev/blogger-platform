@@ -4,7 +4,7 @@ import {ExtensionsType} from "./extensions-type";
 type ResultType<T = null> = {
     status: ResultStatusType,
     errorMessage?: string,
-    extensions?: ExtensionsType,
+    extensions: ExtensionsType,
     data: T
 };
 
