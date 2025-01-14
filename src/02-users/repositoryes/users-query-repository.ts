@@ -4,7 +4,7 @@ import {usersCollection} from "../../db/mongoDb";
 import {MatchMode, PaginationAndSortFilterType} from "../../common/types/input-output-types/pagination-sort-types";
 import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
 
-const qUsersRepository = {
+const usersQueryRepository = {
     async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<WithId<UserDbType>[]> {
         const {
             pageNumber,
@@ -37,7 +37,7 @@ const qUsersRepository = {
     async getUsersCount(
         searchLoginTerm: string | null,
         searchEmailTerm: string | null
-        ): Promise<number> {
+    ): Promise<number> {
 
         const filter: any = createUsersSearchFilter(
             {
@@ -46,9 +46,10 @@ const qUsersRepository = {
             },
             MatchMode.Partial
         );
-            return usersCollection
+
+        return usersCollection
             .countDocuments(filter);
     }
 };
 
-export {qUsersRepository};
+export {usersQueryRepository};

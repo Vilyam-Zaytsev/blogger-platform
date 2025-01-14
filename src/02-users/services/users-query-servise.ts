@@ -5,10 +5,10 @@ import {
 import {UserMeViewModel, UserViewModel} from "../types/input-output-types";
 import {WithId} from "mongodb";
 import {UserDbType} from "../types/user-db-type";
-import {qUsersRepository} from "../repositoryes/users-query-repository";
+import {usersQueryRepository} from "../repositoryes/users-query-repository";
 import {PresentationView} from "../types/presentation-view";
 
-const qUserService = {
+const userQueryService = {
     async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<PaginationResponse<UserViewModel>> {
 
         const {
@@ -18,10 +18,10 @@ const qUserService = {
             searchEmailTerm
         } = sortQueryDto;
 
-        const users: WithId<UserDbType>[] = await qUsersRepository
+        const users: WithId<UserDbType>[] = await usersQueryRepository
             .findUsers(sortQueryDto);
 
-        const usersCount: number = await qUsersRepository
+        const usersCount: number = await usersQueryRepository
             .getUsersCount(searchLoginTerm, searchEmailTerm)
 
         return {
@@ -34,7 +34,7 @@ const qUserService = {
     },
     async findUser(id: string, desiredPresentationView: PresentationView): Promise<UserViewModel | UserMeViewModel | null> {
 
-        const foundUser: WithId<UserDbType> | null= await qUsersRepository
+        const foundUser: WithId<UserDbType> | null= await usersQueryRepository
             .findUser(id);
 
         if (!foundUser) return null;
@@ -65,4 +65,4 @@ const qUserService = {
     },
 };
 
-export {qUserService};
+export {userQueryService};

@@ -10,7 +10,7 @@ import {OutputErrorsType} from "../common/types/input-output-types/output-errors
 import {IdType} from "../common/types/input-output-types/id-type";
 import {UserMeViewModel} from "../02-users/types/input-output-types";
 import {AccessTokenType} from "./types/access-token-type";
-import {qUserService} from "../02-users/services/users-query-servise";
+import {userQueryService} from "../02-users/services/users-query-servise";
 import {PresentationView} from "../02-users/types/presentation-view";
 import {SETTINGS} from "../common/settings";
 
@@ -52,7 +52,7 @@ const authController = {
                 .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
         }
 
-        const me: UserMeViewModel = await qUserService
+        const me: UserMeViewModel = await userQueryService
             .findUser(userId, PresentationView.MeViewModal) as UserMeViewModel;
 
         res

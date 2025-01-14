@@ -6,7 +6,7 @@ import {
 } from "../common/types/input-output-types/pagination-sort-types";
 import {UserInputModel, UserViewModel} from "./types/input-output-types";
 import {usersService} from "./services/users-service";
-import {qUserService} from "./services/users-query-servise";
+import {userQueryService} from "./services/users-query-servise";
 import {SETTINGS} from "../common/settings";
 import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
 import {ResultType} from "../common/types/result-types/result-type";
@@ -31,7 +31,7 @@ const usersController = {
             searchEmailTerm: req.query.searchEmailTerm,
         };
 
-        const foundUsers: PaginationResponse<UserViewModel> = await qUserService
+        const foundUsers: PaginationResponse<UserViewModel> = await userQueryService
             .findUsers(configPaginationAndSortParams(sortingAndPaginationParams));
 
         res
@@ -43,7 +43,7 @@ const usersController = {
         res: Response<UserViewModel>
     ) => {
 
-        const foundUser: UserViewModel | null = await qUserService
+        const foundUser: UserViewModel | null = await userQueryService
             .findUser(req.params.id, PresentationView.ViewModal) as UserViewModel;
 
         if (!foundUser) {
@@ -78,7 +78,7 @@ const usersController = {
             return;
         }
 
-        const createdUser: UserViewModel | null = await qUserService
+        const createdUser: UserViewModel | null = await userQueryService
             .findUser(result.data!, PresentationView.ViewModal) as UserViewModel;
 
         res
