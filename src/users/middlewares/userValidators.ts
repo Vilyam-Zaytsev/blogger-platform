@@ -21,6 +21,7 @@ const userLoginOrEmailInputValidator =
     body('loginOrEmail')
         .isString()
         .withMessage('The "loginOrEmail" field must be of the string type.')
+        .trim()
         .isLength({min: 3, max: 100})
         .withMessage('The length of the "loginOrEmail" field should be from 3 to 100.')
 

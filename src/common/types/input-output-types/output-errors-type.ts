@@ -10,7 +10,7 @@ type FieldNameType =
     | 'loginOrEmailOrPassword';
 
 type OutputErrorsType = {
-    errorsMessage: {
+    errorsMessages: {
         field: FieldNameType
         message: string,
     }[]

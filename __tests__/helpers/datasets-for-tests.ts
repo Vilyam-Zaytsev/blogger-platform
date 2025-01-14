@@ -26,8 +26,11 @@ const user: UserDbType = {
     createdAt: new Date().toISOString(),
 } as const;
 
+const incorrectAccessToken: string = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzg2NjQxNmU0M2Y5MzM1NjlmYjllMmIiLCJpYXQiOjE3MzY4NjA2OTQsImV4cCI6MTczNzAzMzQ5NH0.YSZz3-eZv0lJeqKhpBjq0TUcAt2FGUiI1bh0aBqgNbY` as const;
+
 export {
     blog,
     post,
-    user
-}
+    user,
+    incorrectAccessToken
+};
