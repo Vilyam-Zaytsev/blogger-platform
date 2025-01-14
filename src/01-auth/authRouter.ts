@@ -1,6 +1,6 @@
 import {Router} from "express";
 import {authController} from "./authController";
-import {userLoginOrEmailInputValidator, userPasswordInputValidator} from "../users/middlewares/userValidators";
+import {userLoginOrEmailInputValidator, userPasswordInputValidator} from "../02-users/middlewares/userValidators";
 import {inputCheckErrorsMiddleware} from "../common/middlewares/input-check-errors-middleware";
 import {SETTINGS} from "../common/settings";
 import {bearerAuthorizationMiddleware} from "../common/middlewares/bearer-authorization-middleware";

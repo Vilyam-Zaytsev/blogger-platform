@@ -2,8 +2,8 @@ import {PostDbType} from "../types/post-db-type";
 import {PostInputModel} from "../types/input-output-types";
 import {ObjectId} from "mongodb";
 import {postsRepository} from "../repositoryes/posts-repository";
-import {qBlogsService} from "../../blogs/services/qBlogs-service";
-import {BlogDbType} from "../../blogs/types/blog-db-type";
+import {qBlogsService} from "../../03-blogs/services/qBlogs-service";
+import {BlogDbType} from "../../03-blogs/types/blog-db-type";
 
 const postsService = {
     async createPost(data: PostInputModel, blogId?: string): Promise<string | null> {

@@ -15,12 +15,12 @@ import {
     sortDirectionInputValidator
 } from "../common/middlewares/query-parameters-validator";
 import {SETTINGS} from "../common/settings";
-import {postsController} from "../posts/postsController";
+import {postsController} from "../04-posts/postsController";
 import {
     postContentInputValidator,
     postShortDescriptionInputValidator,
     postTitleInputValidator
-} from "../posts/middlewares/postValidators";
+} from "../04-posts/middlewares/postValidators";
 
 const blogsRouter = Router();
 

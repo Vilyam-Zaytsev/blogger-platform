@@ -1,8 +1,8 @@
 import {req} from "./test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {Response} from "supertest";
-import {BlogDbType} from "../../src/blogs/types/blog-db-type";
-import {BlogViewModel} from "../../src/blogs/types/input-output-types";
+import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
+import {BlogViewModel} from "../../src/03-blogs/types/input-output-types";
 
 const blogsTestManager = {
     async createBlog(

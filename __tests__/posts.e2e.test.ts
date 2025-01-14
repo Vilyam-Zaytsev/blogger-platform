@@ -5,8 +5,8 @@ import {blogsTestManager} from "./helpers/blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
 import {postsCollection, setBlogsCollection, setPostsCollection} from "../src/db/mongoDb";
-import {BlogDbType} from "../src/blogs/types/blog-db-type";
-import {PostDbType} from "../src/posts/types/post-db-type";
+import {BlogDbType} from "../src/03-blogs/types/blog-db-type";
+import {PostDbType} from "../src/04-posts/types/post-db-type";
 import {postsTestManager} from "./helpers/posts-test-manager";
 import {Response} from "supertest";
 

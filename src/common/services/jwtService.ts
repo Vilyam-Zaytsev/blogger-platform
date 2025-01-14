@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import {SETTINGS} from "../settings";
-import {AccessTokenType} from "../../auth/types/access-token-type";
+import {AccessTokenType} from "../../01-auth/types/access-token-type";
 
 const jwtService = {
     async createToken(userId: string): Promise<AccessTokenType> {

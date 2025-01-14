@@ -8,7 +8,7 @@ import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-t
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
 import {OutputErrorsType} from "../common/types/input-output-types/output-errors-type";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {UserMeViewModel} from "../users/types/input-output-types";
+import {UserMeViewModel} from "../02-users/types/input-output-types";
 import {AccessTokenType} from "./types/access-token-type";
 
 const authController = {
