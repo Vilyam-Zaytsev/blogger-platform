@@ -6,7 +6,7 @@ import {
 } from "../common/types/input-output-types/pagination-sort-types";
 import {UserInputModel, UserViewModel} from "./types/input-output-types";
 import {usersService} from "./services/users-service";
-import {qUserService} from "./services/qUsers-servise";
+import {qUserService} from "./services/users-query-servise";
 import {SETTINGS} from "../common/settings";
 import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
 import {ResultType} from "../common/types/result-types/result-type";

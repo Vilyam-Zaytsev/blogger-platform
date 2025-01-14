@@ -6,7 +6,7 @@ import {ResultStatusType} from "../common/types/result-types/result-status-type"
 import {ResultType} from "../common/types/result-types/result-type";
 import {jwtService} from "../common/services/jwtService";
 import {WithId} from "mongodb";
-import {qUserService} from "../02-users/services/qUsers-servise";
+import {qUserService} from "../02-users/services/users-query-servise";
 import {PresentationView} from "../02-users/types/presentation-view";
 import {UserMeViewModel} from "../02-users/types/input-output-types";
 import {AccessTokenType} from "./types/access-token-type";

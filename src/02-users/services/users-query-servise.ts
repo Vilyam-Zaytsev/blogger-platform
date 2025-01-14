@@ -5,7 +5,7 @@ import {
 import {UserMeViewModel, UserViewModel} from "../types/input-output-types";
 import {WithId} from "mongodb";
 import {UserDbType} from "../types/user-db-type";
-import {qUsersRepository} from "../repositoryes/qUsers-repository";
+import {qUsersRepository} from "../repositoryes/users-query-repository";
 import {PresentationView} from "../types/presentation-view";
 
 const qUserService = {

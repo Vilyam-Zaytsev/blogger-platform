@@ -1,10 +1,10 @@
 import {Router} from "express";
-import {usersController} from "./usersController";
+import {usersController} from "./users-controller";
 import {
     userEmailInputValidator,
     userLoginInputValidator,
     userPasswordInputValidator
-} from "./middlewares/userValidators";
+} from "./middlewares/user-validators";
 import {inputCheckErrorsMiddleware} from "../common/middlewares/input-check-errors-middleware";
 import {baseAuthMiddleware} from "../common/middlewares/base-authorization-middleware";
 

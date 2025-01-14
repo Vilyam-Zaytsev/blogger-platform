@@ -3,8 +3,8 @@ import {SETTINGS} from "./common/settings";
 import {blogsRouter} from "./03-blogs/blogsRouter";
 import {postsRouter} from "./04-posts/postsRouter";
 import {testsRouter} from "./autotest/testsRouter";
-import {authRouter} from "./01-auth/authRouter";
-import {usersRouter} from "./02-users/usersRouter";
+import {authRouter} from "./01-auth/auth-router";
+import {usersRouter} from "./02-users/users-router";
 
 
 const app = express();
