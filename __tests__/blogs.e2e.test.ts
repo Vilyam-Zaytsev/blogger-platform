@@ -1221,7 +1221,7 @@ describe('/blogs', () => {
                 .get(SETTINGS.PATH.BLOGS)
                 .query({
                     searchNameTerm: 'G_1',
-                    sortBy: 'id',
+                    sortBy: 'description',
                     sortDirection: 'asc',
                     pageNumber: 1,
                     pageSize: 2
@@ -1235,7 +1235,7 @@ describe('/blogs', () => {
                 totalCount: 3,
                 items: blogsTestManager.filterAndSort(
                     res_post.map(r => r.body),
-                    'id',
+                    'description',
                     'asc',
                     1,
                     2,
@@ -1247,7 +1247,7 @@ describe('/blogs', () => {
                 expect(res_get.body.items[i]).toEqual(
                     blogsTestManager.filterAndSort(
                         res_post.map(r => r.body),
-                        'id',
+                        'description',
                         'asc',
                         1,
                         2,

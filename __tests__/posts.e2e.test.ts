@@ -1653,7 +1653,7 @@ describe('/posts', () => {
             const res_GET_posts = await req
                 .get(SETTINGS.PATH.POSTS)
                 .query({
-                    sortBy: 'id',
+                    sortBy: 'content',
                     sortDirection: 'desc',
                     pageNumber: 6,
                     pageSize: 2
@@ -1667,7 +1667,7 @@ describe('/posts', () => {
                 totalCount: 11,
                 items: postsTestManager.filterAndSort(
                     res_POST_posts.map(r => r.body),
-                    'id',
+                    'content',
                     'desc',
                     6,
                     2
@@ -1678,7 +1678,7 @@ describe('/posts', () => {
                 expect(res_GET_posts.body.items[i]).toEqual(
                     postsTestManager.filterAndSort(
                         res_POST_posts.map(r => r.body),
-                        'id',
+                        'content',
                         'desc',
                         6,
                         2
@@ -1750,6 +1750,14 @@ describe('/posts', () => {
                     pageSize: 2
                 })
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            console.log(postsTestManager.filterAndSort(
+                res_POST_posts.map(r => r.body),
+                'shortDescription',
+                'asc',
+                6,
+                2
+            ))
 
             expect(res_GET_posts.body).toEqual({
                 pagesCount: 6,
