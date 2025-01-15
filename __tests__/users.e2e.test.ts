@@ -6,7 +6,7 @@ import {MongoClient, ObjectId} from "mongodb";
 import {setUserCollection, usersCollection} from "../src/db/mongoDb";
 import {postsTestManager} from "./helpers/posts-test-manager";
 import {Response} from "supertest";
-import {UserDbType} from "../src/users/types/user-db-type";
+import {UserDbType} from "../src/02-users/types/user-db-type";
 import {usersTestManager} from "./helpers/users-test-manager";
 import {SortDirection} from "../src/common/types/input-output-types/pagination-sort-types";
 

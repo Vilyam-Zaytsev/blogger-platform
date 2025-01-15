@@ -11,7 +11,7 @@ import {blogsTestManager} from "./helpers/blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
 import {blogsCollection, setBlogsCollection} from "../src/db/mongoDb";
-import {BlogDbType} from "../src/blogs/types/blog-db-type";
+import {BlogDbType} from "../src/03-blogs/types/blog-db-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -1155,7 +1155,7 @@ describe('/blogs', () => {
             const res_get = await req
                 .get(SETTINGS.PATH.BLOGS)
                 .query({
-                    sortBy: 'id',
+                    sortBy: 'description',
                     sortDirection: 'desc',
                     pageNumber: 6,
                     pageSize: 2
@@ -1169,7 +1169,7 @@ describe('/blogs', () => {
                 totalCount: 11,
                 items: blogsTestManager.filterAndSort(
                     res_post.map(r => r.body),
-                    'id',
+                    'description',
                     'desc',
                     6,
                     2
@@ -1180,7 +1180,7 @@ describe('/blogs', () => {
                 expect(res_get.body.items[i]).toEqual(
                     blogsTestManager.filterAndSort(
                         res_post.map(r => r.body),
-                        'id',
+                        'description',
                         'desc',
                         6,
                         2
@@ -1221,7 +1221,7 @@ describe('/blogs', () => {
                 .get(SETTINGS.PATH.BLOGS)
                 .query({
                     searchNameTerm: 'G_1',
-                    sortBy: 'id',
+                    sortBy: 'description',
                     sortDirection: 'asc',
                     pageNumber: 1,
                     pageSize: 2
@@ -1235,7 +1235,7 @@ describe('/blogs', () => {
                 totalCount: 3,
                 items: blogsTestManager.filterAndSort(
                     res_post.map(r => r.body),
-                    'id',
+                    'description',
                     'asc',
                     1,
                     2,
@@ -1247,7 +1247,7 @@ describe('/blogs', () => {
                 expect(res_get.body.items[i]).toEqual(
                     blogsTestManager.filterAndSort(
                         res_post.map(r => r.body),
-                        'id',
+                        'description',
                         'asc',
                         1,
                         2,

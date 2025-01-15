@@ -5,8 +5,8 @@ import {blogsTestManager} from "./helpers/blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
 import {postsCollection, setBlogsCollection, setPostsCollection} from "../src/db/mongoDb";
-import {BlogDbType} from "../src/blogs/types/blog-db-type";
-import {PostDbType} from "../src/posts/types/post-db-type";
+import {BlogDbType} from "../src/03-blogs/types/blog-db-type";
+import {PostDbType} from "../src/04-posts/types/post-db-type";
 import {postsTestManager} from "./helpers/posts-test-manager";
 import {Response} from "supertest";
 
@@ -1653,7 +1653,7 @@ describe('/posts', () => {
             const res_GET_posts = await req
                 .get(SETTINGS.PATH.POSTS)
                 .query({
-                    sortBy: 'id',
+                    sortBy: 'content',
                     sortDirection: 'desc',
                     pageNumber: 6,
                     pageSize: 2
@@ -1667,7 +1667,7 @@ describe('/posts', () => {
                 totalCount: 11,
                 items: postsTestManager.filterAndSort(
                     res_POST_posts.map(r => r.body),
-                    'id',
+                    'content',
                     'desc',
                     6,
                     2
@@ -1678,7 +1678,7 @@ describe('/posts', () => {
                 expect(res_GET_posts.body.items[i]).toEqual(
                     postsTestManager.filterAndSort(
                         res_POST_posts.map(r => r.body),
-                        'id',
+                        'content',
                         'desc',
                         6,
                         2
@@ -1750,6 +1750,14 @@ describe('/posts', () => {
                     pageSize: 2
                 })
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            console.log(postsTestManager.filterAndSort(
+                res_POST_posts.map(r => r.body),
+                'shortDescription',
+                'asc',
+                6,
+                2
+            ))
 
             expect(res_GET_posts.body).toEqual({
                 pagesCount: 6,

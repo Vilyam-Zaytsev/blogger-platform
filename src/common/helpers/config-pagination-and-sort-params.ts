@@ -5,10 +5,10 @@ import {
 } from "../types/input-output-types/pagination-sort-types";
 
 
-// DO NOTE USER NESTED TERNARY
 // TODO: unit tests
 const configPaginationAndSortParams = (params: SortingAndPaginationParamsType): PaginationAndSortFilterType => {
-    const pageNumber =
+
+    const pageNumber: number =
         params.pageNumber
             ? Number(params.pageNumber)
             : 1;
@@ -20,9 +20,7 @@ const configPaginationAndSortParams = (params: SortingAndPaginationParamsType): 
 
     const sortBy: string =
         params.sortBy
-            ? params.sortBy === 'id'
-                ? '_id'
-                : params.sortBy
+            ? String(params.sortBy)
             : 'createdAt';
 
     const sortDirection: SortDirection =
