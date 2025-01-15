@@ -1155,7 +1155,7 @@ describe('/blogs', () => {
             const res_get = await req
                 .get(SETTINGS.PATH.BLOGS)
                 .query({
-                    sortBy: 'id',
+                    sortBy: 'description',
                     sortDirection: 'desc',
                     pageNumber: 6,
                     pageSize: 2
@@ -1169,7 +1169,7 @@ describe('/blogs', () => {
                 totalCount: 11,
                 items: blogsTestManager.filterAndSort(
                     res_post.map(r => r.body),
-                    'id',
+                    'description',
                     'desc',
                     6,
                     2
@@ -1180,7 +1180,7 @@ describe('/blogs', () => {
                 expect(res_get.body.items[i]).toEqual(
                     blogsTestManager.filterAndSort(
                         res_post.map(r => r.body),
-                        'id',
+                        'description',
                         'desc',
                         6,
                         2
