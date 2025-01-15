@@ -13,6 +13,7 @@ const SETTINGS = {
         USERS: '/users',
         BLOGS: '/blogs',
         POSTS: '/posts',
+        COMMENTS: '/comments',
         TESTS: '/testing/all-data',
     },
     ADMIN_DATA: {

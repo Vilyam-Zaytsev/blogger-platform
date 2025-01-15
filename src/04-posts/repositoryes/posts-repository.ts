@@ -1,9 +1,14 @@
 import {PostDbType} from "../types/post-db-type";
 import {PostInputModel} from "../types/input-output-types";
 import {postsCollection} from "../../db/mongoDb";
-import {InsertOneResult, ObjectId} from "mongodb";
+import {InsertOneResult, ObjectId, WithId} from "mongodb";
 
 const postsRepository = {
+    async findPost(id: string): Promise<WithId<PostDbType> | null> {
+
+        return await postsCollection
+            .findOne({_id: new ObjectId(id)});
+    },
     async insertPost(newPost: PostDbType): Promise<InsertOneResult> {
             return  await postsCollection
                 .insertOne(newPost);

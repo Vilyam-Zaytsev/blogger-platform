@@ -12,6 +12,8 @@ import {
     pageNumberInputValidator,
     pageSizeInputValidator, sortByInputValidator, sortDirectionInputValidator
 } from "../common/middlewares/query-parameters-validator";
+import {SETTINGS} from "../common/settings";
+import {commentsController} from "../05-comments/comments-controller";
 
 const postsRouter = Router();
 
@@ -24,6 +26,9 @@ postsRouter.get('/',
     postsController.getPosts
 );
 postsRouter.get('/:id', postsController.getPost);
+postsRouter.get(`/:id${SETTINGS.PATH.COMMENTS}`,
+    commentsController.getComments
+);
 postsRouter.post('/',
     baseAuthMiddleware,
     postTitleInputValidator,
@@ -32,6 +37,9 @@ postsRouter.post('/',
     postBlogIdInputValidator,
     inputCheckErrorsMiddleware,
     postsController.createAndInsertPost
+);
+postsRouter.post(`/:id${SETTINGS.PATH.COMMENTS}`,
+    commentsController.createAndInsertComment
 );
 postsRouter.put('/:id',
     baseAuthMiddleware,
