@@ -12,7 +12,7 @@ const commentsService = {
 
         if (resultCheckPostId.status !== ResultStatusType.Success) return resultCheckPostId;
 
-
+//остановился здесь
     },
     async checkPostId(postId: string): Promise<ResultType<string | null>> {
 
@@ -45,4 +45,6 @@ const commentsService = {
             data: String(isExistPost._id)
         };
     }
-}
+};
+
+export {commentsService};
