@@ -5,7 +5,7 @@ import {MatchMode, PaginationAndSortFilterType} from "../../common/types/input-o
 import {createPostsSearchFilter} from "../helpers/create-posts-search-filter";
 
 
-const qPostsRepository = {
+const postsQueryRepository = {
     async findPosts(sortQueryDto: PaginationAndSortFilterType, blogId?: string): Promise<WithId<PostDbType>[]> {
 
         const {
@@ -43,4 +43,4 @@ const qPostsRepository = {
     },
 };
 
-export {qPostsRepository};
+export {postsQueryRepository};

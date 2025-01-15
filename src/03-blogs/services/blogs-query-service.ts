@@ -2,9 +2,9 @@ import {BlogViewModel} from "../types/input-output-types";
 import {BlogDbType} from "../types/blog-db-type";
 import {WithId} from "mongodb";
 import {PaginationAndSortFilterType, PaginationResponse} from "../../common/types/input-output-types/pagination-sort-types";
-import {qBlogsRepository} from "../repositoryes/blogs-query-repository";
+import {blogsQueryRepository} from "../repositoryes/blogs-query-repository";
 
-const qBlogsService = {
+const blogsQueryService = {
     async findBlogs(sortQueryDto: PaginationAndSortFilterType): Promise<PaginationResponse<BlogViewModel>> {
 
         const {
@@ -13,10 +13,10 @@ const qBlogsService = {
             searchNameTerm
         } = sortQueryDto;
 
-        const blogs: WithId<BlogDbType>[] = await qBlogsRepository
+        const blogs: WithId<BlogDbType>[] = await blogsQueryRepository
             .findBlogs(sortQueryDto);
 
-        const blogsCount: number = await qBlogsRepository
+        const blogsCount: number = await blogsQueryRepository
             .getBlogsCount(searchNameTerm);
 
         return {
@@ -29,7 +29,7 @@ const qBlogsService = {
     },
     async findBlog(id: string): Promise<BlogViewModel | null> {
 
-        const foundBlog: WithId<BlogDbType> | null = await qBlogsRepository
+        const foundBlog: WithId<BlogDbType> | null = await blogsQueryRepository
             .findBlog(id);
 
         if (!foundBlog) return null;
@@ -49,4 +49,4 @@ const qBlogsService = {
 
 };
 
-export {qBlogsService};
+export {blogsQueryService};

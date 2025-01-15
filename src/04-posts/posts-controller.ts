@@ -9,7 +9,7 @@ import {SETTINGS} from "../common/settings";
 import {postsService} from "./services/posts-service";
 import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
 import {PaginationResponse, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";
-import {qPostsService} from "./services/posts-query-service";
+import {postsQueryService} from "./services/posts-query-service";
 import {IdType} from "../common/types/input-output-types/id-type";
 
 const postsController = {
@@ -27,7 +27,7 @@ const postsController = {
 
         const blogId: string = req.params.id
 
-        const foundPosts: PaginationResponse<PostViewModel> | null = await qPostsService
+        const foundPosts: PaginationResponse<PostViewModel> | null = await postsQueryService
             .findPosts(configPaginationAndSortParams(sortingAndPaginationParams), blogId);
 
         if (!foundPosts) {
@@ -45,7 +45,7 @@ const postsController = {
         res: Response<PostViewModel>
     ) => {
 
-        const foundPost: PostViewModel | null = await qPostsService
+        const foundPost: PostViewModel | null = await postsQueryService
             .findPost(req.params.id);
 
         if (!foundPost) {
@@ -82,7 +82,7 @@ const postsController = {
             return;
         }
 
-        const createdPost: PostViewModel | null = await qPostsService
+        const createdPost: PostViewModel | null = await postsQueryService
             .findPost(idCreatedPost);
 
         res

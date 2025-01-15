@@ -2,7 +2,7 @@ import {PostDbType} from "../types/post-db-type";
 import {PostInputModel} from "../types/input-output-types";
 import {ObjectId} from "mongodb";
 import {postsRepository} from "../repositoryes/posts-repository";
-import {qBlogsService} from "../../03-blogs/services/blogs-query-service";
+import {blogsQueryService} from "../../03-blogs/services/blogs-query-service";
 import {BlogDbType} from "../../03-blogs/types/blog-db-type";
 
 const postsService = {
@@ -11,7 +11,7 @@ const postsService = {
         if (blogId) {
             if (!ObjectId.isValid(blogId)) return null;
 
-            const isExistBlog: BlogDbType | null = await qBlogsService
+            const isExistBlog: BlogDbType | null = await blogsQueryService
                 .findBlog(blogId);
 
             if (!isExistBlog) return null;
@@ -21,7 +21,7 @@ const postsService = {
 
         const newPost: PostDbType = {
             ...data,
-            blogName: (await qBlogsService.findBlog(data.blogId))!.name,
+            blogName: (await blogsQueryService.findBlog(data.blogId))!.name,
             createdAt: new Date().toISOString(),
         }
 

@@ -2,11 +2,11 @@ import {PostDbType} from "../types/post-db-type";
 import {PostViewModel} from "../types/input-output-types";
 import {ObjectId, WithId} from "mongodb";
 import {PaginationAndSortFilterType, PaginationResponse} from "../../common/types/input-output-types/pagination-sort-types";
-import {qPostsRepository} from "../repositoryes/posts-query-repository";
-import {qBlogsService} from "../../03-blogs/services/blogs-query-service";
+import {postsQueryRepository} from "../repositoryes/posts-query-repository";
+import {blogsQueryService} from "../../03-blogs/services/blogs-query-service";
 import {BlogViewModel} from "../../03-blogs/types/input-output-types";
 
-const qPostsService = {
+const postsQueryService = {
     async findPosts(sortQueryDto: PaginationAndSortFilterType, blogId?:string): Promise<PaginationResponse<PostViewModel> | null> {
 
         const {
@@ -17,16 +17,16 @@ const qPostsService = {
         if (blogId) {
             if (!ObjectId.isValid(blogId)) return null;
 
-            const isExistBlog: BlogViewModel | null = await qBlogsService
+            const isExistBlog: BlogViewModel | null = await blogsQueryService
             .findBlog(blogId);
 
             if (!isExistBlog) return null;
         }
 
-        const posts: WithId<PostDbType>[] = await qPostsRepository
+        const posts: WithId<PostDbType>[] = await postsQueryRepository
             .findPosts(sortQueryDto, blogId);
 
-        const postsCount: number = await qPostsRepository
+        const postsCount: number = await postsQueryRepository
             .getPostsCount(blogId);
 
         return {
@@ -39,7 +39,7 @@ const qPostsService = {
     },
     async findPost(id: string): Promise<PostViewModel | null> {
 
-        const foundPost: WithId<PostDbType> | null = await qPostsRepository
+        const foundPost: WithId<PostDbType> | null = await postsQueryRepository
             .findPost(id);
 
         if (!foundPost) return null;
@@ -59,4 +59,4 @@ const qPostsService = {
     },
 };
 
-export {qPostsService};
+export {postsQueryService};

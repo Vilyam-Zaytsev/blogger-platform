@@ -13,7 +13,7 @@ import {blogsService} from "./services/blogs-service";
 import {BlogDbType} from "./types/blog-db-type";
 import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
 import {PaginationResponse, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";
-import {qBlogsService} from "./services/blogs-query-service";
+import {blogsQueryService} from "./services/blogs-query-service";
 import {IdType} from "../common/types/input-output-types/id-type";
 
 
@@ -31,7 +31,7 @@ const blogsController = {
             searchNameTerm: req.query.searchNameTerm
         }
 
-        const foundBlogs: PaginationResponse<BlogViewModel> = await qBlogsService
+        const foundBlogs: PaginationResponse<BlogViewModel> = await blogsQueryService
             .findBlogs(configPaginationAndSortParams(sortingAndPaginationParams));
 
         res
@@ -43,7 +43,7 @@ const blogsController = {
         res: Response<BlogViewModel>
     ) => {
 
-        const foundBlog: BlogViewModel | null = await qBlogsService
+        const foundBlog: BlogViewModel | null = await blogsQueryService
             .findBlog(req.params.id);
 
         if (!foundBlog) {
@@ -71,7 +71,7 @@ const blogsController = {
         const idCreatedBlog: string = await blogsService
             .createBlog(dataForCreatingBlog);
 
-        const createdBlog: BlogViewModel | null = await qBlogsService
+        const createdBlog: BlogViewModel | null = await blogsQueryService
             .findBlog(idCreatedBlog);
 
         res

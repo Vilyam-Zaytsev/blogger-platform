@@ -7,7 +7,7 @@ import {
 } from "../../common/types/input-output-types/pagination-sort-types";
 import {createBlogsSearchFilter} from "../helpers/create-blogs-search-filter";
 
-const qBlogsRepository = {
+const blogsQueryRepository = {
     async findBlogs(sortQueryDto: PaginationAndSortFilterType): Promise<WithId<BlogDbType>[]> {
 
         const {
@@ -46,4 +46,4 @@ const qBlogsRepository = {
     },
 };
 
-export {qBlogsRepository};
+export {blogsQueryRepository};
