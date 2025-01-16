@@ -4,6 +4,8 @@ import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatusType} from "../common/types/result-types/result-status-type";
 import {PostDbType} from "../04-posts/types/post-db-type";
 import {postsService} from "../04-posts/services/posts-service";
+import {commentRepository} from "./repositoryes/comment-repository";
+import {CommentDbType} from "./types/comment-db-type";
 
 const commentsService = {
     async createComment(data: CommentInputModel, postId: string): Promise<ResultType<string | null>> {
@@ -12,7 +14,14 @@ const commentsService = {
 
         if (resultCheckPostId.status !== ResultStatusType.Success) return resultCheckPostId;
 
+        //TODO
+        // const newComment: CommentDbType = {
+        //     ...data,
+        //
+        // }
 
+        // const result = await commentRepository
+        //     .insertComment();
     },
     async checkPostId(postId: string): Promise<ResultType<string | null>> {
 
