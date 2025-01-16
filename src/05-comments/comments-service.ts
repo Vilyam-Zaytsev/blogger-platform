@@ -6,22 +6,44 @@ import {PostDbType} from "../04-posts/types/post-db-type";
 import {postsService} from "../04-posts/services/posts-service";
 import {commentRepository} from "./repositoryes/comment-repository";
 import {CommentDbType} from "./types/comment-db-type";
+import {UserDbType} from "../02-users/types/user-db-type";
+import {usersRepository} from "../02-users/repositoryes/users-repository";
 
 const commentsService = {
-    async createComment(data: CommentInputModel, postId: string): Promise<ResultType<string | null>> {
+    async createComment(data: CommentInputModel, postId: string, commentatorId: string): Promise<ResultType<string | null>> {
 
         const resultCheckPostId: ResultType<string | null> = await this.checkPostId(postId);
 
-        if (resultCheckPostId.status !== ResultStatusType.Success) return resultCheckPostId;
+        if (resultCheckPostId.status !== ResultStatusType.Success) return {
+            status: ResultStatusType.NotFound,
+            errorMessage: 'there is no such post.',
+            extensions: [{
+                field: 'postId',
+                message: 'There is no post with this ID.',
+            }],
+            data: null
+        };
 
-        //TODO
-        // const newComment: CommentDbType = {
-        //     ...data,
-        //
-        // }
+        const commentator: WithId<UserDbType> | null = await usersRepository
+            .findUser(commentatorId);
 
-        // const result = await commentRepository
-        //     .insertComment();
+        const newComment: CommentDbType = {
+            ...data,
+            commentatorInfo: {
+                userId: String(commentator!._id),
+                userLogin: commentator!.login
+            },
+            createdAt: new Date().toISOString()
+        }
+
+        const result = await commentRepository
+            .insertComment(newComment);
+
+        return {
+            status: ResultStatusType.Created,
+            extensions: [],
+            data: String(result.insertedId)
+        };
     },
     async checkPostId(postId: string): Promise<ResultType<string | null>> {
 

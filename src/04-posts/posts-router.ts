@@ -14,6 +14,7 @@ import {
 } from "../common/middlewares/query-parameters-validator";
 import {SETTINGS} from "../common/settings";
 import {commentsController} from "../05-comments/comments-controller";
+import {bearerAuthorizationMiddleware} from "../common/middlewares/bearer-authorization-middleware";
 
 const postsRouter = Router();
 
@@ -39,6 +40,7 @@ postsRouter.post('/',
     postsController.createAndInsertPost
 );
 postsRouter.post(`/:id${SETTINGS.PATH.COMMENTS}`,
+    bearerAuthorizationMiddleware,
     commentsController.createAndInsertComment
 );
 postsRouter.put('/:id',
