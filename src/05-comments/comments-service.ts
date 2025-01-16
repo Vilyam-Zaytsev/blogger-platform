@@ -8,8 +8,21 @@ import {commentRepository} from "./repositoryes/comment-repository";
 import {CommentDbType} from "./types/comment-db-type";
 import {UserDbType} from "../02-users/types/user-db-type";
 import {usersRepository} from "../02-users/repositoryes/users-repository";
+import {
+    PaginationAndSortFilterType,
+    PaginationResponse
+} from "../common/types/input-output-types/pagination-sort-types";
+import {commentsCollection} from "../db/mongoDb";
 
 const commentsService = {
+
+    async findComments(
+        sortQueryDto: PaginationAndSortFilterType,
+        postId: string
+    ): Promise<PaginationResponse<WithId<CommentDbType>> | null> {
+
+    },
+
     async createComment(data: CommentInputModel, postId: string, commentatorId: string): Promise<ResultType<string | null>> {
 
         const resultCheckPostId: ResultType<string | null> = await this.checkPostId(postId);

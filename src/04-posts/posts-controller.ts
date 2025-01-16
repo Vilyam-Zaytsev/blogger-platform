@@ -7,7 +7,7 @@ import {
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
 import {postsService} from "./services/posts-service";
-import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
+import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 import {PaginationResponse, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";
 import {postsQueryService} from "./services/posts-query-service";
 import {IdType} from "../common/types/input-output-types/id-type";
@@ -28,7 +28,7 @@ const postsController = {
         const blogId: string = req.params.id
 
         const foundPosts: PaginationResponse<PostViewModel> | null = await postsQueryService
-            .findPosts(configPaginationAndSortParams(sortingAndPaginationParams), blogId);
+            .findPosts(createPaginationAndSortFilter(sortingAndPaginationParams), blogId);
 
         if (!foundPosts) {
             res.sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);

@@ -8,7 +8,7 @@ import {UserInputModel, UserViewModel} from "./types/input-output-types";
 import {usersService} from "./services/users-service";
 import {userQueryService} from "./services/users-query-servise";
 import {SETTINGS} from "../common/settings";
-import {configPaginationAndSortParams} from "../common/helpers/config-pagination-and-sort-params";
+import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 import {ResultType} from "../common/types/result-types/result-type";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
@@ -32,7 +32,7 @@ const usersController = {
         };
 
         const foundUsers: PaginationResponse<UserViewModel> = await userQueryService
-            .findUsers(configPaginationAndSortParams(sortingAndPaginationParams));
+            .findUsers(createPaginationAndSortFilter(sortingAndPaginationParams));
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
