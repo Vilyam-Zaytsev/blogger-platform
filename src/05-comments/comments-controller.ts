@@ -1,4 +1,4 @@
-import {Request, Response} from "express";
+import {Response} from "express";
 import {
     RequestWithParams,
     RequestWithParamsAndBody,
@@ -8,7 +8,7 @@ import {IdType} from "../common/types/input-output-types/id-type";
 import {CommentInputModel, CommentViewModel} from "./types/input-output-types";
 import {ResultType} from "../common/types/result-types/result-type";
 import {commentsService} from "./comments-service";
-import {ResultStatusType} from "../common/types/result-types/result-status-type";
+import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {SETTINGS} from "../common/settings";
 import {commentQueryRepository} from "./repositoryes/comment-query-repository";
@@ -17,8 +17,6 @@ import {
     PaginationResponse,
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
-import {CommentDbType} from "./types/comment-db-type";
-import {WithId} from "mongodb";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 
 const commentsController = {
@@ -30,10 +28,14 @@ const commentsController = {
 
         const postId: string = req.params.id;
 
+        //TODO спросить на поддержке про данную реализацию проверки на корректность postId
+        // и существование поста с таким id!!!
+        // (Правильно ли ее делать в контроллере через метод сервиса???)
+
         const resultCheckPostId: ResultType<string | null> = await commentsService
             .checkPostId(postId);
 
-        if (resultCheckPostId.status !== ResultStatusType.Success) {
+        if (resultCheckPostId.status !== ResultStatus.Success) {
             res
                 .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
@@ -51,8 +53,24 @@ const commentsController = {
             createPaginationAndSortFilter(sortingAndPaginationParams)
 
 
-        const foundComments: PaginationResponse<WithId<CommentDbType>> | null = await commentQueryRepository
+        const foundComments: CommentViewModel[] = await commentQueryRepository
             .findComments(paginationAndSortFilter, postId);
+
+        const commentsCount: number = await commentQueryRepository
+            .getCommentsCount(postId);
+
+        //TODO спросить на поддержке:
+        // нормально ли формировать объект респонса в контроллере???
+
+        res
+            .status(SETTINGS.HTTP_STATUSES.OK_200)
+            .json({
+                pagesCount: Math.ceil(commentsCount / paginationAndSortFilter.pageSize),
+                page: paginationAndSortFilter.pageNumber,
+                pageSize: paginationAndSortFilter.pageSize,
+                totalCount: commentsCount,
+                items: foundComments
+            })
     },
 
     async getComment(
@@ -60,7 +78,7 @@ const commentsController = {
         res: Response<CommentViewModel>
     ) {
 
-        const foundComment: WithId<CommentDbType> | null = await commentQueryRepository
+        const foundComment: CommentViewModel | null = await commentQueryRepository
             .findComment(req.params.id);
 
         if (!foundComment) {
@@ -70,13 +88,13 @@ const commentsController = {
             return
         }
 
-        const commentViewModel: CommentViewModel = commentQueryRepository
-            .mapToViewModel(foundComment)
-
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(commentViewModel);
+            .json(foundComment);
     },
+
+    //TODO Если проверка postId в контроллере это нормально, то переделать проверку postId!!!
+
     async createAndInsertComment(
         req: RequestWithParamsAndBody<IdType, CommentInputModel>,
         res: Response<CommentViewModel>
@@ -92,31 +110,57 @@ const commentsController = {
         const resultCreateComment: ResultType<string | null> = await commentsService
             .createComment(dataForCreatingComment, postId, commentatorId);
 
-        if (resultCreateComment.status !== ResultStatusType.Created) {
+        if (resultCreateComment.status !== ResultStatus.Created) {
             res
                 .sendStatus(mapResultStatusToHttpStatus(resultCreateComment.status));
 
             return;
         }
 
-        const createdComment: CommentViewModel = await commentQueryRepository
+        const createdComment: CommentViewModel | null = await commentQueryRepository
             .findComment(resultCreateComment.data!);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
-            .json(createdComment);
+            .json(createdComment!);
     },
     async updateComment(
-        req: Request,
+        req: RequestWithParamsAndBody<IdType, CommentInputModel>,
         res: Response
     ) {
 
+        const commentId: string = req.params.id;
+        const dataForCommentUpdates: CommentInputModel = {
+            content: req.body.content
+        };
+
+        const updateResult: ResultType = await commentsService
+            .updateComment(commentId, dataForCommentUpdates);
+
+        if (updateResult.status !== ResultStatus.Success) {
+            res
+                .sendStatus(mapResultStatusToHttpStatus(updateResult.status));
+
+            return;
+        }
+
+        res
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     },
     async deleteComment(
-        req: Request,
+        req: RequestWithParams<IdType>,
         res: Response
     ) {
+        const deleteResult: ResultType = await commentsService
+            .deleteComment(req.params.id);
 
+        if (deleteResult.status !== ResultStatus.Success) {
+            res
+                .sendStatus(mapResultStatusToHttpStatus(deleteResult.status));
+        }
+
+        res
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     }
 };
 

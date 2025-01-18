@@ -1,34 +1,22 @@
 import {CommentInputModel} from "./types/input-output-types";
 import {ObjectId, WithId} from "mongodb";
 import {ResultType} from "../common/types/result-types/result-type";
-import {ResultStatusType} from "../common/types/result-types/result-status-type";
+import {ResultStatus} from "../common/types/result-types/result-status";
 import {PostDbType} from "../04-posts/types/post-db-type";
 import {postsService} from "../04-posts/services/posts-service";
 import {commentRepository} from "./repositoryes/comment-repository";
 import {CommentDbType} from "./types/comment-db-type";
 import {UserDbType} from "../02-users/types/user-db-type";
 import {usersRepository} from "../02-users/repositoryes/users-repository";
-import {
-    PaginationAndSortFilterType,
-    PaginationResponse
-} from "../common/types/input-output-types/pagination-sort-types";
-import {commentsCollection} from "../db/mongoDb";
 
 const commentsService = {
-
-    async findComments(
-        sortQueryDto: PaginationAndSortFilterType,
-        postId: string
-    ): Promise<PaginationResponse<WithId<CommentDbType>> | null> {
-
-    },
 
     async createComment(data: CommentInputModel, postId: string, commentatorId: string): Promise<ResultType<string | null>> {
 
         const resultCheckPostId: ResultType<string | null> = await this.checkPostId(postId);
 
-        if (resultCheckPostId.status !== ResultStatusType.Success) return {
-            status: ResultStatusType.NotFound,
+        if (resultCheckPostId.status !== ResultStatus.Success) return {
+            status: ResultStatus.NotFound,
             errorMessage: 'there is no such post.',
             extensions: [{
                 field: 'postId',
@@ -41,6 +29,7 @@ const commentsService = {
             .findUser(commentatorId);
 
         const newComment: CommentDbType = {
+            postId,
             ...data,
             commentatorInfo: {
                 userId: String(commentator!._id),
@@ -53,15 +42,59 @@ const commentsService = {
             .insertComment(newComment);
 
         return {
-            status: ResultStatusType.Created,
+            status: ResultStatus.Created,
             extensions: [],
             data: String(result.insertedId)
         };
     },
+
+    async updateComment(id: string, data: CommentInputModel): Promise<ResultType> {
+            const updateResult: boolean = await commentRepository
+                .updateComment(id, data);
+
+            if (!updateResult) return {
+                status: ResultStatus.NotFound,
+                errorMessage: 'not found',
+                extensions: [{
+                    field: 'id',
+                    message: 'No comment with this id was found.'
+                }],
+                data: null
+            }
+
+            return {
+                status: ResultStatus.Success,
+                extensions: [],
+                data: null
+            };
+    },
+
+    async deleteComment(id: string): Promise<ResultType> {
+
+        const deleteResult: boolean = await commentRepository
+            .deleteComment(id);
+
+        if (!deleteResult) return {
+            status: ResultStatus.NotFound,
+            errorMessage: 'not found',
+            extensions: [{
+                field: 'id',
+                message: 'No comment with this id was found.'
+            }],
+            data: null
+        }
+
+        return {
+            status: ResultStatus.Success,
+            extensions: [],
+            data: null
+        }
+    },
+
     async checkPostId(postId: string): Promise<ResultType<string | null>> {
 
         if (!ObjectId.isValid(postId)) return {
-            status: ResultStatusType.BadRequest,
+            status: ResultStatus.BadRequest,
             errorMessage: 'postId invalid',
             extensions: [{
                 field: 'postId',
@@ -74,7 +107,7 @@ const commentsService = {
             .findPost(postId);
 
         if (!isExistPost) return {
-            status: ResultStatusType.NotFound,
+            status: ResultStatus.NotFound,
             errorMessage: 'there is no such post.',
             extensions: [{
                 field: 'postId',
@@ -84,7 +117,7 @@ const commentsService = {
         }
 
         return {
-            status: ResultStatusType.Success,
+            status: ResultStatus.Success,
             extensions: [],
             data: String(isExistPost._id)
         };

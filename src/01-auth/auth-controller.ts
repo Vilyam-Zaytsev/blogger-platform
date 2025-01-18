@@ -3,7 +3,7 @@ import {RequestWithBody, RequestWithUserId} from "../common/types/input-output-t
 import {LoginInputType} from "./types/login-input-type";
 import {authService} from "./auth-service";
 import {ResultType} from "../common/types/result-types/result-type";
-import {ResultStatusType} from "../common/types/result-types/result-status-type";
+import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
 import {OutputErrorsType} from "../common/types/input-output-types/output-errors-type";
@@ -28,7 +28,7 @@ const authController = {
         const result: ResultType<AccessTokenType | null> = await authService
             .login(authParams);
 
-        if (result.status !== ResultStatusType.Success) {
+        if (result.status !== ResultStatus.Success) {
             res
                 .status(mapResultStatusToHttpStatus(result.status))
                 .json(mapResultExtensionsToErrorMessage(result.extensions!));
@@ -37,7 +37,7 @@ const authController = {
         }
 
         res
-            .status(mapResultStatusToHttpStatus(ResultStatusType.Success))
+            .status(mapResultStatusToHttpStatus(ResultStatus.Success))
             .json({...result.data!});
     },
     me: async (

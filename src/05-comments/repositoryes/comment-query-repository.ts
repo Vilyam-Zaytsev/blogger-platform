@@ -1,30 +1,46 @@
 import {CommentDbType} from "../types/comment-db-type";
-import {ObjectId, WithId} from "mongodb";
+import {ObjectId, Sort, WithId} from "mongodb";
 import {commentsCollection} from "../../db/mongoDb";
 import {CommentViewModel} from "../types/input-output-types";
-import {
-    PaginationAndSortFilterType,
-    PaginationResponse
-} from "../../common/types/input-output-types/pagination-sort-types";
+import {PaginationAndSortFilterType, SortDirection} from "../../common/types/input-output-types/pagination-sort-types";
 
 const commentQueryRepository = {
 
-    async findComments(sortQueryDto: PaginationAndSortFilterType, postId: string): Promise<WithId<CommentDbType> | null> {
+    async findComments(sortQueryDto: PaginationAndSortFilterType, postId: string): Promise<CommentViewModel[]> {
 
-        const comment: WithId<CommentDbType> | null = await commentsCollection
-            .findOne({_id: new ObjectId(id)});
+        const {
+            pageNumber,
+            pageSize,
+            sortBy,
+            sortDirection,
+        } = sortQueryDto;
 
-        return this.mapToViewModel(comment!);
+        const comments: WithId<CommentDbType>[] | null = await commentsCollection
+            .find({postId})
+            .sort({[sortBy]: sortDirection === SortDirection.Ascending ? 1 : -1} as Sort)
+            .skip((pageNumber - 1) * pageSize)
+            .limit(pageSize)
+            .toArray();
+
+        return comments.map(c => this._mapDBCommentToViewModel(c))
     },
 
-    async findComment(id: string): Promise<WithId<CommentDbType> | null> {
+    async findComment(id: string): Promise<CommentViewModel | null> {
 
-        return  await commentsCollection
+        const comment: WithId<CommentDbType> | null =  await commentsCollection
             .findOne({_id: new ObjectId(id)});
+
+        if (!comment) return null;
+
+        return this._mapDBCommentToViewModel(comment);
     },
 
+    async getCommentsCount(postId: string): Promise<number> {
+        return await commentsCollection
+            .countDocuments({postId})
+    },
 
-    mapToViewModel(comment: WithId<CommentDbType>): CommentViewModel {
+    _mapDBCommentToViewModel(comment: WithId<CommentDbType>): CommentViewModel {
 
         return {
             id: String(comment._id),

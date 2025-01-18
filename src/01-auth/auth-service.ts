@@ -2,7 +2,7 @@ import {bcryptService} from "../common/services/bcrypt-service";
 import {LoginInputType} from "./types/login-input-type";
 import {UserDbType} from "../02-users/types/user-db-type";
 import {usersRepository} from "../02-users/repositoryes/users-repository";
-import {ResultStatusType} from "../common/types/result-types/result-status-type";
+import {ResultStatus} from "../common/types/result-types/result-status";
 import {ResultType} from "../common/types/result-types/result-type";
 import {jwtService} from "../common/services/jwt-service";
 import {WithId} from "mongodb";
@@ -13,8 +13,8 @@ const authService = {
 
         const result: ResultType<WithId<UserDbType> | null> = await this.checkUserCredentials(authParamsDto);
 
-        if (result.status !== ResultStatusType.Success) return {
-            status: ResultStatusType.Unauthorized,
+        if (result.status !== ResultStatus.Success) return {
+            status: ResultStatus.Unauthorized,
             errorMessage: 'auth data incorrect',
             extensions: [{
                 field: 'loginOrEmailOrPassword',
@@ -27,7 +27,7 @@ const authService = {
             .createToken(String(result.data!._id));
 
         return {
-            status: ResultStatusType.Success,
+            status: ResultStatus.Success,
             extensions: [],
             data: accessToken,
         }
@@ -44,7 +44,7 @@ const authService = {
 
         if (!isUser) {
             return {
-                status: ResultStatusType.NotFound,
+                status: ResultStatus.NotFound,
                 errorMessage: 'loginOrEmail incorrect',
                 extensions: [{
                     field: 'loginOrEmail',
@@ -59,7 +59,7 @@ const authService = {
 
         if (!isPasswordCorrect) {
             return {
-                status: ResultStatusType.BadRequest,
+                status: ResultStatus.BadRequest,
                 errorMessage: 'password incorrect',
                 extensions: [{
                     field: 'password',
@@ -70,7 +70,7 @@ const authService = {
         }
 
         return {
-            status: ResultStatusType.Success,
+            status: ResultStatus.Success,
             extensions: [],
             data: isUser
         };
