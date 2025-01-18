@@ -1,6 +1,6 @@
 import {console_log, encodingAdminDataInBase64, generateRandomString, req} from '../../helpers/test-helpers';
 import {SETTINGS} from "../../../src/common/settings";
-import {clearPresets, post, user} from "../../helpers/datasets-for-tests";
+import {clearPresets, comments, post, presets, user} from "../../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
 import {
@@ -19,6 +19,9 @@ import {CommentDbType} from "../../../src/05-comments/types/comment-db-type";
 import {UserDbType} from "../../../src/02-users/types/user-db-type";
 import {BlogDbType} from "../../../src/03-blogs/types/blog-db-type";
 import {PostDbType} from "../../../src/04-posts/types/post-db-type";
+import {blogsTestManager} from "../../helpers/blogs-test-manager";
+import {CommentViewModel} from "../../../src/05-comments/types/input-output-types";
+import {authTestManager} from "../../helpers/auth-test-manager";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -52,12 +55,34 @@ beforeEach(async () => {
 });
 
     describe('POST /comments', () => {
-        it('it should create a new comment if the user is logged in.', async () => {
+        it('should create a new comment if the user is logged in.', async () => {
+
+            const resCreatedBlogs: Response[] = await blogsTestManager
+                .createBlog(1);
+
+            const resCreatedPosts: Response[] = await postsTestManager
+                .createPost(1);
+
             const resCreatedUsers: Response[] = await usersTestManager
                 .createUser(1);
 
+            const resAuth: Response[] = await authTestManager
+                .login([resCreatedUsers[0].body.login]);
+
+            const resCreatedComment: Response = await req
+                .post(`${SETTINGS.PATH.POSTS}/${resCreatedPosts[0].body.id}${SETTINGS.PATH.COMMENTS}`)
+                .send({
+                    content: comments[0]
+                })
+                .set(
+                    'Authorization',
+                    `Bearer ${resAuth[0].body.accessToken}`
+                )
+                .expect(SETTINGS.HTTP_STATUSES.CREATED_201);
 
 
+
+            console.log(resCreatedComment.body)
         });
         // it('should not create a user if the admin is not authenticated.', async () => {
         //     const resPost: Response[] = await usersTestManager.createUser(

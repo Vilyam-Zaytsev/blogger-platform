@@ -3,7 +3,7 @@ import {SETTINGS} from "../../src/common/settings";
 import {Response} from "supertest";
 import {UserInputModel, UserViewModel} from "../../src/02-users/types/input-output-types";
 import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
-import {presets, user, usersLogins} from "./datasets-for-tests";
+import {presets, user, userLogins} from "./datasets-for-tests";
 
 const usersTestManager = {
     async createUser(numberOfUsers: number) {
@@ -16,11 +16,9 @@ const usersTestManager = {
         };
 
         for (let i = 0; i < numberOfUsers; i++) {
-            user.login = usersLogins[i];
-            user.email = `${usersLogins[i]}@example.com`;
-            user.password = usersLogins[i];
-
-            presets.users.push({...user});
+            user.login = userLogins[i];
+            user.email = `${userLogins[i]}@example.com`;
+            user.password = userLogins[i];
 
             const res: Response = await req
                 .post(SETTINGS.PATH.USERS)
@@ -34,12 +32,14 @@ const usersTestManager = {
                 )
                 .expect(SETTINGS.HTTP_STATUSES.CREATED_201);
 
-            expect(res.body).toEqual({
+            expect(res.body).toEqual<UserViewModel>({
                 id: expect.any(String),
-                login: `${presets.users[i].login}`,
-                email: `${presets.users[i].email}`,
+                login: userLogins[i],
+                email: `${userLogins[i]}@example.com`,
                 createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
             });
+
+            presets.users.push(res.body);
 
             responses.push(res);
         }
