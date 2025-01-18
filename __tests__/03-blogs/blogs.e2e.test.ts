@@ -4,14 +4,14 @@ import {
     encodingAdminDataInBase64,
     generateRandomString,
     req
-} from './helpers/test-helpers';
-import {SETTINGS} from "../src/common/settings";
-import {blog} from "./helpers/datasets-for-tests";
-import {blogsTestManager} from "./helpers/blogs-test-manager";
+} from '../helpers/test-helpers';
+import {SETTINGS} from "../../src/common/settings";
+import {blog} from "../helpers/datasets-for-tests";
+import {blogsTestManager} from "../helpers/blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
-import {blogsCollection, setBlogsCollection} from "../src/db/mongoDb";
-import {BlogDbType} from "../src/03-blogs/types/blog-db-type";
+import {blogsCollection, setBlogsCollection} from "../../src/db/mongoDb";
+import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;

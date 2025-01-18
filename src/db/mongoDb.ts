@@ -20,8 +20,12 @@ const setPostsCollection = (collection: Collection<PostDbType>) => {
     postsCollection = collection;
 };
 
-const setUserCollection = (collection: Collection<UserDbType>) => {
+const setUsersCollection = (collection: Collection<UserDbType>) => {
     usersCollection = collection;
+};
+
+const setCommentsCollection = (collection: Collection<CommentDbType>) => {
+    commentsCollection = collection;
 };
 
 async function runDb(url: string) {
@@ -51,7 +55,8 @@ async function runDb(url: string) {
 export {
     setBlogsCollection,
     setPostsCollection,
-    setUserCollection,
+    setUsersCollection,
+    setCommentsCollection,
     blogsCollection,
     postsCollection,
     usersCollection,
