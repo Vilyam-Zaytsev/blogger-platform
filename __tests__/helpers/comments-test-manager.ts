@@ -47,7 +47,7 @@ const commentsTestManager = {
         return responses;
     },
 
-
+//TODO вынести в отдельную функцию и протипизировать <>
     filterAndSort(
         items: CommentViewModel[],
         sortAndPaginationFilter: PaginationAndSortFilterType

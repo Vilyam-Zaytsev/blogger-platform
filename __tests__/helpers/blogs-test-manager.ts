@@ -9,6 +9,7 @@ const blogsTestManager = {
         const responses: Response[] = [];
 
         for (let i = 0; i < numberOfBlogs; i++) {
+
             const blog: BlogInputModel = {
                 name: blogNames[i],
                 description: blogDescriptions[i],
