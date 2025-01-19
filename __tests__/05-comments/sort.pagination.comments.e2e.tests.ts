@@ -76,7 +76,7 @@ describe('pagination and sort /comments', () => {
             .login(presets.users.map(u => u.login));
 
         await commentsTestManager
-            .createComments(11, 1);
+            .createComments(11);
 
         const resGetComments: Response = await req
             .get(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
@@ -166,7 +166,7 @@ describe('pagination and sort /comments', () => {
             .login(presets.users.map(u => u.login));
 
         await commentsTestManager
-            .createComments(11, 1);
+            .createComments(11);
 
         const resGetComments: Response = await req
             .get(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)

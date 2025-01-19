@@ -2,7 +2,11 @@ import {CommentDbType} from "../types/comment-db-type";
 import {ObjectId, Sort, WithId} from "mongodb";
 import {commentsCollection} from "../../db/mongoDb";
 import {CommentViewModel} from "../types/input-output-types";
-import {PaginationAndSortFilterType, SortDirection} from "../../common/types/input-output-types/pagination-sort-types";
+import {
+    PaginationAndSortFilterType,
+    PaginationResponse,
+    SortDirection
+} from "../../common/types/input-output-types/pagination-sort-types";
 
 const commentQueryRepository = {
 
@@ -20,14 +24,14 @@ const commentQueryRepository = {
             .sort({[sortBy]: sortDirection === SortDirection.Ascending ? 1 : -1} as Sort)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray();
+            .toArray()
 
-        return comments.map(c => this._mapDBCommentToViewModel(c))
+        return comments.map(c => this._mapDBCommentToViewModel(c));
     },
 
     async findComment(id: string): Promise<CommentViewModel | null> {
 
-        const comment: WithId<CommentDbType> | null =  await commentsCollection
+        const comment: WithId<CommentDbType> | null = await commentsCollection
             .findOne({_id: new ObjectId(id)});
 
         if (!comment) return null;
@@ -51,6 +55,20 @@ const commentQueryRepository = {
             },
             createdAt: comment.createdAt
         };
+    },
+    _mapCommentsViewModelToPaginationResponse(
+        comments: CommentViewModel[],
+        commentsCount: number,
+        paginationAndSortFilter: PaginationAndSortFilterType
+    ): PaginationResponse<CommentViewModel> {
+
+        return {
+            pagesCount: Math.ceil(commentsCount / paginationAndSortFilter.pageSize),
+            page: paginationAndSortFilter.pageNumber,
+            pageSize: paginationAndSortFilter.pageSize,
+            totalCount: commentsCount,
+            items: comments
+        }
     }
 };
 

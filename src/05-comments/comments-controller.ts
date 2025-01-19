@@ -30,7 +30,7 @@ const commentsController = {
 
         //TODO спросить на поддержке про данную реализацию проверки на корректность postId
         // и существование поста с таким id!!!
-        // (Правильно ли ее делать в контроллере через метод сервиса???)
+        // (Правильно ли ее делать в контроллере через метод сервиса или нужно делать только в контроллере???)
 
         const resultCheckPostId: ResultType<string | null> = await commentsService
             .checkPostId(postId);
@@ -59,18 +59,16 @@ const commentsController = {
         const commentsCount: number = await commentQueryRepository
             .getCommentsCount(postId);
 
-        //TODO спросить на поддержке:
-        // нормально ли формировать объект респонса в контроллере???
+        const paginationResponse: PaginationResponse<CommentViewModel> = await commentQueryRepository
+            ._mapCommentsViewModelToPaginationResponse(
+                foundComments,
+                commentsCount,
+                paginationAndSortFilter
+            );
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json({
-                pagesCount: Math.ceil(commentsCount / paginationAndSortFilter.pageSize),
-                page: paginationAndSortFilter.pageNumber,
-                pageSize: paginationAndSortFilter.pageSize,
-                totalCount: commentsCount,
-                items: foundComments
-            })
+            .json(paginationResponse)
     },
 
     async getComment(
@@ -93,7 +91,7 @@ const commentsController = {
             .json(foundComment);
     },
 
-    //TODO Если проверка postId в контроллере это нормально, то переделать проверку postId!!!
+    //TODO стоит ли делать проветку postId в контроллере???
 
     async createAndInsertComment(
         req: RequestWithParamsAndBody<IdType, CommentInputModel>,
@@ -130,6 +128,7 @@ const commentsController = {
     ) {
 
         const commentId: string = req.params.id;
+
         const dataForCommentUpdates: CommentInputModel = {
             content: req.body.content
         };

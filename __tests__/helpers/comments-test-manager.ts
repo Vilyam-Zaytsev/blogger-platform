@@ -10,7 +10,7 @@ import {
 
 const commentsTestManager = {
 
-    async createComments(numberOfPosts: number, numberOfCommentator: number) {
+    async createComments(numberOfPosts: number, numberOfCommentator: number = 1) {
 
         const responses: Response[] = [];
 

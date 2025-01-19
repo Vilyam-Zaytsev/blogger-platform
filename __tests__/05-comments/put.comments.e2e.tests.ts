@@ -17,10 +17,12 @@ import {postsTestManager} from "../helpers/posts-test-manager";
 import {usersTestManager} from "../helpers/users-test-manager";
 import {authTestManager} from "../helpers/auth-test-manager";
 import {Response} from "supertest";
-import {console_log, req} from "../helpers/test-helpers";
+import {console_log, generateRandomString, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
+import {OutputErrorsType} from "../../src/common/types/input-output-types/output-errors-type";
 import {PaginationResponse, SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
+import {commentsService} from "../../src/05-comments/comments-service";
 import {commentsTestManager} from "../helpers/comments-test-manager";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
 
@@ -55,30 +57,8 @@ beforeEach(async () => {
     clearPresets();
 });
 
-describe('GET /comments', () => {
-    it('should return an empty array.', async () => {
-
-        await blogsTestManager
-            .createBlog(1);
-
-        await postsTestManager
-            .createPost(1);
-
-        const resGetComments: Response = await req
-            .get(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
-        expect(resGetComments.body).toEqual<PaginationResponse<CommentViewModel>>({
-            pagesCount: 0,
-            page: 1,
-            pageSize: 10,
-            totalCount: 0,
-            items: []
-        });
-
-        console_log(resGetComments.body, resGetComments.status, 'Test 1: get(/comments)');
-    });
-    it('should return an array with a single comment.', async () => {
+describe('PUT /comments', () => {
+    it('should update the comment if the user is logged in.', async () => {
 
         await blogsTestManager
             .createBlog(1);
@@ -95,31 +75,33 @@ describe('GET /comments', () => {
         await commentsTestManager
             .createComments(1);
 
-        const resGetComments: Response = await req
-            .get(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
+        const resPutComments: Response = await req
+            .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
+            .set(
+                'Authorization',
+                `Bearer ${presets.accessTokens[0].accessToken}`
+            )
+            .send({
+                content: comments[1]
+            })
+            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+
+        const resGetComment: Response = await req
+            .get(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-        expect(resGetComments.body).toEqual<PaginationResponse<CommentViewModel>>({
-            pagesCount: 1,
-            page: 1,
-            pageSize: 10,
-            totalCount: 1,
-            items: [
-                {
-                    id: presets.comments[0].id,
-                    content: presets.comments[0].content,
-                    commentatorInfo: {
-                        userId: presets.users[0].id,
-                        userLogin: presets.users[0].login
-                    },
-                    createdAt: presets.comments[0].createdAt
-                }
-            ]
+        expect(resGetComment.body).toEqual<CommentViewModel>({
+
+            id: presets.comments[0].id,
+            content: comments[1],
+            commentatorInfo: {
+                userId: presets.users[0].id,
+                userLogin: presets.users[0].login
+            },
+            createdAt: presets.comments[0].createdAt
         })
 
-        expect(resGetComments.body.items.length).toEqual(1);
-
-        console_log(resGetComments.body, resGetComments.status, 'Test 2: get(/comments)');
+        console_log(resPutComments.body, resPutComments.status, 'Test 1: put(/comments)');
     });
     it('should return an array with three comments.', async () => {
 
