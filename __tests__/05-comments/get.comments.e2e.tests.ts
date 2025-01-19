@@ -6,25 +6,25 @@ import {
     setCommentsCollection,
     setPostsCollection,
     setUsersCollection, usersCollection
-} from "../../../src/db/mongoDb";
-import {UserDbType} from "../../../src/02-users/types/user-db-type";
-import {BlogDbType} from "../../../src/03-blogs/types/blog-db-type";
-import {PostDbType} from "../../../src/04-posts/types/post-db-type";
-import {CommentDbType} from "../../../src/05-comments/types/comment-db-type";
-import {clearPresets, comments, incorrectAccessToken, presets} from "../../helpers/datasets-for-tests";
-import {blogsTestManager} from "../../helpers/blogs-test-manager";
-import {postsTestManager} from "../../helpers/posts-test-manager";
-import {usersTestManager} from "../../helpers/users-test-manager";
-import {authTestManager} from "../../helpers/auth-test-manager";
+} from "../../src/db/mongoDb";
+import {UserDbType} from "../../src/02-users/types/user-db-type";
+import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
+import {PostDbType} from "../../src/04-posts/types/post-db-type";
+import {CommentDbType} from "../../src/05-comments/types/comment-db-type";
+import {clearPresets, comments, incorrectAccessToken, presets} from "../helpers/datasets-for-tests";
+import {blogsTestManager} from "../helpers/blogs-test-manager";
+import {postsTestManager} from "../helpers/posts-test-manager";
+import {usersTestManager} from "../helpers/users-test-manager";
+import {authTestManager} from "../helpers/auth-test-manager";
 import {Response} from "supertest";
-import {console_log, generateRandomString, req} from "../../helpers/test-helpers";
-import {SETTINGS} from "../../../src/common/settings";
-import {CommentViewModel} from "../../../src/05-comments/types/input-output-types";
-import {OutputErrorsType} from "../../../src/common/types/input-output-types/output-errors-type";
-import {PaginationResponse, SortDirection} from "../../../src/common/types/input-output-types/pagination-sort-types";
-import {commentsService} from "../../../src/05-comments/comments-service";
-import {commentsTestManager} from "../../helpers/comments-test-manager";
-import {createPaginationAndSortFilter} from "../../../src/common/helpers/create-pagination-and-sort-filter";
+import {console_log, generateRandomString, req} from "../helpers/test-helpers";
+import {SETTINGS} from "../../src/common/settings";
+import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
+import {OutputErrorsType} from "../../src/common/types/input-output-types/output-errors-type";
+import {PaginationResponse, SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
+import {commentsService} from "../../src/05-comments/comments-service";
+import {commentsTestManager} from "../helpers/comments-test-manager";
+import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;

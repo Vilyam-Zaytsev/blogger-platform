@@ -10,7 +10,7 @@ import {
 
 const commentsTestManager = {
 
-    async createComments(numberOfPosts: number) {
+    async createComments(numberOfPosts: number, numberOfCommentator: number) {
 
         const responses: Response[] = [];
 
@@ -24,7 +24,7 @@ const commentsTestManager = {
                 .send(comment)
                 .set(
                     'Authorization',
-                    `Bearer ${presets.accessTokens[0].accessToken}`
+                    `Bearer ${presets.accessTokens[i < numberOfCommentator ? i : 0].accessToken}`
                 )
                 .expect(SETTINGS.HTTP_STATUSES.CREATED_201);
 
@@ -32,8 +32,8 @@ const commentsTestManager = {
                 id: expect.any(String),
                 content: comments[i],
                 commentatorInfo: {
-                    userId: presets.users[0].id,
-                    userLogin: presets.users[0].login
+                    userId: presets.users[i < numberOfCommentator ? i : 0].id,
+                    userLogin: presets.users[i < numberOfCommentator ? i : 0].login
                 },
                 createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
             });
@@ -48,9 +48,10 @@ const commentsTestManager = {
     },
 
 //TODO вынести в отдельную функцию и протипизировать <>
-    filterAndSort(
-        items: CommentViewModel[],
-        sortAndPaginationFilter: PaginationAndSortFilterType
+    filterAndSort<T>(
+        items: T[],
+        sortAndPaginationFilter: PaginationAndSortFilterType,
+        propertyMap: Record<string, string>
     ) {
 
         const {
@@ -63,18 +64,28 @@ const commentsTestManager = {
         let startIndex = (pageNumber - 1) * pageSize;
         let endIndex = startIndex + pageSize;
 
+        const path: string = propertyMap[sortBy];
+
+        if (!path) throw new Error(`Invalid sortBy property: ${sortBy}`);
+
+        const getValueByPath = (obj: T, path: string): any => {
+            return path.split('.').reduce((acc: any, key) => acc && acc[key], obj);
+        };
+
         return items
-            .sort((a: CommentViewModel, b: CommentViewModel) => {
-                const key = sortBy as keyof CommentViewModel;
+            .sort((a: T, b: T) => {
+
+                const aValue = getValueByPath(a, path);
+                const bValue = getValueByPath(b, path);
 
                 if (sortDirection === SortDirection.Descending) {
-                    if (a[key] < b[key]) return 1;
-                    if (a[key] > b[key]) return -1;
+                    if (aValue < bValue) return 1;
+                    if (aValue > bValue) return -1;
                     return 0;
                 }
                 if (sortDirection === SortDirection.Ascending) {
-                    if (a[key] < b[key]) return -1;
-                    if (a[key] > b[key]) return 1;
+                    if (aValue < bValue) return -1;
+                    if (aValue > bValue) return 1;
                     return 0;
                 }
 

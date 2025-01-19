@@ -31,6 +31,14 @@ const user: UserDbType = {
     createdAt: new Date().toISOString(),
 } as const;
 
+const commentPropertyMap: Record<string, string> = {
+    id: 'id',
+    content: 'content',
+    userLogin: 'commentatorInfo.userLogin',
+    userId: 'commentatorInfo.userId',
+    createdAt: 'createdAt'
+};
+
 const clearPresets = () => {
     presets.users = [];
     presets.blogs = [];
@@ -169,6 +177,7 @@ export {
     blog,
     post,
     user,
+    commentPropertyMap,
     presets,
     userLogins,
     blogNames,

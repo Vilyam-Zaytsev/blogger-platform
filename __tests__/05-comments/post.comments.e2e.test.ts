@@ -1,6 +1,6 @@
-import {console_log, generateRandomString, req} from '../../helpers/test-helpers';
-import {SETTINGS} from "../../../src/common/settings";
-import {clearPresets, comments, incorrectAccessToken, post, presets, user} from "../../helpers/datasets-for-tests";
+import {console_log, generateRandomString, req} from '../helpers/test-helpers';
+import {SETTINGS} from "../../src/common/settings";
+import {clearPresets, comments, incorrectAccessToken, post, presets, user} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
 import {
@@ -10,18 +10,18 @@ import {
     setCommentsCollection, setPostsCollection,
     setUsersCollection,
     usersCollection
-} from "../../../src/db/mongoDb";
-import {postsTestManager} from "../../helpers/posts-test-manager";
+} from "../../src/db/mongoDb";
+import {postsTestManager} from "../helpers/posts-test-manager";
 import {Response} from "supertest";
-import {usersTestManager} from "../../helpers/users-test-manager";
-import {CommentDbType} from "../../../src/05-comments/types/comment-db-type";
-import {UserDbType} from "../../../src/02-users/types/user-db-type";
-import {BlogDbType} from "../../../src/03-blogs/types/blog-db-type";
-import {PostDbType} from "../../../src/04-posts/types/post-db-type";
-import {blogsTestManager} from "../../helpers/blogs-test-manager";
-import {CommentViewModel} from "../../../src/05-comments/types/input-output-types";
-import {authTestManager} from "../../helpers/auth-test-manager";
-import {OutputErrorsType} from "../../../src/common/types/input-output-types/output-errors-type";
+import {usersTestManager} from "../helpers/users-test-manager";
+import {CommentDbType} from "../../src/05-comments/types/comment-db-type";
+import {UserDbType} from "../../src/02-users/types/user-db-type";
+import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
+import {PostDbType} from "../../src/04-posts/types/post-db-type";
+import {blogsTestManager} from "../helpers/blogs-test-manager";
+import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
+import {authTestManager} from "../helpers/auth-test-manager";
+import {OutputErrorsType} from "../../src/common/types/input-output-types/output-errors-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
