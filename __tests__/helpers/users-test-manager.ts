@@ -9,16 +9,12 @@ const usersTestManager = {
     async createUser(numberOfUsers: number) {
         const responses: Response[] = [];
 
-        const user: UserInputModel = {
-            login: '',
-            email: '',
-            password: ''
-        };
-
         for (let i = 0; i < numberOfUsers; i++) {
-            user.login = userLogins[i];
-            user.email = `${userLogins[i]}@example.com`;
-            user.password = userLogins[i];
+            const user: UserInputModel = {
+                login: userLogins[i],
+                email: `${userLogins[i]}@example.com`,
+                password: userLogins[i]
+            }
 
             const res: Response = await req
                 .post(SETTINGS.PATH.USERS)

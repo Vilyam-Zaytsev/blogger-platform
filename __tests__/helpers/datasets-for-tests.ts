@@ -5,6 +5,7 @@ import {UserInputModel, UserViewModel} from "../../src/02-users/types/input-outp
 import {BlogInputModel, BlogViewModel} from "../../src/03-blogs/types/input-output-types";
 import {PostInputModel, PostViewModel} from "../../src/04-posts/types/input-output-types";
 import {CommentInputModel, CommentViewModel} from "../../src/05-comments/types/input-output-types";
+import {AccessTokenType} from "../../src/01-auth/types/access-token-type";
 
 const blog: BlogDbType = {
     name: 'BLOG',
@@ -35,20 +36,23 @@ const clearPresets = () => {
     presets.blogs = [];
     presets.posts = [];
     presets.comments = [];
+    presets.accessTokens = [];
 };
 
-    type PresetsType = {
+type PresetsType = {
     users: UserViewModel[],
     blogs: BlogViewModel[],
     posts: PostViewModel[],
-    comments: CommentViewModel[]
+    comments: CommentViewModel[],
+    accessTokens: AccessTokenType[],
 };
 
 const presets: PresetsType = {
     users: [],
     blogs: [],
     posts: [],
-    comments: []
+    comments: [],
+    accessTokens: []
 };
 
 const userLogins = [
@@ -159,7 +163,7 @@ const comments = [
     "Your article stood out because of its clarity and depth. It's both informative and engaging!"
 ] as const;
 
-const incorrectAccessToken: string = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzg2NjQxNmU0M2Y5MzM1NjlmYjllMmIiLCJpYXQiOjE3MzY4NjA2OTQsImV4cCI6MTczNzAzMzQ5NH0.YSZz3-eZv0lJeqKhpBjq0TUcAt2FGUiI1bh0aBqgNbY` as const;
+const incorrectAccessToken: string = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzhjYzM2OTVjYzhmZGNhOTJmYmRhMGIiLCJpYXQiOjE3MzcyNzgzMTMsImV4cCI6MTczNzQ1MTExM30.QLIihOZrSXgUqLF77cvR183E9n0mgMzTVhfKHCFDcWY` as const;
 
 export {
     blog,

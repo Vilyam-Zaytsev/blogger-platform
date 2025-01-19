@@ -8,16 +8,12 @@ const blogsTestManager = {
     async createBlog(numberOfBlogs: number) {
         const responses: Response[] = [];
 
-        const blog: BlogInputModel = {
-            name: '',
-            description: '',
-            websiteUrl: ''
-        };
-
         for (let i = 0; i < numberOfBlogs; i++) {
-            blog.name = blogNames[i];
-            blog.description = blogDescriptions[i];
-            blog.websiteUrl = `https://${blogNames[i].toLowerCase()}.com`
+            const blog: BlogInputModel = {
+                name: blogNames[i],
+                description: blogDescriptions[i],
+                websiteUrl: `https://${blogNames[i].toLowerCase()}.com`
+            };
 
             const res: Response = await req
                 .post(SETTINGS.PATH.BLOGS)
@@ -60,17 +56,17 @@ const blogsTestManager = {
         let finishIndex = startIndex + pageSize;
 
         if (!searchNameTerm) {
-        return items
-            .sort((a: BlogViewModel, b: BlogViewModel) => {
-                return a[sortBy] > b[sortBy]
-                    ? sortDirection === 'desc' ? -1 : 1
-                    : a[sortBy] < b[sortBy]
-                        ? sortDirection === 'desc' ? 1 : -1
-                        : sortDirection === 'desc' ? -1 : 1
-            })
-            .filter((b, i) => {
-                return  i >= startIndex && i < finishIndex ? b : null;
-            })
+            return items
+                .sort((a: BlogViewModel, b: BlogViewModel) => {
+                    return a[sortBy] > b[sortBy]
+                        ? sortDirection === 'desc' ? -1 : 1
+                        : a[sortBy] < b[sortBy]
+                            ? sortDirection === 'desc' ? 1 : -1
+                            : sortDirection === 'desc' ? -1 : 1
+                })
+                .filter((b, i) => {
+                    return i >= startIndex && i < finishIndex ? b : null;
+                })
         } else {
             return items
                 .filter(b => b.name.includes(searchNameTerm) ? b : null)
@@ -82,7 +78,7 @@ const blogsTestManager = {
                             : sortDirection === 'desc' ? -1 : 1
                 })
                 .filter((b, i) => {
-                    return  i >= startIndex && i < finishIndex ? b : null;
+                    return i >= startIndex && i < finishIndex ? b : null;
                 })
         }
 

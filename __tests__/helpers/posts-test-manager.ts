@@ -14,18 +14,13 @@ const postsTestManager = {
     async createPost(numberOfPosts: number) {
         const responses: Response[] = [];
 
-        const post: PostInputModel = {
-            title: '',
-            shortDescription: '',
-            content: '',
-            blogId: ''
-        };
-
         for (let i = 0; i < numberOfPosts; i++) {
-            post.title = postTitles[i];
-            post.shortDescription = postShortDescriptions[i];
-            post.content = postContents[i];
-            post.blogId = presets.blogs[0].id
+            const post: PostInputModel = {
+                title: postTitles[i],
+                shortDescription: postShortDescriptions[i],
+                content: postContents[i],
+                blogId: presets.blogs[0].id
+            }
 
             const res: Response = await req
                 .post(SETTINGS.PATH.POSTS)

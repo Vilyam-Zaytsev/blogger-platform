@@ -6,7 +6,7 @@ const commentContentInputValidator =
         .withMessage('The "content" field must be of the string type.')
         .trim()
         .isLength({min: 20, max: 300})
-        .withMessage('The length of the "title" field should be from 1 to 30.');
+        .withMessage('The length of the "content" field should be from 20 to 300.');
 
 export {
     commentContentInputValidator,

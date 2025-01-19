@@ -2,6 +2,7 @@ import {Response} from "supertest";
 import {req} from "./test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {AccessTokenType} from "../../src/01-auth/types/access-token-type";
+import {presets} from "./datasets-for-tests";
 
 const authTestManager = {
     async login(logins: string[]) {
@@ -21,6 +22,8 @@ const authTestManager = {
                     accessToken: expect.any(String)
                 })
             );
+
+            presets.accessTokens.push(res.body);
 
             responses.push(res);
         }
