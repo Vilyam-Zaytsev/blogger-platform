@@ -13,7 +13,7 @@ const commentsService = {
 
     async createComment(data: CommentInputModel, postId: string, commentatorId: string): Promise<ResultType<string | null>> {
 
-        const resultCheckPostId: ResultType<string | null> = await this.checkPostId(postId);
+        const resultCheckPostId: ResultType<string | null> = await this._checkPostId(postId);
 
         if (resultCheckPostId.status !== ResultStatus.Success) return {
             status: ResultStatus.NotFound,
@@ -48,25 +48,32 @@ const commentsService = {
         };
     },
 
-    async updateComment(id: string, data: CommentInputModel): Promise<ResultType> {
-            const updateResult: boolean = await commentRepository
-                .updateComment(id, data);
+    async updateComment(commentId: string, userId: string, data: CommentInputModel): Promise<ResultType> {
 
-            if (!updateResult) return {
-                status: ResultStatus.NotFound,
-                errorMessage: 'not found',
-                extensions: [{
-                    field: 'id',
-                    message: 'No comment with this id was found.'
-                }],
-                data: null
-            }
+        const resultCheckingExistenceCommentAndOwner: ResultType = await this._checkingExistenceCommentAndOwner(commentId, userId);
 
-            return {
-                status: ResultStatus.Success,
-                extensions: [],
-                data: null
-            };
+        if (resultCheckingExistenceCommentAndOwner.status !== ResultStatus.Success) return resultCheckingExistenceCommentAndOwner;
+
+        const updateResult: boolean = await commentRepository
+            .updateComment(commentId, data);
+
+        //TODO какой статус возвращать в этом случае???
+
+        if (!updateResult) return {
+            status: ResultStatus.NotFound,
+            errorMessage: 'not found',
+            extensions: [{
+                field: 'id',
+                message: 'No comment with this ID was found.'
+            }],
+            data: null
+        }
+
+        return {
+            status: ResultStatus.Success,
+            extensions: [],
+            data: null
+        };
     },
 
     async deleteComment(id: string): Promise<ResultType> {
@@ -91,7 +98,7 @@ const commentsService = {
         }
     },
 
-    async checkPostId(postId: string): Promise<ResultType<string | null>> {
+    async _checkPostId(postId: string): Promise<ResultType<string | null>> {
 
         if (!ObjectId.isValid(postId)) return {
             status: ResultStatus.BadRequest,
@@ -120,6 +127,40 @@ const commentsService = {
             status: ResultStatus.Success,
             extensions: [],
             data: String(isExistPost._id)
+        };
+    },
+
+    //TODO нормально ли делать две проверки в одном методе?
+
+    async _checkingExistenceCommentAndOwner( commentId: string, userId: string): Promise<ResultType> {
+
+        const comment: WithId<CommentDbType> | null = await commentRepository
+            .findComment(commentId);
+
+        if (!comment) return {
+            status: ResultStatus.NotFound,
+            errorMessage: 'comment not found.',
+            extensions: [{
+                field: 'commentId',
+                message: 'There is no comment with this ID.'
+            }],
+            data: null
+        }
+
+        if (comment.commentatorInfo.userId !== userId) return {
+            status: ResultStatus.Forbidden,
+            errorMessage: 'is not the owner.',
+            extensions: [{
+                field: 'userId',
+                message: 'This user is not the owner of this comment.'
+            }],
+            data: null
+        }
+
+        return {
+            status: ResultStatus.Success,
+            extensions: [],
+            data: null
         };
     }
 };

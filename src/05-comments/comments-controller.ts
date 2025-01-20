@@ -33,7 +33,7 @@ const commentsController = {
         // (Правильно ли ее делать в контроллере через метод сервиса или нужно делать только в контроллере???)
 
         const resultCheckPostId: ResultType<string | null> = await commentsService
-            .checkPostId(postId);
+            ._checkPostId(postId);
 
         if (resultCheckPostId.status !== ResultStatus.Success) {
             res
@@ -129,12 +129,14 @@ const commentsController = {
 
         const commentId: string = req.params.id;
 
+        const userId: string = String(req.user?.id);
+
         const dataForCommentUpdates: CommentInputModel = {
             content: req.body.content
         };
 
         const updateResult: ResultType = await commentsService
-            .updateComment(commentId, dataForCommentUpdates);
+            .updateComment(commentId, userId, dataForCommentUpdates);
 
         if (updateResult.status !== ResultStatus.Success) {
             res

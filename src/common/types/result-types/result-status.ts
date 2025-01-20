@@ -1,10 +1,10 @@
 enum ResultStatus {
     Success = 'Success',
     Created = 'Created',
-    NoContent= 'NoContent',
-    NotFound = 'NotFound',
     BadRequest = 'BadRequest',
     Unauthorized = 'Unauthorized',
+    Forbidden = 'Forbidden',
+    NotFound = 'NotFound',
     InternalServerError = 'InternalServerError'
 }
 

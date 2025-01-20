@@ -1,9 +1,15 @@
 import {CommentDbType} from "../types/comment-db-type";
-import {InsertOneResult, ObjectId} from "mongodb";
+import {InsertOneResult, ObjectId, WithId} from "mongodb";
 import {commentsCollection} from "../../db/mongoDb";
-import {CommentInputModel} from "../types/input-output-types";
+import {CommentInputModel, CommentViewModel} from "../types/input-output-types";
 
 const commentRepository = {
+
+    async findComment(id: string): Promise<WithId<CommentDbType> | null> {
+
+        return  await commentsCollection
+            .findOne({_id: new ObjectId(id)});
+    },
 
     async insertComment(newComment: CommentDbType): Promise<InsertOneResult> {
         return await commentsCollection
