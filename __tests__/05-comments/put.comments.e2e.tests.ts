@@ -21,7 +21,7 @@ import {console_log, generateRandomString, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
 import {OutputErrorsType} from "../../src/common/types/input-output-types/output-errors-type";
-import {commentsTestManager} from "../helpers/managers/05_comments-test-manager";
+import {commentsTestManager} from "../helpers/managers/comments-test-manager";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
