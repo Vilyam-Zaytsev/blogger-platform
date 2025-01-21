@@ -152,12 +152,19 @@ const commentsController = {
         req: RequestWithParams<IdType>,
         res: Response
     ) {
+
+        const commentId: string = req.params.id;
+
+        const userId: string = String(req.user?.id);
+
         const deleteResult: ResultType = await commentsService
-            .deleteComment(req.params.id);
+            .deleteComment(commentId, userId);
 
         if (deleteResult.status !== ResultStatus.Success) {
             res
                 .sendStatus(mapResultStatusToHttpStatus(deleteResult.status));
+
+            return;
         }
 
         res

@@ -171,7 +171,7 @@ const comments = [
     "Your article stood out because of its clarity and depth. It's both informative and engaging!"
 ] as const;
 
-const incorrectAccessToken: string = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzhjYzM2OTVjYzhmZGNhOTJmYmRhMGIiLCJpYXQiOjE3MzcyNzgzMTMsImV4cCI6MTczNzQ1MTExM30.QLIihOZrSXgUqLF77cvR183E9n0mgMzTVhfKHCFDcWY` as const;
+const incorrectAccessToken: string = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzhmOTA4NDIwZmJmZTBkNmI0ODkyMmUiLCJpYXQiOjE3Mzc0NjE4OTIsImV4cCI6MTczNzYzNDY5Mn0.B_cIie4YjmbWj6J2X1JQejngzqRgqkWwpr_1acffjo8` as const;
 
 export {
     blog,

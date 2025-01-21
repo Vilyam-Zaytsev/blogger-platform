@@ -13,6 +13,9 @@ commentsRouter.put('/:id',
     inputCheckErrorsMiddleware,
     commentsController.updateComment
 );
-commentsRouter.delete('/:id', commentsController.deleteComment);
+commentsRouter.delete('/:id',
+    bearerAuthorizationMiddleware,
+    commentsController.deleteComment
+);
 
 export {commentsRouter};

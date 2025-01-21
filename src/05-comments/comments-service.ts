@@ -76,10 +76,16 @@ const commentsService = {
         };
     },
 
-    async deleteComment(id: string): Promise<ResultType> {
+    async deleteComment(commentId: string, userId: string): Promise<ResultType> {
+
+        const resultCheckingExistenceCommentAndOwner: ResultType = await this._checkingExistenceCommentAndOwner(commentId, userId);
+
+        if (resultCheckingExistenceCommentAndOwner.status !== ResultStatus.Success) return resultCheckingExistenceCommentAndOwner;
 
         const deleteResult: boolean = await commentRepository
-            .deleteComment(id);
+            .deleteComment(commentId);
+
+        //TODO какой статус возвращать в этом случае???
 
         if (!deleteResult) return {
             status: ResultStatus.NotFound,
