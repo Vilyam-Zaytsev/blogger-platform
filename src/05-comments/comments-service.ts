@@ -85,7 +85,7 @@ const commentsService = {
         const deleteResult: boolean = await commentRepository
             .deleteComment(commentId);
 
-        //TODO какой статус возвращать в этом случае???
+        //TODO какой статус возвращать в этом случае !!!500???
 
         if (!deleteResult) return {
             status: ResultStatus.NotFound,
@@ -138,12 +138,10 @@ const commentsService = {
 
     //TODO нормально ли делать две проверки в одном методе?
 
-    async _checkingExistenceCommentAndOwner( commentId: string, userId: string): Promise<ResultType> {
-
-        const comment: WithId<CommentDbType> | null = await commentRepository
-            .findComment(commentId);
+    async _checkingExistenceCommentAndOwner( comment: WithId<CommentDbType> | null , userId: string): Promise<ResultType> {
 
         if (!comment) return {
+
             status: ResultStatus.NotFound,
             errorMessage: 'comment not found.',
             extensions: [{

@@ -1,9 +1,9 @@
-import {encodingAdminDataInBase64, req} from "./test-helpers";
-import {SETTINGS} from "../../src/common/settings";
+import {encodingAdminDataInBase64, req} from "../test-helpers";
+import {SETTINGS} from "../../../src/common/settings";
 import {Response} from "supertest";
-import {UserInputModel, UserViewModel} from "../../src/02-users/types/input-output-types";
-import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
-import {presets, user, userLogins} from "./datasets-for-tests";
+import {UserInputModel, UserViewModel} from "../../../src/02-users/types/input-output-types";
+import {SortDirection} from "../../../src/common/types/input-output-types/pagination-sort-types";
+import {presets, user, userLogins} from "../datasets-for-tests";
 
 const usersTestManager = {
     async createUser(numberOfUsers: number) {

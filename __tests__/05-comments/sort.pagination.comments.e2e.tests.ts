@@ -17,16 +17,16 @@ import {
     comments,
     presets,
 } from "../helpers/datasets-for-tests";
-import {blogsTestManager} from "../helpers/blogs-test-manager";
-import {postsTestManager} from "../helpers/posts-test-manager";
-import {usersTestManager} from "../helpers/users-test-manager";
-import {authTestManager} from "../helpers/auth-test-manager";
+import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
+import {postsTestManager} from "../helpers/managers/04_posts-test-manager";
+import {usersTestManager} from "../helpers/managers/02_users-test-manager";
+import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {Response} from "supertest";
 import {console_log, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
 import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
-import {commentsTestManager} from "../helpers/comments-test-manager";
+import {commentsTestManager} from "../helpers/managers/05_comments-test-manager";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
 
 let mongoServer: MongoMemoryServer;

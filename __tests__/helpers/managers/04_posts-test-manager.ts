@@ -1,14 +1,14 @@
 import {Response} from "supertest";
-import {PostInputModel, PostViewModel} from "../../src/04-posts/types/input-output-types";
+import {PostInputModel, PostViewModel} from "../../../src/04-posts/types/input-output-types";
 import {
     blogNames,
     postContents,
     postShortDescriptions,
     postTitles,
     presets
-} from "./datasets-for-tests";
-import {encodingAdminDataInBase64, req} from "./test-helpers";
-import {SETTINGS} from "../../src/common/settings";
+} from "../datasets-for-tests";
+import {encodingAdminDataInBase64, req} from "../test-helpers";
+import {SETTINGS} from "../../../src/common/settings";
 
 const postsTestManager = {
     async createPost(numberOfPosts: number) {
