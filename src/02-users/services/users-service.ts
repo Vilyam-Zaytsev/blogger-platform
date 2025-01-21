@@ -3,7 +3,7 @@ import {UserDbType} from "../types/user-db-type";
 import {usersRepository} from "../repositoryes/users-repository";
 import {bcryptService} from "../../common/services/bcrypt-service";
 import {ResultType} from "../../common/types/result-types/result-type";
-import {ResultStatusType} from "../../common/types/result-types/result-status-type";
+import {ResultStatus} from "../../common/types/result-types/result-status";
 
 const usersService = {
     async createUser(data: UserInputModel): Promise<ResultType<string | null>> {
@@ -16,7 +16,7 @@ const usersService = {
 
         const resultCandidateValidation: ResultType = await this.validateCandidateUniqueness(login, email);
 
-        if (resultCandidateValidation.status !== ResultStatusType.Success) return resultCandidateValidation
+        if (resultCandidateValidation.status !== ResultStatus.Success) return resultCandidateValidation
 
         const passwordHash = await bcryptService.generateHash(password);
 
@@ -31,7 +31,7 @@ const usersService = {
             .insertUser(newUser);
 
         return {
-            status: ResultStatusType.Created,
+            status: ResultStatus.Created,
             extensions: [],
             data: String(result.insertedId)
         }
@@ -47,7 +47,7 @@ const usersService = {
 
         if (findByLogin) {
             return {
-                status: ResultStatusType.BadRequest,
+                status: ResultStatus.BadRequest,
                 errorMessage: 'Login incorrect',
                 extensions: [{
                     field: 'login',
@@ -62,7 +62,7 @@ const usersService = {
 
         if (findByEmail) {
             return {
-                status: ResultStatusType.BadRequest,
+                status: ResultStatus.BadRequest,
                 errorMessage: 'Email incorrect',
                 extensions: [{
                     field: 'email',
@@ -74,7 +74,7 @@ const usersService = {
 
 
         return {
-            status: ResultStatusType.Success,
+            status: ResultStatus.Success,
             extensions: [],
             data: null
         };

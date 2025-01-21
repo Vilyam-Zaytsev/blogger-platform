@@ -3,11 +3,14 @@ import {SETTINGS} from "../common/settings";
 import {BlogDbType} from "../03-blogs/types/blog-db-type";
 import {PostDbType} from "../04-posts/types/post-db-type";
 import {UserDbType} from "../02-users/types/user-db-type";
+import {CommentDbType} from "../05-comments/types/comment-db-type";
 
 let blogsCollection: Collection<BlogDbType>;
 let postsCollection: Collection<PostDbType>;
 
 let usersCollection: Collection<UserDbType>;
+
+let commentsCollection: Collection<CommentDbType>;
 
 const setBlogsCollection = (collection: Collection<BlogDbType>) => {
     blogsCollection = collection;
@@ -17,8 +20,12 @@ const setPostsCollection = (collection: Collection<PostDbType>) => {
     postsCollection = collection;
 };
 
-const setUserCollection = (collection: Collection<UserDbType>) => {
+const setUsersCollection = (collection: Collection<UserDbType>) => {
     usersCollection = collection;
+};
+
+const setCommentsCollection = (collection: Collection<CommentDbType>) => {
+    commentsCollection = collection;
 };
 
 async function runDb(url: string) {
@@ -28,6 +35,7 @@ async function runDb(url: string) {
     blogsCollection = db.collection<BlogDbType>('blogs');
     postsCollection = db.collection<PostDbType>('posts');
     usersCollection = db.collection<UserDbType>('users');
+    commentsCollection = db.collection<CommentDbType>('comments');
     try {
         await client.connect();
         await db.command({ping: 1});
@@ -47,9 +55,11 @@ async function runDb(url: string) {
 export {
     setBlogsCollection,
     setPostsCollection,
-    setUserCollection,
+    setUsersCollection,
+    setCommentsCollection,
     blogsCollection,
     postsCollection,
     usersCollection,
+    commentsCollection,
     runDb
 };

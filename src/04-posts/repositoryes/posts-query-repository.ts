@@ -34,7 +34,7 @@ const postsQueryRepository = {
             MatchMode.Exact
         );
 
-        return postsCollection
+        return await postsCollection
             .countDocuments(filter);
     },
     async findPost(id: string): Promise<WithId<PostDbType> | null> {

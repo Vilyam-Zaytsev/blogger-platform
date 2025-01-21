@@ -1,8 +1,8 @@
-import {ResultStatusType} from "./result-status-type";
+import {ResultStatus} from "./result-status";
 import {ExtensionsType} from "./extensions-type";
 
 type ResultType<T = null> = {
-    status: ResultStatusType,
+    status: ResultStatus,
     errorMessage?: string,
     extensions: ExtensionsType,
     data: T

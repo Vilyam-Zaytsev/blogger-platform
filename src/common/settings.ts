@@ -13,6 +13,7 @@ const SETTINGS = {
         USERS: '/users',
         BLOGS: '/blogs',
         POSTS: '/posts',
+        COMMENTS: '/comments',
         TESTS: '/testing/all-data',
     },
     ADMIN_DATA: {
@@ -25,6 +26,7 @@ const SETTINGS = {
         NO_CONTENT_204: 204,
         BAD_REQUEST_400: 400,
         UNAUTHORIZED_401: 401,
+        FORBIDDEN_403: 403,
         NOT_FOUND_404: 404
     },
     MONGO_URL: process.env.MONGO_URL || 'mongodb://localhost:27017',

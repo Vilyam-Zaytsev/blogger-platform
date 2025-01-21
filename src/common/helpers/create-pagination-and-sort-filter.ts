@@ -6,7 +6,7 @@ import {
 
 
 // TODO: unit tests
-const configPaginationAndSortParams = (params: SortingAndPaginationParamsType): PaginationAndSortFilterType => {
+const createPaginationAndSortFilter = (params: SortingAndPaginationParamsType): PaginationAndSortFilterType => {
 
     const pageNumber: number =
         params.pageNumber
@@ -54,4 +54,4 @@ const configPaginationAndSortParams = (params: SortingAndPaginationParamsType): 
     };
 };
 
-export {configPaginationAndSortParams};
+export {createPaginationAndSortFilter};

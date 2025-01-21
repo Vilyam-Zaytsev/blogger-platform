@@ -1,14 +1,20 @@
-import {ResultStatusType} from "../types/result-types/result-status-type";
+import {ResultStatus} from "../types/result-types/result-status";
 import {SETTINGS} from "../settings";
 
-const mapResultStatusToHttpStatus = (resultStatus: ResultStatusType): number => {
+const mapResultStatusToHttpStatus = (resultStatus: ResultStatus): number => {
     switch (resultStatus) {
-        case ResultStatusType.Success:
+        case ResultStatus.Success:
             return SETTINGS.HTTP_STATUSES.OK_200;
-        case ResultStatusType.Unauthorized:
-            return SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401;
-        case ResultStatusType.BadRequest:
+        case ResultStatus.Created:
+            return SETTINGS.HTTP_STATUSES.CREATED_201;
+        case ResultStatus.BadRequest:
             return SETTINGS.HTTP_STATUSES.BAD_REQUEST_400;
+        case ResultStatus.Unauthorized:
+            return SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401;
+            case ResultStatus.Forbidden:
+            return SETTINGS.HTTP_STATUSES.FORBIDDEN_403;
+        case ResultStatus.NotFound:
+            return SETTINGS.HTTP_STATUSES.NOT_FOUND_404;
         default:
             return 1;
     }

@@ -1,5 +1,5 @@
 type PostsSearchFilterType = {
-    blogId?: string | null,
+    blogId?: string,
 };
 
 export {PostsSearchFilterType};

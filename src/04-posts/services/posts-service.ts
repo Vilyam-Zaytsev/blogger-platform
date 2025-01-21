@@ -1,11 +1,17 @@
 import {PostDbType} from "../types/post-db-type";
-import {PostInputModel} from "../types/input-output-types";
-import {ObjectId} from "mongodb";
+import {PostInputModel, PostViewModel} from "../types/input-output-types";
+import {ObjectId, WithId} from "mongodb";
 import {postsRepository} from "../repositoryes/posts-repository";
 import {blogsQueryService} from "../../03-blogs/services/blogs-query-service";
 import {BlogDbType} from "../../03-blogs/types/blog-db-type";
+import {postsQueryRepository} from "../repositoryes/posts-query-repository";
 
 const postsService = {
+    async findPost(id: string): Promise<WithId<PostDbType> | null> {
+
+        return await postsRepository
+            .findPost(id);
+    },
     async createPost(data: PostInputModel, blogId?: string): Promise<string | null> {
 
         if (blogId) {
@@ -23,7 +29,7 @@ const postsService = {
             ...data,
             blogName: (await blogsQueryService.findBlog(data.blogId))!.name,
             createdAt: new Date().toISOString(),
-        }
+        };
 
         const result = await postsRepository
             .insertPost(newPost);

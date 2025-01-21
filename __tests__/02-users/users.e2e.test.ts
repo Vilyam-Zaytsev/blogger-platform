@@ -1,14 +1,14 @@
-import {console_log, encodingAdminDataInBase64, generateRandomString, req} from './helpers/test-helpers';
-import {SETTINGS} from "../src/common/settings";
-import {user} from "./helpers/datasets-for-tests";
+import {console_log, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
+import {SETTINGS} from "../../src/common/settings";
+import {user} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
-import {setUserCollection, usersCollection} from "../src/db/mongoDb";
-import {postsTestManager} from "./helpers/posts-test-manager";
+import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
+import {postsTestManager} from "../helpers/posts-test-manager";
 import {Response} from "supertest";
-import {UserDbType} from "../src/02-users/types/user-db-type";
-import {usersTestManager} from "./helpers/users-test-manager";
-import {SortDirection} from "../src/common/types/input-output-types/pagination-sort-types";
+import {UserDbType} from "../../src/02-users/types/user-db-type";
+import {usersTestManager} from "../helpers/users-test-manager";
+import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -21,7 +21,7 @@ beforeAll(async () => {
     await client.connect();
 
     const db = client.db();
-    setUserCollection(db.collection<UserDbType>('users'));
+    setUsersCollection(db.collection<UserDbType>('users'));
 });
 
 afterAll(async () => {
