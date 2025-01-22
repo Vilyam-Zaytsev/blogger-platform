@@ -144,7 +144,7 @@ describe('GET /comments', () => {
 
         for (let i = 0; i < resGetComments.body.items.length; i++) {
             expect(resGetComments.body.items[i]).toEqual(
-                commentsTestManager.filterAndSort(
+                commentsTestManager.filterAndSort<CommentViewModel>(
                     presets.comments,
                     createPaginationAndSortFilter({
                         pageNumber: '1',
