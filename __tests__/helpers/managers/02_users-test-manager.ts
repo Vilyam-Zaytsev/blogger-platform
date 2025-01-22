@@ -57,7 +57,9 @@ const usersTestManager = {
             pageNumber,
             pageSize,
             sortBy,
-            sortDirection
+            sortDirection,
+            searchLoginTerm,
+            searchEmailTerm
         } = sortAndPaginationFilter;
 
         let startIndex = (pageNumber - 1) * pageSize;
@@ -71,73 +73,75 @@ const usersTestManager = {
             return path.split('.').reduce((acc: any, key) => acc && acc[key], obj);
         };
 
-        return items
-            .sort((a: T, b: T) => {
+        if (searchLoginTerm || searchEmailTerm) {
 
-                const aValue = getValueByPath(a, path);
-                const bValue = getValueByPath(b, path);
+            return items
+                .sort((a: T, b: T) => {
 
-                if (sortDirection === SortDirection.Descending) {
-                    if (aValue < bValue) return 1;
-                    if (aValue > bValue) return -1;
+                    const aValue = getValueByPath(a, path);
+                    const bValue = getValueByPath(b, path);
+
+                    if (sortDirection === SortDirection.Descending) {
+                        if (aValue < bValue) return 1;
+                        if (aValue > bValue) return -1;
+                        return 0;
+                    }
+                    if (sortDirection === SortDirection.Ascending) {
+                        if (aValue < bValue) return -1;
+                        if (aValue > bValue) return 1;
+                        return 0;
+                    }
+
                     return 0;
-                }
-                if (sortDirection === SortDirection.Ascending) {
-                    if (aValue < bValue) return -1;
-                    if (aValue > bValue) return 1;
-                    return 0;
-                }
+                })
+                .slice(startIndex, endIndex);
+        }
 
-                return 0;
-            })
-            .slice(startIndex, endIndex);
-    }
+        // filterAndSort(
+        //     items: UserViewModel[],
+        //     sortBy: keyof UserViewModel = 'createdAt',
+        //     sortDirection: SortDirection = SortDirection.Descending,
+        //     searchLoginTerm: string | null = null,
+        //     searchEmailTerm: string | null = null,
+        //     pageNumber: number = 1,
+        //     pageSize: number = 10,
+        // ) {
+        //     let startIndex = (pageNumber - 1) * pageSize;
+        //     let finishIndex = startIndex + pageSize;
+        //
+        //     if (searchLoginTerm || searchEmailTerm) {
+        //         return items
+        //             .filter(u =>
+        //                 u.login.includes(searchLoginTerm!)
+        //                     ? u
+        //                     : u.email.includes(searchEmailTerm!)
+        //                         ? u
+        //                         : null
+        //             )
+        //             .sort((a: UserViewModel, b: UserViewModel) => {
+        //                 return a[sortBy] > b[sortBy]
+        //                     ? sortDirection === 'desc' ? -1 : 1
+        //                     : a[sortBy] < b[sortBy]
+        //                         ? sortDirection === 'desc' ? 1 : -1
+        //                         : sortDirection === 'desc' ? -1 : 1
+        //             })
+        //             .filter((b, i) => {
+        //                 return i >= startIndex && i < finishIndex ? b : null;
+        //             });
+        //     } else {
+        //         return items
+        //             .sort((a: UserViewModel, b: UserViewModel) => {
+        //                 return a[sortBy] > b[sortBy]
+        //                     ? sortDirection === 'desc' ? -1 : 1
+        //                     : a[sortBy] < b[sortBy]
+        //                         ? sortDirection === 'desc' ? 1 : -1
+        //                         : sortDirection === 'desc' ? -1 : 1
+        //             })
+        //             .filter((b, i) => {
+        //                 return i >= startIndex && i < finishIndex ? b : null;
+        //             });
+        //     }
+        // }
+    };
 
-    // filterAndSort(
-    //     items: UserViewModel[],
-    //     sortBy: keyof UserViewModel = 'createdAt',
-    //     sortDirection: SortDirection = SortDirection.Descending,
-    //     searchLoginTerm: string | null = null,
-    //     searchEmailTerm: string | null = null,
-    //     pageNumber: number = 1,
-    //     pageSize: number = 10,
-    // ) {
-    //     let startIndex = (pageNumber - 1) * pageSize;
-    //     let finishIndex = startIndex + pageSize;
-    //
-    //     if (searchLoginTerm || searchEmailTerm) {
-    //         return items
-    //             .filter(u =>
-    //                 u.login.includes(searchLoginTerm!)
-    //                     ? u
-    //                     : u.email.includes(searchEmailTerm!)
-    //                         ? u
-    //                         : null
-    //             )
-    //             .sort((a: UserViewModel, b: UserViewModel) => {
-    //                 return a[sortBy] > b[sortBy]
-    //                     ? sortDirection === 'desc' ? -1 : 1
-    //                     : a[sortBy] < b[sortBy]
-    //                         ? sortDirection === 'desc' ? 1 : -1
-    //                         : sortDirection === 'desc' ? -1 : 1
-    //             })
-    //             .filter((b, i) => {
-    //                 return i >= startIndex && i < finishIndex ? b : null;
-    //             });
-    //     } else {
-    //         return items
-    //             .sort((a: UserViewModel, b: UserViewModel) => {
-    //                 return a[sortBy] > b[sortBy]
-    //                     ? sortDirection === 'desc' ? -1 : 1
-    //                     : a[sortBy] < b[sortBy]
-    //                         ? sortDirection === 'desc' ? 1 : -1
-    //                         : sortDirection === 'desc' ? -1 : 1
-    //             })
-    //             .filter((b, i) => {
-    //                 return i >= startIndex && i < finishIndex ? b : null;
-    //             });
-    //     }
-    // }
-};
-
-export {usersTestManager};
+    export {usersTestManager};
