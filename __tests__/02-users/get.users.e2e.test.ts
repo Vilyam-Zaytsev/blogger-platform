@@ -1,14 +1,13 @@
-import {console_log, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
+import {console_log, encodingAdminDataInBase64, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {presets, user, userPropertyMap} from "../helpers/datasets-for-tests";
+import {clearPresets, presets, userPropertyMap} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
-import {MongoClient, ObjectId} from "mongodb";
+import {MongoClient} from "mongodb";
 import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
-import {postsTestManager} from "../helpers/managers/04_posts-test-manager";
 import {Response} from "supertest";
 import {UserDbType} from "../../src/02-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
-import {PaginationResponse, SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
+import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {UserViewModel} from "../../src/02-users/types/input-output-types";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
 
@@ -33,6 +32,8 @@ afterAll(async () => {
 
 beforeEach(async () => {
     await usersCollection.deleteMany({});
+
+    clearPresets();
 });
 
 describe('GET /users', () => {

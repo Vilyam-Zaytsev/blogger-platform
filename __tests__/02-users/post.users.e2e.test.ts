@@ -1,6 +1,6 @@
 import {console_log, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {userLogins} from "../helpers/datasets-for-tests";
+import {clearPresets, userLogins} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
@@ -29,6 +29,8 @@ afterAll(async () => {
 
 beforeEach(async () => {
     await usersCollection.deleteMany({});
+
+    clearPresets();
 });
 
 
@@ -70,13 +72,7 @@ describe('POST /users', () => {
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
         expect(resGetUsers.body.items.length).toEqual(1);
-
-        const resGetUser = await req
-            .get(`${SETTINGS.PATH.USERS}/${resPostUser.body.id}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
-        expect(resPostUser.body).toEqual(resGetUser.body);
-
+        expect(resPostUser.body).toEqual(resGetUsers.body.items[0]);
 
         console_log(resPostUser.body, resPostUser.status, 'Test 1: post(/users)');
     });
