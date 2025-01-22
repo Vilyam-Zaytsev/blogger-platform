@@ -201,6 +201,8 @@ describe('pagination, sort, search in term /users', () => {
             )
         });
 
+        //TODO
+
         expect(resGetUsers.body.items.length).toEqual(3);
 
         console_log(resGetUsers.body, resGetUsers.status, 'Test 4: search in term(/users)');
