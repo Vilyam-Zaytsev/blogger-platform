@@ -76,7 +76,7 @@ beforeEach(async () => {
             await usersTestManager
                 .createUser(1);
 
-            const resDeleteUser = await req
+            const resDeleteUser: Response = await req
                 .delete(`${SETTINGS.PATH.USERS}/${presets.users[0].id}`)
                 .set({
                     'Authorization': encodingAdminDataInBase64(
@@ -107,7 +107,7 @@ beforeEach(async () => {
             await usersTestManager
                 .createUser(1);
 
-            const resDeleteUser = await req
+            const resDeleteUser: Response = await req
                 .delete(`${SETTINGS.PATH.USERS}/${new ObjectId()}`)
                 .set({
                     'Authorization': encodingAdminDataInBase64(

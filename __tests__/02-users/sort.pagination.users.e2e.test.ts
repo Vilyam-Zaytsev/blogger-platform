@@ -1,10 +1,9 @@
-import {console_log, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
+import {console_log, encodingAdminDataInBase64, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {clearPresets, presets, user, userLogins, userPropertyMap} from "../helpers/datasets-for-tests";
+import {clearPresets, presets, userLogins, userPropertyMap} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
-import {MongoClient, ObjectId} from "mongodb";
+import {MongoClient} from "mongodb";
 import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
-import {postsTestManager} from "../helpers/managers/04_posts-test-manager";
 import {Response} from "supertest";
 import {UserDbType} from "../../src/02-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
@@ -207,7 +206,7 @@ describe('pagination, sort, search in term /users', () => {
         await usersTestManager
             .createUser(11);
 
-        const resGetUsers = await req
+        const resGetUsers: Response = await req
             .get(SETTINGS.PATH.USERS)
             .set(
                 'Authorization',
@@ -245,7 +244,7 @@ describe('pagination, sort, search in term /users', () => {
         await usersTestManager
             .createUser(11);
 
-        const resGet = await req
+        const resGetUsers: Response = await req
             .get(SETTINGS.PATH.USERS)
             .set(
                 'Authorization',
@@ -260,7 +259,7 @@ describe('pagination, sort, search in term /users', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-        expect(resGet.body).toEqual({
+        expect(resGetUsers.body).toEqual({
             pagesCount: 1,
             page: 1,
             pageSize: 10,
@@ -275,8 +274,8 @@ describe('pagination, sort, search in term /users', () => {
             )
         })
 
-        expect(resGet.body.items.length).toEqual(7);
+        expect(resGetUsers.body.items.length).toEqual(7);
 
-        console_log(resGet.body, resGet.status, 'Test 6: search in term(/users)');
+        console_log(resGetUsers.body, resGetUsers.status, 'Test 6: search in term(/users)');
     });
 });

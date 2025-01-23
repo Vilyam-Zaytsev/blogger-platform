@@ -1,8 +1,8 @@
 import {console_log, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {clearPresets, comments, incorrectAccessToken, post, presets, user} from "../helpers/datasets-for-tests";
+import {clearPresets, comments, incorrectAccessToken, presets} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
-import {MongoClient, ObjectId} from "mongodb";
+import {MongoClient} from "mongodb";
 import {
     blogsCollection,
     commentsCollection, postsCollection,

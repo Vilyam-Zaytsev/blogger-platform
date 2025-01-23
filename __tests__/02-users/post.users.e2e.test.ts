@@ -60,7 +60,7 @@ describe('POST /users', () => {
             createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
         });
 
-        const resGetUsers = await req
+        const resGetUsers: Response = await req
             .get(`${SETTINGS.PATH.USERS}`)
             .set(
                 'Authorization',

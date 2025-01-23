@@ -39,7 +39,7 @@ beforeEach(async () => {
 describe('GET /users', () => {
     it('should return an empty array, the admin is authenticated.', async () => {
 
-        const resGetUsers = await req
+        const resGetUsers: Response = await req
             .get(SETTINGS.PATH.USERS)
             .set(
                 'Authorization',
@@ -62,7 +62,7 @@ describe('GET /users', () => {
     });
     it('should return a 401 error if the admin is not authenticated', async () => {
 
-        const resGetUsers = await req
+        const resGetUsers: Response = await req
             .get(SETTINGS.PATH.USERS)
             .set(
                 'Authorization',
@@ -101,7 +101,7 @@ describe('GET /users', () => {
         await usersTestManager
             .createUser(3);
 
-        const resGetUsers = await req
+        const resGetUsers: Response = await req
             .get(SETTINGS.PATH.USERS)
             .set(
                 'Authorization',
