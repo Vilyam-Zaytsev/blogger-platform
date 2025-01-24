@@ -1,10 +1,10 @@
-import {bcryptService} from "../common/services/bcrypt-service";
+import {bcryptService} from "../common/adapters/bcrypt-service";
 import {LoginInputType} from "./types/login-input-type";
 import {UserDbType} from "../02-users/types/user-db-type";
 import {usersRepository} from "../02-users/repositoryes/users-repository";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {ResultType} from "../common/types/result-types/result-type";
-import {jwtService} from "../common/services/jwt-service";
+import {jwtService} from "../common/adapters/jwt-service";
 import {WithId} from "mongodb";
 import {AccessTokenType} from "./types/access-token-type";
 
