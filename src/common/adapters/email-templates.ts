@@ -1,11 +1,17 @@
-const emailExamples = {
+import {EmailTemplateType} from "../types/input-output-types/email-template-type";
 
-    registrationEmail(code: string) {
+const emailTemplates = {
 
-        return ` <h1>Thank for your registration</h1>
+    registrationEmail(code: string): EmailTemplateType {
+
+        return {
+            subject: 'Confirmation of registration',
+            html: ` <h1>Thank for your registration</h1>
                <p>To finish registration please follow the link below:<br>
                   <a href='https://somesite.com/confirm-email?code=${code}'>complete registration</a>
               </p>`
+        }
+
     },
 
     passwordRecoveryEmail(code: string) {
@@ -17,4 +23,4 @@ const emailExamples = {
     }
 };
 
-export {emailExamples}
+export {emailTemplates}

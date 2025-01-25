@@ -1,21 +1,27 @@
 import nodemailer from 'nodemailer';
+import {EmailTemplateType} from "../types/input-output-types/email-template-type";
 
 const nodemailerService = {
-    async sendEmail(email, code: string, template: (code: string) => string): Promise<boolean> {
+
+    async sendEmail(
+        email: string,
+        code: string,
+        template: EmailTemplateType
+    ): Promise<boolean> {
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: process.env.EMAIL_BLOGGER_PLATFORM,
-                pass: process.env.PASSWORD_GMAIL
+                user: process.env.EMAIL,
+                pass: process.env.EMAIL_PASSWORD
             }
         });
 
         const info = await transporter.sendMail({
-            from: '"Kek 👻" <codeSender>',
+            from: `Blogger Platform <${process.env.EMAIL}>`,
             to: email,
-            subject: "Your code is here",
-            html: template(code),
+            subject: template.subject,
+            html: template.html,
         });
 
         return !!info;
