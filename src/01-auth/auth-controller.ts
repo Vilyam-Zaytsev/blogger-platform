@@ -13,6 +13,7 @@ import {AccessTokenType} from "./types/access-token-type";
 import {userQueryService} from "../02-users/services/users-query-servise";
 import {PresentationView} from "../02-users/types/presentation-view";
 import {SETTINGS} from "../common/settings";
+import {RegistrationConfirmationCodeType} from "./types/registration-confirmation-code-type";
 
 const authController = {
 
@@ -56,12 +57,31 @@ const authController = {
         const result: ResultType<string | null> = await authService
             .registration(login, password, email);
 
-        console.log(result)
-
         if (result.status !== ResultStatus.Success) {
             res
                 .status(mapResultStatusToHttpStatus(result.status))
                 .json(mapResultExtensionsToErrorMessage(result.extensions));
+
+            return;
+        }
+
+        res
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+    },
+
+    registrationConfirmation: async (
+        req: RequestWithBody<RegistrationConfirmationCodeType>,
+        res: Response
+    ) => {
+
+        const {code} = req.body
+
+        const resultRegistrationConfirmation: ResultType = await authService
+            .registrationConfirmation(code);
+
+        if (resultRegistrationConfirmation.status !== ResultStatus.Success) {
+            res
+                .sendStatus(mapResultStatusToHttpStatus(resultRegistrationConfirmation.status));
 
             return;
         }

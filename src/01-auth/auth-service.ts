@@ -1,6 +1,6 @@
 import {bcryptService} from "../common/adapters/bcrypt-service";
 import {LoginInputType} from "./types/login-input-type";
-import {UserDbType} from "../02-users/types/user-db-type";
+import {ConfirmationStatus, UserDbType} from "../02-users/types/user-db-type";
 import {usersRepository} from "../02-users/repositoryes/users-repository";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {ResultType} from "../common/types/result-types/result-type";
@@ -60,6 +60,51 @@ const authService = {
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 
         return resultCreateUser;
+    },
+
+    async registrationConfirmation(confirmationCode: string): Promise<ResultType> {
+
+        const user: WithId<UserDbType> | null = await usersRepository
+            .findByConfirmationCode(confirmationCode);
+
+        //TODO !!!!!!!!!!!!!!!!!!!!!переписать валидацию когда создам фабрики ResultObject!!!!!!!!!!!!!!!
+        if (
+            !user
+            || user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed
+            || user.emailConfirmation.confirmationCode !== confirmationCode
+            || user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()
+        ) return {
+            status: ResultStatus.BadRequest,
+            errorMessage: 'confirmation code invalid',
+            extensions: [
+                {
+                    field: 'code',
+                    message: 'Confirmation code invalid.'
+                }
+            ],
+            data: null
+        };
+
+        const resultUpdateConfirmationStatus = await usersRepository
+            .updateConfirmationStatus(user._id);
+
+        if (!resultUpdateConfirmationStatus) return {
+            status: ResultStatus.InternalServerError,
+            errorMessage: 'server error',
+            extensions: [
+                {
+                    field: 'confirmationStatus',
+                    message: 'The confirmation status could not be updated. Server error.'
+                }
+            ],
+            data: null
+        }
+
+        return {
+            status: ResultStatus.Success,
+            extensions: [],
+            data: null
+        }
     },
 
     async checkUserCredentials(authParamsDto: LoginInputType): Promise<ResultType<WithId<UserDbType> | null>> {
