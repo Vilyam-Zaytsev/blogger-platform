@@ -29,7 +29,7 @@ authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION,
 authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION_CONFIRMATION,
     authConfirmationCodeInputValidator,
     inputCheckErrorsMiddleware,
-    authController.registration
+    authController.registrationConfirmation
 );
 authRouter.get(SETTINGS.PATH.AUTH.ME,
     bearerAuthorizationMiddleware,

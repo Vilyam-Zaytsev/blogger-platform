@@ -44,7 +44,8 @@ const authService = {
         email: string
     ): Promise<ResultType<string | null>> {
 
-        const candidate: UserDbType = await User.registrationUser(login, email, password);
+        const candidate: UserDbType = await User
+            .registrationUser(login, email, password);
 
         const resultCreateUser: ResultType<string | null> = await usersService
             .createUser(candidate);

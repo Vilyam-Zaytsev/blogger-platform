@@ -62,10 +62,10 @@ const usersRepository = {
             .insertOne(newUser);
     },
 
-    async updateConfirmationStatus(id: ObjectId): Promise<boolean> {
+    async updateConfirmationStatus(_id: ObjectId): Promise<boolean> {
 
         const result = await usersCollection
-            .updateOne({id}, {$set: {'emailConfirmation.confirmationStatus': ConfirmationStatus.Confirmed}});
+            .updateOne({_id}, {$set: {'emailConfirmation.confirmationStatus': ConfirmationStatus.Confirmed}});
 
         return result.modifiedCount === 1;
     },

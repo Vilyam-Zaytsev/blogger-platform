@@ -30,7 +30,8 @@ const SETTINGS = {
         BAD_REQUEST_400: 400,
         UNAUTHORIZED_401: 401,
         FORBIDDEN_403: 403,
-        NOT_FOUND_404: 404
+        NOT_FOUND_404: 404,
+        INTERNAL_SERVER_ERROR_500: 500
     },
     MONGO_URL: process.env.MONGO_URL || 'mongodb://localhost:27017',
     DB_NAME: process.env.DB_NAME || 'blogger-platform-dev-local',
