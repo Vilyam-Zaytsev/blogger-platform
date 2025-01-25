@@ -6,29 +6,14 @@ import {ResultType} from "../../common/types/result-types/result-type";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 
 const usersService = {
-    async createUser(data: UserInputModel): Promise<ResultType<string | null>> {
+    async createUser(user: UserDbType): Promise<ResultType<string | null>> {
 
-        const {
-            login,
-            email,
-            password
-        } = data;
-
-        const resultCandidateValidation: ResultType = await this.validateCandidateUniqueness(login, email);
+        const resultCandidateValidation: ResultType = await this.validateCandidateUniqueness(user.login, user.email);
 
         if (resultCandidateValidation.status !== ResultStatus.Success) return resultCandidateValidation
 
-        const passwordHash = await bcryptService.generateHash(password);
-
-        const newUser: UserDbType = {
-            login,
-            email,
-            passwordHash,
-            createdAt: new Date().toISOString(),
-        };
-
         const result = await usersRepository
-            .insertUser(newUser);
+            .insertUser(user);
 
         return {
             status: ResultStatus.Created,
@@ -36,6 +21,36 @@ const usersService = {
             data: String(result.insertedId)
         }
     },
+    // async createUser(data: UserInputModel): Promise<ResultType<string | null>> {
+    //
+    //     const {
+    //         login,
+    //         email,
+    //         password
+    //     } = data;
+    //
+    //     const resultCandidateValidation: ResultType = await this.validateCandidateUniqueness(login, email);
+    //
+    //     if (resultCandidateValidation.status !== ResultStatus.Success) return resultCandidateValidation
+    //
+    //     const passwordHash = await bcryptService.generateHash(password);
+    //
+    //     const newUser: UserDbType = {
+    //         login,
+    //         email,
+    //         passwordHash,
+    //         createdAt: new Date().toISOString(),
+    //     };
+    //
+    //     const result = await usersRepository
+    //         .insertUser(newUser);
+    //
+    //     return {
+    //         status: ResultStatus.Created,
+    //         extensions: [],
+    //         data: String(result.insertedId)
+    //     }
+    // },
     async deleteUser(id: string): Promise<boolean> {
         return await usersRepository
             .deleteUser(id);

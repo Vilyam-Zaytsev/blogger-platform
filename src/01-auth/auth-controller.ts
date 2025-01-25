@@ -8,7 +8,7 @@ import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-t
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
 import {OutputErrorsType} from "../common/types/input-output-types/output-errors-type";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {UserMeViewModel} from "../02-users/types/input-output-types";
+import {UserInputModel, UserMeViewModel} from "../02-users/types/input-output-types";
 import {AccessTokenType} from "./types/access-token-type";
 import {userQueryService} from "../02-users/services/users-query-servise";
 import {PresentationView} from "../02-users/types/presentation-view";
@@ -39,6 +39,12 @@ const authController = {
         res
             .status(mapResultStatusToHttpStatus(ResultStatus.Success))
             .json({...result.data!});
+    },
+    registration: async (
+        req: RequestWithBody<UserInputModel>,
+        res: Response
+    ) => {
+
     },
     me: async (
         req: RequestWithUserId<IdType>,

@@ -8,6 +8,9 @@ const SETTINGS = {
         AUTH: {
             BASE: '/auth',
             LOGIN: '/login',
+            REGISTRATION: '/registration',
+            REGISTRATION_CONFIRMATION: '/registration-confirmation',
+            REGISTRATION_EMAIL_RESENDING: '/registration-email-resending',
             ME: '/me',
         },
         USERS: '/users',
