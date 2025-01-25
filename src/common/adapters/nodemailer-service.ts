@@ -5,7 +5,6 @@ const nodemailerService = {
 
     async sendEmail(
         email: string,
-        code: string,
         template: EmailTemplateType
     ): Promise<boolean> {
 

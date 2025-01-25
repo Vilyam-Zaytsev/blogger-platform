@@ -63,11 +63,6 @@ const usersController = {
         req: RequestWithBody<UserInputModel>,
         res: Response<UserViewModel | OutputErrorsType>
     ) => {
-        // const dataForCreatingUser: UserInputModel = {
-        //     login: req.body.login,
-        //     email: req.body.email,
-        //     password: req.body.password
-        // };
 
         const {
             login,
@@ -75,11 +70,11 @@ const usersController = {
             password
         } = req.body;
 
-        const user: UserDbType = await User
+        const candidate: UserDbType = await User
             .createByAdmin(login, email, password);
 
         const result: ResultType<string | null> = await usersService
-            .createUser(user);
+            .createUser(candidate);
 
         if (!result.data) {
             res

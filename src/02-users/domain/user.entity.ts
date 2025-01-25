@@ -1,5 +1,7 @@
-import {ConfirmationStatuses} from "../types/user-db-type";
+import {ConfirmationStatus, UserDbType} from "../types/user-db-type";
 import {bcryptService} from "../../common/adapters/bcrypt-service";
+import {randomUUID} from "node:crypto";
+import { add } from "date-fns";
 
 class User {
     login: string;
@@ -9,14 +11,14 @@ class User {
     emailConfirmation: {
         confirmationCode: string | null;
         expirationDate: Date | null;
-        confirmationStatus: ConfirmationStatuses;
+        confirmationStatus: ConfirmationStatus;
     };
 
      private constructor(
         login: string,
         email: string,
         passwordHash: string,
-        confirmationStatus: ConfirmationStatuses
+        confirmationStatus: ConfirmationStatus
     ) {
         this.login = login
         this.email = email
@@ -32,25 +34,33 @@ class User {
     static async registrationUser(
         login: string,
         email: string,
-        password: string
+        password: string,
     ): Promise<User> {
 
         const passwordHash: string = await bcryptService
             .generateHash(password);
 
-        return new User(login, email, passwordHash, ConfirmationStatuses.NotConfirmed);
+        const user: UserDbType = new User(login, email, passwordHash, ConfirmationStatus.NotConfirmed);
+
+        user.emailConfirmation.confirmationCode = randomUUID();
+        user.emailConfirmation.expirationDate = add(
+            new Date(),
+            { hours: 1, minutes: 1 }
+        );
+
+        return user;
     };
 
     static async createByAdmin(
         login: string,
         email: string,
-        password: string
+        password: string,
     ): Promise<User> {
 
         const passwordHash: string = await bcryptService
             .generateHash(password);
 
-        return new User(login, email, passwordHash, ConfirmationStatuses.Confirmed);
+        return new User(login, email, passwordHash, ConfirmationStatus.Confirmed);
     }
 }
 

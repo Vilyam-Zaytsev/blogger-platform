@@ -1,56 +1,26 @@
-import {UserInputModel} from "../types/input-output-types";
 import {UserDbType} from "../types/user-db-type";
 import {usersRepository} from "../repositoryes/users-repository";
-import {bcryptService} from "../../common/adapters/bcrypt-service";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 
 const usersService = {
+
     async createUser(user: UserDbType): Promise<ResultType<string | null>> {
 
         const resultCandidateValidation: ResultType = await this.validateCandidateUniqueness(user.login, user.email);
 
-        if (resultCandidateValidation.status !== ResultStatus.Success) return resultCandidateValidation
+        if (resultCandidateValidation.status !== ResultStatus.Success) return resultCandidateValidation;
 
         const result = await usersRepository
             .insertUser(user);
 
         return {
-            status: ResultStatus.Created,
+            status: ResultStatus.Success,
             extensions: [],
             data: String(result.insertedId)
         }
     },
-    // async createUser(data: UserInputModel): Promise<ResultType<string | null>> {
-    //
-    //     const {
-    //         login,
-    //         email,
-    //         password
-    //     } = data;
-    //
-    //     const resultCandidateValidation: ResultType = await this.validateCandidateUniqueness(login, email);
-    //
-    //     if (resultCandidateValidation.status !== ResultStatus.Success) return resultCandidateValidation
-    //
-    //     const passwordHash = await bcryptService.generateHash(password);
-    //
-    //     const newUser: UserDbType = {
-    //         login,
-    //         email,
-    //         passwordHash,
-    //         createdAt: new Date().toISOString(),
-    //     };
-    //
-    //     const result = await usersRepository
-    //         .insertUser(newUser);
-    //
-    //     return {
-    //         status: ResultStatus.Created,
-    //         extensions: [],
-    //         data: String(result.insertedId)
-    //     }
-    // },
+
     async deleteUser(id: string): Promise<boolean> {
         return await usersRepository
             .deleteUser(id);

@@ -23,7 +23,7 @@ authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION,
     userEmailInputValidator,
     userPasswordInputValidator,
     inputCheckErrorsMiddleware,
-    authController.login
+    authController.registration
 );
 authRouter.get(SETTINGS.PATH.AUTH.ME,
     bearerAuthorizationMiddleware,

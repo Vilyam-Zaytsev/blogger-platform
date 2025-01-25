@@ -15,6 +15,7 @@ import {PresentationView} from "../02-users/types/presentation-view";
 import {SETTINGS} from "../common/settings";
 
 const authController = {
+
     login: async (
         req: RequestWithBody<LoginInputType>,
         res: Response<OutputErrorsType | AccessTokenType>
@@ -31,7 +32,7 @@ const authController = {
         if (result.status !== ResultStatus.Success) {
             res
                 .status(mapResultStatusToHttpStatus(result.status))
-                .json(mapResultExtensionsToErrorMessage(result.extensions!));
+                .json(mapResultExtensionsToErrorMessage(result.extensions));
 
             return;
         }
@@ -40,12 +41,35 @@ const authController = {
             .status(mapResultStatusToHttpStatus(ResultStatus.Success))
             .json({...result.data!});
     },
+
     registration: async (
         req: RequestWithBody<UserInputModel>,
         res: Response
     ) => {
 
+        const {
+            login,
+            email,
+            password
+        } = req.body;
+
+        const result: ResultType<string | null> = await authService
+            .registration(login, password, email);
+
+        console.log(result)
+
+        if (result.status !== ResultStatus.Success) {
+            res
+                .status(mapResultStatusToHttpStatus(result.status))
+                .json(mapResultExtensionsToErrorMessage(result.extensions));
+
+            return;
+        }
+
+        res
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     },
+
     me: async (
         req: RequestWithUserId<IdType>,
         res: Response<UserMeViewModel>

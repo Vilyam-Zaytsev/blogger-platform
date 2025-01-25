@@ -1,4 +1,4 @@
-enum ConfirmationStatuses {
+enum ConfirmationStatus {
     Confirmed = 'Confirmed',
     NotConfirmed = 'Not confirmed'
 }
@@ -11,11 +11,11 @@ type UserDbType = {
     emailConfirmation: {
         confirmationCode: string | null;
         expirationDate: Date | null;
-        confirmationStatus: ConfirmationStatuses;
+        confirmationStatus: ConfirmationStatus;
     }
 };
 
 export {
-    ConfirmationStatuses,
+    ConfirmationStatus,
     UserDbType
 };

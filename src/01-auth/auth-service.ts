@@ -7,8 +7,13 @@ import {ResultType} from "../common/types/result-types/result-type";
 import {jwtService} from "../common/adapters/jwt-service";
 import {WithId} from "mongodb";
 import {AccessTokenType} from "./types/access-token-type";
+import {usersService} from "../02-users/services/users-service";
+import {User} from "../02-users/domain/user.entity";
+import {nodemailerService} from "../common/adapters/nodemailer-service";
+import {emailTemplates} from "../common/adapters/email-templates";
 
 const authService = {
+
     async login(authParamsDto: LoginInputType): Promise<ResultType<AccessTokenType | null>> {
 
         const result: ResultType<WithId<UserDbType> | null> = await this.checkUserCredentials(authParamsDto);
@@ -31,6 +36,30 @@ const authService = {
             extensions: [],
             data: accessToken,
         }
+    },
+
+    async registration(
+        login: string,
+        password: string,
+        email: string
+    ): Promise<ResultType<string | null>> {
+
+        const candidate: UserDbType = await User.registrationUser(login, email, password);
+
+        const resultCreateUser: ResultType<string | null> = await usersService
+            .createUser(candidate);
+
+        if (resultCreateUser.status !== ResultStatus.Success) return resultCreateUser;
+
+        nodemailerService
+            .sendEmail(
+                candidate.email,
+                emailTemplates
+                    .registrationEmail(candidate.emailConfirmation.confirmationCode!)
+            )
+            .catch(error => console.error('ERROR IN SEND EMAIL:', error));
+
+        return resultCreateUser;
     },
 
     async checkUserCredentials(authParamsDto: LoginInputType): Promise<ResultType<WithId<UserDbType> | null>> {
