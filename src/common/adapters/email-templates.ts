@@ -6,7 +6,7 @@ const emailTemplates = {
 
         return {
             subject: 'Confirmation of registration',
-            html: ` <h1>Thank for your registration</h1>
+            html: ` <h1>Thanks for your registration</h1>
                <p>To finish registration please follow the link below:<br>
                   <a href='https://somesite.com/confirm-email?code=${code}'>complete registration</a>
               </p>`
