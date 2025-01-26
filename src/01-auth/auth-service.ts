@@ -63,8 +63,6 @@ const authService = {
         const candidate: UserDbType = await User
             .registrationUser(login, email, password);
 
-        console.log('REGISTRATION:', candidate)
-
         const resultCreateUser: ResultType<string | null> = await usersService
             .createUser(candidate);
 
@@ -187,11 +185,6 @@ const authService = {
                     .registrationEmail(confirmationCode)
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
-
-        const TEST = await usersRepository.findUser(String(user._id))
-
-        console.log('RESENDING:', TEST)
-
 
         return {
             status: ResultStatus.Success,
