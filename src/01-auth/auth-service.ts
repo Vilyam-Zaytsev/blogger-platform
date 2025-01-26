@@ -20,18 +20,6 @@ const authService = {
 
         const result: ResultType<WithId<UserDbType> | null> = await this.checkUserCredentials(authParamsDto);
 
-        if (result.status === ResultStatus.Unauthorized) {
-            return {
-                status: ResultStatus.Unauthorized,
-                errorMessage: 'the email address has not been verified',
-                extensions: [{
-                    field: 'confirmationStatus',
-                    message: 'To log in, you must confirm your email address.',
-                }],
-                data: null
-            }
-        }
-
         if (result.status !== ResultStatus.Success) {
             return {
                 status: ResultStatus.Unauthorized,
@@ -178,7 +166,7 @@ const authService = {
             data: null
         };
 
-        nodemailerService
+       await nodemailerService
             .sendEmail(
                 user.email,
                 emailTemplates
@@ -212,18 +200,6 @@ const authService = {
                 }],
                 data: null
             };
-        }
-
-        if (isUser.emailConfirmation.confirmationStatus !== ConfirmationStatus.Confirmed) {
-            return {
-                status: ResultStatus.Unauthorized,
-                errorMessage: 'the email address has not been verified',
-                extensions: [{
-                    field: 'confirmationStatus',
-                    message: 'To log in, you must confirm your email address.',
-                }],
-                data: null
-            }
         }
 
         const isPasswordCorrect: boolean = await bcryptService
