@@ -1,6 +1,6 @@
 import {ConfirmationStatus, UserDbType} from "../types/user-db-type";
 import {InsertOneResult, ObjectId, Sort, WithId} from "mongodb";
-import {usersCollection} from "../../db/mongoDb";
+import {postsCollection, usersCollection} from "../../db/mongoDb";
 import {
     MatchMode,
     PaginationAndSortFilterType,
@@ -36,7 +36,7 @@ const usersRepository = {
             .toArray();
     },
 
-    async findUser(id: string) : Promise<WithId<UserDbType> | null> {
+    async findUser(id: string): Promise<WithId<UserDbType> | null> {
 
         return usersCollection
             .findOne({_id: new ObjectId(id)});
@@ -48,6 +48,12 @@ const usersRepository = {
             .findOne({
                 $or: [{email: loginOrEmail}, {login: loginOrEmail}],
             });
+    },
+
+    async findByEmail(email: string): Promise<WithId<UserDbType> | null> {
+
+        return usersCollection
+            .findOne({email});
     },
 
     async findByConfirmationCode(confirmationCode: string): Promise<WithId<UserDbType> | null> {
@@ -62,10 +68,31 @@ const usersRepository = {
             .insertOne(newUser);
     },
 
+    async updateEmailConfirmation(
+        _id: ObjectId,
+        confirmationCode: string,
+        expirationDate: Date
+    ): Promise<boolean> {
+
+        const result = await usersCollection
+            .updateOne({_id}, {
+                $set: {
+                    'emailConfirmation.confirmationCode': confirmationCode,
+                    'emailConfirmation.expirationDate': expirationDate,
+                }
+            });
+
+        return result.matchedCount === 1;
+    },
+
     async updateConfirmationStatus(_id: ObjectId): Promise<boolean> {
 
         const result = await usersCollection
-            .updateOne({_id}, {$set: {'emailConfirmation.confirmationStatus': ConfirmationStatus.Confirmed}});
+            .updateOne({_id}, {
+                $set: {
+                    'emailConfirmation.confirmationStatus': ConfirmationStatus.Confirmed
+                }
+            });
 
         return result.modifiedCount === 1;
     },

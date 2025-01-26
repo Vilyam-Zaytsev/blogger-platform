@@ -14,6 +14,7 @@ import {userQueryService} from "../02-users/services/users-query-servise";
 import {PresentationView} from "../02-users/types/presentation-view";
 import {SETTINGS} from "../common/settings";
 import {RegistrationConfirmationCodeType} from "./types/registration-confirmation-code-type";
+import {RegistrationEmailResendingType} from "./types/registration-email-resending-type";
 
 const authController = {
 
@@ -82,6 +83,27 @@ const authController = {
         if (resultRegistrationConfirmation.status !== ResultStatus.Success) {
             res
                 .sendStatus(mapResultStatusToHttpStatus(resultRegistrationConfirmation.status));
+
+            return;
+        }
+
+        res
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+    },
+
+    registrationEmailResending: async (
+        req: RequestWithBody<RegistrationEmailResendingType>,
+        res: Response
+    ) => {
+
+        const {email} = req.body;
+
+        const resultEmailResending = await authService
+            .registrationEmailResending(email);
+
+        if (resultEmailResending.status !== ResultStatus.Success) {
+            res
+                .sendStatus(mapResultStatusToHttpStatus(resultEmailResending.status));
 
             return;
         }

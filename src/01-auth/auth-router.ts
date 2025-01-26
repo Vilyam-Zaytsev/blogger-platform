@@ -31,6 +31,11 @@ authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION_CONFIRMATION,
     inputCheckErrorsMiddleware,
     authController.registrationConfirmation
 );
+authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION_EMAIL_RESENDING,
+    userEmailInputValidator,
+    inputCheckErrorsMiddleware,
+    authController.registrationEmailResending
+);
 authRouter.get(SETTINGS.PATH.AUTH.ME,
     bearerAuthorizationMiddleware,
     authController.me
