@@ -1,8 +1,8 @@
-import {encodingAdminDataInBase64, req} from "./test-helpers";
-import {SETTINGS} from "../../src/common/settings";
+import {encodingAdminDataInBase64, req} from "../test-helpers";
+import {SETTINGS} from "../../../src/common/settings";
 import {Response} from "supertest";
-import {BlogInputModel, BlogViewModel} from "../../src/03-blogs/types/input-output-types";
-import {blogDescriptions, blogNames, presets} from "./datasets-for-tests";
+import {BlogInputModel, BlogViewModel} from "../../../src/03-blogs/types/input-output-types";
+import {blogDescriptions, blogNames, presets} from "../datasets-for-tests";
 
 const blogsTestManager = {
     async createBlog(numberOfBlogs: number) {

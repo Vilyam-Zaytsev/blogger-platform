@@ -14,7 +14,6 @@ usersRouter.get('/',
     baseAuthMiddleware,
     usersController.getUsers
 );
-usersRouter.get('/:id', usersController.getUser);
 usersRouter.post('/',
     baseAuthMiddleware,
     userLoginInputValidator,

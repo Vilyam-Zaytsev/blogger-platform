@@ -1,12 +1,12 @@
 import {Response} from "supertest";
-import {comments, presets} from "./datasets-for-tests";
-import {req} from "./test-helpers";
-import {SETTINGS} from "../../src/common/settings";
-import {CommentInputModel, CommentViewModel} from "../../src/05-comments/types/input-output-types";
+import {comments, presets} from "../datasets-for-tests";
+import {req} from "../test-helpers";
+import {SETTINGS} from "../../../src/common/settings";
+import {CommentInputModel, CommentViewModel} from "../../../src/05-comments/types/input-output-types";
 import {
     PaginationAndSortFilterType,
     SortDirection
-} from "../../src/common/types/input-output-types/pagination-sort-types";
+} from "../../../src/common/types/input-output-types/pagination-sort-types";
 
 const commentsTestManager = {
 

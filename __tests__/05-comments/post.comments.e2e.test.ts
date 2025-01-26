@@ -1,8 +1,8 @@
 import {console_log, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {clearPresets, comments, incorrectAccessToken, post, presets, user} from "../helpers/datasets-for-tests";
+import {clearPresets, comments, incorrectAccessToken, presets} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
-import {MongoClient, ObjectId} from "mongodb";
+import {MongoClient} from "mongodb";
 import {
     blogsCollection,
     commentsCollection, postsCollection,
@@ -11,16 +11,16 @@ import {
     setUsersCollection,
     usersCollection
 } from "../../src/db/mongoDb";
-import {postsTestManager} from "../helpers/posts-test-manager";
+import {postsTestManager} from "../helpers/managers/04_posts-test-manager";
 import {Response} from "supertest";
-import {usersTestManager} from "../helpers/users-test-manager";
+import {usersTestManager} from "../helpers/managers/02_users-test-manager";
 import {CommentDbType} from "../../src/05-comments/types/comment-db-type";
 import {UserDbType} from "../../src/02-users/types/user-db-type";
 import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
 import {PostDbType} from "../../src/04-posts/types/post-db-type";
-import {blogsTestManager} from "../helpers/blogs-test-manager";
+import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
-import {authTestManager} from "../helpers/auth-test-manager";
+import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {OutputErrorsType} from "../../src/common/types/input-output-types/output-errors-type";
 
 let mongoServer: MongoMemoryServer;

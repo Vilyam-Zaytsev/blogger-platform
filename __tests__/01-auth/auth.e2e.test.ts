@@ -6,7 +6,7 @@ import {MongoClient, ObjectId} from "mongodb";
 import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
 import {UserDbType} from "../../src/02-users/types/user-db-type";
-import {usersTestManager} from "../helpers/users-test-manager";
+import {usersTestManager} from "../helpers/managers/02_users-test-manager";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;

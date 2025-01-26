@@ -57,7 +57,7 @@ const commentsService = {
         const updateResult: boolean = await commentRepository
             .updateComment(commentId, data);
 
-        //TODO какой статус возвращать в этом случае???
+        //TODO какой статус возвращать в этом случае???(!!!!!!!!500!!!!!!!!!!!)
 
         if (!updateResult) return {
             status: ResultStatus.NotFound,
@@ -85,7 +85,7 @@ const commentsService = {
         const deleteResult: boolean = await commentRepository
             .deleteComment(commentId);
 
-        //TODO какой статус возвращать в этом случае???
+        //TODO какой статус возвращать в этом случае???(!!!!!!!!500!!!!!!!!!!!)
 
         if (!deleteResult) return {
             status: ResultStatus.NotFound,

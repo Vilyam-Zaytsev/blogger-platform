@@ -10,6 +10,7 @@ type UserViewModel = {
     email: string,
     createdAt: string
 };
+
 type UserMeViewModel = {
     email: string,
     login: string,

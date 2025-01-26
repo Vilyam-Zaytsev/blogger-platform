@@ -1,9 +1,15 @@
 import {Router} from "express";
 import {authController} from "./auth-controller";
-import {userLoginOrEmailInputValidator, userPasswordInputValidator} from "../02-users/middlewares/user-validators";
+import {
+    userEmailInputValidator,
+    userLoginInputValidator,
+    userLoginOrEmailInputValidator,
+    userPasswordInputValidator
+} from "../02-users/middlewares/user-validators";
 import {inputCheckErrorsMiddleware} from "../common/middlewares/input-check-errors-middleware";
 import {SETTINGS} from "../common/settings";
 import {bearerAuthorizationMiddleware} from "../common/middlewares/bearer-authorization-middleware";
+import {authConfirmationCodeInputValidator} from "./middlewares/auth-validators";
 
 const authRouter = Router();
 
@@ -12,6 +18,23 @@ authRouter.post(SETTINGS.PATH.AUTH.LOGIN,
     userPasswordInputValidator,
     inputCheckErrorsMiddleware,
     authController.login
+);
+authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION,
+    userLoginInputValidator,
+    userEmailInputValidator,
+    userPasswordInputValidator,
+    inputCheckErrorsMiddleware,
+    authController.registration
+);
+authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION_CONFIRMATION,
+    authConfirmationCodeInputValidator,
+    inputCheckErrorsMiddleware,
+    authController.registrationConfirmation
+);
+authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION_EMAIL_RESENDING,
+    userEmailInputValidator,
+    inputCheckErrorsMiddleware,
+    authController.registrationEmailResending
 );
 authRouter.get(SETTINGS.PATH.AUTH.ME,
     bearerAuthorizationMiddleware,

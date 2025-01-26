@@ -8,13 +8,16 @@ import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-t
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
 import {OutputErrorsType} from "../common/types/input-output-types/output-errors-type";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {UserMeViewModel} from "../02-users/types/input-output-types";
+import {UserInputModel, UserMeViewModel} from "../02-users/types/input-output-types";
 import {AccessTokenType} from "./types/access-token-type";
 import {userQueryService} from "../02-users/services/users-query-servise";
 import {PresentationView} from "../02-users/types/presentation-view";
 import {SETTINGS} from "../common/settings";
+import {RegistrationConfirmationCodeType} from "./types/registration-confirmation-code-type";
+import {RegistrationEmailResendingType} from "./types/registration-email-resending-type";
 
 const authController = {
+
     login: async (
         req: RequestWithBody<LoginInputType>,
         res: Response<OutputErrorsType | AccessTokenType>
@@ -31,7 +34,7 @@ const authController = {
         if (result.status !== ResultStatus.Success) {
             res
                 .status(mapResultStatusToHttpStatus(result.status))
-                .json(mapResultExtensionsToErrorMessage(result.extensions!));
+                .json(mapResultExtensionsToErrorMessage(result.extensions));
 
             return;
         }
@@ -40,6 +43,75 @@ const authController = {
             .status(mapResultStatusToHttpStatus(ResultStatus.Success))
             .json({...result.data!});
     },
+
+    registration: async (
+        req: RequestWithBody<UserInputModel>,
+        res: Response
+    ) => {
+
+        const {
+            login,
+            email,
+            password
+        } = req.body;
+
+        const result: ResultType<string | null> = await authService
+            .registration(login, password, email);
+
+        if (result.status !== ResultStatus.Success) {
+            res
+                .status(mapResultStatusToHttpStatus(result.status))
+                .json(mapResultExtensionsToErrorMessage(result.extensions));
+
+            return;
+        }
+
+        res
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+    },
+
+    registrationConfirmation: async (
+        req: RequestWithBody<RegistrationConfirmationCodeType>,
+        res: Response
+    ) => {
+
+        const {code} = req.body
+
+        const resultRegistrationConfirmation: ResultType = await authService
+            .registrationConfirmation(code);
+
+        if (resultRegistrationConfirmation.status !== ResultStatus.Success) {
+            res
+                .sendStatus(mapResultStatusToHttpStatus(resultRegistrationConfirmation.status));
+
+            return;
+        }
+
+        res
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+    },
+
+    registrationEmailResending: async (
+        req: RequestWithBody<RegistrationEmailResendingType>,
+        res: Response
+    ) => {
+
+        const {email} = req.body;
+
+        const resultEmailResending = await authService
+            .registrationEmailResending(email);
+
+        if (resultEmailResending.status !== ResultStatus.Success) {
+            res
+                .sendStatus(mapResultStatusToHttpStatus(resultEmailResending.status));
+
+            return;
+        }
+
+        res
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+    },
+
     me: async (
         req: RequestWithUserId<IdType>,
         res: Response<UserMeViewModel>
