@@ -1,12 +1,12 @@
 import {bcryptService} from "../common/adapters/bcrypt-service";
-import {LoginInputType} from "./types/login-input-type";
+import {LoginInputModel} from "./types/login-input-model";
 import {ConfirmationStatus, UserDbType} from "../02-users/types/user-db-type";
 import {usersRepository} from "../02-users/repositoryes/users-repository";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {ResultType} from "../common/types/result-types/result-type";
 import {jwtService} from "../common/adapters/jwt-service";
-import {WithId} from "mongodb";
-import {AccessTokenType} from "./types/access-token-type";
+import {ObjectId, WithId} from "mongodb";
+import {LoginSuccessViewModel} from "./types/login-success-view-model";
 import {usersService} from "../02-users/services/users-service";
 import {User} from "../02-users/domain/user.entity";
 import {nodemailerService} from "../common/adapters/nodemailer-service";
@@ -16,24 +16,22 @@ import {add} from "date-fns";
 
 const authService = {
 
-    async login(authParamsDto: LoginInputType): Promise<ResultType<AccessTokenType | null>> {
+    async login(authParamsDto: LoginInputModel): Promise<ResultType<LoginSuccessViewModel | null>> {
 
-        const result: ResultType<WithId<UserDbType> | null> = await this.checkUserCredentials(authParamsDto);
+        const resultCheckUserCredentials: ResultType<string | null> = await this.checkUserCredentials(authParamsDto);
 
-        if (result.status !== ResultStatus.Success) {
-            return {
-                status: ResultStatus.Unauthorized,
-                errorMessage: 'auth data incorrect',
-                extensions: [{
-                    field: 'loginOrEmailOrPassword',
-                    message: 'Login, email or password incorrect.',
-                }],
-                data: null
-            };
-        }
+        if (resultCheckUserCredentials.status !== ResultStatus.Success) return {
+            status: ResultStatus.Unauthorized,
+            errorMessage: 'auth data incorrect',
+            extensions: [{
+                field: 'loginOrEmailOrPassword',
+                message: 'Login, email or password incorrect.',
+            }],
+            data: null
+        };
 
-        const accessToken: AccessTokenType = await jwtService
-            .createToken(String(result.data!._id));
+        const accessToken: LoginSuccessViewModel = await jwtService
+            .createToken(resultCheckUserCredentials.data!);
 
         return {
             status: ResultStatus.Success,
@@ -166,7 +164,7 @@ const authService = {
             data: null
         };
 
-       await nodemailerService
+        await nodemailerService
             .sendEmail(
                 user.email,
                 emailTemplates
@@ -181,46 +179,42 @@ const authService = {
         }
     },
 
-    async checkUserCredentials(authParamsDto: LoginInputType): Promise<ResultType<WithId<UserDbType> | null>> {
+    async checkUserCredentials(authParamsDto: LoginInputModel): Promise<ResultType<string | null>> {
         const {
             loginOrEmail,
             password
         } = authParamsDto;
 
-        const isUser: WithId<UserDbType> | null = await usersRepository
+        const user: WithId<UserDbType> | null = await usersRepository
             .findByLoginOrEmail(loginOrEmail);
 
-        if (!isUser) {
-            return {
-                status: ResultStatus.BadRequest,
-                errorMessage: 'loginOrEmail incorrect',
-                extensions: [{
-                    field: 'loginOrEmail',
-                    message: 'There is no user with such data.',
-                }],
-                data: null
-            };
-        }
+        if (!user) return {
+            status: ResultStatus.BadRequest,
+            errorMessage: 'loginOrEmail incorrect',
+            extensions: [{
+                field: 'loginOrEmail',
+                message: 'There is no user with such data.',
+            }],
+            data: null
+        };
 
         const isPasswordCorrect: boolean = await bcryptService
-            .checkPassword(password, isUser.passwordHash);
+            .checkPassword(password, user.passwordHash);
 
-        if (!isPasswordCorrect) {
-            return {
-                status: ResultStatus.BadRequest,
-                errorMessage: 'password incorrect',
-                extensions: [{
-                    field: 'password',
-                    message: 'Invalid password.',
-                }],
-                data: null
-            };
-        }
+        if (!isPasswordCorrect) return {
+            status: ResultStatus.BadRequest,
+            errorMessage: 'password incorrect',
+            extensions: [{
+                field: 'password',
+                message: 'Incorrect password.',
+            }],
+            data: null
+        };
 
         return {
             status: ResultStatus.Success,
             extensions: [],
-            data: isUser
+            data: String(user._id)
         };
     }
 };

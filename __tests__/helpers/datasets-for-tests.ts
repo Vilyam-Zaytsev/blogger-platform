@@ -1,11 +1,11 @@
 import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
 import {PostDbType} from "../../src/04-posts/types/post-db-type";
-import {UserDbType} from "../../src/02-users/types/user-db-type";
+import {ConfirmationStatus, UserDbType} from "../../src/02-users/types/user-db-type";
 import {UserInputModel, UserViewModel} from "../../src/02-users/types/input-output-types";
 import {BlogInputModel, BlogViewModel} from "../../src/03-blogs/types/input-output-types";
 import {PostInputModel, PostViewModel} from "../../src/04-posts/types/input-output-types";
 import {CommentInputModel, CommentViewModel} from "../../src/05-comments/types/input-output-types";
-import {AccessTokenType} from "../../src/01-auth/types/access-token-type";
+import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
 
 const blog: BlogDbType = {
     name: 'BLOG',
@@ -29,6 +29,11 @@ const user: UserDbType = {
     email: '@example.com',
     passwordHash: 'hash',
     createdAt: new Date().toISOString(),
+    emailConfirmation: {
+        confirmationCode: null,
+        expirationDate: null,
+        confirmationStatus: ConfirmationStatus.Confirmed
+    }
 } as const;
 
 const userPropertyMap: Record<string, string> = {
@@ -59,7 +64,7 @@ type PresetsType = {
     blogs: BlogViewModel[],
     posts: PostViewModel[],
     comments: CommentViewModel[],
-    accessTokens: AccessTokenType[],
+    accessTokens: LoginSuccessViewModel[],
 };
 
 const presets: PresetsType = {

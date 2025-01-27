@@ -1,7 +1,7 @@
 import {Response} from "supertest";
 import {req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";
-import {AccessTokenType} from "../../../src/01-auth/types/access-token-type";
+import {LoginSuccessViewModel} from "../../../src/01-auth/types/login-success-view-model";
 import {presets} from "../datasets-for-tests";
 
 const authTestManager = {
@@ -17,7 +17,7 @@ const authTestManager = {
                 })
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-            expect(res.body).toEqual<AccessTokenType>(
+            expect(res.body).toEqual<LoginSuccessViewModel>(
                 expect.objectContaining({
                     accessToken: expect.any(String)
                 })

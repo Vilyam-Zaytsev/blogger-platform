@@ -6,10 +6,13 @@ import {
     PaginationAndSortFilterType,
     SortDirection
 } from "../../../src/common/types/input-output-types/pagination-sort-types";
-import {presets, user, userLogins} from "../datasets-for-tests";
+import {presets, user, userLogins, userPropertyMap} from "../datasets-for-tests";
+import {createPaginationAndSortFilter} from "../../../src/common/helpers/create-pagination-and-sort-filter";
 
 const usersTestManager = {
+
     async createUser(numberOfUsers: number) {
+
         const responses: Response[] = [];
 
         for (let i = 0; i < numberOfUsers; i++) {
@@ -45,6 +48,37 @@ const usersTestManager = {
 
 
         return responses;
+    },
+
+    async getUsers() {
+
+        const res: Response = await req
+            .get(SETTINGS.PATH.USERS)
+            .set(
+                'Authorization',
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            )
+            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        const filteredPreset: UserViewModel[] = this.filterAndSort(
+            presets.users,
+            createPaginationAndSortFilter({
+                pageNumber: '1',
+                pageSize: '10',
+                sortBy: 'createdAt',
+                sortDirection: SortDirection.Descending
+            }),
+            userPropertyMap
+        );
+
+        for (let i = 0; i < presets.users.length; i++) {
+            expect(res.body.items[i]).toEqual(filteredPreset[i]);
+        }
+
+        return res.body;
     },
 
     filterAndSort<T extends { login: string; email: string }>(
