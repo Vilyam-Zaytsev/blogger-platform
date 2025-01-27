@@ -6,7 +6,7 @@ import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
-import {OutputErrorsType} from "../common/types/input-output-types/output-errors-type";
+import {ApiErrorResult} from "../common/types/input-output-types/api-error-result";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {UserInputModel, UserMeViewModel} from "../02-users/types/input-output-types";
 import {LoginSuccessViewModel} from "./types/login-success-view-model";
@@ -20,7 +20,7 @@ const authController = {
 
     login: async (
         req: RequestWithBody<LoginInputModel>,
-        res: Response<OutputErrorsType | LoginSuccessViewModel>
+        res: Response<ApiErrorResult | LoginSuccessViewModel>
     ) => {
 
         const authParams: LoginInputModel = {

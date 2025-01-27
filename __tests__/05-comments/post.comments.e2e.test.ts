@@ -21,7 +21,7 @@ import {PostDbType} from "../../src/04-posts/types/post-db-type";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
-import {OutputErrorsType} from "../../src/common/types/input-output-types/output-errors-type";
+import {ApiErrorResult} from "../../src/common/types/input-output-types/api-error-result";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -194,7 +194,7 @@ describe('POST /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect(resCreatedComment.body).toEqual<OutputErrorsType>({
+        expect(resCreatedComment.body).toEqual<ApiErrorResult>({
             errorsMessages: [
                 {
                     field: 'content',
@@ -235,7 +235,7 @@ describe('POST /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect(resCreatedComment.body).toEqual<OutputErrorsType>({
+        expect(resCreatedComment.body).toEqual<ApiErrorResult>({
             errorsMessages: [
                 {
                     field: 'content',
@@ -276,7 +276,7 @@ describe('POST /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect(resCreatedComment.body).toEqual<OutputErrorsType>({
+        expect(resCreatedComment.body).toEqual<ApiErrorResult>({
             errorsMessages: [
                 {
                     field: 'content',
@@ -317,7 +317,7 @@ describe('POST /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect(resCreatedComment.body).toEqual<OutputErrorsType>({
+        expect(resCreatedComment.body).toEqual<ApiErrorResult>({
             errorsMessages: [
                 {
                     field: 'content',

@@ -1,6 +1,6 @@
 import {
     PaginationAndSortFilterType,
-    PaginationResponse
+    Paginator
 } from "../../common/types/input-output-types/pagination-sort-types";
 import {UserMeViewModel, UserViewModel} from "../types/input-output-types";
 import {WithId} from "mongodb";
@@ -9,7 +9,7 @@ import {usersQueryRepository} from "../repositoryes/users-query-repository";
 import {PresentationView} from "../types/presentation-view";
 
 const userQueryService = {
-    async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<PaginationResponse<UserViewModel>> {
+    async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<Paginator<UserViewModel>> {
 
         const {
             pageNumber,

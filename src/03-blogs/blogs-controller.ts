@@ -12,7 +12,7 @@ import {SETTINGS} from "../common/settings";
 import {blogsService} from "./services/blogs-service";
 import {BlogDbType} from "./types/blog-db-type";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
-import {PaginationResponse, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";
+import {Paginator, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";
 import {blogsQueryService} from "./services/blogs-query-service";
 import {IdType} from "../common/types/input-output-types/id-type";
 
@@ -20,7 +20,7 @@ import {IdType} from "../common/types/input-output-types/id-type";
 const blogsController = {
     getBlogs: async (
         req: RequestWithQuery<SortingAndPaginationParamsType>,
-        res: Response<PaginationResponse<BlogDbType>>
+        res: Response<Paginator<BlogDbType>>
     ) => {
 
         const sortingAndPaginationParams: SortingAndPaginationParamsType = {
@@ -31,7 +31,7 @@ const blogsController = {
             searchNameTerm: req.query.searchNameTerm
         }
 
-        const foundBlogs: PaginationResponse<BlogViewModel> = await blogsQueryService
+        const foundBlogs: Paginator<BlogViewModel> = await blogsQueryService
             .findBlogs(createPaginationAndSortFilter(sortingAndPaginationParams));
 
         res

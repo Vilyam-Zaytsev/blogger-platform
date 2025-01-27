@@ -1,13 +1,13 @@
 import {PostDbType} from "../types/post-db-type";
 import {PostViewModel} from "../types/input-output-types";
 import {ObjectId, WithId} from "mongodb";
-import {PaginationAndSortFilterType, PaginationResponse} from "../../common/types/input-output-types/pagination-sort-types";
+import {PaginationAndSortFilterType, Paginator} from "../../common/types/input-output-types/pagination-sort-types";
 import {postsQueryRepository} from "../repositoryes/posts-query-repository";
 import {blogsQueryService} from "../../03-blogs/services/blogs-query-service";
 import {BlogViewModel} from "../../03-blogs/types/input-output-types";
 
 const postsQueryService = {
-    async findPosts(sortQueryDto: PaginationAndSortFilterType, blogId?:string): Promise<PaginationResponse<PostViewModel> | null> {
+    async findPosts(sortQueryDto: PaginationAndSortFilterType, blogId?:string): Promise<Paginator<PostViewModel> | null> {
 
         const {
             pageNumber,

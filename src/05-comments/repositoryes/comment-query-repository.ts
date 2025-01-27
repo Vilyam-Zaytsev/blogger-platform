@@ -4,7 +4,7 @@ import {commentsCollection} from "../../db/mongoDb";
 import {CommentViewModel} from "../types/input-output-types";
 import {
     PaginationAndSortFilterType,
-    PaginationResponse,
+    Paginator,
     SortDirection
 } from "../../common/types/input-output-types/pagination-sort-types";
 
@@ -60,7 +60,7 @@ const commentQueryRepository = {
         comments: CommentViewModel[],
         commentsCount: number,
         paginationAndSortFilter: PaginationAndSortFilterType
-    ): PaginationResponse<CommentViewModel> {
+    ): Paginator<CommentViewModel> {
 
         return {
             pagesCount: Math.ceil(commentsCount / paginationAndSortFilter.pageSize),

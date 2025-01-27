@@ -20,7 +20,7 @@ import {Response} from "supertest";
 import {console_log, generateRandomString, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
-import {OutputErrorsType} from "../../src/common/types/input-output-types/output-errors-type";
+import {ApiErrorResult} from "../../src/common/types/input-output-types/api-error-result";
 import {commentsTestManager} from "../helpers/managers/comments-test-manager";
 
 let mongoServer: MongoMemoryServer;
@@ -162,7 +162,7 @@ describe('PUT /comments', () => {
             .send({})
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect(resPutComments.body).toEqual<OutputErrorsType>({
+        expect(resPutComments.body).toEqual<ApiErrorResult>({
             errorsMessages: [
                 {
                     field: 'content',
@@ -207,7 +207,7 @@ describe('PUT /comments', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect(resPutComments.body).toEqual<OutputErrorsType>({
+        expect(resPutComments.body).toEqual<ApiErrorResult>({
             errorsMessages: [
                 {
                     field: 'content',
@@ -252,7 +252,7 @@ describe('PUT /comments', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect(resPutComments.body).toEqual<OutputErrorsType>({
+        expect(resPutComments.body).toEqual<ApiErrorResult>({
             errorsMessages: [
                 {
                     field: 'content',
@@ -297,7 +297,7 @@ describe('PUT /comments', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect(resPutComments.body).toEqual<OutputErrorsType>({
+        expect(resPutComments.body).toEqual<ApiErrorResult>({
             errorsMessages: [
                 {
                     field: 'content',

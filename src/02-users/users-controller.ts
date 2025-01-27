@@ -1,7 +1,7 @@
 import {Response} from "express";
 import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../common/types/input-output-types/request-types";
 import {
-    PaginationResponse,
+    Paginator,
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {UserInputModel, UserViewModel} from "./types/input-output-types";
@@ -12,7 +12,7 @@ import {createPaginationAndSortFilter} from "../common/helpers/create-pagination
 import {ResultType} from "../common/types/result-types/result-type";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
-import {OutputErrorsType} from "../common/types/input-output-types/output-errors-type";
+import {ApiErrorResult} from "../common/types/input-output-types/api-error-result";
 import {PresentationView} from "./types/presentation-view";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {UserDbType} from "./types/user-db-type";
@@ -21,7 +21,7 @@ import {User} from "./domain/user.entity";
 const usersController = {
     getUsers: async (
         req: RequestWithQuery<SortingAndPaginationParamsType>,
-        res: Response<PaginationResponse<UserViewModel>>
+        res: Response<Paginator<UserViewModel>>
     ) => {
 
         const sortingAndPaginationParams: SortingAndPaginationParamsType = {
@@ -33,7 +33,7 @@ const usersController = {
             searchEmailTerm: req.query.searchEmailTerm,
         };
 
-        const foundUsers: PaginationResponse<UserViewModel> = await userQueryService
+        const foundUsers: Paginator<UserViewModel> = await userQueryService
             .findUsers(createPaginationAndSortFilter(sortingAndPaginationParams));
 
         res
@@ -61,7 +61,7 @@ const usersController = {
     },
     createAndInsertUser: async (
         req: RequestWithBody<UserInputModel>,
-        res: Response<UserViewModel | OutputErrorsType>
+        res: Response<UserViewModel | ApiErrorResult>
     ) => {
 
         const {

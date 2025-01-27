@@ -20,7 +20,7 @@ import {Response} from "supertest";
 import {console_log, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
-import {PaginationResponse, SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
+import {Paginator, SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {commentsTestManager} from "../helpers/managers/comments-test-manager";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
 
@@ -68,7 +68,7 @@ describe('GET /comments', () => {
             .get(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-        expect(resGetComments.body).toEqual<PaginationResponse<CommentViewModel>>({
+        expect(resGetComments.body).toEqual<Paginator<CommentViewModel>>({
             pagesCount: 0,
             page: 1,
             pageSize: 10,
@@ -99,7 +99,7 @@ describe('GET /comments', () => {
             .get(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-        expect(resGetComments.body).toEqual<PaginationResponse<CommentViewModel>>({
+        expect(resGetComments.body).toEqual<Paginator<CommentViewModel>>({
             pagesCount: 1,
             page: 1,
             pageSize: 10,

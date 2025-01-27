@@ -1,7 +1,7 @@
 import {ExtensionsType} from "../types/result-types/extensions-type";
-import {OutputErrorsType} from "../types/input-output-types/output-errors-type";
+import {ApiErrorResult} from "../types/input-output-types/api-error-result";
 
-const mapResultExtensionsToErrorMessage = (extensions: ExtensionsType): OutputErrorsType => {
+const mapResultExtensionsToErrorMessage = (extensions: ExtensionsType): ApiErrorResult => {
     return {
         errorsMessages: [...extensions]
     };

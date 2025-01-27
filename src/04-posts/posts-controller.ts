@@ -8,14 +8,14 @@ import {
 import {SETTINGS} from "../common/settings";
 import {postsService} from "./services/posts-service";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
-import {PaginationResponse, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";
+import {Paginator, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";
 import {postsQueryService} from "./services/posts-query-service";
 import {IdType} from "../common/types/input-output-types/id-type";
 
 const postsController = {
     getPosts: async (
         req: RequestWithParamsAndQuery<IdType, SortingAndPaginationParamsType>,
-        res: Response<PaginationResponse<PostViewModel>>
+        res: Response<Paginator<PostViewModel>>
     ) => {
 
         const sortingAndPaginationParams: SortingAndPaginationParamsType = {
@@ -27,7 +27,7 @@ const postsController = {
 
         const blogId: string = req.params.id
 
-        const foundPosts: PaginationResponse<PostViewModel> | null = await postsQueryService
+        const foundPosts: Paginator<PostViewModel> | null = await postsQueryService
             .findPosts(createPaginationAndSortFilter(sortingAndPaginationParams), blogId);
 
         if (!foundPosts) {

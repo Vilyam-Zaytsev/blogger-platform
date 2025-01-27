@@ -14,7 +14,7 @@ import {SETTINGS} from "../common/settings";
 import {commentQueryRepository} from "./repositoryes/comment-query-repository";
 import {
     PaginationAndSortFilterType,
-    PaginationResponse,
+    Paginator,
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
@@ -23,7 +23,7 @@ const commentsController = {
 
     async getComments(
         req: RequestWithParamsAndQuery<IdType, SortingAndPaginationParamsType>,
-        res: Response<PaginationResponse<CommentViewModel>>
+        res: Response<Paginator<CommentViewModel>>
     ) {
 
         const postId: string = req.params.id;
@@ -59,7 +59,7 @@ const commentsController = {
         const commentsCount: number = await commentQueryRepository
             .getCommentsCount(postId);
 
-        const paginationResponse: PaginationResponse<CommentViewModel> = await commentQueryRepository
+        const paginationResponse: Paginator<CommentViewModel> = await commentQueryRepository
             ._mapCommentsViewModelToPaginationResponse(
                 foundComments,
                 commentsCount,
