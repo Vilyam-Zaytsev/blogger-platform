@@ -4,10 +4,13 @@ import {blogsCollection} from "../../db/mongoDb";
 import {InsertOneResult, ObjectId} from "mongodb";
 
 const blogsRepository = {
+
     async insertBlog(newBlog: BlogDbType): Promise<InsertOneResult> {
+
         return await blogsCollection
             .insertOne(newBlog);
     },
+
     async updateBlog(id: string, data: BlogInputModel): Promise<boolean> {
 
         const result = await blogsCollection
@@ -15,6 +18,7 @@ const blogsRepository = {
 
         return result.matchedCount === 1;
     },
+
     async deleteBlog(id: string): Promise<boolean> {
 
         const result = await blogsCollection

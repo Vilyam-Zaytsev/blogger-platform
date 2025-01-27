@@ -6,6 +6,7 @@ import {
     PaginationAndSortFilterType,
 } from "../../common/types/input-output-types/pagination-sort-types";
 import {createBlogsSearchFilter} from "../helpers/create-blogs-search-filter";
+import {BlogViewModel} from "../types/input-output-types";
 
 const blogsQueryRepository = {
     async findBlogs(sortQueryDto: PaginationAndSortFilterType): Promise<WithId<BlogDbType>[]> {
@@ -30,6 +31,17 @@ const blogsQueryRepository = {
             .limit(pageSize)
             .toArray()
     },
+
+    async findBlog(id: string): Promise<BlogViewModel | null> {
+
+        const blog: WithId<BlogDbType> | null = await blogsCollection
+            .findOne({_id: new ObjectId(id)});
+
+        if (!blog) return null;
+
+        return this._mapDbBlogsToViewModel(blog);
+    },
+
     async getBlogsCount(searchNameTerm: string | null): Promise<number> {
 
         const filter: any = createBlogsSearchFilter(
@@ -40,10 +52,18 @@ const blogsQueryRepository = {
         return blogsCollection
             .countDocuments(filter);
     },
-    async findBlog(id: string): Promise<WithId<BlogDbType> | null> {
-        return await blogsCollection
-            .findOne({_id: new ObjectId(id)});
-    },
+
+    _mapDbBlogsToViewModel(blog: WithId<BlogDbType>): BlogViewModel {
+
+        return {
+            id: String(blog._id),
+            name: blog.name,
+            description: blog.description,
+            websiteUrl: blog.websiteUrl,
+            createdAt: blog.createdAt,
+            isMembership: blog.isMembership
+        };
+    }
 };
 
 export {blogsQueryRepository};

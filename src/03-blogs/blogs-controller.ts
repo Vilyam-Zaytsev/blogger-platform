@@ -15,6 +15,7 @@ import {createPaginationAndSortFilter} from "../common/helpers/create-pagination
 import {Paginator, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";
 import {blogsQueryService} from "./services/blogs-query-service";
 import {IdType} from "../common/types/input-output-types/id-type";
+import {blogsQueryRepository} from "./repositoryes/blogs-query-repository";
 
 
 const blogsController = {
@@ -57,7 +58,8 @@ const blogsController = {
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(foundBlog);
     },
-    createAndInsertBlog: async (
+
+    createBlog: async (
         req: RequestWithBody<BlogInputModel>,
         res: Response<BlogViewModel>
     ) => {
@@ -71,13 +73,14 @@ const blogsController = {
         const idCreatedBlog: string = await blogsService
             .createBlog(dataForCreatingBlog);
 
-        const createdBlog: BlogViewModel | null = await blogsQueryService
+        const createdBlog: BlogViewModel | null = await blogsQueryRepository
             .findBlog(idCreatedBlog);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
             .json(createdBlog!);
     },
+
     updateBlog: async (
         req: RequestWithParamsAndBody<IdType, BlogInputModel>,
         res: Response<BlogViewModel>

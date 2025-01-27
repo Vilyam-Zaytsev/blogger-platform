@@ -56,7 +56,7 @@ blogsRouter.post('/',
     blogDescriptionInputValidator,
     blogWebsiteUrlInputValidator,
     inputCheckErrorsMiddleware,
-    blogsController.createAndInsertBlog
+    blogsController.createBlog
 );
 blogsRouter.put('/:id',
     baseAuthMiddleware,

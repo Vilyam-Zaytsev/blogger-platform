@@ -36,16 +36,7 @@ const blogsQueryService = {
 
         return this.mapToViewModel(foundBlog);
     },
-    mapToViewModel(blog: WithId<BlogDbType>): BlogViewModel {
-        return {
-            id: String(blog._id),
-            name: blog.name,
-            description: blog.description,
-            websiteUrl: blog.websiteUrl,
-            createdAt: blog.createdAt,
-            isMembership: blog.isMembership
-        };
-    },
+
 
 };
 
