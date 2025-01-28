@@ -1,10 +1,9 @@
 import {PostDbType} from "../types/post-db-type";
-import {PostInputModel, PostViewModel} from "../types/input-output-types";
+import {PostInputModel} from "../types/input-output-types";
 import {ObjectId, WithId} from "mongodb";
 import {postsRepository} from "../repositoryes/posts-repository";
-import {blogsQueryService} from "../../03-blogs/services/blogs-query-service";
 import {BlogDbType} from "../../03-blogs/types/blog-db-type";
-import {postsQueryRepository} from "../repositoryes/posts-query-repository";
+import {blogsQueryRepository} from "../../03-blogs/repositoryes/blogs-query-repository";
 
 const postsService = {
     async findPost(id: string): Promise<WithId<PostDbType> | null> {
@@ -17,7 +16,7 @@ const postsService = {
         if (blogId) {
             if (!ObjectId.isValid(blogId)) return null;
 
-            const isExistBlog: BlogDbType | null = await blogsQueryService
+            const isExistBlog: BlogDbType | null = await blogsQueryRepository
                 .findBlog(blogId);
 
             if (!isExistBlog) return null;
@@ -27,7 +26,7 @@ const postsService = {
 
         const newPost: PostDbType = {
             ...data,
-            blogName: (await blogsQueryService.findBlog(data.blogId))!.name,
+            blogName: (await blogsQueryRepository.findBlog(data.blogId))!.name,
             createdAt: new Date().toISOString(),
         };
 

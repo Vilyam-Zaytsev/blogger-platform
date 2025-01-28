@@ -10,7 +10,7 @@ type BlogViewModel = {
     description: string,
     websiteUrl: string,
     createdAt: string,
-    isMembership: boolean //True if user has not expired membership subscription to blog
+    isMembership: boolean
 };
 
 export {

@@ -56,6 +56,7 @@ const commentQueryRepository = {
             createdAt: comment.createdAt
         };
     },
+
     _mapCommentsViewModelToPaginationResponse(
         comments: CommentViewModel[],
         commentsCount: number,

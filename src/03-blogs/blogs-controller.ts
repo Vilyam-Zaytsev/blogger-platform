@@ -12,13 +12,17 @@ import {SETTINGS} from "../common/settings";
 import {blogsService} from "./services/blogs-service";
 import {BlogDbType} from "./types/blog-db-type";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
-import {Paginator, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";
-import {blogsQueryService} from "./services/blogs-query-service";
+import {
+    PaginationAndSortFilterType,
+    Paginator,
+    SortingAndPaginationParamsType
+} from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {blogsQueryRepository} from "./repositoryes/blogs-query-repository";
 
 
 const blogsController = {
+
     getBlogs: async (
         req: RequestWithQuery<SortingAndPaginationParamsType>,
         res: Response<Paginator<BlogDbType>>
@@ -30,21 +34,35 @@ const blogsController = {
             sortBy: req.query.sortBy,
             sortDirection: req.query.sortDirection,
             searchNameTerm: req.query.searchNameTerm
-        }
+        };
 
-        const foundBlogs: Paginator<BlogViewModel> = await blogsQueryService
-            .findBlogs(createPaginationAndSortFilter(sortingAndPaginationParams));
+        const paginationAndSortFilter: PaginationAndSortFilterType =
+            createPaginationAndSortFilter(sortingAndPaginationParams)
+
+        const foundBlogs: BlogViewModel[] = await blogsQueryRepository
+            .findBlogs(paginationAndSortFilter);
+
+        const blogsCount: number = await blogsQueryRepository
+            .getBlogsCount(paginationAndSortFilter.searchNameTerm);
+
+        const paginationResponse: Paginator<BlogViewModel> = await blogsQueryRepository
+            ._mapCommentsViewModelToPaginationResponse(
+                foundBlogs,
+                blogsCount,
+                paginationAndSortFilter
+            )
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(foundBlogs);
+            .json(paginationResponse);
     },
+
     getBlog: async (
         req: RequestWithParams<IdType>,
         res: Response<BlogViewModel>
     ) => {
 
-        const foundBlog: BlogViewModel | null = await blogsQueryService
+        const foundBlog: BlogViewModel | null = await blogsQueryRepository
             .findBlog(req.params.id);
 
         if (!foundBlog) {

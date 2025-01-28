@@ -3,8 +3,8 @@ import {PostViewModel} from "../types/input-output-types";
 import {ObjectId, WithId} from "mongodb";
 import {PaginationAndSortFilterType, Paginator} from "../../common/types/input-output-types/pagination-sort-types";
 import {postsQueryRepository} from "../repositoryes/posts-query-repository";
-import {blogsQueryService} from "../../03-blogs/services/blogs-query-service";
 import {BlogViewModel} from "../../03-blogs/types/input-output-types";
+import {blogsQueryRepository} from "../../03-blogs/repositoryes/blogs-query-repository";
 
 const postsQueryService = {
     async findPosts(sortQueryDto: PaginationAndSortFilterType, blogId?:string): Promise<Paginator<PostViewModel> | null> {
@@ -17,7 +17,7 @@ const postsQueryService = {
         if (blogId) {
             if (!ObjectId.isValid(blogId)) return null;
 
-            const isExistBlog: BlogViewModel | null = await blogsQueryService
+            const isExistBlog: BlogViewModel | null = await blogsQueryRepository
             .findBlog(blogId);
 
             if (!isExistBlog) return null;

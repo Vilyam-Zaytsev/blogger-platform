@@ -43,6 +43,15 @@ const userPropertyMap: Record<string, string> = {
     createdAt: 'createdAt'
 };
 
+const blogPropertyMap: Record<string, string> = {
+    id: 'id',
+    name: 'name',
+    description: 'description',
+    websiteUrl: 'websiteUrl',
+    createdAt: 'createdAt',
+    isMembership: 'isMembership'
+};
+
 const commentPropertyMap: Record<string, string> = {
     id: 'id',
     content: 'content',
@@ -190,6 +199,7 @@ export {
     post,
     user,
     userPropertyMap,
+    blogPropertyMap,
     commentPropertyMap,
     presets,
     userLogins,
