@@ -11,6 +11,7 @@ import {BlogViewModel} from "../types/input-output-types";
 import {CommentViewModel} from "../../05-comments/types/input-output-types";
 
 const blogsQueryRepository = {
+
     async findBlogs(sortQueryDto: PaginationAndSortFilterType): Promise<BlogViewModel[]> {
 
         const {
@@ -21,6 +22,7 @@ const blogsQueryRepository = {
             searchNameTerm
         } = sortQueryDto;
 
+        //TODO что если создание фильтра унести в контроллер???
         const filter: any = createBlogsSearchFilter(
             {searchNameTerm},
             MatchMode.Partial
@@ -48,6 +50,7 @@ const blogsQueryRepository = {
 
     async getBlogsCount(searchNameTerm: string | null): Promise<number> {
 
+        //TODO что если создание фильтра унести в контроллер???
         const filter: any = createBlogsSearchFilter(
             {searchNameTerm},
             MatchMode.Partial

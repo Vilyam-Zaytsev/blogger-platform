@@ -3,6 +3,7 @@ import {BlogInputModel} from "../types/input-output-types";
 import {BlogDbType} from "../types/blog-db-type";
 
 const blogsService = {
+
     async createBlog(blogData: BlogInputModel): Promise<string> {
 
         const newBlog: BlogDbType = {
@@ -11,20 +12,23 @@ const blogsService = {
             isMembership: false,
         };
 
-        const result =  await blogsRepository
+        const resultInsertBlog =  await blogsRepository
             .insertBlog(newBlog);
 
-        return String(result.insertedId);
+        return String(resultInsertBlog.insertedId);
     },
+
     async updateBlog(id: string, data: BlogInputModel): Promise<boolean> {
+
         return await blogsRepository
             .updateBlog(id, data);
     },
+
     async deleteBlog(id: string): Promise<boolean> {
+
         return await blogsRepository
             .deleteBlog(id);
     },
-
 };
 
 export {blogsService};

@@ -70,79 +70,78 @@ const blogsTestManager = {
         return res.body;
     },
 
-//     filterAndSort<T>(
-//         items: T[],
-//         sortAndPaginationFilter: PaginationAndSortFilterType,
-//         propertyMap: Record<string, string>
-//     ) {
-//
-//         const {
-//             pageNumber,
-//             pageSize,
-//             sortBy,
-//             sortDirection,
-//             searchNameTerm,
-//         } = sortAndPaginationFilter;
-//
-//         let startIndex = (pageNumber - 1) * pageSize;
-//         let endIndex = startIndex + pageSize;
-//
-//         const path: string = propertyMap[sortBy];
-//
-//         if (!path) throw new Error(`Invalid sortBy property: ${sortBy}`);
-//
-//         const getValueByPath = (obj: T, path: string): any => {
-//             return path.split('.').reduce((acc: any, key) => acc && acc[key], obj);
-//         };
-//
-//         if (searchNameTerm) {
-//
-//             return items
-//                 .filter(b => b.name.includes(searchNameTerm))
-//                 .sort((a: T, b: T) => {
-//
-//                     const aValue = getValueByPath(a, path);
-//                     const bValue = getValueByPath(b, path);
-//
-//                     if (sortDirection === SortDirection.Descending) {
-//                         if (aValue < bValue) return 1;
-//                         if (aValue > bValue) return -1;
-//                         return 0;
-//                     }
-//                     if (sortDirection === SortDirection.Ascending) {
-//                         if (aValue < bValue) return -1;
-//                         if (aValue > bValue) return 1;
-//                         return 0;
-//                     }
-//
-//                     return 0;
-//                 })
-//                 .slice(startIndex, endIndex);
-//         } else {
-//
-//             return items
-//                 .sort((a: T, b: T) => {
-//
-//                     const aValue = getValueByPath(a, path);
-//                     const bValue = getValueByPath(b, path);
-//
-//                     if (sortDirection === SortDirection.Descending) {
-//                         if (aValue < bValue) return 1;
-//                         if (aValue > bValue) return -1;
-//                         return 0;
-//                     }
-//                     if (sortDirection === SortDirection.Ascending) {
-//                         if (aValue < bValue) return -1;
-//                         if (aValue > bValue) return 1;
-//                         return 0;
-//                     }
-//
-//                     return 0;
-//                 })
-//                 .slice(startIndex, endIndex);
-//         }
-//     }
-// };
+    filterAndSort<T extends { name: string }>(
+        items: T[],
+        sortAndPaginationFilter: PaginationAndSortFilterType,
+        propertyMap: Record<string, string>
+    ) {
+
+        const {
+            pageNumber,
+            pageSize,
+            sortBy,
+            sortDirection,
+            searchNameTerm,
+        } = sortAndPaginationFilter;
+
+        let startIndex = (pageNumber - 1) * pageSize;
+        let endIndex = startIndex + pageSize;
+
+        const path: string = propertyMap[sortBy];
+
+        if (!path) throw new Error(`Invalid sortBy property: ${sortBy}`);
+
+        const getValueByPath = (obj: T, path: string): any => {
+            return path.split('.').reduce((acc: any, key) => acc && acc[key], obj);
+        };
+
+        if (searchNameTerm) {
+
+            return items
+                .filter(b => b.name.includes(searchNameTerm))
+                .sort((a: T, b: T) => {
+
+                    const aValue = getValueByPath(a, path);
+                    const bValue = getValueByPath(b, path);
+
+                    if (sortDirection === SortDirection.Descending) {
+                        if (aValue < bValue) return 1;
+                        if (aValue > bValue) return -1;
+                        return 0;
+                    }
+                    if (sortDirection === SortDirection.Ascending) {
+                        if (aValue < bValue) return -1;
+                        if (aValue > bValue) return 1;
+                        return 0;
+                    }
+
+                    return 0;
+                })
+                .slice(startIndex, endIndex);
+        } else {
+
+            return items
+                .sort((a: T, b: T) => {
+
+                    const aValue = getValueByPath(a, path);
+                    const bValue = getValueByPath(b, path);
+
+                    if (sortDirection === SortDirection.Descending) {
+                        if (aValue < bValue) return 1;
+                        if (aValue > bValue) return -1;
+                        return 0;
+                    }
+                    if (sortDirection === SortDirection.Ascending) {
+                        if (aValue < bValue) return -1;
+                        if (aValue > bValue) return 1;
+                        return 0;
+                    }
+
+                    return 0;
+                })
+                .slice(startIndex, endIndex);
+        }
+    },
 
 // const blogsTestManager = {
 //     async createBlog(
