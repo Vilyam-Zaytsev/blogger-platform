@@ -26,7 +26,7 @@ import {console_log, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
 import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
-import {commentsTestManager} from "../helpers/managers/comments-test-manager";
+import {commentsTestManager} from "../helpers/managers/05_comments-test-manager";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
 
 let mongoServer: MongoMemoryServer;

@@ -232,7 +232,7 @@ describe('POST /blogs', () => {
         console_log(resCreatedBlog.body, resCreatedBlog.status, 'Test 5: post(/blogs)');
     });
 
-    it('should not create a blog if the data in the request body is incorrect.', async () => {
+    it('should not create a blog if the data in the request body is incorrect (name: type number, description: type number, website Url: type number).', async () => {
 
         const resCreatedBlog: Response = await req
             .post(SETTINGS.PATH.BLOGS)
