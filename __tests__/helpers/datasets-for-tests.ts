@@ -103,7 +103,7 @@ const blogNames = [
     'CreativeVibes',
     'TheGastronome',
     'MindfulMusings',
-    'Wanderlust Diaries',
+    'WanderDiaries',
     'CodeCraft',
     'LifestyleLuxe',
     'TheHealthyLife',

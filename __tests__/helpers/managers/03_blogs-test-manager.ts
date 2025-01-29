@@ -98,7 +98,7 @@ const blogsTestManager = {
         if (searchNameTerm) {
 
             return items
-                .filter(b => b.name.includes(searchNameTerm))
+                .filter(b => b.name.toLowerCase().includes(searchNameTerm))
                 .sort((a: T, b: T) => {
 
                     const aValue = getValueByPath(a, path);
