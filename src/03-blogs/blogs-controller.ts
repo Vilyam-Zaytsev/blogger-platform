@@ -123,6 +123,7 @@ const blogsController = {
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     },
+
     deleteBlog: async (
         req: RequestWithParams<IdType>,
         res: Response
