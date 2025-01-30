@@ -2,10 +2,14 @@ import {encodingAdminDataInBase64, req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";
 import {Response} from "supertest";
 import {BlogInputModel, BlogViewModel} from "../../../src/03-blogs/types/input-output-types";
-import {blogDescriptions, blogNames, blogPropertyMap, presets} from "../datasets-for-tests";
-import {createPaginationAndSortFilter} from "../../../src/common/helpers/create-pagination-and-sort-filter";
 import {
-    PaginationAndSortFilterType, Paginator,
+    blogDescriptions,
+    blogNames,
+    presets
+} from "../datasets-for-tests";
+import {
+    PaginationAndSortFilterType,
+    Paginator,
     SortDirection
 } from "../../../src/common/types/input-output-types/pagination-sort-types";
 

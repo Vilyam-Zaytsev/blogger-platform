@@ -2,11 +2,10 @@ import {Response} from "supertest";
 import {
     console_log,
     encodingAdminDataInBase64,
-    generateRandomString,
     req
 } from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {blog, clearPresets, presets} from "../helpers/datasets-for-tests";
+import {clearPresets, presets} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";

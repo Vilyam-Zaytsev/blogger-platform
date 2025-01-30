@@ -1,12 +1,7 @@
 import {Response} from "supertest";
-import {
-    console_log,
-    encodingAdminDataInBase64,
-    generateRandomString,
-    req
-} from '../helpers/test-helpers';
+import {console_log, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {blog, blogPropertyMap, presets} from "../helpers/datasets-for-tests";
+import {blogPropertyMap, clearPresets, presets} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
@@ -38,7 +33,7 @@ afterAll(async () => {
 beforeEach(async () => {
     await blogsCollection.deleteMany({});
 
-    presets.blogs = [];
+    clearPresets();
 });
 
 

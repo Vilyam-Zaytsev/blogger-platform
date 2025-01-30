@@ -1,15 +1,10 @@
 import {Response} from "supertest";
-import {
-    console_log,
-    encodingAdminDataInBase64,
-    generateRandomString,
-    req
-} from '../helpers/test-helpers';
+import {console_log, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {blog, blogPropertyMap, clearPresets, presets} from "../helpers/datasets-for-tests";
+import {blogPropertyMap, clearPresets, presets} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
-import {MongoClient, ObjectId} from "mongodb";
+import {MongoClient} from "mongodb";
 import {blogsCollection, setBlogsCollection} from "../../src/db/mongoDb";
 import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";

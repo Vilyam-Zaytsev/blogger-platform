@@ -1,10 +1,10 @@
 import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
 import {PostDbType} from "../../src/04-posts/types/post-db-type";
 import {ConfirmationStatus, UserDbType} from "../../src/02-users/types/user-db-type";
-import {UserInputModel, UserViewModel} from "../../src/02-users/types/input-output-types";
-import {BlogInputModel, BlogViewModel} from "../../src/03-blogs/types/input-output-types";
-import {PostInputModel, PostViewModel} from "../../src/04-posts/types/input-output-types";
-import {CommentInputModel, CommentViewModel} from "../../src/05-comments/types/input-output-types";
+import {UserViewModel} from "../../src/02-users/types/input-output-types";
+import {BlogViewModel} from "../../src/03-blogs/types/input-output-types";
+import {PostViewModel} from "../../src/04-posts/types/input-output-types";
+import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
 
 const blog: BlogDbType = {

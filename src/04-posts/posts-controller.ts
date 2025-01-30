@@ -59,7 +59,7 @@ const postsController = {
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(foundPost);
     },
-    createAndInsertPost: async (
+    createPost: async (
         req: RequestWithParamsAndBody<IdType, PostInputModel>,
         res: Response<PostViewModel>
     ) => {

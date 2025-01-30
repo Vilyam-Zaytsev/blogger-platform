@@ -43,7 +43,7 @@ postsRouter.post('/',
     postContentInputValidator,
     postBlogIdInputValidator,
     inputCheckErrorsMiddleware,
-    postsController.createAndInsertPost
+    postsController.createPost
 );
 postsRouter.post(`/:id${SETTINGS.PATH.COMMENTS}`,
     bearerAuthorizationMiddleware,

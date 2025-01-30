@@ -19,6 +19,7 @@ import {
 } from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {blogsQueryRepository} from "./repositoryes/blogs-query-repository";
+import {PostInputModel, PostViewModel} from "../04-posts/types/input-output-types";
 
 
 const blogsController = {
@@ -97,6 +98,13 @@ const blogsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
             .json(createdBlog!);
+    },
+
+    createPost: async (
+        req: RequestWithParamsAndBody<IdType, PostInputModel>,
+        res: Response<PostViewModel>
+    ) => {
+
     },
 
     updateBlog: async (

@@ -6,10 +6,10 @@ import {
     req
 } from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {blog, blogDescriptions, blogNames, presets} from "../helpers/datasets-for-tests";
+import {blogDescriptions, blogNames, clearPresets, presets} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
-import {MongoClient, ObjectId} from "mongodb";
+import {MongoClient} from "mongodb";
 import {blogsCollection, setBlogsCollection} from "../../src/db/mongoDb";
 import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
 import {BlogViewModel} from "../../src/03-blogs/types/input-output-types";
@@ -36,7 +36,7 @@ afterAll(async () => {
 beforeEach(async () => {
     await blogsCollection.deleteMany({});
 
-    presets.blogs = [];
+    clearPresets();
 });
 
     describe('PUT /blogs', () => {
