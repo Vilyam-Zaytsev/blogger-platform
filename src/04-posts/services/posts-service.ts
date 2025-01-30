@@ -11,18 +11,33 @@ const postsService = {
         return await postsRepository
             .findPost(id);
     },
-    async createPost(data: PostInputModel, blogId?: string): Promise<string | null> {
 
-        if (blogId) {
-            if (!ObjectId.isValid(blogId)) return null;
+    // async createPost(data: PostInputModel, blogId?: string): Promise<string | null> {
+    //
+    //     if (blogId) {
+    //         if (!ObjectId.isValid(blogId)) return null;
+    //
+    //         const isExistBlog: BlogDbType | null = await blogsQueryRepository
+    //             .findBlog(blogId);
+    //
+    //         if (!isExistBlog) return null;
+    //
+    //         data.blogId = blogId;
+    //     }
+    //
+    //     const newPost: PostDbType = {
+    //         ...data,
+    //         blogName: (await blogsQueryRepository.findBlog(data.blogId))!.name,
+    //         createdAt: new Date().toISOString(),
+    //     };
+    //
+    //     const result = await postsRepository
+    //         .insertPost(newPost);
+    //
+    //     return String(result.insertedId);
+    // },
 
-            const isExistBlog: BlogDbType | null = await blogsQueryRepository
-                .findBlog(blogId);
-
-            if (!isExistBlog) return null;
-
-            data.blogId = blogId;
-        }
+    async createPost(data: PostInputModel): Promise<string> {
 
         const newPost: PostDbType = {
             ...data,

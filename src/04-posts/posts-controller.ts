@@ -1,6 +1,7 @@
 import {Response} from "express";
 import {PostInputModel, PostViewModel} from "./types/input-output-types";
 import {
+    RequestWithBody,
     RequestWithParams,
     RequestWithParamsAndBody,
     RequestWithParamsAndQuery
@@ -9,8 +10,8 @@ import {SETTINGS} from "../common/settings";
 import {postsService} from "./services/posts-service";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 import {Paginator, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";
-import {postsQueryService} from "./services/posts-query-service";
 import {IdType} from "../common/types/input-output-types/id-type";
+import {postsQueryRepository} from "./repositoryes/posts-query-repository";
 
 const postsController = {
     getPosts: async (
@@ -59,10 +60,43 @@ const postsController = {
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(foundPost);
     },
+
+    // createPost: async (
+    //     req: RequestWithParamsAndBody<IdType, PostInputModel>,
+    //     res: Response<PostViewModel>
+    // ) => {
+    //     const dataForCreatingPost: PostInputModel = {
+    //         title: req.body.title,
+    //         shortDescription: req.body.shortDescription,
+    //         content: req.body.content,
+    //         blogId: req.body.blogId,
+    //     };
+    //
+    //     const blogId: string = req.params.id;
+    //
+    //     const idCreatedPost: string | null = await postsService
+    //         .createPost(dataForCreatingPost, blogId);
+    //
+    //     if (!idCreatedPost) {
+    //         res
+    //             .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
+    //
+    //         return;
+    //     }
+    //
+    //     const createdPost: PostViewModel | null = await postsQueryService
+    //         .findPost(idCreatedPost);
+    //
+    //     res
+    //         .status(SETTINGS.HTTP_STATUSES.CREATED_201)
+    //         .json(createdPost!);
+    // },
+
     createPost: async (
-        req: RequestWithParamsAndBody<IdType, PostInputModel>,
+        req: RequestWithBody<PostInputModel>,
         res: Response<PostViewModel>
     ) => {
+
         const dataForCreatingPost: PostInputModel = {
             title: req.body.title,
             shortDescription: req.body.shortDescription,
@@ -70,25 +104,17 @@ const postsController = {
             blogId: req.body.blogId,
         };
 
-        const blogId: string = req.params.id;
-
         const idCreatedPost: string | null = await postsService
-            .createPost(dataForCreatingPost, blogId);
+            .createPost(dataForCreatingPost);
 
-        if (!idCreatedPost) {
-            res
-                .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
-
-            return;
-        }
-
-        const createdPost: PostViewModel | null = await postsQueryService
+        const createdPost: PostViewModel | null = await postsQueryRepository
             .findPost(idCreatedPost);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
             .json(createdPost!);
     },
+
     updatePost: async (
         req: RequestWithParamsAndBody<IdType, PostInputModel>,
         res: Response<PostViewModel>

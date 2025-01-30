@@ -1,12 +1,10 @@
 import {Response} from "express";
-import {
-    BlogInputModel,
-    BlogViewModel
-} from "./types/input-output-types";
+import {BlogInputModel, BlogPostInputModel, BlogViewModel} from "./types/input-output-types";
 import {
     RequestWithBody,
     RequestWithParams,
-    RequestWithParamsAndBody, RequestWithQuery
+    RequestWithParamsAndBody,
+    RequestWithQuery
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
 import {blogsService} from "./services/blogs-service";
@@ -19,7 +17,11 @@ import {
 } from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {blogsQueryRepository} from "./repositoryes/blogs-query-repository";
-import {PostInputModel, PostViewModel} from "../04-posts/types/input-output-types";
+import {PostViewModel} from "../04-posts/types/input-output-types";
+import {ResultType} from "../common/types/result-types/result-type";
+import {ResultStatus} from "../common/types/result-types/result-status";
+import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
+import {postsQueryRepository} from "../04-posts/repositoryes/posts-query-repository";
 
 
 const blogsController = {
@@ -101,10 +103,35 @@ const blogsController = {
     },
 
     createPost: async (
-        req: RequestWithParamsAndBody<IdType, PostInputModel>,
+        req: RequestWithParamsAndBody<IdType, BlogPostInputModel>,
         res: Response<PostViewModel>
     ) => {
 
+        const blogId: string = req.params.id;
+
+        const dataForCreatingPost: BlogPostInputModel = {
+            title: req.body.title,
+            shortDescription: req.body.shortDescription,
+            content: req.body.content,
+        };
+
+        const resultCreatedPost: ResultType<string | null> = await blogsService
+            .createPost(blogId, dataForCreatingPost);
+
+        if (resultCreatedPost.status !== ResultStatus.Success) {
+
+            res
+                .sendStatus(mapResultStatusToHttpStatus(resultCreatedPost.status));
+
+            return;
+        }
+
+        const createdPost: PostViewModel | null = await postsQueryRepository
+            .findPost(resultCreatedPost.data!);
+
+        res
+            .status(SETTINGS.HTTP_STATUSES.CREATED_201)
+            .json(createdPost!)
     },
 
     updateBlog: async (

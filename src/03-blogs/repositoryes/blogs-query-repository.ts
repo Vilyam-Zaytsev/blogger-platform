@@ -35,7 +35,7 @@ const blogsQueryRepository = {
             .limit(pageSize)
             .toArray();
 
-        return blogs.map(b => this._mapDbBlogsToViewModel(b));
+        return blogs.map(b => this._mapDbBlogToViewModel(b));
     },
 
     async findBlog(id: string): Promise<BlogViewModel | null> {
@@ -45,7 +45,7 @@ const blogsQueryRepository = {
 
         if (!blog) return null;
 
-        return this._mapDbBlogsToViewModel(blog);
+        return this._mapDbBlogToViewModel(blog);
     },
 
     async getBlogsCount(searchNameTerm: string | null): Promise<number> {
@@ -60,7 +60,7 @@ const blogsQueryRepository = {
             .countDocuments(filter);
     },
 
-    _mapDbBlogsToViewModel(blog: WithId<BlogDbType>): BlogViewModel {
+    _mapDbBlogToViewModel(blog: WithId<BlogDbType>): BlogViewModel {
 
         return {
             id: String(blog._id),

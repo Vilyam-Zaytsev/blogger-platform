@@ -5,6 +5,11 @@ import {InsertOneResult, ObjectId} from "mongodb";
 
 const blogsRepository = {
 
+    async findBlog(id: string): Promise<BlogDbType | null> {
+      return await blogsCollection
+          .findOne({_id: new ObjectId(id)});
+    },
+
     async insertBlog(newBlog: BlogDbType): Promise<InsertOneResult> {
 
         return await blogsCollection
