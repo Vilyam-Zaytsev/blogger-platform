@@ -4,18 +4,23 @@ import {
     RequestWithBody,
     RequestWithParams,
     RequestWithParamsAndBody,
-    RequestWithParamsAndQuery
+    RequestWithQuery
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
 import {postsService} from "./services/posts-service";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
-import {Paginator, SortingAndPaginationParamsType} from "../common/types/input-output-types/pagination-sort-types";
+import {
+    PaginationAndSortFilterType,
+    Paginator,
+    SortingAndPaginationParamsType
+} from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {postsQueryRepository} from "./repositoryes/posts-query-repository";
 
 const postsController = {
+
     getPosts: async (
-        req: RequestWithParamsAndQuery<IdType, SortingAndPaginationParamsType>,
+        req: RequestWithQuery<SortingAndPaginationParamsType>,
         res: Response<Paginator<PostViewModel>>
     ) => {
 
@@ -24,29 +29,34 @@ const postsController = {
             pageSize: req.query.pageSize,
             sortBy: req.query.sortBy,
             sortDirection: req.query.sortDirection,
-        }
+        };
 
-        const blogId: string = req.params.id
+        const paginationAndSortFilter: PaginationAndSortFilterType = createPaginationAndSortFilter(sortingAndPaginationParams)
 
-        const foundPosts: Paginator<PostViewModel> | null = await postsQueryService
-            .findPosts(createPaginationAndSortFilter(sortingAndPaginationParams), blogId);
+        const foundPosts: PostViewModel[] = await postsQueryRepository
+            .findPosts(paginationAndSortFilter);
 
-        if (!foundPosts) {
-            res.sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
+        const postsCount: number = await postsQueryRepository
+            .getPostsCount();
 
-            return;
-        }
+        const paginationResponse: Paginator<PostViewModel> = await postsQueryRepository
+            ._mapPostsViewModelToPaginationResponse(
+                foundPosts,
+                postsCount,
+                paginationAndSortFilter
+            );
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(foundPosts);
+            .json(paginationResponse);
     },
+
     getPost: async (
         req: RequestWithParams<IdType>,
         res: Response<PostViewModel>
     ) => {
 
-        const foundPost: PostViewModel | null = await postsQueryService
+        const foundPost: PostViewModel | null = await postsQueryRepository
             .findPost(req.params.id);
 
         if (!foundPost) {
@@ -140,10 +150,12 @@ const postsController = {
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
     },
+
     deletePost: async (
         req: RequestWithParams<IdType>,
         res: Response
     ) => {
+
         const isDeletedPost: boolean = await postsService
             .deletePost(req.params.id);
 
