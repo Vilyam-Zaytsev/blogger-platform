@@ -72,7 +72,7 @@ const blogsQueryRepository = {
         };
     },
 
-    _mapCommentsViewModelToPaginationResponse(
+    _mapBlogsViewModelToPaginationResponse(
         blogs: BlogViewModel[],
         blogsCount: number,
         paginationAndSortFilter: PaginationAndSortFilterType

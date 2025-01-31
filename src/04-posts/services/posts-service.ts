@@ -4,6 +4,7 @@ import {ObjectId, WithId} from "mongodb";
 import {postsRepository} from "../repositoryes/posts-repository";
 import {BlogDbType} from "../../03-blogs/types/blog-db-type";
 import {blogsQueryRepository} from "../../03-blogs/repositoryes/blogs-query-repository";
+import {blogsRepository} from "../../03-blogs/repositoryes/blogs-repository";
 
 const postsService = {
     async findPost(id: string): Promise<WithId<PostDbType> | null> {
@@ -41,7 +42,7 @@ const postsService = {
 
         const newPost: PostDbType = {
             ...data,
-            blogName: (await blogsQueryRepository.findBlog(data.blogId))!.name,
+            blogName: (await blogsRepository.findBlog(data.blogId))!.name,
             createdAt: new Date().toISOString(),
         };
 
@@ -50,11 +51,15 @@ const postsService = {
 
         return String(result.insertedId);
     },
+
     async updatePost(id: string, data: PostInputModel): Promise<boolean> {
+
         return await postsRepository
             .updatePost(id, data);
     },
+
     async deletePost(id: string): Promise<boolean> {
+
         return await postsRepository
             .deletePost(id);
     },

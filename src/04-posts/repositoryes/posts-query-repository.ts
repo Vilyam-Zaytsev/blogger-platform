@@ -1,13 +1,18 @@
 import {PostDbType} from "../types/post-db-type";
 import {postsCollection} from "../../db/mongoDb";
 import {ObjectId, Sort, WithId} from "mongodb";
-import {MatchMode, PaginationAndSortFilterType} from "../../common/types/input-output-types/pagination-sort-types";
+import {
+    MatchMode,
+    PaginationAndSortFilterType,
+    Paginator
+} from "../../common/types/input-output-types/pagination-sort-types";
 import {createPostsSearchFilter} from "../helpers/create-posts-search-filter";
 import {PostViewModel} from "../types/input-output-types";
+import {BlogViewModel} from "../../03-blogs/types/input-output-types";
 
 
 const postsQueryRepository = {
-    async findPosts(sortQueryDto: PaginationAndSortFilterType, blogId?: string): Promise<WithId<PostDbType>[]> {
+    async findPosts(sortQueryDto: PaginationAndSortFilterType, blogId?: string): Promise<PostViewModel[]> {
 
         const {
             pageNumber,
@@ -21,12 +26,14 @@ const postsQueryRepository = {
             MatchMode.Exact
         );
 
-        return await postsCollection
+        const posts: WithId<PostDbType>[] = await postsCollection
             .find(filter)
             .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as Sort)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .toArray();
+
+        return posts.map(p => this._mapDbPostToViewModel(p));
     },
 
     async getPostsCount(blogId?: string ): Promise<number> {
@@ -60,6 +67,21 @@ const postsQueryRepository = {
             createdAt: post.createdAt
         };
     },
+
+    _mapPostsViewModelToPaginationResponse(
+        posts: PostViewModel[],
+        blogsCount: number,
+        paginationAndSortFilter: PaginationAndSortFilterType
+    ): Paginator<PostViewModel> {
+
+        return {
+            pagesCount: Math.ceil(blogsCount / paginationAndSortFilter.pageSize),
+            page: paginationAndSortFilter.pageNumber,
+            pageSize: paginationAndSortFilter.pageSize,
+            totalCount: blogsCount,
+            items: posts
+        };
+    }
 };
 
 export {postsQueryRepository};
