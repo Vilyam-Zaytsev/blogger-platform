@@ -52,6 +52,16 @@ const blogPropertyMap: Record<string, string> = {
     isMembership: 'isMembership'
 };
 
+const postPropertyMap: Record<string, string> = {
+    id: 'id',
+    title: 'title',
+    shortDescription: 'shortDescription',
+    content: 'content',
+    blogId: 'blogId',
+    blogName: 'blogName',
+    createdAt: 'createdAt'
+};
+
 const commentPropertyMap: Record<string, string> = {
     id: 'id',
     content: 'content',
@@ -139,7 +149,7 @@ const blogDescriptions = [
 const postTitles = [
     'The Future of Tech',
     'Inspiration for Creatives',
-    'Gourmet Recipes: Simple & Delicious',
+    'Gourmet Recipes',
     'Be More Mindful Daily',
     'Best Travel Destinations 2025',
     'Master Python in 30 Days',
@@ -147,7 +157,7 @@ const postTitles = [
     'Healthy Lifestyle Every Day',
     'Fashion Trends 2025: Wear Now',
     'Eco-Trends: Living in Harmony',
-    'Digital Nomad Life: Work Anywhere'
+    'Digital Nomad Life'
 ] as const;
 
 const postShortDescriptions = [
@@ -200,6 +210,7 @@ export {
     user,
     userPropertyMap,
     blogPropertyMap,
+    postPropertyMap,
     commentPropertyMap,
     presets,
     userLogins,

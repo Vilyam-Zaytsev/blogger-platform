@@ -42,7 +42,7 @@ const blogsService = {
         };
 
         const resultCreatedPost: string = await postsService
-            .createPost(dataForCreatingPost[blogId]);
+            .createPost({...dataForCreatingPost, blogId});
 
         return {
             status: ResultStatus.Success,

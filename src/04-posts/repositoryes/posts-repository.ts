@@ -4,15 +4,19 @@ import {postsCollection} from "../../db/mongoDb";
 import {InsertOneResult, ObjectId, WithId} from "mongodb";
 
 const postsRepository = {
+
     async findPost(id: string): Promise<WithId<PostDbType> | null> {
 
         return await postsCollection
             .findOne({_id: new ObjectId(id)});
     },
+
     async insertPost(newPost: PostDbType): Promise<InsertOneResult> {
+
             return  await postsCollection
                 .insertOne(newPost);
     },
+
     async updatePost(id: string, data: PostInputModel): Promise<boolean> {
 
             const result = await postsCollection
@@ -20,6 +24,7 @@ const postsRepository = {
 
             return result.matchedCount === 1;
     },
+
     async deletePost(id: string): Promise<boolean> {
 
             const result = await postsCollection
