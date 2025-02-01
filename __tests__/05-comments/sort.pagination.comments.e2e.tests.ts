@@ -61,6 +61,7 @@ beforeEach(async () => {
 });
 
 describe('pagination and sort /comments', () => {
+
     it('should use default pagination values when none are provided by the client.', async () => {
 
         await blogsTestManager
@@ -103,6 +104,7 @@ describe('pagination and sort /comments', () => {
 
         console_log(resGetComments.body, resGetComments.status, 'Test 1: pagination and sort(/comments)');
     });
+
     it('should use client-provided pagination values to return the correct subset of data.', async () => {
 
         await blogsTestManager
@@ -151,6 +153,7 @@ describe('pagination and sort /comments', () => {
 
         console_log(resGetComments.body, resGetComments.status, 'Test 2: pagination and sort(/comments)');
     });
+
     it('should return a 400 error if the client has passed invalid pagination values.', async () => {
 
         await blogsTestManager
