@@ -2,6 +2,7 @@ import {UserDbType} from "../types/user-db-type";
 import {usersRepository} from "../repositoryes/users-repository";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ResultStatus} from "../../common/types/result-types/result-status";
+import {WithId} from "mongodb";
 
 const usersService = {
 
@@ -22,12 +23,14 @@ const usersService = {
     },
 
     async deleteUser(id: string): Promise<boolean> {
+
         return await usersRepository
             .deleteUser(id);
     },
+
     async validateCandidateUniqueness(login: string, email: string): Promise<ResultType> {
 
-        const findByLogin = await usersRepository
+        const findByLogin: WithId<UserDbType> | null = await usersRepository
             .findByLoginOrEmail(login);
 
         if (findByLogin) {
@@ -42,7 +45,7 @@ const usersService = {
             }
         }
 
-        const findByEmail = await usersRepository
+        const findByEmail:  WithId<UserDbType> | null = await usersRepository
             .findByLoginOrEmail(email);
 
         if (findByEmail) {

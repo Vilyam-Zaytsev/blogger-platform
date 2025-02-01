@@ -10,7 +10,6 @@ import {ApiErrorResult} from "../common/types/input-output-types/api-error-resul
 import {IdType} from "../common/types/input-output-types/id-type";
 import {UserInputModel, UserMeViewModel} from "../02-users/types/input-output-types";
 import {LoginSuccessViewModel} from "./types/login-success-view-model";
-import {userQueryService} from "../02-users/services/users-query-servise";
 import {PresentationView} from "../02-users/types/presentation-view";
 import {SETTINGS} from "../common/settings";
 import {RegistrationConfirmationCodeType} from "./types/registration-confirmation-code-type";
@@ -124,12 +123,12 @@ const authController = {
                 .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
         }
 
-        const me: UserMeViewModel = await userQueryService
-            .findUser(userId, PresentationView.MeViewModal) as UserMeViewModel;
-
-        res
-            .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(me);
+        // const me: UserMeViewModel = await userQueryService
+        //     .findUser(userId, PresentationView.MeViewModal) as UserMeViewModel;
+        //
+        // res
+        //     .status(SETTINGS.HTTP_STATUSES.OK_200)
+        //     .json(me);
     },
 };
 

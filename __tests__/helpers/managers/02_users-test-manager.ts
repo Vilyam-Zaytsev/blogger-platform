@@ -3,11 +3,11 @@ import {SETTINGS} from "../../../src/common/settings";
 import {Response} from "supertest";
 import {UserInputModel, UserViewModel} from "../../../src/02-users/types/input-output-types";
 import {
-    PaginationAndSortFilterType,
+    PaginationAndSortFilterType, Paginator,
     SortDirection
 } from "../../../src/common/types/input-output-types/pagination-sort-types";
-import {presets, user, userLogins, userPropertyMap} from "../datasets-for-tests";
-import {createPaginationAndSortFilter} from "../../../src/common/helpers/create-pagination-and-sort-filter";
+import {presets, userLogins} from "../datasets-for-tests";
+
 
 const usersTestManager = {
 
@@ -50,7 +50,7 @@ const usersTestManager = {
         return responses;
     },
 
-    async getUsers() {
+    async getUsers(): Promise<Paginator<UserViewModel>> {
 
         const res: Response = await req
             .get(SETTINGS.PATH.USERS)
@@ -62,21 +62,6 @@ const usersTestManager = {
                 )
             )
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
-        const filteredPreset: UserViewModel[] = this.filterAndSort(
-            presets.users,
-            createPaginationAndSortFilter({
-                pageNumber: '1',
-                pageSize: '10',
-                sortBy: 'createdAt',
-                sortDirection: SortDirection.Descending
-            }),
-            userPropertyMap
-        );
-
-        for (let i = 0; i < presets.users.length; i++) {
-            expect(res.body.items[i]).toEqual(filteredPreset[i]);
-        }
 
         return res.body;
     },

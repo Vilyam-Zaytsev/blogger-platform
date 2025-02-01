@@ -1,6 +1,6 @@
 import {ConfirmationStatus, UserDbType} from "../types/user-db-type";
 import {InsertOneResult, ObjectId, Sort, WithId} from "mongodb";
-import {postsCollection, usersCollection} from "../../db/mongoDb";
+import {usersCollection} from "../../db/mongoDb";
 import {
     MatchMode,
     PaginationAndSortFilterType,

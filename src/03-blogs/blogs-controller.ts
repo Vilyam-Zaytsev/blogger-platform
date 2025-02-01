@@ -40,7 +40,7 @@ const blogsController = {
         };
 
         const paginationAndSortFilter: PaginationAndSortFilterType =
-            createPaginationAndSortFilter(sortingAndPaginationParams)
+            createPaginationAndSortFilter(sortingAndPaginationParams);
 
         const foundBlogs: BlogViewModel[] = await blogsQueryRepository
             .findBlogs(paginationAndSortFilter);
