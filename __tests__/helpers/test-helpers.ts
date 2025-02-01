@@ -9,7 +9,7 @@ const console_log = (responseBody: any, statusCode: number, descriptions: string
         JSON.stringify({
             ResponseBody: responseBody,
             StatusCode: statusCode,
-        }, null, 2),
+        }, (key, value) => (typeof value === "object" && value !== null ? value : value), 4),
     )
 };
 
