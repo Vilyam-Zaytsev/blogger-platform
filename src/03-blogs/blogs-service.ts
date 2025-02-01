@@ -1,10 +1,10 @@
-import {blogsRepository} from "../repositoryes/blogs-repository";
-import {BlogInputModel, BlogPostInputModel} from "../types/input-output-types";
-import {BlogDbType} from "../types/blog-db-type";
-import {ResultType} from "../../common/types/result-types/result-type";
+import {blogsRepository} from "./repositoryes/blogs-repository";
+import {BlogInputModel, BlogPostInputModel} from "./types/input-output-types";
+import {BlogDbType} from "./types/blog-db-type";
+import {ResultType} from "../common/types/result-types/result-type";
 import {ObjectId} from "mongodb";
-import {ResultStatus} from "../../common/types/result-types/result-status";
-import {postsService} from "../../04-posts/services/posts-service";
+import {ResultStatus} from "../common/types/result-types/result-status";
+import {postsService} from "../04-posts/posts-service";
 
 const blogsService = {
 

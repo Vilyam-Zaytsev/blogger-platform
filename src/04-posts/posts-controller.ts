@@ -7,7 +7,7 @@ import {
     RequestWithQuery
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
-import {postsService} from "./services/posts-service";
+import {postsService} from "./posts-service";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 import {
     PaginationAndSortFilterType,
@@ -70,37 +70,6 @@ const postsController = {
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(foundPost);
     },
-
-    // createPost: async (
-    //     req: RequestWithParamsAndBody<IdType, PostInputModel>,
-    //     res: Response<PostViewModel>
-    // ) => {
-    //     const dataForCreatingPost: PostInputModel = {
-    //         title: req.body.title,
-    //         shortDescription: req.body.shortDescription,
-    //         content: req.body.content,
-    //         blogId: req.body.blogId,
-    //     };
-    //
-    //     const blogId: string = req.params.id;
-    //
-    //     const idCreatedPost: string | null = await postsService
-    //         .createPost(dataForCreatingPost, blogId);
-    //
-    //     if (!idCreatedPost) {
-    //         res
-    //             .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
-    //
-    //         return;
-    //     }
-    //
-    //     const createdPost: PostViewModel | null = await postsQueryService
-    //         .findPost(idCreatedPost);
-    //
-    //     res
-    //         .status(SETTINGS.HTTP_STATUSES.CREATED_201)
-    //         .json(createdPost!);
-    // },
 
     createPost: async (
         req: RequestWithBody<PostInputModel>,

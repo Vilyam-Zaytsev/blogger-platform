@@ -68,6 +68,15 @@ const postsTestManager = {
         return res.body;
     },
 
+    async getPost(id: string): Promise<Paginator<PostViewModel>> {
+
+        const res: Response = await req
+            .get(`${SETTINGS.PATH.POSTS}/${id}`)
+            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        return res.body;
+    },
+
     filterAndSort<T>(
         items: T[],
         sortAndPaginationFilter: PaginationAndSortFilterType,
