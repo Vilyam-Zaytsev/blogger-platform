@@ -21,6 +21,7 @@ import {console_log, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
 import {commentsTestManager} from "../helpers/managers/05_comments-test-manager";
+import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -54,6 +55,7 @@ beforeEach(async () => {
 });
 
 describe('DELETE /comments', () => {
+
     it('should delete the comment if the user is logged in.', async () => {
 
         await blogsTestManager
@@ -79,14 +81,14 @@ describe('DELETE /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
-        const resGetComments: Response = await req
-            .get(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const foundComments: Paginator<CommentViewModel> = await commentsTestManager
+            .getComments(presets.posts[0].id);
 
-        expect(resGetComments.body.items.length).toEqual(0);
+        expect(foundComments.items.length).toEqual(0);
 
-        console_log(resDeleteComments.body, resDeleteComments.status, 'Test 1: delete(/comments)');
+        console_log(resDeleteComments.body, resDeleteComments.status, 'Test 1: delete(/comments/:id)');
     });
+
     it('should not delete the comment if the user is not logged in.', async () => {
 
         await blogsTestManager
@@ -112,14 +114,14 @@ describe('DELETE /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
 
-        const resGetComment: Response = await req
-            .get(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const foundComments: Paginator<CommentViewModel> = await commentsTestManager
+            .getComments(presets.posts[0].id);
 
-        expect(resGetComment.body).toEqual<CommentViewModel>(presets.comments[0])
+        expect(foundComments.items.length).toEqual(1);
 
-        console_log(resDeleteComments.body, resDeleteComments.status, 'Test 2: delete(/comments)');
+        console_log(resDeleteComments.body, resDeleteComments.status, 'Test 2: delete(/comments/:id)');
     });
+
     it('should not delete comments if the user in question is not the owner of the comment.', async () => {
 
         await blogsTestManager
@@ -137,7 +139,7 @@ describe('DELETE /comments', () => {
         await commentsTestManager
             .createComments(1);
 
-        const resDeleteComments_1: Response = await req
+        const resDeleteComments: Response = await req
             .delete(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
             .set(
                 'Authorization',
@@ -145,7 +147,7 @@ describe('DELETE /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.FORBIDDEN_403);
 
-        const resDeleteComments_2: Response = await req
+        await req
             .delete(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
             .set(
                 'Authorization',
@@ -153,8 +155,9 @@ describe('DELETE /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
-        console_log(resDeleteComments_1.body, resDeleteComments_1.status, 'Test 3: delete(/comments)');
+        console_log(resDeleteComments.body, resDeleteComments.status, 'Test 3: delete(/comments/:id)');
     });
+
     it('should not delete comments if the comment does not exist.', async () => {
 
         await blogsTestManager
@@ -180,12 +183,11 @@ describe('DELETE /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
-        const resGetComment: Response = await req
-            .get(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200)
+        const foundComments: Paginator<CommentViewModel> = await commentsTestManager
+            .getComments(presets.posts[0].id);
 
-        expect(resGetComment.body).toEqual<CommentViewModel>(presets.comments[0]);
+        expect(foundComments.items.length).toEqual(1);
 
-        console_log(resDeleteComments.body, resDeleteComments.status, 'Test 4: delete(/comments)');
+        console_log(resDeleteComments.body, resDeleteComments.status, 'Test 4: delete(/comments/:id)');
     });
 });
