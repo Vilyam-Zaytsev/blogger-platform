@@ -56,6 +56,7 @@ beforeEach(async () => {
 });
 
 describe('GET /comments', () => {
+
     it('should return an empty array.', async () => {
 
         await blogsTestManager
@@ -78,6 +79,7 @@ describe('GET /comments', () => {
 
         console_log(resGetComments.body, resGetComments.status, 'Test 1: get(/comments)');
     });
+
     it('should return an array with a single comment.', async () => {
 
         await blogsTestManager
@@ -121,6 +123,7 @@ describe('GET /comments', () => {
 
         console_log(resGetComments.body, resGetComments.status, 'Test 2: get(/comments)');
     });
+
     it('should return an array with three comments.', async () => {
 
         await blogsTestManager
@@ -161,6 +164,7 @@ describe('GET /comments', () => {
 
         console_log(resGetComments.body, resGetComments.status, 'Test 3: get(/comments)');
     });
+
     it('should return comment found by id.', async () => {
 
         await blogsTestManager
@@ -184,8 +188,9 @@ describe('GET /comments', () => {
 
         expect(resGetComment.body).toEqual(presets.comments[0])
 
-        console_log(resGetComment.body, resGetComment.status, 'Test 4: getById(/comments)');
+        console_log(resGetComment.body, resGetComment.status, 'Test 4: get(/comments/:id)');
     });
+
     it('should return the 404 not found error (if the comment with this ID does not exist).', async () => {
 
         await blogsTestManager
@@ -213,6 +218,6 @@ describe('GET /comments', () => {
 
         expect(resGetComment_2.body).toEqual(presets.comments[0])
 
-        console_log(resGetComment_1.body, resGetComment_1.status, 'Test 5: getById(/comments)');
+        console_log(resGetComment_1.body, resGetComment_1.status, 'Test 5: get(/comments/:id)');
     });
 });
