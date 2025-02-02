@@ -1,11 +1,14 @@
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {
-    blogsCollection, commentsCollection, postsCollection,
+    blogsCollection,
+    commentsCollection,
+    postsCollection,
+    usersCollection,
     setBlogsCollection,
     setCommentsCollection,
     setPostsCollection,
-    setUsersCollection, usersCollection
+    setUsersCollection,
 } from "../../src/db/mongoDb";
 import {UserDbType} from "../../src/02-users/types/user-db-type";
 import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
@@ -86,7 +89,7 @@ describe('pagination and sort /comments', () => {
         for (let i = 0; i < resGetComments.body.items.length; i++) {
             expect(resGetComments.body.items[i]).toEqual(
                 commentsTestManager.filterAndSort<CommentViewModel>(
-                    presets.comments,
+                    [...presets.comments],
                     createPaginationAndSortFilter({
                         pageNumber: '1',
                         pageSize: '10',
@@ -135,7 +138,7 @@ describe('pagination and sort /comments', () => {
         for (let i = 0; i < resGetComments.body.items.length; i++) {
             expect(resGetComments.body.items[i]).toEqual(
                 commentsTestManager.filterAndSort<CommentViewModel>(
-                    presets.comments,
+                    [...presets.comments],
                     createPaginationAndSortFilter({
                         pageNumber: '2',
                         pageSize: '3',

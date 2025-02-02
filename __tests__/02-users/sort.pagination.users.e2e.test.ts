@@ -1,6 +1,14 @@
-import {console_log_e2e, encodingAdminDataInBase64, req} from '../helpers/test-helpers';
+import {
+    console_log_e2e,
+    encodingAdminDataInBase64,
+    req
+} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {clearPresets, presets, userLogins, userPropertyMap} from "../helpers/datasets-for-tests";
+import {
+    clearPresets,
+    presets,
+    userPropertyMap
+} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
@@ -60,7 +68,7 @@ describe('pagination, sort, search in term /users', () => {
             pageSize: 10,
             totalCount: 11,
             items: usersTestManager.filterAndSort<UserViewModel>(
-                presets.users,
+                [...presets.users],
                 createPaginationAndSortFilter({
                     pageNumber: '1',
                     pageSize: '10',
@@ -104,7 +112,7 @@ describe('pagination, sort, search in term /users', () => {
             pageSize: 3,
             totalCount: 11,
             items: usersTestManager.filterAndSort<UserViewModel>(
-                presets.users,
+                [...presets.users],
                 createPaginationAndSortFilter({
                     pageNumber: '2',
                     pageSize: '3',
@@ -148,7 +156,7 @@ describe('pagination, sort, search in term /users', () => {
             pageSize: 2,
             totalCount: 11,
             items: usersTestManager.filterAndSort<UserViewModel>(
-                presets.users,
+                [...presets.users],
                 createPaginationAndSortFilter({
                     pageNumber: '6',
                     pageSize: '2',
@@ -189,7 +197,7 @@ describe('pagination, sort, search in term /users', () => {
             pageSize: 10,
             totalCount: 2,
             items: usersTestManager.filterAndSort<UserViewModel>(
-                presets.users,
+                [...presets.users],
                 createPaginationAndSortFilter({
                     searchLoginTerm: 'ro',
                 }),
@@ -227,7 +235,7 @@ describe('pagination, sort, search in term /users', () => {
             pageSize: 10,
             totalCount: 2,
             items: usersTestManager.filterAndSort<UserViewModel>(
-                presets.users,
+                [...presets.users],
                 createPaginationAndSortFilter({
                     searchEmailTerm: 'ro',
                 }),
@@ -266,7 +274,7 @@ describe('pagination, sort, search in term /users', () => {
             pageSize: 10,
             totalCount: 4,
             items: usersTestManager.filterAndSort<UserViewModel>(
-                presets.users,
+                [...presets.users],
                 createPaginationAndSortFilter({
                     searchLoginTerm: 'ro',
                     searchEmailTerm: 'la'

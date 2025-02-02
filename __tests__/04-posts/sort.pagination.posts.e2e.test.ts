@@ -68,7 +68,7 @@ describe('pagination, sort /posts', () => {
             pageSize: 10,
             totalCount: 11,
             items: postsTestManager.filterAndSort(
-                presets.posts,
+                [...presets.posts],
                 createPaginationAndSortFilter({
                     pageNumber: '1',
                     pageSize: '10',
@@ -108,7 +108,7 @@ describe('pagination, sort /posts', () => {
             pageSize: 3,
             totalCount: 11,
             items: postsTestManager.filterAndSort(
-                presets.posts,
+                [...presets.posts],
                 createPaginationAndSortFilter({
                     pageNumber: '2',
                     pageSize: '3',
@@ -148,7 +148,7 @@ describe('pagination, sort /posts', () => {
             pageSize: 2,
             totalCount: 11,
             items: postsTestManager.filterAndSort(
-                presets.posts,
+                [...presets.posts],
                 createPaginationAndSortFilter({
                     pageNumber: '6',
                     pageSize: '2',
@@ -188,7 +188,7 @@ describe('pagination, sort /posts', () => {
             pageSize: 2,
             totalCount: 11,
             items: postsTestManager.filterAndSort(
-                presets.posts,
+                [...presets.posts],
                 createPaginationAndSortFilter({
                     pageNumber: '6',
                     pageSize: '2',

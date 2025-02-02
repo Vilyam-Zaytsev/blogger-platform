@@ -1,7 +1,11 @@
 import {Response} from "supertest";
 import {console_log_e2e, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {blogPropertyMap, clearPresets, presets} from "../helpers/datasets-for-tests";
+import {
+    blogPropertyMap,
+    clearPresets,
+    presets
+} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
@@ -95,7 +99,7 @@ describe('GET /blogs', () => {
             "pageSize": 10,
             "totalCount": presets.blogs.length,
             "items": blogsTestManager.filterAndSort<BlogViewModel>(
-                presets.blogs,
+                [...presets.blogs],
                 createPaginationAndSortFilter({
                     pageNumber: '1',
                     pageSize: '10',

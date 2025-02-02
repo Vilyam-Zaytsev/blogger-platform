@@ -1,6 +1,6 @@
-import {console_log_e2e, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
+import {console_log_e2e, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {blog, clearPresets, post, postPropertyMap, presets} from "../helpers/datasets-for-tests";
+import {clearPresets, postPropertyMap, presets} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
@@ -94,7 +94,7 @@ beforeEach(async () => {
                 pageSize: 10,
                 totalCount: 3,
                 items: postsTestManager.filterAndSort(
-                    presets.posts,
+                    [...presets.posts],
                     createPaginationAndSortFilter({
                         pageNumber: '1',
                         pageSize: '10',

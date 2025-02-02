@@ -1,17 +1,25 @@
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
 import {
-    blogsCollection, commentsCollection, postsCollection,
+    blogsCollection,
+    commentsCollection,
+    postsCollection,
     setBlogsCollection,
     setCommentsCollection,
     setPostsCollection,
-    setUsersCollection, usersCollection
+    setUsersCollection,
+    usersCollection
 } from "../../src/db/mongoDb";
 import {UserDbType} from "../../src/02-users/types/user-db-type";
 import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
 import {PostDbType} from "../../src/04-posts/types/post-db-type";
 import {CommentDbType} from "../../src/05-comments/types/comment-db-type";
-import {clearPresets, comments, incorrectAccessToken, presets} from "../helpers/datasets-for-tests";
+import {
+    clearPresets,
+    comments,
+    incorrectAccessToken,
+    presets
+} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
 import {postsTestManager} from "../helpers/managers/04_posts-test-manager";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";

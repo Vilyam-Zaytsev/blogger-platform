@@ -5,7 +5,8 @@ import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {
     blogsCollection,
-    commentsCollection, postsCollection,
+    commentsCollection,
+    postsCollection,
     setBlogsCollection,
     setCommentsCollection, setPostsCollection,
     setUsersCollection,

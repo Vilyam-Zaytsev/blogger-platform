@@ -63,7 +63,7 @@ clearPresets();
                 "pageSize": 10,
                 "totalCount": 3,
                 "items": postsTestManager.filterAndSort(
-                    presets.posts,
+                    [...presets.posts],
                     createPaginationAndSortFilter({
                         pageNumber: '1',
                         pageSize: '10',
@@ -102,7 +102,7 @@ clearPresets();
                 pageSize: 3,
                 totalCount: 11,
                 items: postsTestManager.filterAndSort(
-                    presets.posts,
+                    [...presets.posts],
                     createPaginationAndSortFilter({
                         pageNumber: '2',
                         pageSize: '3',

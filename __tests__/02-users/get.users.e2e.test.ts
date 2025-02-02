@@ -122,7 +122,7 @@ describe('GET /users', () => {
 
             expect(resGetUsers.body.items).toEqual(
                 usersTestManager.filterAndSort<UserViewModel>(
-                    presets.users,
+                    [...presets.users],
                     createPaginationAndSortFilter({
                         pageNumber: '1',
                         pageSize: '10',
