@@ -23,9 +23,7 @@ const authTestManager = {
                 })
             );
 
-            presets.accessTokens.push(res.body);
-
-            responses.push(res);
+            presets.accessTokens.push(res.body.accessToken);
         }
 
         return responses;

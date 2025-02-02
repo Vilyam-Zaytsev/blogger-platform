@@ -10,10 +10,10 @@ import {ApiErrorResult} from "../common/types/input-output-types/api-error-resul
 import {IdType} from "../common/types/input-output-types/id-type";
 import {UserInputModel, UserMeViewModel} from "../02-users/types/input-output-types";
 import {LoginSuccessViewModel} from "./types/login-success-view-model";
-import {PresentationView} from "../02-users/types/presentation-view";
 import {SETTINGS} from "../common/settings";
 import {RegistrationConfirmationCodeType} from "./types/registration-confirmation-code-type";
 import {RegistrationEmailResendingType} from "./types/registration-email-resending-type";
+import {usersQueryRepository} from "../02-users/repositoryes/users-query-repository";
 
 const authController = {
 
@@ -119,16 +119,17 @@ const authController = {
         const userId: string = String(req.user?.id);
 
         if (!userId) {
+
             res
                 .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
         }
 
-        // const me: UserMeViewModel = await userQueryService
-        //     .findUser(userId, PresentationView.MeViewModal) as UserMeViewModel;
-        //
-        // res
-        //     .status(SETTINGS.HTTP_STATUSES.OK_200)
-        //     .json(me);
+        const me: UserMeViewModel | null = await usersQueryRepository
+            .findUserAndMapToMeViewModel(userId);
+
+        res
+            .status(SETTINGS.HTTP_STATUSES.OK_200)
+            .json(me!);
     },
 };
 

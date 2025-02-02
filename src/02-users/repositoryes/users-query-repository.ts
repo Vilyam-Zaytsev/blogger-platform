@@ -50,6 +50,16 @@ const usersQueryRepository = {
         return this._mapDbUserToViewModel(user);
     },
 
+    async findUserAndMapToMeViewModel(id: string): Promise<UserMeViewModel | null> {
+
+        const user: WithId<UserDbType> | null = await usersCollection
+            .findOne({_id: new ObjectId(id)});
+
+        if (!user) return null;
+
+        return this._mapDbUserToMeViewModel(user);
+    },
+
     async getUsersCount(
         searchLoginTerm: string | null,
         searchEmailTerm: string | null
@@ -77,7 +87,7 @@ const usersQueryRepository = {
         };
     },
 
-    mapToMeViewModel(user: WithId<UserDbType>): UserMeViewModel {
+    _mapDbUserToMeViewModel(user: WithId<UserDbType>): UserMeViewModel {
 
         return {
             email: user.email,
