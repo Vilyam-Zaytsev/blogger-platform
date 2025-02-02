@@ -1,23 +1,31 @@
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
 import {
-    blogsCollection, commentsCollection, postsCollection,
+    blogsCollection,
+    commentsCollection,
+    postsCollection,
+    usersCollection,
     setBlogsCollection,
     setCommentsCollection,
     setPostsCollection,
-    setUsersCollection, usersCollection
+    setUsersCollection,
 } from "../../src/db/mongoDb";
 import {UserDbType} from "../../src/02-users/types/user-db-type";
 import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
 import {PostDbType} from "../../src/04-posts/types/post-db-type";
 import {CommentDbType} from "../../src/05-comments/types/comment-db-type";
-import {clearPresets, commentPropertyMap, comments, incorrectAccessToken, presets} from "../helpers/datasets-for-tests";
+import {
+    clearPresets,
+    commentPropertyMap,
+    comments,
+    presets
+} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
 import {postsTestManager} from "../helpers/managers/04_posts-test-manager";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {Response} from "supertest";
-import {console_log, req} from "../helpers/test-helpers";
+import {console_log_e2e, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
 import {Paginator, SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
@@ -77,7 +85,7 @@ describe('GET /comments', () => {
             items: []
         });
 
-        console_log(resGetComments.body, resGetComments.status, 'Test 1: get(/comments)');
+        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 1: get(/comments)');
     });
 
     it('should return an array with a single comment.', async () => {
@@ -121,7 +129,7 @@ describe('GET /comments', () => {
 
         expect(resGetComments.body.items.length).toEqual(1);
 
-        console_log(resGetComments.body, resGetComments.status, 'Test 2: get(/comments)');
+        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 2: get(/comments)');
     });
 
     it('should return an array with three comments.', async () => {
@@ -162,7 +170,7 @@ describe('GET /comments', () => {
 
         expect(resGetComments.body.items.length).toEqual(3);
 
-        console_log(resGetComments.body, resGetComments.status, 'Test 3: get(/comments)');
+        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 3: get(/comments)');
     });
 
     it('should return comment found by id.', async () => {
@@ -188,7 +196,7 @@ describe('GET /comments', () => {
 
         expect(resGetComment.body).toEqual(presets.comments[0])
 
-        console_log(resGetComment.body, resGetComment.status, 'Test 4: get(/comments/:id)');
+        console_log_e2e(resGetComment.body, resGetComment.status, 'Test 4: get(/comments/:id)');
     });
 
     it('should return the 404 not found error (if the comment with this ID does not exist).', async () => {
@@ -218,6 +226,6 @@ describe('GET /comments', () => {
 
         expect(resGetComment_2.body).toEqual(presets.comments[0])
 
-        console_log(resGetComment_1.body, resGetComment_1.status, 'Test 5: get(/comments/:id)');
+        console_log_e2e(resGetComment_1.body, resGetComment_1.status, 'Test 5: get(/comments/:id)');
     });
 });

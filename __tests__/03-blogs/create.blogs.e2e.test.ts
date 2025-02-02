@@ -1,6 +1,6 @@
 import {Response} from "supertest";
 import {
-    console_log,
+    console_log_e2e,
     encodingAdminDataInBase64,
     generateRandomString,
     req
@@ -76,7 +76,7 @@ describe('POST /blogs', () => {
 
         expect(resCreatedBlog.body).toEqual(foundBlog);
 
-        console_log(resCreatedBlog.body, resCreatedBlog.status, 'Test 1: post(/blogs)');
+        console_log_e2e(resCreatedBlog.body, resCreatedBlog.status, 'Test 1: post(/blogs)');
     });
 
     it('should not create a blog if the admin is not authenticated.', async () => {
@@ -102,7 +102,7 @@ describe('POST /blogs', () => {
 
         expect(foundBlogs.items.length).toEqual(0);
 
-        console_log(resCreatedBlog.body, resCreatedBlog.status, 'Test 2: post(/blogs)');
+        console_log_e2e(resCreatedBlog.body, resCreatedBlog.status, 'Test 2: post(/blogs)');
     });
 
     it('should not create a blog if the data in the request body is incorrect (an empty object is passed).', async () => {
@@ -143,7 +143,7 @@ describe('POST /blogs', () => {
 
         expect(foundBlogs.items.length).toEqual(0);
 
-        console_log(resCreatedBlog.body, resCreatedBlog.status, 'Test 3: post(/blogs)');
+        console_log_e2e(resCreatedBlog.body, resCreatedBlog.status, 'Test 3: post(/blogs)');
     });
 
     it('should not create a blog if the data in the request body is incorrect (name: empty line, description: empty line, website Url: empty line).', async () => {
@@ -188,7 +188,7 @@ describe('POST /blogs', () => {
 
         expect(foundBlogs.items.length).toEqual(0);
 
-        console_log(resCreatedBlog.body, resCreatedBlog.status, 'Test 4: post(/blogs)');
+        console_log_e2e(resCreatedBlog.body, resCreatedBlog.status, 'Test 4: post(/blogs)');
     });
 
     it('should not create a blog if the data in the request body is incorrect (name: exceeds max length, description: exceeds max length, website Url: exceeds max length).', async () => {
@@ -233,7 +233,7 @@ describe('POST /blogs', () => {
 
         expect(foundBlogs.items.length).toEqual(0);
 
-        console_log(resCreatedBlog.body, resCreatedBlog.status, 'Test 5: post(/blogs)');
+        console_log_e2e(resCreatedBlog.body, resCreatedBlog.status, 'Test 5: post(/blogs)');
     });
 
     it('should not create a blog if the data in the request body is incorrect (name: type number, description: type number, website Url: type number).', async () => {
@@ -278,7 +278,7 @@ describe('POST /blogs', () => {
 
         expect(foundBlogs.items.length).toEqual(0);
 
-        console_log(resCreatedBlog.body, resCreatedBlog.status, 'Test 6: post(/blogs)');
+        console_log_e2e(resCreatedBlog.body, resCreatedBlog.status, 'Test 6: post(/blogs)');
     });
 
     it('should not create a blog if the data in the request body is incorrect (invalid url).', async () => {
@@ -315,6 +315,6 @@ describe('POST /blogs', () => {
 
         expect(foundBlogs.items.length).toEqual(0);
 
-        console_log(resCreatedBlog.body, resCreatedBlog.status, 'Test 7: post(/blogs)');
+        console_log_e2e(resCreatedBlog.body, resCreatedBlog.status, 'Test 7: post(/blogs)');
     });
 });

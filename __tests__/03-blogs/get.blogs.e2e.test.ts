@@ -1,7 +1,11 @@
 import {Response} from "supertest";
-import {console_log, req} from '../helpers/test-helpers';
+import {console_log_e2e, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {blogPropertyMap, clearPresets, presets} from "../helpers/datasets-for-tests";
+import {
+    blogPropertyMap,
+    clearPresets,
+    presets
+} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
@@ -53,7 +57,7 @@ describe('GET /blogs', () => {
             "items": []
         })
 
-        console_log(res.body, res.status, 'Test 1: get(/blogs)');
+        console_log_e2e(res.body, res.status, 'Test 1: get(/blogs)');
     });
 
     it('should return an array with a single blog.', async () => {
@@ -77,7 +81,7 @@ describe('GET /blogs', () => {
         expect(presets.blogs.length).toEqual(1);
 
 
-        console_log(resGetBlogs.body, resGetBlogs.status, 'Test 2: get(/blogs)');
+        console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 2: get(/blogs)');
     });
 
     it('should return an array with a three blogs.', async () => {
@@ -95,7 +99,7 @@ describe('GET /blogs', () => {
             "pageSize": 10,
             "totalCount": presets.blogs.length,
             "items": blogsTestManager.filterAndSort<BlogViewModel>(
-                presets.blogs,
+                [...presets.blogs],
                 createPaginationAndSortFilter({
                     pageNumber: '1',
                     pageSize: '10',
@@ -109,7 +113,7 @@ describe('GET /blogs', () => {
         expect(resGetBlogs.body.items.length).toEqual(3);
         expect(presets.blogs.length).toEqual(3);
 
-        console_log(resGetBlogs.body, resGetBlogs.status, 'Test 3: get(/blogs)');
+        console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 3: get(/blogs)');
     });
 
     it('should return blog found by id.', async () => {
@@ -123,7 +127,7 @@ describe('GET /blogs', () => {
 
         expect(resGetBlog.body).toEqual(presets.blogs[0]);
 
-        console_log(resGetBlog.body, resGetBlog.status, 'Test 4: get(/blogs)');
+        console_log_e2e(resGetBlog.body, resGetBlog.status, 'Test 4: get(/blogs)');
     });
 
     it('should return error 404 not found.', async () => {
@@ -141,6 +145,6 @@ describe('GET /blogs', () => {
 
         expect(resGetBlog_2.body).toEqual(presets.blogs[0]);
 
-        console_log(resGetBlog_1.body, resGetBlog_1.status, 'Test 5: get(/blogs)');
+        console_log_e2e(resGetBlog_1.body, resGetBlog_1.status, 'Test 5: get(/blogs)');
     });
 });

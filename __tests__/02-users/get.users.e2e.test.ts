@@ -1,6 +1,10 @@
-import {console_log, encodingAdminDataInBase64, req} from '../helpers/test-helpers';
+import {console_log_e2e, encodingAdminDataInBase64, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {clearPresets, presets, userPropertyMap} from "../helpers/datasets-for-tests";
+import {
+    clearPresets,
+    presets,
+    userPropertyMap
+} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
@@ -59,7 +63,7 @@ describe('GET /users', () => {
             items: []
         });
 
-        console_log(resGetUsers.body, resGetUsers.status, 'Test 1: get(/users)');
+        console_log_e2e(resGetUsers.body, resGetUsers.status, 'Test 1: get(/users)');
     });
 
     it('should return a 401 error if the admin is not authenticated', async () => {
@@ -75,7 +79,7 @@ describe('GET /users', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
 
-        console_log(resGetUsers.body, resGetUsers.status, 'Test 2: get(/users)');
+        console_log_e2e(resGetUsers.body, resGetUsers.status, 'Test 2: get(/users)');
     });
 
     it('should return an array with a single user, the admin is authenticated.', async () => {
@@ -97,7 +101,7 @@ describe('GET /users', () => {
         expect(resGetUsers.body.items[0]).toEqual(presets.users[0]);
         expect(resGetUsers.body.items.length).toEqual(1);
 
-        console_log(resGetUsers.body, resGetUsers.status, 'Test 3: get(/users)');
+        console_log_e2e(resGetUsers.body, resGetUsers.status, 'Test 3: get(/users)');
     });
 
     it('should return an array with a three users, the admin is authenticated.', async () => {
@@ -118,7 +122,7 @@ describe('GET /users', () => {
 
             expect(resGetUsers.body.items).toEqual(
                 usersTestManager.filterAndSort<UserViewModel>(
-                    presets.users,
+                    [...presets.users],
                     createPaginationAndSortFilter({
                         pageNumber: '1',
                         pageSize: '10',
@@ -131,6 +135,6 @@ describe('GET /users', () => {
 
         expect(resGetUsers.body.items.length).toEqual(3);
 
-        console_log(resGetUsers.body, resGetUsers.status, 'Test 4: get(/users)');
+        console_log_e2e(resGetUsers.body, resGetUsers.status, 'Test 4: get(/users)');
     });
 });

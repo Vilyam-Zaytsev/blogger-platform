@@ -1,4 +1,4 @@
-import {console_log, encodingAdminDataInBase64, req} from '../helpers/test-helpers';
+import {console_log_e2e, encodingAdminDataInBase64, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, presets} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
@@ -64,7 +64,7 @@ beforeEach(async () => {
 
             expect(foundPosts.items.length).toEqual(0);
 
-            console_log(resDeletePost.body, resDeletePost.status, 'Test 1: delete(/posts/:id)');
+            console_log_e2e(resDeletePost.body, resDeletePost.status, 'Test 1: delete(/posts/:id)');
         });
 
         it('should not delete blog, the admin is not authenticated.', async () => {
@@ -91,7 +91,7 @@ beforeEach(async () => {
             expect(foundPosts.items[0]).toEqual(presets.posts[0]);
             expect(foundPosts.items.length).toEqual(1);
 
-            console_log(resDeletePost.body, resDeletePost.status, 'Test 2: delete(/posts/:id)');
+            console_log_e2e(resDeletePost.body, resDeletePost.status, 'Test 2: delete(/posts/:id)');
         });
 
         it('should return a 404 error if the blog was not found by the passed ID in the parameters.', async () => {
@@ -118,6 +118,6 @@ beforeEach(async () => {
             expect(foundPosts.items[0]).toEqual(presets.posts[0]);
             expect(foundPosts.items.length).toEqual(1);
 
-            console_log(resDeletePost.body, resDeletePost.status, 'Test 3: delete(/posts/:id)');
+            console_log_e2e(resDeletePost.body, resDeletePost.status, 'Test 3: delete(/posts/:id)');
         });
     });

@@ -1,4 +1,4 @@
-import {console_log, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
+import {console_log_e2e, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, presets} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
@@ -57,7 +57,7 @@ beforeEach(async () => {
 
             expect(foundUsers.items.length).toEqual(0);
 
-            console_log(resDeleteUser.body, resDeleteUser.status, 'Test 1: delete(/users)');
+            console_log_e2e(resDeleteUser.body, resDeleteUser.status, 'Test 1: delete(/users)');
         });
 
         it('should not delete user, the admin is not authenticated.', async () => {
@@ -81,7 +81,7 @@ beforeEach(async () => {
             expect(foundUsers.items[0]).toEqual<UserViewModel>(presets.users[0]);
             expect(foundUsers.items.length).toEqual(1);
 
-            console_log(resDeleteUser.body, resDeleteUser.status, 'Test 2: delete(/users)');
+            console_log_e2e(resDeleteUser.body, resDeleteUser.status, 'Test 2: delete(/users)');
         });
 
         it('should return a 404 error if the user was not found by the passed ID in the parameters.', async () => {
@@ -105,6 +105,6 @@ beforeEach(async () => {
             expect(foundUsers.items[0]).toEqual<UserViewModel>(presets.users[0]);
             expect(foundUsers.items.length).toEqual(1);
 
-            console_log(resDeleteUser.body, resDeleteUser.status, 'Test 3: delete(/users)');
+            console_log_e2e(resDeleteUser.body, resDeleteUser.status, 'Test 3: delete(/users)');
         });
     });

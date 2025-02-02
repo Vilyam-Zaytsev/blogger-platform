@@ -3,12 +3,21 @@ import {agent} from "supertest";
 
 const req = agent(app);
 
-const console_log = (responseBody: any, statusCode: number, descriptions: string) => {
+const console_log_e2e = (responseBody: any, statusCode: number, descriptions: string) => {
     console.log(
         `\x1b[4;36m***************${descriptions}***************\x1b[0m\n`,
         JSON.stringify({
             ResponseBody: responseBody,
             StatusCode: statusCode,
+        }, (key, value) => (typeof value === "object" && value !== null ? value : value), 4),
+    )
+};
+
+const console_log_unit = (result: any, descriptions: string) => {
+    console.log(
+        `\x1b[4;36m***************${descriptions}***************\x1b[0m\n`,
+        JSON.stringify({
+            Result: result,
         }, (key, value) => (typeof value === "object" && value !== null ? value : value), 4),
     )
 };
@@ -33,7 +42,8 @@ const encodingAdminDataInBase64 = (login: string, password: string) => {
 
 export {
     req,
-    console_log,
+    console_log_e2e,
+    console_log_unit,
     generateRandomString,
     encodingAdminDataInBase64,
 };

@@ -1,4 +1,4 @@
-import {console_log, encodingAdminDataInBase64, generateRandomString, req} from './__tests__/helpers/test-helpers';
+import {console_log_e2e, encodingAdminDataInBase64, generateRandomString, req} from './__tests__/helpers/test-helpers';
 import {SETTINGS} from "./src/common/settings";
 import {incorrectAccessToken, user} from "./__tests__/helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
@@ -82,7 +82,7 @@ describe('/auth', () => {
                 })
             );
 
-            console_log(resAuth.body, resAuth.status, 'Test 1: post(/auth/users)');
+            console_log_e2e(resAuth.body, resAuth.status, 'Test 1: post(/auth/users)');
         });
         it('should be authorized if the user has sent the correct data (login or email and password).', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -132,7 +132,7 @@ describe('/auth', () => {
                 })
             );
 
-            console_log(resAuth.body, resAuth.status, 'Test 2: post(/auth/users)');
+            console_log_e2e(resAuth.body, resAuth.status, 'Test 2: post(/auth/users)');
         });
         it('should not log in if the user has sent invalid data (login or email address and password).', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -188,7 +188,7 @@ describe('/auth', () => {
                 }
             );
 
-            console_log(resAuth.body, resAuth.status, 'Test 3: post(/auth/users)');
+            console_log_e2e(resAuth.body, resAuth.status, 'Test 3: post(/auth/users)');
         });
         it('should not log in if the user has sent invalid data (login or email address and password).', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -245,7 +245,7 @@ describe('/auth', () => {
                 ]
             });
 
-            console_log(resAuth.body, resAuth.status, 'Test 4: post(/auth/users)');
+            console_log_e2e(resAuth.body, resAuth.status, 'Test 4: post(/auth/users)');
         });
         it('should not log in if the user has sent invalid data (login or email address and password).', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -302,7 +302,7 @@ describe('/auth', () => {
                 ]
             });
 
-            console_log(resAuth.body, resAuth.status, 'Test 5: post(/auth/users)');
+            console_log_e2e(resAuth.body, resAuth.status, 'Test 5: post(/auth/users)');
         });
         it('should not log in if the user has sent invalid data (login or email address and password).', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -359,7 +359,7 @@ describe('/auth', () => {
                 ]
             });
 
-            console_log(resAuth.body, resAuth.status, 'Test 6: post(/auth/users)');
+            console_log_e2e(resAuth.body, resAuth.status, 'Test 6: post(/auth/users)');
         });
         it('should not be authorized if the user has sent incorrect data (login or email address and password).', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -412,7 +412,7 @@ describe('/auth', () => {
                 ]
             });
 
-            console_log(resAuth.body, resAuth.status, 'Test 7: post(/auth/users)');
+            console_log_e2e(resAuth.body, resAuth.status, 'Test 7: post(/auth/users)');
         });
         it('should not be authorized if the user has sent incorrect data (login or email address and password).', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -465,7 +465,7 @@ describe('/auth', () => {
                 ]
             });
 
-            console_log(resAuth.body, resAuth.status, 'Test 8: post(/auth/users)');
+            console_log_e2e(resAuth.body, resAuth.status, 'Test 8: post(/auth/users)');
         });
         it('should not create a user if the data in the request body is incorrect.', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -520,7 +520,7 @@ describe('/auth', () => {
                 items: []
             });
 
-            console_log(resPost[0].body, resPost[0].status, 'Test 9: post(/users)');
+            console_log_e2e(resPost[0].body, resPost[0].status, 'Test 9: post(/users)');
         });
     });
     describe('GET /auth/me', () => {
@@ -588,7 +588,7 @@ describe('/auth', () => {
                 })
             )
 
-            console_log(resMe.body, resMe.status, 'Test 1: post(/auth/me)');
+            console_log_e2e(resMe.body, resMe.status, 'Test 1: post(/auth/me)');
         });
         it('should return a 401 error if the user is logged in (sending an invalid access token).', async () => {
             const resPost: Response[] = await usersTestManager.createUser(
@@ -646,7 +646,7 @@ describe('/auth', () => {
                 )
                 .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
 
-            console_log(resMe.body, resMe.status, 'Test 2: post(/auth/me)');
+            console_log_e2e(resMe.body, resMe.status, 'Test 2: post(/auth/me)');
         });
     });
 });

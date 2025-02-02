@@ -1,6 +1,6 @@
 import {Response} from "supertest";
 import {
-    console_log,
+    console_log_e2e,
     encodingAdminDataInBase64,
     generateRandomString,
     req
@@ -89,7 +89,7 @@ describe('POST /blogs/{blogId}/posts', () => {
         expect(foundPosts.items.length).toEqual(1);
 
 
-        console_log(resCreatePosts.body, resCreatePosts.status, 'Test 1: post(/blogs/{blogId}/posts)');
+        console_log_e2e(resCreatePosts.body, resCreatePosts.status, 'Test 1: post(/blogs/{blogId}/posts)');
     });
 
     it('should not create a post if the admin is not authenticated.', async () => {
@@ -117,7 +117,7 @@ describe('POST /blogs/{blogId}/posts', () => {
 
         expect(foundPosts.items.length).toEqual(0);
 
-        console_log(resCreatePosts.body, resCreatePosts.status, 'Test 2: post(/blogs/{blogId}/posts)');
+        console_log_e2e(resCreatePosts.body, resCreatePosts.status, 'Test 2: post(/blogs/{blogId}/posts)');
     });
 
     it('should not create a post if the data in the request body is incorrect (an empty object is passed).', async () => {
@@ -160,7 +160,7 @@ describe('POST /blogs/{blogId}/posts', () => {
 
         expect(foundPosts.items.length).toEqual(0);
 
-        console_log(resCreatePosts.body, resCreatePosts.status, 'Test 3: post(/blogs/{blogId}/posts)');
+        console_log_e2e(resCreatePosts.body, resCreatePosts.status, 'Test 3: post(/blogs/{blogId}/posts)');
     });
 
     it('should not create a post if the data in the request body is incorrect (title: empty line, shortDescription: empty line, content: empty line).', async () => {
@@ -207,7 +207,7 @@ describe('POST /blogs/{blogId}/posts', () => {
 
         expect(foundPosts.items.length).toEqual(0);
 
-        console_log(resCreatePosts.body, resCreatePosts.status, 'Test 4: post(/blogs/{blogId}/posts)');
+        console_log_e2e(resCreatePosts.body, resCreatePosts.status, 'Test 4: post(/blogs/{blogId}/posts)');
     });
 
     it('should not create a post if the data in the request body is incorrect (title: exceeds max length, shortDescription: exceeds max length, content: exceeds max length).', async () => {
@@ -254,7 +254,7 @@ describe('POST /blogs/{blogId}/posts', () => {
 
         expect(foundPosts.items.length).toEqual(0);
 
-        console_log(resCreatePosts.body, resCreatePosts.status, 'Test 5: post(/blogs/{blogId}/posts)');
+        console_log_e2e(resCreatePosts.body, resCreatePosts.status, 'Test 5: post(/blogs/{blogId}/posts)');
     });
 
     it('should not create a post if the data in the request body is incorrect (title: type number, shortDescription: type number, content: type number).', async () => {
@@ -301,7 +301,7 @@ describe('POST /blogs/{blogId}/posts', () => {
 
         expect(foundPosts.items.length).toEqual(0);
 
-        console_log(resCreatePosts.body, resCreatePosts.status, 'Test 6: post(/blogs/{blogId}/posts)');
+        console_log_e2e(resCreatePosts.body, resCreatePosts.status, 'Test 6: post(/blogs/{blogId}/posts)');
     });
 
     it('should not create a post if the data in the request body is incorrect (blogId: incorrect).', async () => {
@@ -329,6 +329,6 @@ describe('POST /blogs/{blogId}/posts', () => {
 
         expect(foundPosts.items.length).toEqual(0);
 
-        console_log(resCreatePosts.body, resCreatePosts.status, 'Test 7: post(/blogs/{blogId}/posts)');
+        console_log_e2e(resCreatePosts.body, resCreatePosts.status, 'Test 7: post(/blogs/{blogId}/posts)');
     });
 });

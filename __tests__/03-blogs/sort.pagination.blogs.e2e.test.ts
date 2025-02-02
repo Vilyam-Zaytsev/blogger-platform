@@ -1,7 +1,11 @@
 import {Response} from "supertest";
-import {console_log, req} from '../helpers/test-helpers';
+import {console_log_e2e, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {blogPropertyMap, clearPresets, presets} from "../helpers/datasets-for-tests";
+import {
+    blogPropertyMap,
+    clearPresets,
+    presets
+} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
@@ -52,7 +56,7 @@ beforeEach(async () => {
                 "pageSize": 10,
                 "totalCount": 11,
                 "items": blogsTestManager.filterAndSort(
-                    presets.blogs,
+                    [...presets.blogs],
                     createPaginationAndSortFilter({
                         pageNumber: '1',
                         pageSize: '10',
@@ -65,7 +69,7 @@ beforeEach(async () => {
 
             expect(resGetBlogs.body.items.length).toEqual(10);
 
-            console_log(resGetBlogs.body, resGetBlogs.status, 'Test 1: pagination(/blogs)');
+            console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 1: pagination(/blogs)');
         });
 
         it('should use client-provided pagination values to return the correct subset of data.', async () => {
@@ -89,7 +93,7 @@ beforeEach(async () => {
                 pageSize: 3,
                 totalCount: 11,
                 items: blogsTestManager.filterAndSort(
-                    presets.blogs,
+                    [...presets.blogs],
                     createPaginationAndSortFilter({
                         pageNumber: '2',
                         pageSize: '3',
@@ -102,7 +106,7 @@ beforeEach(async () => {
 
             expect(resGetBlogs.body.items.length).toEqual(3);
 
-            console_log(resGetBlogs.body, resGetBlogs.status, 'Test 2: pagination(/blogs)');
+            console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 2: pagination(/blogs)');
         });
 
         it('should use client-provided pagination values to return the correct subset of data.', async () => {
@@ -126,7 +130,7 @@ beforeEach(async () => {
                 pageSize: 2,
                 totalCount: 11,
                 items: blogsTestManager.filterAndSort(
-                    presets.blogs,
+                    [...presets.blogs],
                     createPaginationAndSortFilter({
                         pageNumber: '6',
                         pageSize: '2',
@@ -140,7 +144,7 @@ beforeEach(async () => {
 
             expect(resGetBlogs.body.items.length).toEqual(1);
 
-            console_log(resGetBlogs.body, resGetBlogs.status, 'Test 3: pagination(/blogs)');
+            console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 3: pagination(/blogs)');
         });
 
         it('should use client-provided pagination values to return the correct subset of data.', async () => {
@@ -165,7 +169,7 @@ beforeEach(async () => {
                 pageSize: 1,
                 totalCount: 2,
                 items: blogsTestManager.filterAndSort(
-                    presets.blogs,
+                    [...presets.blogs],
                     createPaginationAndSortFilter({
                         pageNumber: '1',
                         pageSize: '1',
@@ -179,6 +183,6 @@ beforeEach(async () => {
 
             expect(resGetBlogs.body.items.length).toEqual(1);
 
-            console_log(resGetBlogs.body, resGetBlogs.status, 'Test 4: pagination(/blogs)');
+            console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 4: pagination(/blogs)');
         });
     });

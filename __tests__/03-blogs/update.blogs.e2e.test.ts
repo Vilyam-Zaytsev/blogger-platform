@@ -1,12 +1,17 @@
 import {Response} from "supertest";
 import {
-    console_log,
+    console_log_e2e,
     encodingAdminDataInBase64,
     generateRandomString,
     req
 } from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {blogDescriptions, blogNames, clearPresets, presets} from "../helpers/datasets-for-tests";
+import {
+    blogDescriptions,
+    blogNames,
+    clearPresets,
+    presets
+} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
@@ -77,7 +82,7 @@ beforeEach(async () => {
                 }
             );
 
-            console_log(resUpdateBlog.body, resUpdateBlog.status, 'Test 1: put(/blogs)');
+            console_log_e2e(resUpdateBlog.body, resUpdateBlog.status, 'Test 1: put(/blogs)');
         });
 
         it('should not update the blog if the user has not been authenticated.', async () => {
@@ -107,7 +112,7 @@ beforeEach(async () => {
 
             expect(foundBlog).toEqual(presets.blogs[0]);
 
-            console_log(resUpdateBlog.body, resUpdateBlog.status, 'Test 2: put(/blogs)');
+            console_log_e2e(resUpdateBlog.body, resUpdateBlog.status, 'Test 2: put(/blogs)');
         });
 
         it('should not update a blog if the data in the request body is incorrect (an empty object is passed).', async () => {
@@ -148,7 +153,7 @@ beforeEach(async () => {
 
             expect(foundBlog).toEqual(presets.blogs[0]);
 
-            console_log(resUpdateBlog.body, resUpdateBlog.status, 'Test 3: put(/blogs)');
+            console_log_e2e(resUpdateBlog.body, resUpdateBlog.status, 'Test 3: put(/blogs)');
         });
 
         it('should not update a blog if the data in the request body is incorrect (name: empty line, description: empty line, website Url: empty line).', async () => {
@@ -195,7 +200,7 @@ beforeEach(async () => {
 
             expect(foundBlog).toEqual(presets.blogs[0]);
 
-            console_log(resUpdateBlog.body, resUpdateBlog.status, 'Test 4: put(/blogs)');
+            console_log_e2e(resUpdateBlog.body, resUpdateBlog.status, 'Test 4: put(/blogs)');
         });
 
         it('should not update a blog if the data in the request body is incorrect (name: exceeds max length, description: exceeds max length, website Url: exceeds max length).', async () => {
@@ -242,7 +247,7 @@ beforeEach(async () => {
 
             expect(foundBlog).toEqual(presets.blogs[0]);
 
-            console_log(resUpdateBlog.body, resUpdateBlog.status, 'Test 5: put(/blogs)');
+            console_log_e2e(resUpdateBlog.body, resUpdateBlog.status, 'Test 5: put(/blogs)');
         });
 
         it('should not update a blog if the data in the request body is incorrect (name: type number, description: type number, website Url: type number).', async () => {
@@ -289,7 +294,7 @@ beforeEach(async () => {
 
             expect(foundBlog).toEqual(presets.blogs[0]);
 
-            console_log(resUpdateBlog.body, resUpdateBlog.status, 'Test 6: put(/blogs)');
+            console_log_e2e(resUpdateBlog.body, resUpdateBlog.status, 'Test 6: put(/blogs)');
         });
 
         it('should not update a blog if the data in the request body is incorrect (invalid url).', async () => {
@@ -328,6 +333,6 @@ beforeEach(async () => {
 
             expect(foundBlog).toEqual(presets.blogs[0]);
 
-            console_log(resUpdateBlog.body, resUpdateBlog.status, 'Test 7: put(/blogs)');
+            console_log_e2e(resUpdateBlog.body, resUpdateBlog.status, 'Test 7: put(/blogs)');
         });
     });
