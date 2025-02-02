@@ -1,4 +1,4 @@
-import {console_log, req} from '../helpers/test-helpers';
+import {console_log_e2e, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {
     clearPresets,
@@ -75,7 +75,7 @@ clearPresets();
             });
             expect(resGetPosts.body.items.length).toEqual(3);
 
-            console_log(resGetPosts.body, resGetPosts.status, 'Test 1: get(/blogs/{blogId}/posts)');
+            console_log_e2e(resGetPosts.body, resGetPosts.status, 'Test 1: get(/blogs/{blogId}/posts)');
         });
 
         it('should return all entries from a specific blog using the pagination values provided by the client.', async () => {
@@ -115,7 +115,7 @@ clearPresets();
 
             expect(resGetPosts.body.items.length).toEqual(3);
 
-            console_log(resGetPosts.body, resGetPosts.status, 'Test 2: get(/blogs/{blogId}/posts)');
+            console_log_e2e(resGetPosts.body, resGetPosts.status, 'Test 2: get(/blogs/{blogId}/posts)');
         });
 
         it('should return a 404 error if the benefit does not exist.', async () => {
@@ -136,6 +136,6 @@ clearPresets();
 
             expect(resGetPosts_2.body.items.length).toEqual(10);
 
-            console_log(resGetPosts_1.body, resGetPosts_1.status, 'Test 3: get(/blogs/{blogId}/posts)');
+            console_log_e2e(resGetPosts_1.body, resGetPosts_1.status, 'Test 3: get(/blogs/{blogId}/posts)');
         })
     });

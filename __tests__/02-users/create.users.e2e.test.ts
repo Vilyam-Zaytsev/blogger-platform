@@ -1,4 +1,4 @@
-import {console_log, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
+import {console_log_e2e, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, userLogins} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
@@ -69,7 +69,7 @@ describe('POST /users', () => {
         expect(resPostUser.body).toEqual(foundUsers.items[0]);
         expect(foundUsers.items.length).toEqual(1);
 
-        console_log(resPostUser.body, resPostUser.status, 'Test 1: post(/users)');
+        console_log_e2e(resPostUser.body, resPostUser.status, 'Test 1: post(/users)');
     });
 
     it('should not create a user if the admin is not authenticated.', async () => {
@@ -95,7 +95,7 @@ describe('POST /users', () => {
 
         expect(foundUsers.items.length).toEqual(0);
 
-        console_log(resPostUser.body, resPostUser.status, 'Test 2: post(/users)');
+        console_log_e2e(resPostUser.body, resPostUser.status, 'Test 2: post(/users)');
     });
 
     it('should not create a user if the data in the request body is incorrect (an empty object is passed).', async () => {
@@ -136,7 +136,7 @@ describe('POST /users', () => {
 
         expect(foundUsers.items.length).toEqual(0);
 
-        console_log(resPostUser.body, resPostUser.status, 'Test 3: post(/users)');
+        console_log_e2e(resPostUser.body, resPostUser.status, 'Test 3: post(/users)');
     });
 
     it('should not create a user if the data in the request body is incorrect (login: empty line, email: empty line, password: empty line).', async () => {
@@ -181,7 +181,7 @@ describe('POST /users', () => {
 
         expect(foundUsers.items.length).toEqual(0);
 
-        console_log(resPostUser.body, resPostUser.status, 'Test 4: post(/users)');
+        console_log_e2e(resPostUser.body, resPostUser.status, 'Test 4: post(/users)');
     });
 
     it('should not create a user if the data in the request body is incorrect (login: less than the minimum length, email: incorrect, password: less than the minimum length)', async () => {
@@ -226,7 +226,7 @@ describe('POST /users', () => {
 
         expect(foundUsers.items.length).toEqual(0);
 
-        console_log(resPostUser.body, resPostUser.status, 'Test 5: post(/users)');
+        console_log_e2e(resPostUser.body, resPostUser.status, 'Test 5: post(/users)');
     });
 
     it('should not create a user if the data in the request body is incorrect (login: exceeds max length,  email: incorrect, password: exceeds max length).', async () => {
@@ -271,7 +271,7 @@ describe('POST /users', () => {
 
         expect(foundUsers.items.length).toEqual(0);
 
-        console_log(resPostUser.body, resPostUser.status, 'Test 6: post(/users)');
+        console_log_e2e(resPostUser.body, resPostUser.status, 'Test 6: post(/users)');
     });
 
     it('should not create a user if the data in the request body is incorrect (login: type number,  email: type number, password: type number).', async () => {
@@ -316,6 +316,6 @@ describe('POST /users', () => {
 
         expect(foundUsers.items.length).toEqual(0);
 
-        console_log(resPostUser.body, resPostUser.status, 'Test 7: post(/users)');
+        console_log_e2e(resPostUser.body, resPostUser.status, 'Test 7: post(/users)');
     });
 });

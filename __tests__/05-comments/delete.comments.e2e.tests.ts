@@ -17,7 +17,7 @@ import {postsTestManager} from "../helpers/managers/04_posts-test-manager";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {Response} from "supertest";
-import {console_log, req} from "../helpers/test-helpers";
+import {console_log_e2e, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
 import {commentsTestManager} from "../helpers/managers/05_comments-test-manager";
@@ -86,7 +86,7 @@ describe('DELETE /comments', () => {
 
         expect(foundComments.items.length).toEqual(0);
 
-        console_log(resDeleteComments.body, resDeleteComments.status, 'Test 1: delete(/comments/:id)');
+        console_log_e2e(resDeleteComments.body, resDeleteComments.status, 'Test 1: delete(/comments/:id)');
     });
 
     it('should not delete the comment if the user is not logged in.', async () => {
@@ -119,7 +119,7 @@ describe('DELETE /comments', () => {
 
         expect(foundComments.items.length).toEqual(1);
 
-        console_log(resDeleteComments.body, resDeleteComments.status, 'Test 2: delete(/comments/:id)');
+        console_log_e2e(resDeleteComments.body, resDeleteComments.status, 'Test 2: delete(/comments/:id)');
     });
 
     it('should not delete comments if the user in question is not the owner of the comment.', async () => {
@@ -155,7 +155,7 @@ describe('DELETE /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
-        console_log(resDeleteComments.body, resDeleteComments.status, 'Test 3: delete(/comments/:id)');
+        console_log_e2e(resDeleteComments.body, resDeleteComments.status, 'Test 3: delete(/comments/:id)');
     });
 
     it('should not delete comments if the comment does not exist.', async () => {
@@ -188,6 +188,6 @@ describe('DELETE /comments', () => {
 
         expect(foundComments.items.length).toEqual(1);
 
-        console_log(resDeleteComments.body, resDeleteComments.status, 'Test 4: delete(/comments/:id)');
+        console_log_e2e(resDeleteComments.body, resDeleteComments.status, 'Test 4: delete(/comments/:id)');
     });
 });

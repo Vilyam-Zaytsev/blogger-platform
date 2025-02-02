@@ -1,4 +1,4 @@
-import {console_log, encodingAdminDataInBase64, req} from '../helpers/test-helpers';
+import {console_log_e2e, encodingAdminDataInBase64, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, presets, userLogins, userPropertyMap} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
@@ -73,7 +73,7 @@ describe('pagination, sort, search in term /users', () => {
 
         expect(resGetUsers.body.items.length).toEqual(10);
 
-        console_log(resGetUsers.body, resGetUsers.status, 'Test 1: pagination and sort(/users)');
+        console_log_e2e(resGetUsers.body, resGetUsers.status, 'Test 1: pagination and sort(/users)');
     });
 
     it('should use client-provided pagination values to return the correct subset of data.', async () => {
@@ -117,7 +117,7 @@ describe('pagination, sort, search in term /users', () => {
 
         expect(resGetUsers.body.items.length).toEqual(3);
 
-        console_log(resGetUsers.body, resGetUsers.status, 'Test 2: pagination(/users)');
+        console_log_e2e(resGetUsers.body, resGetUsers.status, 'Test 2: pagination(/users)');
     });
 
     it('should use client-provided pagination values to return the correct subset of data.', async () => {
@@ -161,7 +161,7 @@ describe('pagination, sort, search in term /users', () => {
 
         expect(resGetUsers.body.items.length).toEqual(1);
 
-        console_log(resGetUsers.body, resGetUsers.status, 'Test 3: pagination(/users)');
+        console_log_e2e(resGetUsers.body, resGetUsers.status, 'Test 3: pagination(/users)');
     });
 
     it('should use the values provided by the client to search for users by the occurrence of the substring (the  "login" field).', async () => {
@@ -199,7 +199,7 @@ describe('pagination, sort, search in term /users', () => {
 
         expect(resGetUsers.body.items.length).toEqual(2);
 
-        console_log(resGetUsers.body, resGetUsers.status, 'Test 4: search in term(/users)');
+        console_log_e2e(resGetUsers.body, resGetUsers.status, 'Test 4: search in term(/users)');
     });
 
     it('should use the values provided by the client to search for users by the occurrence of the substring (the "email" field).', async () => {
@@ -237,7 +237,7 @@ describe('pagination, sort, search in term /users', () => {
 
         expect(resGetUsers.body.items.length).toEqual(2);
 
-        console_log(resGetUsers.body, resGetUsers.status, 'Test 5: search in term(/users)');
+        console_log_e2e(resGetUsers.body, resGetUsers.status, 'Test 5: search in term(/users)');
     });
 
     it('should use the values provided by the client to search for users by the occurrence of the substring (the "login" and "email" fields).', async () => {
@@ -277,6 +277,6 @@ describe('pagination, sort, search in term /users', () => {
 
         expect(resGetUsers.body.items.length).toEqual(4);
 
-        console_log(resGetUsers.body, resGetUsers.status, 'Test 6: search in term(/users)');
+        console_log_e2e(resGetUsers.body, resGetUsers.status, 'Test 6: search in term(/users)');
     });
 });

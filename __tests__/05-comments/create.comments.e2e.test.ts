@@ -1,4 +1,4 @@
-import {console_log, generateRandomString, req} from '../helpers/test-helpers';
+import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, comments, incorrectAccessToken, presets} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
@@ -99,7 +99,7 @@ describe('POST /comments', () => {
         expect(foundComments.items[0]).toEqual(resCreatedComment.body)
         expect(foundComments.items.length).toEqual(1);
 
-        console_log(resCreatedComment.body, resCreatedComment.status, 'Test 1: post(/comments)');
+        console_log_e2e(resCreatedComment.body, resCreatedComment.status, 'Test 1: post(/comments)');
     });
 
     it('should not create a new comment if the user is not logged in.', async () => {
@@ -126,7 +126,7 @@ describe('POST /comments', () => {
 
         expect(foundComments.items.length).toEqual(0);
 
-        console_log(resCreatedComment.body, resCreatedComment.status, 'Test 2: post(/comments)');
+        console_log_e2e(resCreatedComment.body, resCreatedComment.status, 'Test 2: post(/comments)');
     });
 
     it('should not create a new comment If post with specified postId doesn\'t exists.', async () => {
@@ -159,7 +159,7 @@ describe('POST /comments', () => {
 
         expect(foundComments.items.length).toEqual(0);
 
-        console_log(resCreatedComment.body, resCreatedComment.status, 'Test 3: post(/comments)');
+        console_log_e2e(resCreatedComment.body, resCreatedComment.status, 'Test 3: post(/comments)');
     });
 
     it('should not create a commentary if the data in the request body is incorrect (an empty object is passed).', async () => {
@@ -199,7 +199,7 @@ describe('POST /comments', () => {
 
         expect(foundComments.items.length).toEqual(0);
 
-        console_log(resCreatedComment.body, resCreatedComment.status, 'Test 4: post(/comments)');
+        console_log_e2e(resCreatedComment.body, resCreatedComment.status, 'Test 4: post(/comments)');
     });
 
     it('should not create a commentary if the data in the request body is incorrect (the content field contains data of the number type).', async () => {
@@ -241,7 +241,7 @@ describe('POST /comments', () => {
 
         expect(foundComments.items.length).toEqual(0);
 
-        console_log(resCreatedComment.body, resCreatedComment.status, 'Test 5: post(/comments)');
+        console_log_e2e(resCreatedComment.body, resCreatedComment.status, 'Test 5: post(/comments)');
     });
 
     it('should not create a commentary if the data in the request body is incorrect (the content field is less than 20 characters long).', async () => {
@@ -283,7 +283,7 @@ describe('POST /comments', () => {
 
         expect(foundComments.items.length).toEqual(0);
 
-        console_log(resCreatedComment.body, resCreatedComment.status, 'Test 6: post(/comments)');
+        console_log_e2e(resCreatedComment.body, resCreatedComment.status, 'Test 6: post(/comments)');
     });
 
     it('should not create a commentary if the data in the request body is incorrect (the content field is more than 300 characters long).', async () => {
@@ -325,6 +325,6 @@ describe('POST /comments', () => {
 
         expect(foundComments.items.length).toEqual(0);
 
-        console_log(resCreatedComment.body, resCreatedComment.status, 'Test 7: post(/comments)');
+        console_log_e2e(resCreatedComment.body, resCreatedComment.status, 'Test 7: post(/comments)');
     });
 });

@@ -1,4 +1,4 @@
-import {console_log, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
+import {console_log_e2e, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {
     clearPresets,
@@ -84,7 +84,7 @@ beforeEach(async () => {
                 expect(resCreatePost.body).toEqual(resGetPosts.items[0]);
                 expect(resGetPosts.items.length).toEqual(1);
 
-            console_log(resCreatePost.body, resCreatePost.status, 'Test 1: post(/posts)');
+            console_log_e2e(resCreatePost.body, resCreatePost.status, 'Test 1: post(/posts)');
         });
 
         it('should not create a post if the admin is not authenticated.', async () => {
@@ -113,7 +113,7 @@ beforeEach(async () => {
 
             expect(resGetPosts.items.length).toEqual(0);
 
-            console_log(resCreatePost.body, resCreatePost.status, 'Test 2: post(/posts)');
+            console_log_e2e(resCreatePost.body, resCreatePost.status, 'Test 2: post(/posts)');
         });
 
         it('should not create a post if the data in the request body is incorrect (an empty object is passed).', async () => {
@@ -160,7 +160,7 @@ beforeEach(async () => {
 
             expect(resGetPosts.items.length).toEqual(0);
 
-            console_log(resCreatePost.body, resCreatePost.status, 'Test 3: post(/posts)');
+            console_log_e2e(resCreatePost.body, resCreatePost.status, 'Test 3: post(/posts)');
         });
 
         it('should not create a post if the data in the request body is incorrect (title: empty line,  short Description: empty line, content: empty line, blogId: empty line).', async () => {
@@ -212,7 +212,7 @@ beforeEach(async () => {
 
             expect(resGetPosts.items.length).toEqual(0);
 
-            console_log(resCreatePost.body, resCreatePost.status, 'Test 4: post(/posts)');
+            console_log_e2e(resCreatePost.body, resCreatePost.status, 'Test 4: post(/posts)');
         });
 
         it('should not create a post if the data in the request body is incorrect (title: exceeds max length, shortDescription: exceeds max length, content: exceeds max length, blogId: incorrect).', async () => {
@@ -264,7 +264,7 @@ beforeEach(async () => {
 
             expect(resGetPosts.items.length).toEqual(0);
 
-            console_log(resCreatePost.body, resCreatePost.status, 'Test 5: post(/posts)');
+            console_log_e2e(resCreatePost.body, resCreatePost.status, 'Test 5: post(/posts)');
         });
 
         it('should not create a post if the data in the request body is incorrect (title: type number, shortDescription: type number, content: type number, blogId: incorrect).', async () => {
@@ -316,6 +316,6 @@ beforeEach(async () => {
 
             expect(resGetPosts.items.length).toEqual(0);
 
-            console_log(resCreatePost.body, resCreatePost.status, 'Test 6: post(/posts)');
+            console_log_e2e(resCreatePost.body, resCreatePost.status, 'Test 6: post(/posts)');
         });
     });

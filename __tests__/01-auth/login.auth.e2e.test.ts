@@ -1,4 +1,4 @@
-import {console_log, generateRandomString, req} from '../helpers/test-helpers';
+import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {presets} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
@@ -55,7 +55,7 @@ describe('POST /auth/login', () => {
             })
         );
 
-        console_log(resLogin.body, resLogin.status, 'Test 1: post(/auth/login)');
+        console_log_e2e(resLogin.body, resLogin.status, 'Test 1: post(/auth/login)');
     });
 
     it('should not log in if the user has sent invalid data (loginOrEmail: "undefined", password: "undefined").', async () => {
@@ -83,7 +83,7 @@ describe('POST /auth/login', () => {
             }
         );
 
-        console_log(resLogin.body, resLogin.status, 'Test 2: post(/auth/login)');
+        console_log_e2e(resLogin.body, resLogin.status, 'Test 2: post(/auth/login)');
     });
 
     it('should not log in if the user has sent invalid data (loginOrEmail: type number, password: type number).', async () => {
@@ -112,7 +112,7 @@ describe('POST /auth/login', () => {
             ]
         });
 
-        console_log(resLogin.body, resLogin.status, 'Test 3: post(/auth/login)');
+        console_log_e2e(resLogin.body, resLogin.status, 'Test 3: post(/auth/login)');
     });
 
     it('should not log in if the user has sent invalid data (loginOrEmail: empty line, password: empty line).', async () => {
@@ -141,7 +141,7 @@ describe('POST /auth/login', () => {
             ]
         });
 
-        console_log(resLogin.body, resLogin.status, 'Test 4: post(/auth/login)');
+        console_log_e2e(resLogin.body, resLogin.status, 'Test 4: post(/auth/login)');
     });
 
     it('should not log in if the user has sent invalid data (loginOrEmail: exceeds max length, password: exceeds max length).', async () => {
@@ -170,7 +170,7 @@ describe('POST /auth/login', () => {
             ]
         });
 
-        console_log(resLogin.body, resLogin.status, 'Test 5: post(/auth/login)');
+        console_log_e2e(resLogin.body, resLogin.status, 'Test 5: post(/auth/login)');
     });
 
     it('should not be authorized if the user has sent incorrect data (loginOrEmail: non-existent login).', async () => {
@@ -195,7 +195,7 @@ describe('POST /auth/login', () => {
             ]
         });
 
-        console_log(resAuth.body, resAuth.status, 'Test 6: post(/auth/login)');
+        console_log_e2e(resAuth.body, resAuth.status, 'Test 6: post(/auth/login)');
     });
 
     it('should not be authorized if the user has sent incorrect data (password: invalid password).', async () => {
@@ -220,6 +220,6 @@ describe('POST /auth/login', () => {
             ]
         });
 
-        console_log(resAuth.body, resAuth.status, 'Test 7: post(/auth/login)');
+        console_log_e2e(resAuth.body, resAuth.status, 'Test 7: post(/auth/login)');
     });
 });

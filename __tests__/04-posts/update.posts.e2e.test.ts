@@ -1,4 +1,4 @@
-import {console_log, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
+import {console_log_e2e, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {
     clearPresets,
@@ -88,7 +88,7 @@ beforeEach(async () => {
                 }
             )
 
-            console_log(resUpdatePost.body, resUpdatePost.status, 'Test 1: put(/posts/:id)');
+            console_log_e2e(resUpdatePost.body, resUpdatePost.status, 'Test 1: put(/posts/:id)');
         });
 
         it('should not update the post if the admin has not been authenticated.', async () => {
@@ -123,7 +123,7 @@ beforeEach(async () => {
             expect(foundPost).toEqual(presets.posts[0]);
 
 
-            console_log(resUpdatePost.body, resUpdatePost.status, 'Test 2: put(/posts/:id)');
+            console_log_e2e(resUpdatePost.body, resUpdatePost.status, 'Test 2: put(/posts/:id)');
         });
 
         it('should not update a post if the data in the request body is incorrect (an empty object is passed).', async () => {
@@ -171,7 +171,7 @@ beforeEach(async () => {
 
             expect(foundPost).toEqual(presets.posts[0]);
 
-            console_log(resUpdatePost.body, resUpdatePost.status, 'Test 3: put(/posts/:id)');
+            console_log_e2e(resUpdatePost.body, resUpdatePost.status, 'Test 3: put(/posts/:id)');
         });
 
         it('should not update a blog if the data in the request body is incorrect (title: empty line,  short Description: empty line, content: empty line, blogId: empty line).', async () => {
@@ -224,7 +224,7 @@ beforeEach(async () => {
 
             expect(foundPost).toEqual(presets.posts[0]);
 
-            console_log(resUpdatePost.body, resUpdatePost.status, 'Test 4: put(/posts/:id)');
+            console_log_e2e(resUpdatePost.body, resUpdatePost.status, 'Test 4: put(/posts/:id)');
         });
 
         it('should not update a blog if the data in the request body is incorrect (title: exceeds max length, shortDescription: exceeds max length, content: exceeds max length, blogId: incorrect).', async () => {
@@ -277,7 +277,7 @@ beforeEach(async () => {
 
             expect(foundPost).toEqual(presets.posts[0]);
 
-            console_log(resUpdatePost.body, resUpdatePost.status, 'Test 5: put(/posts/:id)');
+            console_log_e2e(resUpdatePost.body, resUpdatePost.status, 'Test 5: put(/posts/:id)');
         });
 
         it('should not update a blog if the data in the request body is incorrect (title: type number, shortDescription: type number, content: type number, blogId: incorrect).', async () => {
@@ -330,7 +330,7 @@ beforeEach(async () => {
 
             expect(foundPost).toEqual(presets.posts[0]);
 
-            console_log(resUpdatePost.body, resUpdatePost.status, 'Test 6: put(/posts/:id)');
+            console_log_e2e(resUpdatePost.body, resUpdatePost.status, 'Test 6: put(/posts/:id)');
         });
 
         it('should return a 404 error if the post does not exist..', async () => {
@@ -362,6 +362,6 @@ beforeEach(async () => {
 
             expect(foundPost).toEqual(presets.posts[0]);
 
-            console_log(resUpdatePost.body, resUpdatePost.status, 'Test 7: put(/posts/:id)');
+            console_log_e2e(resUpdatePost.body, resUpdatePost.status, 'Test 7: put(/posts/:id)');
         });
     });

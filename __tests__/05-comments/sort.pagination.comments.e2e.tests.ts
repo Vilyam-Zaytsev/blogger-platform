@@ -22,7 +22,7 @@ import {postsTestManager} from "../helpers/managers/04_posts-test-manager";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {Response} from "supertest";
-import {console_log, req} from "../helpers/test-helpers";
+import {console_log_e2e, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
 import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
@@ -102,7 +102,7 @@ describe('pagination and sort /comments', () => {
 
         expect(presets.comments.length).toEqual(11);
 
-        console_log(resGetComments.body, resGetComments.status, 'Test 1: pagination and sort(/comments)');
+        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 1: pagination and sort(/comments)');
     });
 
     it('should use client-provided pagination values to return the correct subset of data.', async () => {
@@ -151,7 +151,7 @@ describe('pagination and sort /comments', () => {
 
         expect(presets.comments.length).toEqual(11);
 
-        console_log(resGetComments.body, resGetComments.status, 'Test 2: pagination and sort(/comments)');
+        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 2: pagination and sort(/comments)');
     });
 
     it('should return a 400 error if the client has passed invalid pagination values.', async () => {
@@ -200,6 +200,6 @@ describe('pagination and sort /comments', () => {
 
         expect(presets.comments.length).toEqual(11);
 
-        console_log(resGetComments.body, resGetComments.status, 'Test 3: pagination and sort(/comments)');
+        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 3: pagination and sort(/comments)');
     });
 });

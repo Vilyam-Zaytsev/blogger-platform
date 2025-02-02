@@ -17,7 +17,7 @@ import {postsTestManager} from "../helpers/managers/04_posts-test-manager";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {Response} from "supertest";
-import {console_log, generateRandomString, req} from "../helpers/test-helpers";
+import {console_log_e2e, generateRandomString, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
 import {ApiErrorResult} from "../../src/common/types/input-output-types/api-error-result";
@@ -98,7 +98,7 @@ describe('PUT /comments', () => {
             createdAt: presets.comments[0].createdAt
         });
 
-        console_log(resPutComments.body, resPutComments.status, 'Test 1: put(/comments/:id)');
+        console_log_e2e(resPutComments.body, resPutComments.status, 'Test 1: put(/comments/:id)');
     });
 
     it('should not update the comment if the user is not logged in.', async () => {
@@ -134,7 +134,7 @@ describe('PUT /comments', () => {
 
         expect(foundComment).toEqual<CommentViewModel>(presets.comments[0]);
 
-        console_log(resPutComments.body, resPutComments.status, 'Test 2: put(/comments/:id)');
+        console_log_e2e(resPutComments.body, resPutComments.status, 'Test 2: put(/comments/:id)');
     });
 
     it('should not update the comment if the data in the request body is incorrect (an empty object is passed).', async () => {
@@ -177,7 +177,7 @@ describe('PUT /comments', () => {
 
         expect(foundComment).toEqual<CommentViewModel>(presets.comments[0]);
 
-        console_log(resPutComments.body, resPutComments.status, 'Test 3: put(/comments/:id)');
+        console_log_e2e(resPutComments.body, resPutComments.status, 'Test 3: put(/comments/:id)');
     });
 
     it('should not update the comment if the data in the request body is incorrect (the content field contains data of the number type).', async () => {
@@ -222,7 +222,7 @@ describe('PUT /comments', () => {
 
         expect(foundComment).toEqual<CommentViewModel>(presets.comments[0]);
 
-        console_log(resPutComments.body, resPutComments.status, 'Test 4: put(/comments/:id)');
+        console_log_e2e(resPutComments.body, resPutComments.status, 'Test 4: put(/comments/:id)');
     });
 
     it('should not update the comment if the data in the request body is incorrect (the content field is less than 20 characters long).', async () => {
@@ -267,7 +267,7 @@ describe('PUT /comments', () => {
 
         expect(foundComment).toEqual<CommentViewModel>(presets.comments[0]);
 
-        console_log(resPutComments.body, resPutComments.status, 'Test 5: put(/comments/:id)');
+        console_log_e2e(resPutComments.body, resPutComments.status, 'Test 5: put(/comments/:id)');
     });
 
     it('should not update the comment if the data in the request body is incorrect (the content field is more than 300 characters long).', async () => {
@@ -312,7 +312,7 @@ describe('PUT /comments', () => {
 
         expect(foundComment).toEqual<CommentViewModel>(presets.comments[0]);
 
-        console_log(resPutComments.body, resPutComments.status, 'Test 6: put(/comments/:id)');
+        console_log_e2e(resPutComments.body, resPutComments.status, 'Test 6: put(/comments/:id)');
     });
 
     it('should not update comments if the user in question is not the owner of the comment.', async () => {
@@ -354,7 +354,7 @@ describe('PUT /comments', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
-        console_log(resPutComments.body, resPutComments.status, 'Test 7: put(/comments/:id)');
+        console_log_e2e(resPutComments.body, resPutComments.status, 'Test 7: put(/comments/:id)');
     });
 
     it('should not update comments if the comment does not exist.', async () => {
@@ -390,6 +390,6 @@ describe('PUT /comments', () => {
 
         expect(foundComment).toEqual<CommentViewModel>(presets.comments[0]);
 
-        console_log(resPutComments.body, resPutComments.status, 'Test 8: put(/comments/:id)');
+        console_log_e2e(resPutComments.body, resPutComments.status, 'Test 8: put(/comments/:id)');
     });
 });

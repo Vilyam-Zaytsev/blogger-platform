@@ -1,4 +1,4 @@
-import {console_log, req} from '../helpers/test-helpers';
+import {console_log_e2e, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {
     clearPresets,
@@ -81,7 +81,7 @@ describe('pagination, sort /posts', () => {
 
         expect(resGetPosts.body.items.length).toEqual(10);
 
-        console_log(resGetPosts.body, resGetPosts.status, 'Test 1: pagination, sort(/posts)');
+        console_log_e2e(resGetPosts.body, resGetPosts.status, 'Test 1: pagination, sort(/posts)');
     });
 
     it('should use client-provided pagination values to return the correct subset of data.', async () => {
@@ -121,7 +121,7 @@ describe('pagination, sort /posts', () => {
 
         expect(resGetPosts.body.items.length).toEqual(3);
 
-        console_log(resGetPosts.body, resGetPosts.status, 'Test 2: pagination, sort(/posts)');
+        console_log_e2e(resGetPosts.body, resGetPosts.status, 'Test 2: pagination, sort(/posts)');
     });
 
     it('should use client-provided pagination values to return the correct subset of data (№2).', async () => {
@@ -161,7 +161,7 @@ describe('pagination, sort /posts', () => {
 
         expect(resGetPosts.body.items.length).toEqual(1);
 
-        console_log(resGetPosts.body, resGetPosts.status, 'Test 3: pagination, sort(/posts)');
+        console_log_e2e(resGetPosts.body, resGetPosts.status, 'Test 3: pagination, sort(/posts)');
     });
 
     it('should use client-provided pagination values to return the correct subset of data (№3).', async () => {
@@ -203,6 +203,6 @@ describe('pagination, sort /posts', () => {
 
         expect(resGetPosts.body.items.length).toEqual(1);
 
-        console_log(resGetPosts.body, resGetPosts.status, 'Test 4: pagination, sort(/posts)');
+        console_log_e2e(resGetPosts.body, resGetPosts.status, 'Test 4: pagination, sort(/posts)');
     });
 });

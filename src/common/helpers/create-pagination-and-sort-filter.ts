@@ -4,8 +4,6 @@ import {
     SortingAndPaginationParamsType
 } from "../types/input-output-types/pagination-sort-types";
 
-
-// TODO: unit tests
 const createPaginationAndSortFilter = (params: SortingAndPaginationParamsType): PaginationAndSortFilterType => {
 
     const pageNumber: number =

@@ -1,5 +1,5 @@
 import {Response} from "supertest";
-import {console_log, req} from '../helpers/test-helpers';
+import {console_log_e2e, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {blogPropertyMap, clearPresets, presets} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
@@ -65,7 +65,7 @@ beforeEach(async () => {
 
             expect(resGetBlogs.body.items.length).toEqual(10);
 
-            console_log(resGetBlogs.body, resGetBlogs.status, 'Test 1: pagination(/blogs)');
+            console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 1: pagination(/blogs)');
         });
 
         it('should use client-provided pagination values to return the correct subset of data.', async () => {
@@ -102,7 +102,7 @@ beforeEach(async () => {
 
             expect(resGetBlogs.body.items.length).toEqual(3);
 
-            console_log(resGetBlogs.body, resGetBlogs.status, 'Test 2: pagination(/blogs)');
+            console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 2: pagination(/blogs)');
         });
 
         it('should use client-provided pagination values to return the correct subset of data.', async () => {
@@ -140,7 +140,7 @@ beforeEach(async () => {
 
             expect(resGetBlogs.body.items.length).toEqual(1);
 
-            console_log(resGetBlogs.body, resGetBlogs.status, 'Test 3: pagination(/blogs)');
+            console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 3: pagination(/blogs)');
         });
 
         it('should use client-provided pagination values to return the correct subset of data.', async () => {
@@ -179,6 +179,6 @@ beforeEach(async () => {
 
             expect(resGetBlogs.body.items.length).toEqual(1);
 
-            console_log(resGetBlogs.body, resGetBlogs.status, 'Test 4: pagination(/blogs)');
+            console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 4: pagination(/blogs)');
         });
     });

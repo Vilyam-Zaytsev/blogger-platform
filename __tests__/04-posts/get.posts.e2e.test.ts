@@ -1,4 +1,4 @@
-import {console_log, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
+import {console_log_e2e, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {blog, clearPresets, post, postPropertyMap, presets} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
@@ -55,7 +55,7 @@ beforeEach(async () => {
                 items: []
             });
 
-            console_log(resGetPosts.body, resGetPosts.status, 'Test 1: get(/posts)');
+            console_log_e2e(resGetPosts.body, resGetPosts.status, 'Test 1: get(/posts)');
         });
 
         it('should return an array with a single post.', async () => {
@@ -73,7 +73,7 @@ beforeEach(async () => {
             expect(resGetPosts.body.items[0]).toEqual(presets.posts[0]);
             expect(resGetPosts.body.items.length).toEqual(1);
 
-            console_log(resGetPosts.body, resGetPosts.status, 'Test 2: get(/posts)');
+            console_log_e2e(resGetPosts.body, resGetPosts.status, 'Test 2: get(/posts)');
         });
 
         it('should return an array with a two posts.', async () => {
@@ -107,7 +107,7 @@ beforeEach(async () => {
 
             expect(resGetPosts.body.items.length).toEqual(3);
 
-            console_log(resGetPosts.body, resGetPosts.status, 'Test 3: get(/posts)');
+            console_log_e2e(resGetPosts.body, resGetPosts.status, 'Test 3: get(/posts)');
         });
 
         it('should return post found by id.', async () => {
@@ -124,7 +124,7 @@ beforeEach(async () => {
 
             expect(resGetPost.body).toEqual(presets.posts[0]);
 
-            console_log(resGetPost.body, resGetPost.status, 'Test 4: get(/posts/:id)');
+            console_log_e2e(resGetPost.body, resGetPost.status, 'Test 4: get(/posts/:id)');
         });
 
         it('should return error 404 not found.', async () => {
@@ -145,6 +145,6 @@ beforeEach(async () => {
 
             expect(resGetPost_2.body).toEqual(presets.posts[0]);
 
-            console_log(resGetPost_1.body, resGetPost_1.status, 'Test 5: get(/posts/:id)');
+            console_log_e2e(resGetPost_1.body, resGetPost_1.status, 'Test 5: get(/posts/:id)');
         });
     });

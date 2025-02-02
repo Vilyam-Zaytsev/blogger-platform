@@ -1,6 +1,6 @@
 import {Response} from "supertest";
 import {
-    console_log,
+    console_log_e2e,
     encodingAdminDataInBase64,
     req
 } from '../helpers/test-helpers';
@@ -61,7 +61,7 @@ beforeEach(async () => {
 
             expect(foundBlogs.items.length).toEqual(0);
 
-            console_log(resDeleteBlog.body, resDeleteBlog.status, 'Test 1: delete(/blogs)');
+            console_log_e2e(resDeleteBlog.body, resDeleteBlog.status, 'Test 1: delete(/blogs)');
         });
 
         it('should not delete blog, the admin is not authenticated.', async () => {
@@ -84,7 +84,7 @@ beforeEach(async () => {
 
             expect(foundBlog).toEqual(presets.blogs[0]);
 
-            console_log(resDeleteBlog.body, resDeleteBlog.status, 'Test 2: delete(/blogs)');
+            console_log_e2e(resDeleteBlog.body, resDeleteBlog.status, 'Test 2: delete(/blogs)');
         });
 
         it('should return a 404 error if the blog was not found by the passed ID in the parameters.', async () => {
@@ -107,6 +107,6 @@ beforeEach(async () => {
 
             expect(foundBlog).toEqual(presets.blogs[0]);
 
-            console_log(resDeleteBlog.body, resDeleteBlog.status, 'Test 3: delete(/blogs)');
+            console_log_e2e(resDeleteBlog.body, resDeleteBlog.status, 'Test 3: delete(/blogs)');
         });
     });
