@@ -21,7 +21,9 @@ import {PostDbType} from "../../src/04-posts/types/post-db-type";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
-import {OutputErrorsType} from "../../src/common/types/input-output-types/output-errors-type";
+import {ApiErrorResult} from "../../src/common/types/input-output-types/api-error-result";
+import {commentsTestManager} from "../helpers/managers/05_comments-test-manager";
+import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -55,6 +57,7 @@ beforeEach(async () => {
 });
 
 describe('POST /comments', () => {
+
     it('should create a new comment if the user is logged in.', async () => {
 
         await blogsTestManager
@@ -90,28 +93,15 @@ describe('POST /comments', () => {
             createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
         });
 
-        const resGetComment: Response = await req
-            .get(`${SETTINGS.PATH.COMMENTS}/${resCreatedComment.body.id}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const foundComments: Paginator<CommentViewModel> = await commentsTestManager
+            .getComments(presets.posts[0].id);
 
-        expect(resGetComment.body).toEqual<CommentViewModel>({
-            id: expect.any(String),
-            content: resCreatedComment.body.content,
-            commentatorInfo: {
-                userId: presets.users[0].id,
-                userLogin: presets.users[0].login
-            },
-            createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
-        });
-
-        const resGetComments: Response = await req
-            .get(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
-        expect(resGetComments.body.items.length).toEqual(1);
+        expect(foundComments.items[0]).toEqual(resCreatedComment.body)
+        expect(foundComments.items.length).toEqual(1);
 
         console_log(resCreatedComment.body, resCreatedComment.status, 'Test 1: post(/comments)');
     });
+
     it('should not create a new comment if the user is not logged in.', async () => {
 
         await blogsTestManager
@@ -131,14 +121,14 @@ describe('POST /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
 
-        const resGetComments: Response = await req
-            .get(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const foundComments: Paginator<CommentViewModel> = await commentsTestManager
+            .getComments(presets.posts[0].id);
 
-        expect(resGetComments.body.items.length).toEqual(0);
+        expect(foundComments.items.length).toEqual(0);
 
         console_log(resCreatedComment.body, resCreatedComment.status, 'Test 2: post(/comments)');
     });
+
     it('should not create a new comment If post with specified postId doesn\'t exists.', async () => {
 
         await blogsTestManager
@@ -164,15 +154,16 @@ describe('POST /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
-        const resGetComments: Response = await req
-            .get(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const foundComments: Paginator<CommentViewModel> = await commentsTestManager
+            .getComments(presets.posts[0].id);
 
-        expect(resGetComments.body.items.length).toEqual(0);
+        expect(foundComments.items.length).toEqual(0);
 
         console_log(resCreatedComment.body, resCreatedComment.status, 'Test 3: post(/comments)');
     });
+
     it('should not create a commentary if the data in the request body is incorrect (an empty object is passed).', async () => {
+
         await blogsTestManager
             .createBlog(1);
 
@@ -194,7 +185,7 @@ describe('POST /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect(resCreatedComment.body).toEqual<OutputErrorsType>({
+        expect(resCreatedComment.body).toEqual<ApiErrorResult>({
             errorsMessages: [
                 {
                     field: 'content',
@@ -203,15 +194,16 @@ describe('POST /comments', () => {
             ]
         });
 
-        const resGetComments: Response = await req
-            .get(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const foundComments: Paginator<CommentViewModel> = await commentsTestManager
+            .getComments(presets.posts[0].id);
 
-        expect(resGetComments.body.items.length).toEqual(0);
+        expect(foundComments.items.length).toEqual(0);
 
         console_log(resCreatedComment.body, resCreatedComment.status, 'Test 4: post(/comments)');
     });
+
     it('should not create a commentary if the data in the request body is incorrect (the content field contains data of the number type).', async () => {
+
         await blogsTestManager
             .createBlog(1);
 
@@ -235,7 +227,7 @@ describe('POST /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect(resCreatedComment.body).toEqual<OutputErrorsType>({
+        expect(resCreatedComment.body).toEqual<ApiErrorResult>({
             errorsMessages: [
                 {
                     field: 'content',
@@ -244,15 +236,16 @@ describe('POST /comments', () => {
             ]
         });
 
-        const resGetComments: Response = await req
-            .get(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const foundComments: Paginator<CommentViewModel> = await commentsTestManager
+            .getComments(presets.posts[0].id);
 
-        expect(resGetComments.body.items.length).toEqual(0);
+        expect(foundComments.items.length).toEqual(0);
 
         console_log(resCreatedComment.body, resCreatedComment.status, 'Test 5: post(/comments)');
     });
+
     it('should not create a commentary if the data in the request body is incorrect (the content field is less than 20 characters long).', async () => {
+
         await blogsTestManager
             .createBlog(1);
 
@@ -276,7 +269,7 @@ describe('POST /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect(resCreatedComment.body).toEqual<OutputErrorsType>({
+        expect(resCreatedComment.body).toEqual<ApiErrorResult>({
             errorsMessages: [
                 {
                     field: 'content',
@@ -285,15 +278,16 @@ describe('POST /comments', () => {
             ]
         });
 
-        const resGetComments: Response = await req
-            .get(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const foundComments: Paginator<CommentViewModel> = await commentsTestManager
+            .getComments(presets.posts[0].id);
 
-        expect(resGetComments.body.items.length).toEqual(0);
+        expect(foundComments.items.length).toEqual(0);
 
         console_log(resCreatedComment.body, resCreatedComment.status, 'Test 6: post(/comments)');
     });
+
     it('should not create a commentary if the data in the request body is incorrect (the content field is more than 300 characters long).', async () => {
+
         await blogsTestManager
             .createBlog(1);
 
@@ -317,7 +311,7 @@ describe('POST /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect(resCreatedComment.body).toEqual<OutputErrorsType>({
+        expect(resCreatedComment.body).toEqual<ApiErrorResult>({
             errorsMessages: [
                 {
                     field: 'content',
@@ -326,11 +320,10 @@ describe('POST /comments', () => {
             ]
         });
 
-        const resGetComments: Response = await req
-            .get(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const foundComments: Paginator<CommentViewModel> = await commentsTestManager
+            .getComments(presets.posts[0].id);
 
-        expect(resGetComments.body.items.length).toEqual(0);
+        expect(foundComments.items.length).toEqual(0);
 
         console_log(resCreatedComment.body, resCreatedComment.status, 'Test 7: post(/comments)');
     });

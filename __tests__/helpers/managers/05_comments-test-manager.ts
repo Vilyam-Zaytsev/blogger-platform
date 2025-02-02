@@ -4,7 +4,7 @@ import {req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";
 import {CommentInputModel, CommentViewModel} from "../../../src/05-comments/types/input-output-types";
 import {
-    PaginationAndSortFilterType,
+    PaginationAndSortFilterType, Paginator,
     SortDirection
 } from "../../../src/common/types/input-output-types/pagination-sort-types";
 
@@ -45,6 +45,24 @@ const commentsTestManager = {
 
 
         return responses;
+    },
+
+    async getComments(postId: string): Promise<Paginator<CommentViewModel>> {
+
+        const res: Response = await req
+            .get(`${SETTINGS.PATH.POSTS}/${postId}${SETTINGS.PATH.COMMENTS}`)
+            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        return res.body;
+    },
+
+    async getComment(id: string): Promise<CommentViewModel> {
+
+        const res: Response = await req
+            .get(`${SETTINGS.PATH.COMMENTS}/${id}`)
+            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        return res.body;
     },
 
 //TODO вынести в отдельную функцию и протипизировать <>

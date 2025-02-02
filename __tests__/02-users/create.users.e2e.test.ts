@@ -7,6 +7,8 @@ import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
 import {UserDbType} from "../../src/02-users/types/user-db-type";
 import {UserViewModel} from "../../src/02-users/types/input-output-types";
+import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
+import {usersTestManager} from "../helpers/managers/02_users-test-manager";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -35,6 +37,7 @@ beforeEach(async () => {
 
 
 describe('POST /users', () => {
+
     it('should create a new user, the admin is authenticated.', async () => {
 
         const resPostUser: Response = await req
@@ -60,22 +63,15 @@ describe('POST /users', () => {
             createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
         });
 
-        const resGetUsers: Response = await req
-            .get(`${SETTINGS.PATH.USERS}`)
-            .set(
-                'Authorization',
-                encodingAdminDataInBase64(
-                    SETTINGS.ADMIN_DATA.LOGIN,
-                    SETTINGS.ADMIN_DATA.PASSWORD
-                )
-            )
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const foundUsers: Paginator<UserViewModel> = await usersTestManager
+            .getUsers();
 
-        expect(resGetUsers.body.items.length).toEqual(1);
-        expect(resPostUser.body).toEqual(resGetUsers.body.items[0]);
+        expect(resPostUser.body).toEqual(foundUsers.items[0]);
+        expect(foundUsers.items.length).toEqual(1);
 
         console_log(resPostUser.body, resPostUser.status, 'Test 1: post(/users)');
     });
+
     it('should not create a user if the admin is not authenticated.', async () => {
 
         const resPostUser: Response = await req
@@ -94,27 +90,14 @@ describe('POST /users', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
 
-        await req
-            .get(SETTINGS.PATH.USERS)
-            .set(
-                'Authorization',
-                encodingAdminDataInBase64(
-                    SETTINGS.ADMIN_DATA.LOGIN,
-                    SETTINGS.ADMIN_DATA.PASSWORD
-                )
-            )
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const foundUsers: Paginator<UserViewModel> = await usersTestManager
+            .getUsers();
 
-        expect({
-            pageCount: 0,
-            page: 1,
-            pageSize: 10,
-            totalCount: 0,
-            items: []
-        });
+        expect(foundUsers.items.length).toEqual(0);
 
         console_log(resPostUser.body, resPostUser.status, 'Test 2: post(/users)');
     });
+
     it('should not create a user if the data in the request body is incorrect (an empty object is passed).', async () => {
 
         const resPostUser: Response = await req
@@ -148,28 +131,15 @@ describe('POST /users', () => {
             },
         );
 
-        await req
-            .get(SETTINGS.PATH.USERS)
-            .set(
-                'Authorization',
-                encodingAdminDataInBase64(
-                    SETTINGS.ADMIN_DATA.LOGIN,
-                    SETTINGS.ADMIN_DATA.PASSWORD
-                )
-            )
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const foundUsers: Paginator<UserViewModel> = await usersTestManager
+            .getUsers();
 
-        expect({
-            pageCount: 0,
-            page: 1,
-            pageSize: 10,
-            totalCount: 0,
-            items: []
-        });
+        expect(foundUsers.items.length).toEqual(0);
 
         console_log(resPostUser.body, resPostUser.status, 'Test 3: post(/users)');
     });
-    it('should not create a user if the data in the request body is incorrect (login, email, password contain empty strings).', async () => {
+
+    it('should not create a user if the data in the request body is incorrect (login: empty line, email: empty line, password: empty line).', async () => {
 
         const resPostUser: Response = await req
             .post(SETTINGS.PATH.USERS)
@@ -206,28 +176,15 @@ describe('POST /users', () => {
             },
         );
 
-        await req
-            .get(SETTINGS.PATH.USERS)
-            .set(
-                'Authorization',
-                encodingAdminDataInBase64(
-                    SETTINGS.ADMIN_DATA.LOGIN,
-                    SETTINGS.ADMIN_DATA.PASSWORD
-                )
-            )
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const foundUsers: Paginator<UserViewModel> = await usersTestManager
+            .getUsers();
 
-        expect({
-            pageCount: 0,
-            page: 1,
-            pageSize: 10,
-            totalCount: 0,
-            items: []
-        });
+        expect(foundUsers.items.length).toEqual(0);
 
         console_log(resPostUser.body, resPostUser.status, 'Test 4: post(/users)');
     });
-    it('should not create a user if the data in the request body is incorrect (login contains less than 3 characters, password contains less than 6 characters, email does not match the pattern).', async () => {
+
+    it('should not create a user if the data in the request body is incorrect (login: less than the minimum length, email: incorrect, password: less than the minimum length)', async () => {
 
         const resPostUser: Response = await req
             .post(SETTINGS.PATH.USERS)
@@ -264,28 +221,15 @@ describe('POST /users', () => {
             },
         );
 
-        await req
-            .get(SETTINGS.PATH.USERS)
-            .set(
-                'Authorization',
-                encodingAdminDataInBase64(
-                    SETTINGS.ADMIN_DATA.LOGIN,
-                    SETTINGS.ADMIN_DATA.PASSWORD
-                )
-            )
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const foundUsers: Paginator<UserViewModel> = await usersTestManager
+            .getUsers();
 
-        expect({
-            pageCount: 0,
-            page: 1,
-            pageSize: 10,
-            totalCount: 0,
-            items: []
-        });
+        expect(foundUsers.items.length).toEqual(0);
 
         console_log(resPostUser.body, resPostUser.status, 'Test 5: post(/users)');
     });
-    it('should not create a user if the data in the request body is incorrect (login contains more than 10 characters, password contains more than 20 characters, email does not match the pattern).', async () => {
+
+    it('should not create a user if the data in the request body is incorrect (login: exceeds max length,  email: incorrect, password: exceeds max length).', async () => {
 
         const resPostUser: Response = await req
             .post(SETTINGS.PATH.USERS)
@@ -322,28 +266,15 @@ describe('POST /users', () => {
             },
         );
 
-        await req
-            .get(SETTINGS.PATH.USERS)
-            .set(
-                'Authorization',
-                encodingAdminDataInBase64(
-                    SETTINGS.ADMIN_DATA.LOGIN,
-                    SETTINGS.ADMIN_DATA.PASSWORD
-                )
-            )
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const foundUsers: Paginator<UserViewModel> = await usersTestManager
+            .getUsers();
 
-        expect({
-            pageCount: 0,
-            page: 1,
-            pageSize: 10,
-            totalCount: 0,
-            items: []
-        });
+        expect(foundUsers.items.length).toEqual(0);
 
         console_log(resPostUser.body, resPostUser.status, 'Test 6: post(/users)');
     });
-    it('should not create a user if the data in the request body is incorrect (the login, email, password fields are number type).', async () => {
+
+    it('should not create a user if the data in the request body is incorrect (login: type number,  email: type number, password: type number).', async () => {
 
         const resPostUser: Response = await req
             .post(SETTINGS.PATH.USERS)
@@ -380,24 +311,10 @@ describe('POST /users', () => {
             },
         );
 
-        await req
-            .get(SETTINGS.PATH.USERS)
-            .set(
-                'Authorization',
-                encodingAdminDataInBase64(
-                    SETTINGS.ADMIN_DATA.LOGIN,
-                    SETTINGS.ADMIN_DATA.PASSWORD
-                )
-            )
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const foundUsers: Paginator<UserViewModel> = await usersTestManager
+            .getUsers();
 
-        expect({
-            pageCount: 0,
-            page: 1,
-            pageSize: 10,
-            totalCount: 0,
-            items: []
-        });
+        expect(foundUsers.items.length).toEqual(0);
 
         console_log(resPostUser.body, resPostUser.status, 'Test 7: post(/users)');
     });

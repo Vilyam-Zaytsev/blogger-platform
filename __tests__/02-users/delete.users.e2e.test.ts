@@ -8,6 +8,7 @@ import {Response} from "supertest";
 import {UserDbType} from "../../src/02-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
 import {UserViewModel} from "../../src/02-users/types/input-output-types";
+import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -35,6 +36,7 @@ beforeEach(async () => {
 });
 
     describe('DELETE /users', () => {
+
         it('should delete user, the admin is authenticated.', async () => {
 
             await usersTestManager
@@ -50,27 +52,14 @@ beforeEach(async () => {
                 })
                 .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
-            await req
-                .get(SETTINGS.PATH.USERS)
-                .set(
-                    'Authorization',
-                    encodingAdminDataInBase64(
-                        SETTINGS.ADMIN_DATA.LOGIN,
-                        SETTINGS.ADMIN_DATA.PASSWORD
-                    )
-                )
-                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+            const foundUsers: Paginator<UserViewModel> = await usersTestManager
+                .getUsers();
 
-            expect({
-                pageCount: 0,
-                page: 1,
-                pageSize: 10,
-                totalCount: 0,
-                items: []
-            });
+            expect(foundUsers.items.length).toEqual(0);
 
             console_log(resDeleteUser.body, resDeleteUser.status, 'Test 1: delete(/users)');
         });
+
         it('should not delete user, the admin is not authenticated.', async () => {
 
             await usersTestManager
@@ -86,22 +75,15 @@ beforeEach(async () => {
                 })
                 .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
 
-            const resGetUsers: Response = await req
-                .get(SETTINGS.PATH.USERS)
-                .set(
-                    'Authorization',
-                    encodingAdminDataInBase64(
-                        SETTINGS.ADMIN_DATA.LOGIN,
-                        SETTINGS.ADMIN_DATA.PASSWORD
-                    )
-                )
-                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+            const foundUsers: Paginator<UserViewModel> = await usersTestManager
+                .getUsers();
 
-            expect(resGetUsers.body.items[0]).toEqual<UserViewModel>(presets.users[0]);
-            expect(resGetUsers.body.items.length).toEqual(1);
+            expect(foundUsers.items[0]).toEqual<UserViewModel>(presets.users[0]);
+            expect(foundUsers.items.length).toEqual(1);
 
             console_log(resDeleteUser.body, resDeleteUser.status, 'Test 2: delete(/users)');
         });
+
         it('should return a 404 error if the user was not found by the passed ID in the parameters.', async () => {
 
             await usersTestManager
@@ -117,18 +99,11 @@ beforeEach(async () => {
                 })
                 .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
-            const resGetUsers: Response = await req
-                .get(SETTINGS.PATH.USERS)
-                .set(
-                    'Authorization',
-                    encodingAdminDataInBase64(
-                        SETTINGS.ADMIN_DATA.LOGIN,
-                        SETTINGS.ADMIN_DATA.PASSWORD
-                    )
-                )
-                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+            const foundUsers: Paginator<UserViewModel> = await usersTestManager
+                .getUsers();
 
-            expect(resGetUsers.body.items.length).toEqual(1)
+            expect(foundUsers.items[0]).toEqual<UserViewModel>(presets.users[0]);
+            expect(foundUsers.items.length).toEqual(1);
 
             console_log(resDeleteUser.body, resDeleteUser.status, 'Test 3: delete(/users)');
         });

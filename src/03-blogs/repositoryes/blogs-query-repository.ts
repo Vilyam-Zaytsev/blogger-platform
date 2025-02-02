@@ -4,11 +4,15 @@ import {ObjectId, Sort, WithId} from "mongodb";
 import {
     MatchMode,
     PaginationAndSortFilterType,
+    Paginator
 } from "../../common/types/input-output-types/pagination-sort-types";
 import {createBlogsSearchFilter} from "../helpers/create-blogs-search-filter";
+import {BlogViewModel} from "../types/input-output-types";
+import {CommentViewModel} from "../../05-comments/types/input-output-types";
 
 const blogsQueryRepository = {
-    async findBlogs(sortQueryDto: PaginationAndSortFilterType): Promise<WithId<BlogDbType>[]> {
+
+    async findBlogs(sortQueryDto: PaginationAndSortFilterType): Promise<BlogViewModel[]> {
 
         const {
             pageNumber,
@@ -18,20 +22,35 @@ const blogsQueryRepository = {
             searchNameTerm
         } = sortQueryDto;
 
+        //TODO что если создание фильтра унести в контроллер???
         const filter: any = createBlogsSearchFilter(
             {searchNameTerm},
             MatchMode.Partial
         );
 
-        return await blogsCollection
+        const blogs: WithId<BlogDbType>[] = await blogsCollection
             .find(filter)
             .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as Sort)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .toArray();
+
+        return blogs.map(b => this._mapDbBlogToViewModel(b));
     },
+
+    async findBlog(id: string): Promise<BlogViewModel | null> {
+
+        const blog: WithId<BlogDbType> | null = await blogsCollection
+            .findOne({_id: new ObjectId(id)});
+
+        if (!blog) return null;
+
+        return this._mapDbBlogToViewModel(blog);
+    },
+
     async getBlogsCount(searchNameTerm: string | null): Promise<number> {
 
+        //TODO что если создание фильтра унести в контроллер???
         const filter: any = createBlogsSearchFilter(
             {searchNameTerm},
             MatchMode.Partial
@@ -40,10 +59,33 @@ const blogsQueryRepository = {
         return blogsCollection
             .countDocuments(filter);
     },
-    async findBlog(id: string): Promise<WithId<BlogDbType> | null> {
-        return await blogsCollection
-            .findOne({_id: new ObjectId(id)});
+
+    _mapDbBlogToViewModel(blog: WithId<BlogDbType>): BlogViewModel {
+
+        return {
+            id: String(blog._id),
+            name: blog.name,
+            description: blog.description,
+            websiteUrl: blog.websiteUrl,
+            createdAt: blog.createdAt,
+            isMembership: blog.isMembership
+        };
     },
+
+    _mapBlogsViewModelToPaginationResponse(
+        blogs: BlogViewModel[],
+        blogsCount: number,
+        paginationAndSortFilter: PaginationAndSortFilterType
+    ): Paginator<BlogViewModel> {
+
+        return {
+            pagesCount: Math.ceil(blogsCount / paginationAndSortFilter.pageSize),
+            page: paginationAndSortFilter.pageNumber,
+            pageSize: paginationAndSortFilter.pageSize,
+            totalCount: blogsCount,
+            items: blogs
+        };
+    }
 };
 
 export {blogsQueryRepository};

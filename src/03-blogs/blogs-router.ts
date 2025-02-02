@@ -15,7 +15,6 @@ import {
     sortDirectionInputValidator
 } from "../common/middlewares/query-parameters-validator";
 import {SETTINGS} from "../common/settings";
-import {postsController} from "../04-posts/posts-controller";
 import {
     postContentInputValidator,
     postShortDescriptionInputValidator,
@@ -34,29 +33,13 @@ blogsRouter.get('/',
     blogsController.getBlogs
 );
 blogsRouter.get('/:id', blogsController.getBlog);
-blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
-    pageNumberInputValidator,
-    pageSizeInputValidator,
-    sortByInputValidator,
-    sortDirectionInputValidator,
-    inputCheckErrorsMiddleware,
-    postsController.getPosts
-);
-blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
-    baseAuthMiddleware,
-    postTitleInputValidator,
-    postShortDescriptionInputValidator,
-    postContentInputValidator,
-    inputCheckErrorsMiddleware,
-    postsController.createAndInsertPost
-);
 blogsRouter.post('/',
     baseAuthMiddleware,
     blogNameInputValidator,
     blogDescriptionInputValidator,
     blogWebsiteUrlInputValidator,
     inputCheckErrorsMiddleware,
-    blogsController.createAndInsertBlog
+    blogsController.createBlog
 );
 blogsRouter.put('/:id',
     baseAuthMiddleware,
@@ -69,6 +52,22 @@ blogsRouter.put('/:id',
 blogsRouter.delete('/:id',
     baseAuthMiddleware,
     blogsController.deleteBlog
+);
+blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
+    pageNumberInputValidator,
+    pageSizeInputValidator,
+    sortByInputValidator,
+    sortDirectionInputValidator,
+    inputCheckErrorsMiddleware,
+    blogsController.getPosts
+);
+blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
+    baseAuthMiddleware,
+    postTitleInputValidator,
+    postShortDescriptionInputValidator,
+    postContentInputValidator,
+    inputCheckErrorsMiddleware,
+    blogsController.createPost
 );
 
 export {blogsRouter};

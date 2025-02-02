@@ -1,16 +1,15 @@
 import {Response} from "express";
 import {RequestWithBody, RequestWithUserId} from "../common/types/input-output-types/request-types";
-import {LoginInputType} from "./types/login-input-type";
+import {LoginInputModel} from "./types/login-input-model";
 import {authService} from "./auth-service";
 import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
-import {OutputErrorsType} from "../common/types/input-output-types/output-errors-type";
+import {ApiErrorResult} from "../common/types/input-output-types/api-error-result";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {UserInputModel, UserMeViewModel} from "../02-users/types/input-output-types";
-import {AccessTokenType} from "./types/access-token-type";
-import {userQueryService} from "../02-users/services/users-query-servise";
+import {LoginSuccessViewModel} from "./types/login-success-view-model";
 import {PresentationView} from "../02-users/types/presentation-view";
 import {SETTINGS} from "../common/settings";
 import {RegistrationConfirmationCodeType} from "./types/registration-confirmation-code-type";
@@ -19,29 +18,29 @@ import {RegistrationEmailResendingType} from "./types/registration-email-resendi
 const authController = {
 
     login: async (
-        req: RequestWithBody<LoginInputType>,
-        res: Response<OutputErrorsType | AccessTokenType>
+        req: RequestWithBody<LoginInputModel>,
+        res: Response<ApiErrorResult | LoginSuccessViewModel>
     ) => {
 
-        const authParams: LoginInputType = {
+        const authParams: LoginInputModel = {
             loginOrEmail: req.body.loginOrEmail,
             password: req.body.password
         };
 
-        const result: ResultType<AccessTokenType | null> = await authService
+        const resultLogin: ResultType<LoginSuccessViewModel | null> = await authService
             .login(authParams);
 
-        if (result.status !== ResultStatus.Success) {
+        if (resultLogin.status !== ResultStatus.Success) {
             res
-                .status(mapResultStatusToHttpStatus(result.status))
-                .json(mapResultExtensionsToErrorMessage(result.extensions));
+                .status(mapResultStatusToHttpStatus(resultLogin.status))
+                .json(mapResultExtensionsToErrorMessage(resultLogin.extensions));
 
             return;
         }
 
         res
-            .status(mapResultStatusToHttpStatus(ResultStatus.Success))
-            .json({...result.data!});
+            .status(mapResultStatusToHttpStatus(resultLogin.status))
+            .json({...resultLogin.data!});
     },
 
     registration: async (
@@ -124,12 +123,12 @@ const authController = {
                 .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
         }
 
-        const me: UserMeViewModel = await userQueryService
-            .findUser(userId, PresentationView.MeViewModal) as UserMeViewModel;
-
-        res
-            .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(me);
+        // const me: UserMeViewModel = await userQueryService
+        //     .findUser(userId, PresentationView.MeViewModal) as UserMeViewModel;
+        //
+        // res
+        //     .status(SETTINGS.HTTP_STATUSES.OK_200)
+        //     .json(me);
     },
 };
 

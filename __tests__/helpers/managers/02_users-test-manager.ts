@@ -3,13 +3,16 @@ import {SETTINGS} from "../../../src/common/settings";
 import {Response} from "supertest";
 import {UserInputModel, UserViewModel} from "../../../src/02-users/types/input-output-types";
 import {
-    PaginationAndSortFilterType,
+    PaginationAndSortFilterType, Paginator,
     SortDirection
 } from "../../../src/common/types/input-output-types/pagination-sort-types";
-import {presets, user, userLogins} from "../datasets-for-tests";
+import {presets, userLogins} from "../datasets-for-tests";
+
 
 const usersTestManager = {
+
     async createUser(numberOfUsers: number) {
+
         const responses: Response[] = [];
 
         for (let i = 0; i < numberOfUsers; i++) {
@@ -45,6 +48,22 @@ const usersTestManager = {
 
 
         return responses;
+    },
+
+    async getUsers(): Promise<Paginator<UserViewModel>> {
+
+        const res: Response = await req
+            .get(SETTINGS.PATH.USERS)
+            .set(
+                'Authorization',
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            )
+            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        return res.body;
     },
 
     filterAndSort<T extends { login: string; email: string }>(

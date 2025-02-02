@@ -1,9 +1,11 @@
 import jwt from 'jsonwebtoken';
 import {SETTINGS} from "../settings";
-import {AccessTokenType} from "../../01-auth/types/access-token-type";
+import {LoginSuccessViewModel} from "../../01-auth/types/login-success-view-model";
 
 const jwtService = {
-    async createToken(userId: string): Promise<AccessTokenType> {
+
+    async createToken(userId: string): Promise<LoginSuccessViewModel> {
+
         const accessToken: string = jwt.sign(
             {userId},
             SETTINGS.JWT_SECRET,
@@ -12,9 +14,12 @@ const jwtService = {
 
         return {accessToken};
     },
-    async verifyToken(token: string): Promise<{userId: string} | null> {
+
+    async verifyToken(token: string): Promise<{ userId: string } | null> {
+
         try {
-            return jwt.verify(token, SETTINGS.JWT_SECRET) as {userId: string};
+
+            return jwt.verify(token, SETTINGS.JWT_SECRET) as { userId: string };
         } catch (error) {
             console.error(error);
 

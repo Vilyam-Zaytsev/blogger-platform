@@ -1,11 +1,11 @@
 import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
 import {PostDbType} from "../../src/04-posts/types/post-db-type";
-import {UserDbType} from "../../src/02-users/types/user-db-type";
-import {UserInputModel, UserViewModel} from "../../src/02-users/types/input-output-types";
-import {BlogInputModel, BlogViewModel} from "../../src/03-blogs/types/input-output-types";
-import {PostInputModel, PostViewModel} from "../../src/04-posts/types/input-output-types";
-import {CommentInputModel, CommentViewModel} from "../../src/05-comments/types/input-output-types";
-import {AccessTokenType} from "../../src/01-auth/types/access-token-type";
+import {ConfirmationStatus, UserDbType} from "../../src/02-users/types/user-db-type";
+import {UserViewModel} from "../../src/02-users/types/input-output-types";
+import {BlogViewModel} from "../../src/03-blogs/types/input-output-types";
+import {PostViewModel} from "../../src/04-posts/types/input-output-types";
+import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
+import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
 
 const blog: BlogDbType = {
     name: 'BLOG',
@@ -29,12 +29,36 @@ const user: UserDbType = {
     email: '@example.com',
     passwordHash: 'hash',
     createdAt: new Date().toISOString(),
+    emailConfirmation: {
+        confirmationCode: null,
+        expirationDate: null,
+        confirmationStatus: ConfirmationStatus.Confirmed
+    }
 } as const;
 
 const userPropertyMap: Record<string, string> = {
     id: 'id',
     login: 'login',
     email: 'email',
+    createdAt: 'createdAt'
+};
+
+const blogPropertyMap: Record<string, string> = {
+    id: 'id',
+    name: 'name',
+    description: 'description',
+    websiteUrl: 'websiteUrl',
+    createdAt: 'createdAt',
+    isMembership: 'isMembership'
+};
+
+const postPropertyMap: Record<string, string> = {
+    id: 'id',
+    title: 'title',
+    shortDescription: 'shortDescription',
+    content: 'content',
+    blogId: 'blogId',
+    blogName: 'blogName',
     createdAt: 'createdAt'
 };
 
@@ -59,7 +83,7 @@ type PresetsType = {
     blogs: BlogViewModel[],
     posts: PostViewModel[],
     comments: CommentViewModel[],
-    accessTokens: AccessTokenType[],
+    accessTokens: LoginSuccessViewModel[],
 };
 
 const presets: PresetsType = {
@@ -89,7 +113,7 @@ const blogNames = [
     'CreativeVibes',
     'TheGastronome',
     'MindfulMusings',
-    'Wanderlust Diaries',
+    'WanderDiaries',
     'CodeCraft',
     'LifestyleLuxe',
     'TheHealthyLife',
@@ -125,7 +149,7 @@ const blogDescriptions = [
 const postTitles = [
     'The Future of Tech',
     'Inspiration for Creatives',
-    'Gourmet Recipes: Simple & Delicious',
+    'Gourmet Recipes',
     'Be More Mindful Daily',
     'Best Travel Destinations 2025',
     'Master Python in 30 Days',
@@ -133,7 +157,7 @@ const postTitles = [
     'Healthy Lifestyle Every Day',
     'Fashion Trends 2025: Wear Now',
     'Eco-Trends: Living in Harmony',
-    'Digital Nomad Life: Work Anywhere'
+    'Digital Nomad Life'
 ] as const;
 
 const postShortDescriptions = [
@@ -178,13 +202,15 @@ const comments = [
     "Your article stood out because of its clarity and depth. It's both informative and engaging!"
 ] as const;
 
-const incorrectAccessToken: string = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzhmOTA4NDIwZmJmZTBkNmI0ODkyMmUiLCJpYXQiOjE3Mzc0NjE4OTIsImV4cCI6MTczNzYzNDY5Mn0.B_cIie4YjmbWj6J2X1JQejngzqRgqkWwpr_1acffjo8` as const;
+const incorrectAccessToken: string = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzllNDkwYmMyNzQyZjQ2Y2ZlYWYyMzgiLCJpYXQiOjE3Mzg0MjY2MzUsImV4cCI6MTczODU5OTQzNX0.jnr_jbzaBr9WZhGzZQWQZsK4Bd4VcovtQ5NsKJ8TYzE` as const;
 
 export {
     blog,
     post,
     user,
     userPropertyMap,
+    blogPropertyMap,
+    postPropertyMap,
     commentPropertyMap,
     presets,
     userLogins,

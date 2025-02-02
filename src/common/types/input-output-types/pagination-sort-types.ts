@@ -34,7 +34,7 @@ type PaginationAndSortFilterType = {
     searchEmailTerm: string | null,
 };
 
-type PaginationResponse<T> = {
+type Paginator<T> = {
     pagesCount: number,
     page: number,
     pageSize: number,
@@ -49,5 +49,5 @@ export {
     FilterCondition,
     SortingAndPaginationParamsType,
     PaginationAndSortFilterType,
-    PaginationResponse,
+    Paginator,
 };

@@ -37,6 +37,7 @@ beforeEach(async () => {
 });
 
 describe('GET /users', () => {
+
     it('should return an empty array, the admin is authenticated.', async () => {
 
         const resGetUsers: Response = await req
@@ -60,6 +61,7 @@ describe('GET /users', () => {
 
         console_log(resGetUsers.body, resGetUsers.status, 'Test 1: get(/users)');
     });
+
     it('should return a 401 error if the admin is not authenticated', async () => {
 
         const resGetUsers: Response = await req
@@ -75,6 +77,7 @@ describe('GET /users', () => {
 
         console_log(resGetUsers.body, resGetUsers.status, 'Test 2: get(/users)');
     });
+
     it('should return an array with a single user, the admin is authenticated.', async () => {
 
         await usersTestManager
@@ -96,6 +99,7 @@ describe('GET /users', () => {
 
         console_log(resGetUsers.body, resGetUsers.status, 'Test 3: get(/users)');
     });
+
     it('should return an array with a three users, the admin is authenticated.', async () => {
 
         await usersTestManager
@@ -112,8 +116,7 @@ describe('GET /users', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-        for (let i = 0; i < resGetUsers.body.items.length; i++) {
-            expect(resGetUsers.body.items[i]).toEqual(
+            expect(resGetUsers.body.items).toEqual(
                 usersTestManager.filterAndSort<UserViewModel>(
                     presets.users,
                     createPaginationAndSortFilter({
@@ -123,9 +126,8 @@ describe('GET /users', () => {
                         sortDirection: SortDirection.Descending
                     }),
                     userPropertyMap
-                )[i]
-            )
-        }
+                )
+            );
 
         expect(resGetUsers.body.items.length).toEqual(3);
 

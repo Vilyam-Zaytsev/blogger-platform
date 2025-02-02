@@ -37,6 +37,7 @@ beforeEach(async () => {
 });
 
 describe('pagination, sort, search in term /users', () => {
+
     it('should use default pagination values when none are provided by the client.', async () => {
 
         await usersTestManager
@@ -72,10 +73,9 @@ describe('pagination, sort, search in term /users', () => {
 
         expect(resGetUsers.body.items.length).toEqual(10);
 
-        expect(presets.users.length).toEqual(11);
-
         console_log(resGetUsers.body, resGetUsers.status, 'Test 1: pagination and sort(/users)');
     });
+
     it('should use client-provided pagination values to return the correct subset of data.', async () => {
 
         await usersTestManager
@@ -119,6 +119,7 @@ describe('pagination, sort, search in term /users', () => {
 
         console_log(resGetUsers.body, resGetUsers.status, 'Test 2: pagination(/users)');
     });
+
     it('should use client-provided pagination values to return the correct subset of data.', async () => {
 
         await usersTestManager
@@ -162,8 +163,8 @@ describe('pagination, sort, search in term /users', () => {
 
         console_log(resGetUsers.body, resGetUsers.status, 'Test 3: pagination(/users)');
     });
-    it('should use the values provided by the client to search for users by the occurrence of the substring (the' +
-        ' "login" field).', async () => {
+
+    it('should use the values provided by the client to search for users by the occurrence of the substring (the  "login" field).', async () => {
 
         await usersTestManager
             .createUser(11);
@@ -178,7 +179,7 @@ describe('pagination, sort, search in term /users', () => {
                 )
             )
             .query({
-                searchLoginTerm: userLogins[1].slice(1, 2),
+                searchLoginTerm: 'ro',
             })
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
@@ -186,22 +187,22 @@ describe('pagination, sort, search in term /users', () => {
             pagesCount: 1,
             page: 1,
             pageSize: 10,
-            totalCount: 4,
+            totalCount: 2,
             items: usersTestManager.filterAndSort<UserViewModel>(
                 presets.users,
                 createPaginationAndSortFilter({
-                    searchLoginTerm: userLogins[1].slice(1, 2),
+                    searchLoginTerm: 'ro',
                 }),
                 userPropertyMap
             )
         });
 
-        expect(resGetUsers.body.items.length).toEqual(4);
+        expect(resGetUsers.body.items.length).toEqual(2);
 
         console_log(resGetUsers.body, resGetUsers.status, 'Test 4: search in term(/users)');
     });
-    it('should use the values provided by the client to search for users by the occurrence of the substring (the' +
-        ' "email" field).', async () => {
+
+    it('should use the values provided by the client to search for users by the occurrence of the substring (the "email" field).', async () => {
 
         await usersTestManager
             .createUser(11);
@@ -216,7 +217,46 @@ describe('pagination, sort, search in term /users', () => {
                 )
             )
             .query({
-                searchEmailTerm: userLogins[1].slice(1, 2),
+                searchEmailTerm: 'ro',
+            })
+            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        expect(resGetUsers.body).toEqual({
+            pagesCount: 1,
+            page: 1,
+            pageSize: 10,
+            totalCount: 2,
+            items: usersTestManager.filterAndSort<UserViewModel>(
+                presets.users,
+                createPaginationAndSortFilter({
+                    searchEmailTerm: 'ro',
+                }),
+                userPropertyMap
+            )
+        });
+
+        expect(resGetUsers.body.items.length).toEqual(2);
+
+        console_log(resGetUsers.body, resGetUsers.status, 'Test 5: search in term(/users)');
+    });
+
+    it('should use the values provided by the client to search for users by the occurrence of the substring (the "login" and "email" fields).', async () => {
+
+        await usersTestManager
+            .createUser(11);
+
+        const resGetUsers: Response = await req
+            .get(SETTINGS.PATH.USERS)
+            .set(
+                'Authorization',
+                encodingAdminDataInBase64(
+                    SETTINGS.ADMIN_DATA.LOGIN,
+                    SETTINGS.ADMIN_DATA.PASSWORD
+                )
+            )
+            .query({
+                searchLoginTerm: 'ro',
+                searchEmailTerm: 'la',
             })
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
@@ -228,53 +268,14 @@ describe('pagination, sort, search in term /users', () => {
             items: usersTestManager.filterAndSort<UserViewModel>(
                 presets.users,
                 createPaginationAndSortFilter({
-                    searchEmailTerm: userLogins[1].slice(1, 2),
-                }),
-                userPropertyMap
-            )
-        });
-
-        expect(resGetUsers.body.items.length).toEqual(4);
-
-        console_log(resGetUsers.body, resGetUsers.status, 'Test 5: search in term(/users)');
-    });
-    it('should use the values provided by the client to search for users by the occurrence of the substring (the' +
-        ' "login" and "email" fields). ', async () => {
-
-        await usersTestManager
-            .createUser(11);
-
-        const resGetUsers: Response = await req
-            .get(SETTINGS.PATH.USERS)
-            .set(
-                'Authorization',
-                encodingAdminDataInBase64(
-                    SETTINGS.ADMIN_DATA.LOGIN,
-                    SETTINGS.ADMIN_DATA.PASSWORD
-                )
-            )
-            .query({
-                searchLoginTerm: userLogins[1].slice(0, 1),
-                searchEmailTerm: userLogins[10].slice(0, 1),
-            })
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
-        expect(resGetUsers.body).toEqual({
-            pagesCount: 1,
-            page: 1,
-            pageSize: 10,
-            totalCount: 7,
-            items: usersTestManager.filterAndSort<UserViewModel>(
-                presets.users,
-                createPaginationAndSortFilter({
-                    searchLoginTerm: userLogins[1].slice(0, 1),
-                    searchEmailTerm: userLogins[10].slice(0, 1)
+                    searchLoginTerm: 'ro',
+                    searchEmailTerm: 'la'
                 }),
                 userPropertyMap
             )
         })
 
-        expect(resGetUsers.body.items.length).toEqual(7);
+        expect(resGetUsers.body.items.length).toEqual(4);
 
         console_log(resGetUsers.body, resGetUsers.status, 'Test 6: search in term(/users)');
     });

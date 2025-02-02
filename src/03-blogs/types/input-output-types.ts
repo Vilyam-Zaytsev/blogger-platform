@@ -4,6 +4,12 @@ type BlogInputModel = {
     websiteUrl: string
 };
 
+type BlogPostInputModel = {
+    title: string,
+    shortDescription: string,
+    content: string
+};
+
 type BlogViewModel = {
     id: string,
     name: string,
@@ -15,5 +21,6 @@ type BlogViewModel = {
 
 export {
     BlogInputModel,
+    BlogPostInputModel,
     BlogViewModel
 };

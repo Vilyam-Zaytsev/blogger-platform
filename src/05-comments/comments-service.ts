@@ -3,7 +3,7 @@ import {ObjectId, WithId} from "mongodb";
 import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {PostDbType} from "../04-posts/types/post-db-type";
-import {postsService} from "../04-posts/services/posts-service";
+import {postsService} from "../04-posts/posts-service";
 import {commentRepository} from "./repositoryes/comment-repository";
 import {CommentDbType} from "./types/comment-db-type";
 import {UserDbType} from "../02-users/types/user-db-type";

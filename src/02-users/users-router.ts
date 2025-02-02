@@ -20,7 +20,7 @@ usersRouter.post('/',
     userEmailInputValidator,
     userPasswordInputValidator,
     inputCheckErrorsMiddleware,
-    usersController.createAndInsertUser
+    usersController.createUser
 );
 usersRouter.delete('/:id',
     baseAuthMiddleware,

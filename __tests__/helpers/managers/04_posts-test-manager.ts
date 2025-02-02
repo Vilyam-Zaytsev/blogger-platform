@@ -9,12 +9,19 @@ import {
 } from "../datasets-for-tests";
 import {encodingAdminDataInBase64, req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";
+import {
+    PaginationAndSortFilterType,
+    Paginator, SortDirection
+} from "../../../src/common/types/input-output-types/pagination-sort-types";
 
 const postsTestManager = {
+
     async createPost(numberOfPosts: number) {
+
         const responses: Response[] = [];
 
         for (let i = 0; i < numberOfPosts; i++) {
+
             const post: PostInputModel = {
                 title: postTitles[i],
                 shortDescription: postShortDescriptions[i],
@@ -39,7 +46,7 @@ const postsTestManager = {
                 shortDescription: postShortDescriptions[i],
                 content: postContents[i],
                 blogId: presets.blogs[0].id,
-                blogName: blogNames[i],
+                blogName: blogNames[0],
                 createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
             });
 
@@ -52,106 +59,69 @@ const postsTestManager = {
         return responses;
     },
 
+    async getPosts(): Promise<Paginator<PostViewModel>> {
 
-    filterAndSort(
-        items: PostViewModel[],
-        sortBy: keyof PostViewModel = 'createdAt',
-        sortDirection: string = 'desc',
-        pageNumber: number = 1,
-        pageSize: number = 10,
+        const res: Response = await req
+            .get(SETTINGS.PATH.POSTS)
+            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        return res.body;
+    },
+
+    async getPost(id: string): Promise<Paginator<PostViewModel>> {
+
+        const res: Response = await req
+            .get(`${SETTINGS.PATH.POSTS}/${id}`)
+            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        return res.body;
+    },
+
+    filterAndSort<T>(
+        items: T[],
+        sortAndPaginationFilter: PaginationAndSortFilterType,
+        propertyMap: Record<string, string>
     ) {
+
+        const {
+            pageNumber,
+            pageSize,
+            sortBy,
+            sortDirection,
+        } = sortAndPaginationFilter;
+
         let startIndex = (pageNumber - 1) * pageSize;
-        let finishIndex = startIndex + pageSize;
+        let endIndex = startIndex + pageSize;
+
+        const path: string = propertyMap[sortBy];
+
+        if (!path) throw new Error(`Invalid sortBy property: ${sortBy}`);
+
+        const getValueByPath = (obj: T, path: string): any => {
+            return path.split('.').reduce((acc: any, key) => acc && acc[key], obj);
+        };
 
         return items
-            .sort((a: PostViewModel, b: PostViewModel) => {
-                return a[sortBy] > b[sortBy]
-                    ? sortDirection === 'desc' ? -1 : 1
-                    : a[sortBy] < b[sortBy]
-                        ? sortDirection === 'desc' ? 1 : -1
-                        : sortDirection === 'desc' ? -1 : 1
-            })
-            .filter((b, i) => {
-                return i >= startIndex && i < finishIndex ? b : null;
-            })
-    }
-};
+            .sort((a: T, b: T) => {
 
-// const postsTestManager = {
-//     async createPost(
-//         numberOfPosts: number,
-//         dataPost: any,
-//         adminData: string,
-//         statusCode: number = SETTINGS.HTTP_STATUSES.CREATED_201,
-//         path: string = SETTINGS.PATH.POSTS
-//     ) {
-//         const responses: Response[] = [];
-//
-//         for (let i = 0; i < numberOfPosts; i++) {
-//             const res: Response = await req
-//                 .post(path)
-//                 .send(this.formingPostData({...dataPost}, (i + 1)))
-//                 .set('Authorization', adminData)
-//                 .expect(statusCode);
-//
-//             responses.push(res);
-//         }
-//
-//
-//         return responses;
-//     },
-//
-//     formingPostData(dataPost: any, postNumber: number) {
-//         return {
-//             title:
-//                 dataPost.title
-//                     ? typeof dataPost.title === 'string'
-//                         ? dataPost.title.trim() !== ''
-//                             ? `${dataPost.title}_${postNumber}`
-//                             : ''
-//                         : dataPost.title
-//                     : null,
-//             shortDescription:
-//                 dataPost.shortDescription
-//                     ? typeof dataPost.shortDescription === 'string'
-//                         ? dataPost.shortDescription.trim() !== ''
-//                             ? `${dataPost.shortDescription}_${postNumber}`
-//                             : ''
-//                         : dataPost.shortDescription
-//                     : null,
-//             content:
-//                 dataPost.content
-//                     ? typeof dataPost.content === 'string'
-//                         ? dataPost.content.trim() !== ''
-//                             ? `${dataPost.content}_${postNumber}`
-//                             : ''
-//                         : dataPost.content
-//                     : null,
-//             blogId: dataPost.blogId
-//         };
-//     },
-//     filterAndSort(
-//         items: PostViewModel[],
-//         sortBy: keyof PostViewModel = 'createdAt',
-//         sortDirection: string = 'desc',
-//         pageNumber: number = 1,
-//         pageSize: number = 10,
-//     ) {
-//         let startIndex = (pageNumber - 1) * pageSize;
-//         let finishIndex = startIndex + pageSize;
-//
-//         return items
-//             .sort((a: PostViewModel, b: PostViewModel) => {
-//                 return a[sortBy] > b[sortBy]
-//                     ? sortDirection === 'desc' ? -1 : 1
-//                     : a[sortBy] < b[sortBy]
-//                         ? sortDirection === 'desc' ? 1 : -1
-//                         : sortDirection === 'desc' ? -1 : 1
-//             })
-//             .filter((b, i) => {
-//                 return i >= startIndex && i < finishIndex ? b : null;
-//             })
-//     }
-// };
+                const aValue = getValueByPath(a, path);
+                const bValue = getValueByPath(b, path);
+
+                if (sortDirection === SortDirection.Descending) {
+                    if (aValue < bValue) return 1;
+                    if (aValue > bValue) return -1;
+                    return 0;
+                }
+                if (sortDirection === SortDirection.Ascending) {
+                    if (aValue < bValue) return -1;
+                    if (aValue > bValue) return 1;
+                    return 0;
+                }
+
+                return 0;
+            })
+            .slice(startIndex, endIndex);
+    },
+};
 
 export {postsTestManager};

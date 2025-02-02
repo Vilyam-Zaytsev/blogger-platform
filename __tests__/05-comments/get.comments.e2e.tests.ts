@@ -20,8 +20,8 @@ import {Response} from "supertest";
 import {console_log, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
-import {PaginationResponse, SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
-import {commentsTestManager} from "../helpers/managers/comments-test-manager";
+import {Paginator, SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
+import {commentsTestManager} from "../helpers/managers/05_comments-test-manager";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
 
 let mongoServer: MongoMemoryServer;
@@ -56,6 +56,7 @@ beforeEach(async () => {
 });
 
 describe('GET /comments', () => {
+
     it('should return an empty array.', async () => {
 
         await blogsTestManager
@@ -68,7 +69,7 @@ describe('GET /comments', () => {
             .get(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-        expect(resGetComments.body).toEqual<PaginationResponse<CommentViewModel>>({
+        expect(resGetComments.body).toEqual<Paginator<CommentViewModel>>({
             pagesCount: 0,
             page: 1,
             pageSize: 10,
@@ -78,6 +79,7 @@ describe('GET /comments', () => {
 
         console_log(resGetComments.body, resGetComments.status, 'Test 1: get(/comments)');
     });
+
     it('should return an array with a single comment.', async () => {
 
         await blogsTestManager
@@ -99,7 +101,7 @@ describe('GET /comments', () => {
             .get(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-        expect(resGetComments.body).toEqual<PaginationResponse<CommentViewModel>>({
+        expect(resGetComments.body).toEqual<Paginator<CommentViewModel>>({
             pagesCount: 1,
             page: 1,
             pageSize: 10,
@@ -121,6 +123,7 @@ describe('GET /comments', () => {
 
         console_log(resGetComments.body, resGetComments.status, 'Test 2: get(/comments)');
     });
+
     it('should return an array with three comments.', async () => {
 
         await blogsTestManager
@@ -161,6 +164,7 @@ describe('GET /comments', () => {
 
         console_log(resGetComments.body, resGetComments.status, 'Test 3: get(/comments)');
     });
+
     it('should return comment found by id.', async () => {
 
         await blogsTestManager
@@ -184,8 +188,9 @@ describe('GET /comments', () => {
 
         expect(resGetComment.body).toEqual(presets.comments[0])
 
-        console_log(resGetComment.body, resGetComment.status, 'Test 4: getById(/comments)');
+        console_log(resGetComment.body, resGetComment.status, 'Test 4: get(/comments/:id)');
     });
+
     it('should return the 404 not found error (if the comment with this ID does not exist).', async () => {
 
         await blogsTestManager
@@ -213,6 +218,6 @@ describe('GET /comments', () => {
 
         expect(resGetComment_2.body).toEqual(presets.comments[0])
 
-        console_log(resGetComment_1.body, resGetComment_1.status, 'Test 5: getById(/comments)');
+        console_log(resGetComment_1.body, resGetComment_1.status, 'Test 5: get(/comments/:id)');
     });
 });
