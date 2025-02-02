@@ -1,6 +1,10 @@
 import {console_log_e2e, encodingAdminDataInBase64, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {clearPresets, presets, userPropertyMap} from "../helpers/datasets-for-tests";
+import {
+    clearPresets,
+    presets,
+    userPropertyMap
+} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
