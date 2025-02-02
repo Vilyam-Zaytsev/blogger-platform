@@ -40,6 +40,7 @@ const commentQueryRepository = {
     },
 
     async getCommentsCount(postId: string): Promise<number> {
+
         return await commentsCollection
             .countDocuments({postId})
     },
