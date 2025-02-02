@@ -52,7 +52,7 @@ beforeEach(async () => {
                 .get(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.ME}`)
                 .set(
                     'Authorization',
-                    `Bearer ${presets.accessTokens[0]}`
+                    `Bearer ${presets.accessTokens[0].accessToken}`
                 )
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 

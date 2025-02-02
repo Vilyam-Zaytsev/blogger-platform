@@ -7,7 +7,7 @@ import {ResultType} from "../common/types/result-types/result-type";
 import {jwtService} from "../common/adapters/jwt-service";
 import {ObjectId, WithId} from "mongodb";
 import {LoginSuccessViewModel} from "./types/login-success-view-model";
-import {usersService} from "../02-users/services/users-service";
+import {usersService} from "../02-users/users-service";
 import {User} from "../02-users/domain/user.entity";
 import {nodemailerService} from "../common/adapters/nodemailer-service";
 import {emailTemplates} from "../common/adapters/email-templates";
