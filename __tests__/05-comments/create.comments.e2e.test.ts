@@ -1,6 +1,11 @@
 import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {clearPresets, comments, incorrectAccessToken, presets} from "../helpers/datasets-for-tests";
+import {
+    clearPresets,
+    comments,
+    incorrectAccessToken,
+    presets
+} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {
@@ -8,7 +13,8 @@ import {
     commentsCollection,
     postsCollection,
     setBlogsCollection,
-    setCommentsCollection, setPostsCollection,
+    setCommentsCollection,
+    setPostsCollection,
     setUsersCollection,
     usersCollection
 } from "../../src/db/mongoDb";
@@ -57,7 +63,7 @@ beforeEach(async () => {
     clearPresets();
 });
 
-describe('POST /comments', () => {
+describe('POST /posts/{postId}/comments', () => {
 
     it('should create a new comment if the user is logged in.', async () => {
 
@@ -73,7 +79,7 @@ describe('POST /comments', () => {
         await authTestManager
             .login(presets.users.map(u => u.login));
 
-        const resCreatedComment: Response = await req
+        const resCreateComment: Response = await req
             .post(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
             .send({
                 content: comments[0]
@@ -84,7 +90,7 @@ describe('POST /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.CREATED_201);
 
-        expect(resCreatedComment.body).toEqual<CommentViewModel>({
+        expect(resCreateComment.body).toEqual<CommentViewModel>({
             id: expect.any(String),
             content: comments[0],
             commentatorInfo: {
@@ -97,10 +103,10 @@ describe('POST /comments', () => {
         const foundComments: Paginator<CommentViewModel> = await commentsTestManager
             .getComments(presets.posts[0].id);
 
-        expect(foundComments.items[0]).toEqual(resCreatedComment.body)
+        expect(foundComments.items[0]).toEqual(resCreateComment.body)
         expect(foundComments.items.length).toEqual(1);
 
-        console_log_e2e(resCreatedComment.body, resCreatedComment.status, 'Test 1: post(/comments)');
+        console_log_e2e(resCreateComment.body, resCreateComment.status, 'Test 1: post(/posts/{postId}/comments)');
     });
 
     it('should not create a new comment if the user is not logged in.', async () => {
@@ -111,7 +117,7 @@ describe('POST /comments', () => {
         await postsTestManager
             .createPost(1);
 
-        const resCreatedComment: Response = await req
+        const resCreateComment: Response = await req
             .post(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
             .send({
                 content: comments[0]
@@ -127,7 +133,7 @@ describe('POST /comments', () => {
 
         expect(foundComments.items.length).toEqual(0);
 
-        console_log_e2e(resCreatedComment.body, resCreatedComment.status, 'Test 2: post(/comments)');
+        console_log_e2e(resCreateComment.body, resCreateComment.status, 'Test 2: post(/posts/{postId}/comments)');
     });
 
     it('should not create a new comment If post with specified postId doesn\'t exists.', async () => {
@@ -144,7 +150,7 @@ describe('POST /comments', () => {
         await authTestManager
             .login(presets.users.map(u => u.login));
 
-        const resCreatedComment: Response = await req
+        const resCreateComment: Response = await req
             .post(`${SETTINGS.PATH.POSTS}/123${SETTINGS.PATH.COMMENTS}`)
             .send({
                 content: comments[0]
@@ -160,7 +166,7 @@ describe('POST /comments', () => {
 
         expect(foundComments.items.length).toEqual(0);
 
-        console_log_e2e(resCreatedComment.body, resCreatedComment.status, 'Test 3: post(/comments)');
+        console_log_e2e(resCreateComment.body, resCreateComment.status, 'Test 3: post(/posts/{postId}/comments)');
     });
 
     it('should not create a commentary if the data in the request body is incorrect (an empty object is passed).', async () => {
@@ -177,7 +183,7 @@ describe('POST /comments', () => {
         await authTestManager
             .login(presets.users.map(u => u.login));
 
-        const resCreatedComment: Response = await req
+        const resCreateComment: Response = await req
             .post(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
             .send({})
             .set(
@@ -186,7 +192,7 @@ describe('POST /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect(resCreatedComment.body).toEqual<ApiErrorResult>({
+        expect(resCreateComment.body).toEqual<ApiErrorResult>({
             errorsMessages: [
                 {
                     field: 'content',
@@ -200,7 +206,7 @@ describe('POST /comments', () => {
 
         expect(foundComments.items.length).toEqual(0);
 
-        console_log_e2e(resCreatedComment.body, resCreatedComment.status, 'Test 4: post(/comments)');
+        console_log_e2e(resCreateComment.body, resCreateComment.status, 'Test 4: post(/posts/{postId}/comments)');
     });
 
     it('should not create a commentary if the data in the request body is incorrect (the content field contains data of the number type).', async () => {
@@ -217,7 +223,7 @@ describe('POST /comments', () => {
         await authTestManager
             .login(presets.users.map(u => u.login));
 
-        const resCreatedComment: Response = await req
+        const resCreateComment: Response = await req
             .post(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
             .send({
                 content: 123
@@ -228,7 +234,7 @@ describe('POST /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect(resCreatedComment.body).toEqual<ApiErrorResult>({
+        expect(resCreateComment.body).toEqual<ApiErrorResult>({
             errorsMessages: [
                 {
                     field: 'content',
@@ -242,7 +248,7 @@ describe('POST /comments', () => {
 
         expect(foundComments.items.length).toEqual(0);
 
-        console_log_e2e(resCreatedComment.body, resCreatedComment.status, 'Test 5: post(/comments)');
+        console_log_e2e(resCreateComment.body, resCreateComment.status, 'Test 5: post(/posts/{postId}/comments)');
     });
 
     it('should not create a commentary if the data in the request body is incorrect (the content field is less than 20 characters long).', async () => {
@@ -259,7 +265,7 @@ describe('POST /comments', () => {
         await authTestManager
             .login(presets.users.map(u => u.login));
 
-        const resCreatedComment: Response = await req
+        const resCreateComment: Response = await req
             .post(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
             .send({
                 content: generateRandomString(19)
@@ -270,7 +276,7 @@ describe('POST /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect(resCreatedComment.body).toEqual<ApiErrorResult>({
+        expect(resCreateComment.body).toEqual<ApiErrorResult>({
             errorsMessages: [
                 {
                     field: 'content',
@@ -284,7 +290,7 @@ describe('POST /comments', () => {
 
         expect(foundComments.items.length).toEqual(0);
 
-        console_log_e2e(resCreatedComment.body, resCreatedComment.status, 'Test 6: post(/comments)');
+        console_log_e2e(resCreateComment.body, resCreateComment.status, 'Test 6: post(/posts/{postId}/comments)');
     });
 
     it('should not create a commentary if the data in the request body is incorrect (the content field is more than 300 characters long).', async () => {
@@ -301,7 +307,7 @@ describe('POST /comments', () => {
         await authTestManager
             .login(presets.users.map(u => u.login));
 
-        const resCreatedComment: Response = await req
+        const resCreateComment: Response = await req
             .post(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.COMMENTS}`)
             .send({
                 content: generateRandomString(301)
@@ -312,7 +318,7 @@ describe('POST /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect(resCreatedComment.body).toEqual<ApiErrorResult>({
+        expect(resCreateComment.body).toEqual<ApiErrorResult>({
             errorsMessages: [
                 {
                     field: 'content',
@@ -326,6 +332,6 @@ describe('POST /comments', () => {
 
         expect(foundComments.items.length).toEqual(0);
 
-        console_log_e2e(resCreatedComment.body, resCreatedComment.status, 'Test 7: post(/comments)');
+        console_log_e2e(resCreateComment.body, resCreateComment.status, 'Test 7: post(/posts/{postId}/comments)');
     });
 });

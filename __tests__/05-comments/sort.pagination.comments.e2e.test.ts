@@ -105,7 +105,8 @@ describe('pagination and sort /comments', () => {
 
         expect(presets.comments.length).toEqual(11);
 
-        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 1: pagination and sort(/comments)');
+        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 1: pagination and' +
+            ' sort(/posts/{postId}/comments)');
     });
 
     it('should use client-provided pagination values to return the correct subset of data.', async () => {
@@ -154,7 +155,7 @@ describe('pagination and sort /comments', () => {
 
         expect(presets.comments.length).toEqual(11);
 
-        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 2: pagination and sort(/comments)');
+        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 2: pagination and sort(/posts/{postId}/comments)');
     });
 
     it('should return a 400 error if the client has passed invalid pagination values.', async () => {
@@ -203,6 +204,6 @@ describe('pagination and sort /comments', () => {
 
         expect(presets.comments.length).toEqual(11);
 
-        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 3: pagination and sort(/comments)');
+        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 3: pagination and sort(/posts/{postId}/comments)');
     });
 });

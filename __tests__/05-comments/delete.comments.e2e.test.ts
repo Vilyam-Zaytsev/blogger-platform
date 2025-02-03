@@ -81,7 +81,7 @@ describe('DELETE /comments', () => {
         await commentsTestManager
             .createComments(1);
 
-        const resDeleteComments: Response = await req
+        const resDeleteComment: Response = await req
             .delete(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
             .set(
                 'Authorization',
@@ -94,7 +94,7 @@ describe('DELETE /comments', () => {
 
         expect(foundComments.items.length).toEqual(0);
 
-        console_log_e2e(resDeleteComments.body, resDeleteComments.status, 'Test 1: delete(/comments/:id)');
+        console_log_e2e(resDeleteComment.body, resDeleteComment.status, 'Test 1: delete(/comments/:id)');
     });
 
     it('should not delete the comment if the user is not logged in.', async () => {
@@ -114,7 +114,7 @@ describe('DELETE /comments', () => {
         await commentsTestManager
             .createComments(1);
 
-        const resDeleteComments: Response = await req
+        const resDeleteComment: Response = await req
             .delete(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
             .set(
                 'Authorization',
@@ -127,7 +127,7 @@ describe('DELETE /comments', () => {
 
         expect(foundComments.items.length).toEqual(1);
 
-        console_log_e2e(resDeleteComments.body, resDeleteComments.status, 'Test 2: delete(/comments/:id)');
+        console_log_e2e(resDeleteComment.body, resDeleteComment.status, 'Test 2: delete(/comments/:id)');
     });
 
     it('should not delete comments if the user in question is not the owner of the comment.', async () => {
@@ -147,7 +147,7 @@ describe('DELETE /comments', () => {
         await commentsTestManager
             .createComments(1);
 
-        const resDeleteComments: Response = await req
+        const resDeleteComment: Response = await req
             .delete(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
             .set(
                 'Authorization',
@@ -163,7 +163,7 @@ describe('DELETE /comments', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
-        console_log_e2e(resDeleteComments.body, resDeleteComments.status, 'Test 3: delete(/comments/:id)');
+        console_log_e2e(resDeleteComment.body, resDeleteComment.status, 'Test 3: delete(/comments/:id)');
     });
 
     it('should not delete comments if the comment does not exist.', async () => {
@@ -183,7 +183,7 @@ describe('DELETE /comments', () => {
         await commentsTestManager
             .createComments(1);
 
-        const resDeleteComments: Response = await req
+        const resDeleteComment: Response = await req
             .delete(`${SETTINGS.PATH.COMMENTS}/${new ObjectId()}`)
             .set(
                 'Authorization',
@@ -196,6 +196,6 @@ describe('DELETE /comments', () => {
 
         expect(foundComments.items.length).toEqual(1);
 
-        console_log_e2e(resDeleteComments.body, resDeleteComments.status, 'Test 4: delete(/comments/:id)');
+        console_log_e2e(resDeleteComment.body, resDeleteComment.status, 'Test 4: delete(/comments/:id)');
     });
 });
