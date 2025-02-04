@@ -31,6 +31,7 @@ const authController = {
             .login(authParams);
 
         if (resultLogin.status !== ResultStatus.Success) {
+
             res
                 .status(mapResultStatusToHttpStatus(resultLogin.status))
                 .json(mapResultExtensionsToErrorMessage(resultLogin.extensions));
@@ -48,19 +49,20 @@ const authController = {
         res: Response
     ) => {
 
-        const {
-            login,
-            email,
-            password
-        } = req.body;
+        const dataForRegistrationUser: UserInputModel = {
+            login: req.body.login,
+            email: req.body.email,
+            password: req.body.password
+        };
 
-        const result: ResultType<string | null> = await authService
-            .registration(login, password, email);
+        const resultRegistration: ResultType<string | null> = await authService
+            .registration(dataForRegistrationUser);
 
-        if (result.status !== ResultStatus.Success) {
+        if (resultRegistration.status !== ResultStatus.Success) {
+
             res
-                .status(mapResultStatusToHttpStatus(result.status))
-                .json(mapResultExtensionsToErrorMessage(result.extensions));
+                .status(mapResultStatusToHttpStatus(resultRegistration.status))
+                .json(mapResultExtensionsToErrorMessage(resultRegistration.extensions));
 
             return;
         }
