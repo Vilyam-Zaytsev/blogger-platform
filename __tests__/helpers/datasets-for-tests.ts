@@ -1,7 +1,7 @@
 import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
 import {PostDbType} from "../../src/04-posts/types/post-db-type";
 import {ConfirmationStatus, UserDbType} from "../../src/02-users/types/user-db-type";
-import {UserViewModel} from "../../src/02-users/types/input-output-types";
+import {UserInputModel, UserViewModel} from "../../src/02-users/types/input-output-types";
 import {BlogViewModel} from "../../src/03-blogs/types/input-output-types";
 import {PostViewModel} from "../../src/04-posts/types/input-output-types";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
@@ -24,17 +24,19 @@ const post: PostDbType = {
     createdAt: new Date().toISOString(),
 } as const;
 
-const user: UserDbType = {
-    login: 'user',
-    email: '@example.com',
-    passwordHash: 'hash',
-    createdAt: new Date().toISOString(),
-    emailConfirmation: {
-        confirmationCode: null,
-        expirationDate: null,
-        confirmationStatus: ConfirmationStatus.Confirmed
-    }
-} as const;
+// const user: UserDbType = {
+//     login: 'user',
+//     email: '@example.com',
+//     passwordHash: 'hash',
+//     createdAt: new Date().toISOString(),
+//     emailConfirmation: {
+//         confirmationCode: null,
+//         expirationDate: null,
+//         confirmationStatus: ConfirmationStatus.Confirmed
+//     }
+// } as const;
+
+
 
 const userPropertyMap: Record<string, string> = {
     id: 'id',
@@ -201,6 +203,12 @@ const comments = [
     "This post is a great resource for anyone interested in the topic. Highly recommend reading it.",
     "Your article stood out because of its clarity and depth. It's both informative and engaging!"
 ] as const;
+
+const user: UserInputModel = {
+    login: userLogins[0],
+    email: `${userLogins[0]}@example.com`,
+    password: userLogins[0]
+} as const;
 
 const incorrectAccessToken: string = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzllNDkwYmMyNzQyZjQ2Y2ZlYWYyMzgiLCJpYXQiOjE3Mzg0MjY2MzUsImV4cCI6MTczODU5OTQzNX0.jnr_jbzaBr9WZhGzZQWQZsK4Bd4VcovtQ5NsKJ8TYzE` as const;
 
