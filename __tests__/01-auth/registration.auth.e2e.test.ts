@@ -13,6 +13,8 @@ import {EmailTemplateType} from "../../src/common/types/input-output-types/email
 import {usersRepository} from "../../src/02-users/repositoryes/users-repository";
 import {emailTemplates} from "../../src/common/adapters/email-templates";
 import {log} from "node:util";
+import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
+import {UserViewModel} from "../../src/02-users/types/input-output-types";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -86,168 +88,247 @@ describe('POST /auth/registration', () => {
         console_log_e2e(resRegistration.body, resRegistration.status, 'Test 1: post(/auth/registration)');
     });
 
-    // it('should not log in if the user has sent invalid data (loginOrEmail: "undefined", password: "undefined").', async () => {
-    //
-    //     await usersTestManager
-    //         .createUser(1);
-    //
-    //     const resLogin: Response = await req
-    //         .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
-    //         .send({})
-    //         .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
-    //
-    //     expect(resLogin.body).toEqual(
-    //         {
-    //             errorsMessages: [
-    //                 {
-    //                     field: 'loginOrEmail',
-    //                     message: 'The "loginOrEmail" field must be of the string type.'
-    //                 },
-    //                 {
-    //                     field: 'password',
-    //                     message: 'The "password" field must be of the string type.'
-    //                 }
-    //             ]
-    //         }
-    //     );
-    //
-    //     console_log_e2e(resLogin.body, resLogin.status, 'Test 2: post(/auth/login)');
-    // });
-    //
-    // it('should not log in if the user has sent invalid data (loginOrEmail: type number, password: type number).', async () => {
-    //
-    //     await usersTestManager
-    //         .createUser(1);
-    //
-    //     const resLogin: Response = await req
-    //         .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
-    //         .send({
-    //             loginOrEmail: 123,
-    //             password: 123
-    //         })
-    //         .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
-    //
-    //     expect(resLogin.body).toEqual({
-    //         errorsMessages: [
-    //             {
-    //                 field: 'loginOrEmail',
-    //                 message: 'The "loginOrEmail" field must be of the string type.'
-    //             },
-    //             {
-    //                 field: 'password',
-    //                 message: 'The "password" field must be of the string type.'
-    //             }
-    //         ]
-    //     });
-    //
-    //     console_log_e2e(resLogin.body, resLogin.status, 'Test 3: post(/auth/login)');
-    // });
-    //
-    // it('should not log in if the user has sent invalid data (loginOrEmail: empty line, password: empty line).', async () => {
-    //
-    //     await usersTestManager
-    //         .createUser(1);
-    //
-    //     const resLogin: Response = await req
-    //         .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
-    //         .send({
-    //             loginOrEmail: '   ',
-    //             password: '   '
-    //         })
-    //         .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
-    //
-    //     expect(resLogin.body).toEqual({
-    //         errorsMessages: [
-    //             {
-    //                 field: 'loginOrEmail',
-    //                 message: 'The length of the "loginOrEmail" field should be from 3 to 100.'
-    //             },
-    //             {
-    //                 field: 'password',
-    //                 message: 'The length of the "password" field should be from 6 to 20.'
-    //             }
-    //         ]
-    //     });
-    //
-    //     console_log_e2e(resLogin.body, resLogin.status, 'Test 4: post(/auth/login)');
-    // });
-    //
-    // it('should not log in if the user has sent invalid data (loginOrEmail: exceeds max length, password: exceeds max length).', async () => {
-    //
-    //     await usersTestManager
-    //         .createUser(1);
-    //
-    //     const resLogin: Response = await req
-    //         .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
-    //         .send({
-    //             loginOrEmail: generateRandomString(101),
-    //             password: generateRandomString(21)
-    //         })
-    //         .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
-    //
-    //     expect(resLogin.body).toEqual({
-    //         errorsMessages: [
-    //             {
-    //                 field: 'loginOrEmail',
-    //                 message: 'The length of the "loginOrEmail" field should be from 3 to 100.'
-    //             },
-    //             {
-    //                 field: 'password',
-    //                 message: 'The length of the "password" field should be from 6 to 20.'
-    //             }
-    //         ]
-    //     });
-    //
-    //     console_log_e2e(resLogin.body, resLogin.status, 'Test 5: post(/auth/login)');
-    // });
-    //
-    // it('should not be authorized if the user has sent incorrect data (loginOrEmail: non-existent login).', async () => {
-    //
-    //     await usersTestManager
-    //         .createUser(1);
-    //
-    //     const resAuth: Response = await req
-    //         .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
-    //         .send({
-    //             loginOrEmail: generateRandomString(10),
-    //             password: presets.users[0].login
-    //         })
-    //         .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
-    //
-    //     expect(resAuth.body).toEqual({
-    //         errorsMessages: [
-    //             {
-    //                 field: 'loginOrEmailOrPassword',
-    //                 message: 'Login, email or password incorrect.'
-    //             }
-    //         ]
-    //     });
-    //
-    //     console_log_e2e(resAuth.body, resAuth.status, 'Test 6: post(/auth/login)');
-    // });
-    //
-    // it('should not be authorized if the user has sent incorrect data (password: invalid password).', async () => {
-    //
-    //     await usersTestManager
-    //         .createUser(1);
-    //
-    //     const resAuth: Response = await req
-    //         .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
-    //         .send({
-    //             loginOrEmail: presets.users[0].login,
-    //             password: 'qwertyu'
-    //         })
-    //         .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
-    //
-    //     expect(resAuth.body).toEqual({
-    //         errorsMessages: [
-    //             {
-    //                 field: 'loginOrEmailOrPassword',
-    //                 message: 'Login, email or password incorrect.'
-    //             }
-    //         ]
-    //     });
-    //
-    //     console_log_e2e(resAuth.body, resAuth.status, 'Test 7: post(/auth/login)');
-    // });
+    it('should not be registered if a user with such data already exists (login).', async () => {
+
+        await usersTestManager
+            .createUser(1);
+
+        const resRegistration: Response = await req
+            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION}`)
+            .send({
+                login: user.login,
+                email: `${userLogins[1]}@example.com`,
+                password: userLogins[1]
+            })
+            .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
+
+        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(0);
+
+        const foundUsers: Paginator<UserViewModel> = await usersTestManager
+            .getUsers();
+
+        expect(foundUsers.items.length).toEqual(1);
+
+        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 2: post(/auth/registration)');
+    });
+
+    it('should not be registered if a user with such data already exists (email).', async () => {
+
+        await usersTestManager
+            .createUser(1);
+
+        const resRegistration: Response = await req
+            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION}`)
+            .send({
+                login: userLogins[1],
+                email: user.email,
+                password: userLogins[1]
+            })
+            .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
+
+        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(0);
+
+        const foundUsers: Paginator<UserViewModel> = await usersTestManager
+            .getUsers();
+
+        expect(foundUsers.items.length).toEqual(1);
+
+        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 3: post(/auth/registration)');
+    });
+
+    it('should not be registered a user if the data in the request body is incorrect (an empty object is passed).', async () => {
+
+        const resRegistration: Response = await req
+            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION}`)
+            .send({})
+            .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
+
+        expect(resRegistration.body).toEqual(
+            {
+                errorsMessages: [
+                    {
+                        field: 'login',
+                        message: 'The "login" field must be of the string type.'
+                    },
+                    {
+                        field: 'email',
+                        message: 'The "email" field must be of the string type.'
+                    },
+                    {
+                        field: 'password',
+                        message: 'The "password" field must be of the string type.'
+                    },
+                ]
+            },
+        );
+
+        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(0);
+
+        const foundUsers: Paginator<UserViewModel> = await usersTestManager
+            .getUsers();
+
+        expect(foundUsers.items.length).toEqual(0);
+
+        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 4: post(/auth/registration)');
+    });
+
+    it('should not be registered a user if the data in the request body is incorrect (login: empty line, email: empty line, password: empty line).', async () => {
+
+        const resRegistration: Response = await req
+            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION}`)
+            .send({
+                login: '   ',
+                email: '   ',
+                password: '   ',
+            })
+            .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
+
+        expect(resRegistration.body).toEqual(
+            {
+                errorsMessages: [
+                    {
+                        field: 'login',
+                        message: 'The length of the "login" field should be from 3 to 10.'
+                    },
+                    {
+                        field: 'email',
+                        message: 'The "email" field should be in the format: example@domain.com . Letters, numbers, hyphens, and dots are allowed.'
+                    },
+                    {
+                        field: 'password',
+                        message: 'The length of the "password" field should be from 6 to 20.'
+                    },
+                ]
+            },
+        );
+
+        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(0);
+
+        const foundUsers: Paginator<UserViewModel> = await usersTestManager
+            .getUsers();
+
+        expect(foundUsers.items.length).toEqual(0);
+
+        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 5: post(/auth/registration)');
+    });
+
+    it('should not be registered a user if the data in the request body is incorrect (login: less than the minimum length, email: incorrect, password: less than the minimum length).', async () => {
+
+        const resRegistration: Response = await req
+            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION}`)
+            .send({
+                login: generateRandomString(2),
+                email: generateRandomString(10),
+                password: generateRandomString(5),
+            })
+            .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
+
+        expect(resRegistration.body).toEqual(
+            {
+                errorsMessages: [
+                    {
+                        field: 'login',
+                        message: 'The length of the "login" field should be from 3 to 10.'
+                    },
+                    {
+                        field: 'email',
+                        message: 'The "email" field should be in the format: example@domain.com . Letters, numbers, hyphens, and dots are allowed.'
+                    },
+                    {
+                        field: 'password',
+                        message: 'The length of the "password" field should be from 6 to 20.'
+                    },
+                ]
+            },
+        );
+
+        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(0);
+
+        const foundUsers: Paginator<UserViewModel> = await usersTestManager
+            .getUsers();
+
+        expect(foundUsers.items.length).toEqual(0);
+
+        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 6: post(/auth/registration)');
+    });
+
+    it('should not be registered a user if the data in the request body is incorrect (login: exceeds max length,  email: incorrect, password: exceeds max length).', async () => {
+
+        const resRegistration: Response = await req
+            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION}`)
+            .send({
+                login: generateRandomString(11),
+                email: generateRandomString(10),
+                password: generateRandomString(21),
+            })
+            .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
+
+        expect(resRegistration.body).toEqual(
+            {
+                errorsMessages: [
+                    {
+                        field: 'login',
+                        message: 'The length of the "login" field should be from 3 to 10.'
+                    },
+                    {
+                        field: 'email',
+                        message: 'The "email" field should be in the format: example@domain.com . Letters, numbers, hyphens, and dots are allowed.'
+                    },
+                    {
+                        field: 'password',
+                        message: 'The length of the "password" field should be from 6 to 20.'
+                    },
+                ]
+            },
+        );
+
+        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(0);
+
+        const foundUsers: Paginator<UserViewModel> = await usersTestManager
+            .getUsers();
+
+        expect(foundUsers.items.length).toEqual(0);
+
+        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 7: post(/auth/registration)');
+    });
+
+    it('should not be registered a user if the data in the request body is incorrect (login: type number,  email: type number, password: type number).', async () => {
+
+        const resRegistration: Response = await req
+            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION}`)
+            .send({
+                login: 123,
+                email: 123,
+                password: 123,
+            })
+            .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
+
+        expect(resRegistration.body).toEqual(
+            {
+                errorsMessages: [
+                    {
+                        field: 'login',
+                        message: 'The "login" field must be of the string type.'
+                    },
+                    {
+                        field: 'email',
+                        message: 'The "email" field must be of the string type.'
+                    },
+                    {
+                        field: 'password',
+                        message: 'The "password" field must be of the string type.'
+                    },
+                ]
+            },
+        );
+
+        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(0);
+
+        const foundUsers: Paginator<UserViewModel> = await usersTestManager
+            .getUsers();
+
+        expect(foundUsers.items.length).toEqual(0);
+
+        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 8: post(/auth/registration)');
+    });
 });
