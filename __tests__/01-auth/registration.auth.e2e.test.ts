@@ -7,12 +7,10 @@ import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
 import {ConfirmationStatus, UserDbType} from "../../src/02-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
-import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
 import {nodemailerService} from "../../src/common/adapters/nodemailer-service";
 import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
 import {usersRepository} from "../../src/02-users/repositoryes/users-repository";
 import {emailTemplates} from "../../src/common/adapters/email-templates";
-import {log} from "node:util";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {UserViewModel} from "../../src/02-users/types/input-output-types";
 

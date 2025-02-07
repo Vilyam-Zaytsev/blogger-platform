@@ -11,7 +11,7 @@ import {IdType} from "../common/types/input-output-types/id-type";
 import {UserInputModel, UserMeViewModel} from "../02-users/types/input-output-types";
 import {LoginSuccessViewModel} from "./types/login-success-view-model";
 import {SETTINGS} from "../common/settings";
-import {RegistrationConfirmationCodeType} from "./types/registration-confirmation-code-type";
+import {RegistrationConfirmationCodeModel} from "./types/registration-confirmation-code-model";
 import {RegistrationEmailResendingType} from "./types/registration-email-resending-type";
 import {usersQueryRepository} from "../02-users/repositoryes/users-query-repository";
 
@@ -72,7 +72,7 @@ const authController = {
     },
 
     registrationConfirmation: async (
-        req: RequestWithBody<RegistrationConfirmationCodeType>,
+        req: RequestWithBody<RegistrationConfirmationCodeModel>,
         res: Response
     ) => {
 
