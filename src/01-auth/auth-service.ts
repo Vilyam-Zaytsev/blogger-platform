@@ -71,19 +71,50 @@ const authService = {
         const user: WithId<UserDbType> | null = await usersRepository
             .findByConfirmationCode(confirmationCode);
 
-        //TODO !!!!!!!!!!!!!!!!!!!!!переписать валидацию когда создам фабрики ResultObject!!!!!!!!!!!!!!!
-        if (
-            !user
-            || user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed
-            || user.emailConfirmation.confirmationCode !== confirmationCode
-            || user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()
-        ) return {
+
+        if (!user) return {
+            status: ResultStatus.BadRequest,
+            errorMessage: 'confirmation code incorrect',
+            extensions: [
+                {
+                    field: 'code',
+                    message: 'Confirmation code incorrect.'
+                }
+            ],
+            data: null
+        }
+
+        if (user.emailConfirmation.confirmationCode !== confirmationCode) return {
+            status: ResultStatus.BadRequest,
+            errorMessage: 'confirmation code incorrect',
+            extensions: [
+                {
+                    field: 'code',
+                    message: 'Confirmation code incorrect.'
+                }
+            ],
+            data: null
+        }
+
+        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) return {
             status: ResultStatus.BadRequest,
             errorMessage: 'confirmation code invalid',
             extensions: [
                 {
                     field: 'code',
-                    message: 'Confirmation code invalid.'
+                    message: 'The confirmation code has already been used. The account has already been verified.'
+                }
+            ],
+            data: null
+        }
+
+        if (user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()) return {
+            status: ResultStatus.BadRequest,
+            errorMessage: 'confirmation code invalid',
+            extensions: [
+                {
+                    field: 'code',
+                    message: 'The code has expired.'
                 }
             ],
             data: null

@@ -87,6 +87,15 @@ describe('POST /auth/registration-confirmation', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
+        expect(resRegistrationConfirmation.body).toEqual({
+            errorsMessages: [
+                {
+                    field: 'code',
+                    message: 'Confirmation code incorrect.'
+                }
+            ]
+        });
+
         const foundUser: WithId<UserDbType> | null = await usersRepository
             .findByEmail(user.email);
 
@@ -140,6 +149,15 @@ describe('POST /auth/registration-confirmation', () => {
                 code: foundUser_1!.emailConfirmation.confirmationCode
             })
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
+
+        expect(resRegistrationConfirmation_2.body).toEqual({
+            errorsMessages: [
+                {
+                    field: 'code',
+                    message: 'The confirmation code has already been used. The account has already been verified.'
+                }
+            ]
+        })
 
         const foundUser_2: WithId<UserDbType> | null = await usersRepository
             .findByEmail(user.email);

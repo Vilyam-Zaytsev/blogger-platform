@@ -82,8 +82,10 @@ const authController = {
             .registrationConfirmation(code);
 
         if (resultRegistrationConfirmation.status !== ResultStatus.Success) {
+
             res
-                .sendStatus(mapResultStatusToHttpStatus(resultRegistrationConfirmation.status));
+                .status(mapResultStatusToHttpStatus(resultRegistrationConfirmation.status))
+                .json(mapResultExtensionsToErrorMessage(resultRegistrationConfirmation.extensions));
 
             return;
         }
