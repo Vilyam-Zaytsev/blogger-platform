@@ -147,7 +147,6 @@ const authService = {
         const user: WithId<UserDbType> | null = await usersRepository
             .findByEmail(email);
 
-        //TODO !!!!!!!!!!!!!!!!!!!!!переписать валидацию когда создам фабрики ResultObject!!!!!!!!!!!!!!!
         if (!user) return {
             status: ResultStatus.BadRequest,
             errorMessage: 'email incorrect',

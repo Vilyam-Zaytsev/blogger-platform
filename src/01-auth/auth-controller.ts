@@ -105,8 +105,10 @@ const authController = {
             .registrationEmailResending(email);
 
         if (resultEmailResending.status !== ResultStatus.Success) {
+
             res
-                .sendStatus(mapResultStatusToHttpStatus(resultEmailResending.status));
+                .status(mapResultStatusToHttpStatus(resultEmailResending.status))
+                .json(mapResultExtensionsToErrorMessage(resultEmailResending.extensions));
 
             return;
         }
