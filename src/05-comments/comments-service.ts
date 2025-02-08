@@ -42,7 +42,7 @@ const commentsService = {
             .insertComment(newComment);
 
         return {
-            status: ResultStatus.Created,
+            status: ResultStatus.Success,
             extensions: [],
             data: String(result.insertedId)
         };
@@ -58,7 +58,6 @@ const commentsService = {
             .updateComment(commentId, data);
 
         //TODO какой статус возвращать в этом случае???(!!!!!!!!500!!!!!!!!!!!)
-
         if (!updateResult) return {
             status: ResultStatus.NotFound,
             errorMessage: 'not found',
@@ -86,7 +85,6 @@ const commentsService = {
             .deleteComment(commentId);
 
         //TODO какой статус возвращать в этом случае???(!!!!!!!!500!!!!!!!!!!!)
-
         if (!deleteResult) return {
             status: ResultStatus.NotFound,
             errorMessage: 'not found',
@@ -116,6 +114,7 @@ const commentsService = {
             data: null
         };
 
+        //TODO стоит ли делать запрос через сервис или лучше сразу в репозиторий???
         const isExistPost: WithId<PostDbType> | null = await postsService
             .findPost(postId);
 
@@ -137,7 +136,6 @@ const commentsService = {
     },
 
     //TODO нормально ли делать две проверки в одном методе?
-
     async _checkingExistenceCommentAndOwner( commentId: string, userId: string): Promise<ResultType> {
 
         const comment: WithId<CommentDbType> | null = await commentRepository

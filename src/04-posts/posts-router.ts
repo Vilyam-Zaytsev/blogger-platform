@@ -49,7 +49,7 @@ postsRouter.post(`/:id${SETTINGS.PATH.COMMENTS}`,
     bearerAuthorizationMiddleware,
     commentContentInputValidator,
     inputCheckErrorsMiddleware,
-    commentsController.createAndInsertComment
+    commentsController.createComment
 );
 postsRouter.put('/:id',
     baseAuthMiddleware,

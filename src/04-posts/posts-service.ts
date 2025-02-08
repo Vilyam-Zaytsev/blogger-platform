@@ -5,6 +5,7 @@ import {postsRepository} from "./repositoryes/posts-repository";
 import {blogsRepository} from "../03-blogs/repositoryes/blogs-repository";
 
 const postsService = {
+
     async findPost(id: string): Promise<WithId<PostDbType> | null> {
 
         return await postsRepository

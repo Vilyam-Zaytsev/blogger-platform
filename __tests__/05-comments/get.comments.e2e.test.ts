@@ -63,7 +63,7 @@ beforeEach(async () => {
     clearPresets();
 });
 
-describe('GET /comments', () => {
+describe('GET /posts/{postId}/comments', () => {
 
     it('should return an empty array.', async () => {
 
@@ -85,7 +85,7 @@ describe('GET /comments', () => {
             items: []
         });
 
-        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 1: get(/comments)');
+        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 1: get(/posts/{postId}/comments)');
     });
 
     it('should return an array with a single comment.', async () => {
@@ -129,7 +129,7 @@ describe('GET /comments', () => {
 
         expect(resGetComments.body.items.length).toEqual(1);
 
-        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 2: get(/comments)');
+        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 2: get(/posts/{postId}/comments)');
     });
 
     it('should return an array with three comments.', async () => {
@@ -170,7 +170,7 @@ describe('GET /comments', () => {
 
         expect(resGetComments.body.items.length).toEqual(3);
 
-        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 3: get(/comments)');
+        console_log_e2e(resGetComments.body, resGetComments.status, 'Test 3: get(/posts/{postId}/comments)');
     });
 
     it('should return comment found by id.', async () => {

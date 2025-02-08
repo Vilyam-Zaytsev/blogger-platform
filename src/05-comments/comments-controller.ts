@@ -28,14 +28,11 @@ const commentsController = {
 
         const postId: string = req.params.id;
 
-        //TODO спросить на поддержке про данную реализацию проверки на корректность postId
-        // и существование поста с таким id!!!
-        // (Правильно ли ее делать в контроллере через метод сервиса или нужно делать только в контроллере???)
-
         const resultCheckPostId: ResultType<string | null> = await commentsService
             ._checkPostId(postId);
 
         if (resultCheckPostId.status !== ResultStatus.Success) {
+
             res
                 .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
@@ -52,7 +49,6 @@ const commentsController = {
         const paginationAndSortFilter: PaginationAndSortFilterType =
             createPaginationAndSortFilter(sortingAndPaginationParams)
 
-
         const foundComments: CommentViewModel[] = await commentQueryRepository
             .findComments(paginationAndSortFilter, postId);
 
@@ -68,7 +64,7 @@ const commentsController = {
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(paginationResponse)
+            .json(paginationResponse);
     },
 
     async getComment(
@@ -80,6 +76,7 @@ const commentsController = {
             .findComment(req.params.id);
 
         if (!foundComment) {
+
             res
                 .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
@@ -91,9 +88,7 @@ const commentsController = {
             .json(foundComment);
     },
 
-    //TODO стоит ли делать проветку postId в контроллере???
-
-    async createAndInsertComment(
+    async createComment(
         req: RequestWithParamsAndBody<IdType, CommentInputModel>,
         res: Response<CommentViewModel>
     ) {
@@ -108,7 +103,7 @@ const commentsController = {
         const resultCreateComment: ResultType<string | null> = await commentsService
             .createComment(dataForCreatingComment, postId, commentatorId);
 
-        if (resultCreateComment.status !== ResultStatus.Created) {
+        if (resultCreateComment.status !== ResultStatus.Success) {
             res
                 .sendStatus(mapResultStatusToHttpStatus(resultCreateComment.status));
 
@@ -122,6 +117,7 @@ const commentsController = {
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
             .json(createdComment!);
     },
+
     async updateComment(
         req: RequestWithParamsAndBody<IdType, CommentInputModel>,
         res: Response
@@ -139,6 +135,7 @@ const commentsController = {
             .updateComment(commentId, userId, dataForCommentUpdates);
 
         if (updateResult.status !== ResultStatus.Success) {
+
             res
                 .sendStatus(mapResultStatusToHttpStatus(updateResult.status));
 
@@ -148,6 +145,7 @@ const commentsController = {
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     },
+
     async deleteComment(
         req: RequestWithParams<IdType>,
         res: Response
@@ -161,6 +159,7 @@ const commentsController = {
             .deleteComment(commentId, userId);
 
         if (deleteResult.status !== ResultStatus.Success) {
+
             res
                 .sendStatus(mapResultStatusToHttpStatus(deleteResult.status));
 

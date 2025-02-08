@@ -10,7 +10,9 @@ const bearerAuthorizationMiddleware = async (
     res: Response,
     next: NextFunction
 ) => {
+
     if (!req.headers.authorization) {
+
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
 
@@ -29,6 +31,7 @@ const bearerAuthorizationMiddleware = async (
             .findUser(userId);
 
         if (!isUser) {
+
             res
                 .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
 

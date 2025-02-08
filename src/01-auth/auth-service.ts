@@ -5,14 +5,15 @@ import {usersRepository} from "../02-users/repositoryes/users-repository";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {ResultType} from "../common/types/result-types/result-type";
 import {jwtService} from "../common/adapters/jwt-service";
-import {ObjectId, WithId} from "mongodb";
+import {WithId} from "mongodb";
 import {LoginSuccessViewModel} from "./types/login-success-view-model";
-import {usersService} from "../02-users/services/users-service";
+import {usersService} from "../02-users/users-service";
 import {User} from "../02-users/domain/user.entity";
 import {nodemailerService} from "../common/adapters/nodemailer-service";
 import {emailTemplates} from "../common/adapters/email-templates";
 import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
+import {UserInputModel} from "../02-users/types/input-output-types";
 
 const authService = {
 
@@ -40,14 +41,10 @@ const authService = {
         }
     },
 
-    async registration(
-        login: string,
-        password: string,
-        email: string
-    ): Promise<ResultType<string | null>> {
+    async registration(registrationUserDto: UserInputModel): Promise<ResultType<string | null>> {
 
         const candidate: UserDbType = await User
-            .registrationUser(login, email, password);
+            .registrationUser(registrationUserDto);
 
         const resultCreateUser: ResultType<string | null> = await usersService
             .createUser(candidate);
@@ -62,7 +59,11 @@ const authService = {
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 
-        return resultCreateUser;
+        return {
+            status: ResultStatus.Success,
+            extensions: [],
+            data: null
+        };
     },
 
     async registrationConfirmation(confirmationCode: string): Promise<ResultType> {
@@ -70,19 +71,50 @@ const authService = {
         const user: WithId<UserDbType> | null = await usersRepository
             .findByConfirmationCode(confirmationCode);
 
-        //TODO !!!!!!!!!!!!!!!!!!!!!переписать валидацию когда создам фабрики ResultObject!!!!!!!!!!!!!!!
-        if (
-            !user
-            || user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed
-            || user.emailConfirmation.confirmationCode !== confirmationCode
-            || user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()
-        ) return {
+
+        if (!user) return {
+            status: ResultStatus.BadRequest,
+            errorMessage: 'confirmation code incorrect',
+            extensions: [
+                {
+                    field: 'code',
+                    message: 'Confirmation code incorrect.'
+                }
+            ],
+            data: null
+        }
+
+        if (user.emailConfirmation.confirmationCode !== confirmationCode) return {
+            status: ResultStatus.BadRequest,
+            errorMessage: 'confirmation code incorrect',
+            extensions: [
+                {
+                    field: 'code',
+                    message: 'Confirmation code incorrect.'
+                }
+            ],
+            data: null
+        }
+
+        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) return {
             status: ResultStatus.BadRequest,
             errorMessage: 'confirmation code invalid',
             extensions: [
                 {
                     field: 'code',
-                    message: 'Confirmation code invalid.'
+                    message: 'The confirmation code has already been used. The account has already been verified.'
+                }
+            ],
+            data: null
+        }
+
+        if (user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()) return {
+            status: ResultStatus.BadRequest,
+            errorMessage: 'confirmation code invalid',
+            extensions: [
+                {
+                    field: 'code',
+                    message: 'The code has expired.'
                 }
             ],
             data: null
@@ -115,7 +147,6 @@ const authService = {
         const user: WithId<UserDbType> | null = await usersRepository
             .findByEmail(email);
 
-        //TODO !!!!!!!!!!!!!!!!!!!!!переписать валидацию когда создам фабрики ResultObject!!!!!!!!!!!!!!!
         if (!user) return {
             status: ResultStatus.BadRequest,
             errorMessage: 'email incorrect',

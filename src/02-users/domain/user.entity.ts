@@ -2,6 +2,7 @@ import {ConfirmationStatus, UserDbType} from "../types/user-db-type";
 import {bcryptService} from "../../common/adapters/bcrypt-service";
 import {randomUUID} from "node:crypto";
 import { add } from "date-fns";
+import {UserInputModel} from "../types/input-output-types";
 
 class User {
     login: string;
@@ -31,11 +32,13 @@ class User {
         };
     };
 
-    static async registrationUser(
-        login: string,
-        email: string,
-        password: string,
-    ): Promise<User> {
+    static async registrationUser(registrationUserDto: UserInputModel): Promise<User> {
+
+        const {
+            login,
+            email,
+            password
+        } = registrationUserDto;
 
         const passwordHash: string = await bcryptService
             .generateHash(password);

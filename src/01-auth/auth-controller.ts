@@ -10,10 +10,10 @@ import {ApiErrorResult} from "../common/types/input-output-types/api-error-resul
 import {IdType} from "../common/types/input-output-types/id-type";
 import {UserInputModel, UserMeViewModel} from "../02-users/types/input-output-types";
 import {LoginSuccessViewModel} from "./types/login-success-view-model";
-import {PresentationView} from "../02-users/types/presentation-view";
 import {SETTINGS} from "../common/settings";
-import {RegistrationConfirmationCodeType} from "./types/registration-confirmation-code-type";
+import {RegistrationConfirmationCodeModel} from "./types/registration-confirmation-code-model";
 import {RegistrationEmailResendingType} from "./types/registration-email-resending-type";
+import {usersQueryRepository} from "../02-users/repositoryes/users-query-repository";
 
 const authController = {
 
@@ -31,6 +31,7 @@ const authController = {
             .login(authParams);
 
         if (resultLogin.status !== ResultStatus.Success) {
+
             res
                 .status(mapResultStatusToHttpStatus(resultLogin.status))
                 .json(mapResultExtensionsToErrorMessage(resultLogin.extensions));
@@ -48,19 +49,20 @@ const authController = {
         res: Response
     ) => {
 
-        const {
-            login,
-            email,
-            password
-        } = req.body;
+        const dataForRegistrationUser: UserInputModel = {
+            login: req.body.login,
+            email: req.body.email,
+            password: req.body.password
+        };
 
-        const result: ResultType<string | null> = await authService
-            .registration(login, password, email);
+        const resultRegistration: ResultType<string | null> = await authService
+            .registration(dataForRegistrationUser);
 
-        if (result.status !== ResultStatus.Success) {
+        if (resultRegistration.status !== ResultStatus.Success) {
+
             res
-                .status(mapResultStatusToHttpStatus(result.status))
-                .json(mapResultExtensionsToErrorMessage(result.extensions));
+                .status(mapResultStatusToHttpStatus(resultRegistration.status))
+                .json(mapResultExtensionsToErrorMessage(resultRegistration.extensions));
 
             return;
         }
@@ -70,7 +72,7 @@ const authController = {
     },
 
     registrationConfirmation: async (
-        req: RequestWithBody<RegistrationConfirmationCodeType>,
+        req: RequestWithBody<RegistrationConfirmationCodeModel>,
         res: Response
     ) => {
 
@@ -80,8 +82,10 @@ const authController = {
             .registrationConfirmation(code);
 
         if (resultRegistrationConfirmation.status !== ResultStatus.Success) {
+
             res
-                .sendStatus(mapResultStatusToHttpStatus(resultRegistrationConfirmation.status));
+                .status(mapResultStatusToHttpStatus(resultRegistrationConfirmation.status))
+                .json(mapResultExtensionsToErrorMessage(resultRegistrationConfirmation.extensions));
 
             return;
         }
@@ -101,8 +105,10 @@ const authController = {
             .registrationEmailResending(email);
 
         if (resultEmailResending.status !== ResultStatus.Success) {
+
             res
-                .sendStatus(mapResultStatusToHttpStatus(resultEmailResending.status));
+                .status(mapResultStatusToHttpStatus(resultEmailResending.status))
+                .json(mapResultExtensionsToErrorMessage(resultEmailResending.extensions));
 
             return;
         }
@@ -119,16 +125,17 @@ const authController = {
         const userId: string = String(req.user?.id);
 
         if (!userId) {
+
             res
                 .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
         }
 
-        // const me: UserMeViewModel = await userQueryService
-        //     .findUser(userId, PresentationView.MeViewModal) as UserMeViewModel;
-        //
-        // res
-        //     .status(SETTINGS.HTTP_STATUSES.OK_200)
-        //     .json(me);
+        const me: UserMeViewModel | null = await usersQueryRepository
+            .findUserAndMapToMeViewModel(userId);
+
+        res
+            .status(SETTINGS.HTTP_STATUSES.OK_200)
+            .json(me!);
     },
 };
 
