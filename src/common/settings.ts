@@ -33,7 +33,7 @@ const SETTINGS = {
         NOT_FOUND_404: 404,
         INTERNAL_SERVER_ERROR_500: 500
     },
-    MONGO_URL: process.env.MONGO_URL || 'mongodb://localhost:27017',
+    MONGO_URL: process.env.MONGO_URL,
     // MONGO_URL: process.env.MONGO_URL || 'mongodb://localhost:27017',
     DB_NAME: process.env.DB_NAME || 'blogger-platform-dev-local',
     JWT_SECRET: process.env.JWT_SECRET || 'my_secret',
