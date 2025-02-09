@@ -164,7 +164,7 @@ const authService = {
             errorMessage: 'the user\'s email has already been confirmed',
             extensions: [
                 {
-                    field: 'confirmationStatus',
+                    field: 'email',
                     message: 'The users have already confirmed their credentials.'
                 }
             ],
