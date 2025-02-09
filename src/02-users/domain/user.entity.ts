@@ -21,10 +21,10 @@ class User {
         passwordHash: string,
         confirmationStatus: ConfirmationStatus
     ) {
-        this.login = login
-        this.email = email
-        this.passwordHash = passwordHash
-        this.createdAt = new Date().toISOString()
+        this.login = login;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.createdAt = new Date().toISOString();
         this.emailConfirmation = {
             confirmationCode: null,
             expirationDate: null,
