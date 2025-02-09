@@ -204,7 +204,7 @@ describe('POST /auth/registration-email-resending', () => {
             {
                 errorsMessages: [
                     {
-                        field: 'confirmationStatus',
+                        field: 'email',
                         message: 'The users have already confirmed their credentials.'
                     },
                 ]
