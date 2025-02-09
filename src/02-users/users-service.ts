@@ -17,7 +17,7 @@ const usersService = {
             .insertUser(user);
 
         return ResultObject
-            .success<string>(String(result.insertedId));
+            .positive<string>(ResultStatus.Success, String(result.insertedId));
     },
 
     async deleteUser(id: string): Promise<boolean> {
@@ -32,7 +32,8 @@ const usersService = {
             .findByLoginOrEmail(login);
 
         if (findByLogin) return ResultObject
-            .badRequest(
+            .negative(
+                ResultStatus.BadRequest,
                 'login',
                 'The user with this login already exists.'
             );
@@ -41,13 +42,14 @@ const usersService = {
             .findByLoginOrEmail(email);
 
         if (findByEmail) return ResultObject
-            .badRequest(
+            .negative(
+                ResultStatus.BadRequest,
                 'email',
                 'The user with this email already exists.'
             );
 
         return ResultObject
-            .success();
+            .positive(ResultStatus.Success);
     },
 
 };

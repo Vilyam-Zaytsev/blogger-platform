@@ -19,14 +19,14 @@ class ResultObject<T = null> {
         this.data = data ? data : null as T;
     };
 
-    static success<T = null>(data?: T): ResultObject<T> {
+    static positive<T = null>(status: ResultStatus, data?: T): ResultObject<T> {
 
-        if (!data) return new ResultObject<T>(ResultStatus.Success);
+        if (!data) return new ResultObject<T>(status);
 
-        return new ResultObject<T>(ResultStatus.Success, undefined, undefined, data);
+        return new ResultObject<T>(status, undefined, undefined, data);
     };
 
-    static badRequest(field: string, errorMessage: string): ResultObject {
+    static negative(status: ResultStatus, field: string, errorMessage: string): ResultObject {
 
         const extensions: ExtensionsType = [
             {
@@ -35,7 +35,7 @@ class ResultObject<T = null> {
             }
         ];
 
-        return new ResultObject(ResultStatus.BadRequest, errorMessage, extensions);
+        return new ResultObject(status, errorMessage, extensions);
     }
 
 }
