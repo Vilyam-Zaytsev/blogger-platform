@@ -8,6 +8,7 @@ import {commentRepository} from "./repositoryes/comment-repository";
 import {CommentDbType} from "./types/comment-db-type";
 import {UserDbType} from "../02-users/types/user-db-type";
 import {usersRepository} from "../02-users/repositoryes/users-repository";
+import {ResultObject} from "../common/helpers/result-object";
 
 const commentsService = {
 
@@ -15,15 +16,12 @@ const commentsService = {
 
         const resultCheckPostId: ResultType<string | null> = await this._checkPostId(postId);
 
-        if (resultCheckPostId.status !== ResultStatus.Success) return {
-            status: ResultStatus.NotFound,
-            errorMessage: 'there is no such post.',
-            extensions: [{
-                field: 'postId',
-                message: 'There is no post with this ID.',
-            }],
-            data: null
-        };
+        if (resultCheckPostId.status !== ResultStatus.Success) return ResultObject
+            .negative(
+                ResultStatus.NotFound,
+                'postId',
+                'There is no post with this ID.'
+            );
 
         const commentator: WithId<UserDbType> | null = await usersRepository
             .findUser(commentatorId);
@@ -41,11 +39,11 @@ const commentsService = {
         const result = await commentRepository
             .insertComment(newComment);
 
-        return {
-            status: ResultStatus.Success,
-            extensions: [],
-            data: String(result.insertedId)
-        };
+        return ResultObject
+            .positive<string>(
+                ResultStatus.Success,
+                String(result.insertedId)
+            );
     },
 
     async updateComment(commentId: string, userId: string, data: CommentInputModel): Promise<ResultType> {
@@ -54,25 +52,11 @@ const commentsService = {
 
         if (resultCheckingExistenceCommentAndOwner.status !== ResultStatus.Success) return resultCheckingExistenceCommentAndOwner;
 
-        const updateResult: boolean = await commentRepository
+        await commentRepository
             .updateComment(commentId, data);
 
-        //TODO какой статус возвращать в этом случае???(!!!!!!!!500!!!!!!!!!!!)
-        if (!updateResult) return {
-            status: ResultStatus.NotFound,
-            errorMessage: 'not found',
-            extensions: [{
-                field: 'id',
-                message: 'No comment with this ID was found.'
-            }],
-            data: null
-        }
-
-        return {
-            status: ResultStatus.Success,
-            extensions: [],
-            data: null
-        };
+        return ResultObject
+            .positive(ResultStatus.Success);
     },
 
     async deleteComment(commentId: string, userId: string): Promise<ResultType> {
@@ -81,91 +65,60 @@ const commentsService = {
 
         if (resultCheckingExistenceCommentAndOwner.status !== ResultStatus.Success) return resultCheckingExistenceCommentAndOwner;
 
-        const deleteResult: boolean = await commentRepository
+        await commentRepository
             .deleteComment(commentId);
 
-        //TODO какой статус возвращать в этом случае???(!!!!!!!!500!!!!!!!!!!!)
-        if (!deleteResult) return {
-            status: ResultStatus.NotFound,
-            errorMessage: 'not found',
-            extensions: [{
-                field: 'id',
-                message: 'No comment with this id was found.'
-            }],
-            data: null
-        }
-
-        return {
-            status: ResultStatus.Success,
-            extensions: [],
-            data: null
-        }
+        return ResultObject
+            .positive(ResultStatus.Success);
     },
 
     async _checkPostId(postId: string): Promise<ResultType<string | null>> {
 
-        if (!ObjectId.isValid(postId)) return {
-            status: ResultStatus.BadRequest,
-            errorMessage: 'postId invalid',
-            extensions: [{
-                field: 'postId',
-                message: 'Invalid ID format: The provided post ID is not a valid MongoDB ObjectId.',
-            }],
-            data: null
-        };
+        if (!ObjectId.isValid(postId)) return ResultObject
+            .negative(
+                ResultStatus.BadRequest,
+                'postId',
+                'Invalid ID format: The provided post ID is not a valid MongoDB ObjectId.'
+            );
 
-        //TODO стоит ли делать запрос через сервис или лучше сразу в репозиторий???
         const isExistPost: WithId<PostDbType> | null = await postsService
             .findPost(postId);
 
-        if (!isExistPost) return {
-            status: ResultStatus.NotFound,
-            errorMessage: 'there is no such post.',
-            extensions: [{
-                field: 'postId',
-                message: 'There is no post with this ID.',
-            }],
-            data: null
-        }
+        if (!isExistPost) return ResultObject
+            .negative(
+                ResultStatus.NotFound,
+                'postId',
+                'There is no post with this ID.'
+            );
 
-        return {
-            status: ResultStatus.Success,
-            extensions: [],
-            data: String(isExistPost._id)
-        };
+        return ResultObject
+            .positive<string>(
+                ResultStatus.Success,
+                String(isExistPost._id)
+            );
     },
 
-    //TODO нормально ли делать две проверки в одном методе?
-    async _checkingExistenceCommentAndOwner( commentId: string, userId: string): Promise<ResultType> {
+    async _checkingExistenceCommentAndOwner(commentId: string, userId: string): Promise<ResultType> {
 
         const comment: WithId<CommentDbType> | null = await commentRepository
             .findComment(commentId);
 
-        if (!comment) return {
-            status: ResultStatus.NotFound,
-            errorMessage: 'comment not found.',
-            extensions: [{
-                field: 'commentId',
-                message: 'There is no comment with this ID.'
-            }],
-            data: null
-        }
+        if (!comment) return ResultObject
+            .negative(
+                ResultStatus.NotFound,
+                'commentId',
+                'There is no comment with this ID.'
+            );
 
-        if (comment.commentatorInfo.userId !== userId) return {
-            status: ResultStatus.Forbidden,
-            errorMessage: 'is not the owner.',
-            extensions: [{
-                field: 'userId',
-                message: 'This user is not the owner of this comment.'
-            }],
-            data: null
-        }
+        if (comment.commentatorInfo.userId !== userId) return ResultObject
+            .negative(
+                ResultStatus.Forbidden,
+                'userId',
+                'This user is not the owner of this comment.'
+            );
 
-        return {
-            status: ResultStatus.Success,
-            extensions: [],
-            data: null
-        };
+        return ResultObject
+            .positive(ResultStatus.Success);
     }
 };
 
