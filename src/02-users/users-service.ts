@@ -3,6 +3,7 @@ import {usersRepository} from "./repositoryes/users-repository";
 import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {WithId} from "mongodb";
+import {ResultObject} from "../common/helpers/result-object";
 
 const usersService = {
 
@@ -15,11 +16,8 @@ const usersService = {
         const result = await usersRepository
             .insertUser(user);
 
-        return {
-            status: ResultStatus.Success,
-            extensions: [],
-            data: String(result.insertedId)
-        }
+        return ResultObject
+            .positive<string>(ResultStatus.Success, String(result.insertedId));
     },
 
     async deleteUser(id: string): Promise<boolean> {
@@ -33,39 +31,25 @@ const usersService = {
         const findByLogin: WithId<UserDbType> | null = await usersRepository
             .findByLoginOrEmail(login);
 
-        if (findByLogin) {
-            return {
-                status: ResultStatus.BadRequest,
-                errorMessage: 'Login incorrect',
-                extensions: [{
-                    field: 'login',
-                    message: 'The user with this login already exists.',
-                }],
-                data: null
-            }
-        }
+        if (findByLogin) return ResultObject
+            .negative(
+                ResultStatus.BadRequest,
+                'login',
+                'The user with this login already exists.'
+            );
 
-        const findByEmail:  WithId<UserDbType> | null = await usersRepository
+        const findByEmail: WithId<UserDbType> | null = await usersRepository
             .findByLoginOrEmail(email);
 
-        if (findByEmail) {
-            return {
-                status: ResultStatus.BadRequest,
-                errorMessage: 'Email incorrect',
-                extensions: [{
-                    field: 'email',
-                    message: 'The user with this email already exists.',
-                }],
-                data: null
-            }
-        }
+        if (findByEmail) return ResultObject
+            .negative(
+                ResultStatus.BadRequest,
+                'email',
+                'The user with this email already exists.'
+            );
 
-
-        return {
-            status: ResultStatus.Success,
-            extensions: [],
-            data: null
-        };
+        return ResultObject
+            .positive(ResultStatus.Success);
     },
 
 };
