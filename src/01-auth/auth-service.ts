@@ -147,7 +147,7 @@ const authService = {
                 'The confirmation code and  could not be updated. Server error.'
             );
 
-        await nodemailerService
+        nodemailerService
             .sendEmail(
                 user.email,
                 emailTemplates
