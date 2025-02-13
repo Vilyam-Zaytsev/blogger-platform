@@ -7,7 +7,7 @@ class ResultObject<T = null> {
     extensions: ExtensionsType;
     data: T;
 
-    private constructor(
+    protected constructor(
         status: ResultStatus,
         errorMessage?: string,
         extensions?: ExtensionsType,
@@ -40,4 +40,20 @@ class ResultObject<T = null> {
 
 }
 
-export {ResultObject};
+class SuccessResult<T> extends ResultObject {
+
+    private constructor(data: T) {
+
+        super(ResultStatus.Success);
+    };
+
+    static create<T>(data: T) {
+
+        return new this(data);
+    };
+}
+
+export {
+    ResultObject,
+    SuccessResult
+};
