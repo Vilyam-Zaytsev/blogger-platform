@@ -5,7 +5,7 @@ import {ResultType} from "../common/types/result-types/result-type";
 import {ObjectId} from "mongodb";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {postsService} from "../04-posts/posts-service";
-import {ResultObject} from "../common/helpers/result-object";
+import {SuccessResult} from "../common/helpers/result-object";
 
 const blogsService = {
 
@@ -64,28 +64,43 @@ const blogsService = {
 
     async checkBlogId(blogId: string): Promise<ResultType<string | null>> {
 
-        if (!ObjectId.isValid(blogId)) return ResultObject
-            .negative(
-                ResultStatus.NotFound,
-                'blogId',
-                'There is no blog with this ID.'
-                );
+        if (!ObjectId.isValid(blogId)) return {
+            status: ResultStatus.NotFound,
+            errorMessage: 'blog not found',
+            extensions: [{
+                field: 'blogId',
+                message: 'There is no blog with this ID.'
+            }],
+            data: null
+        };
+        // ResultObject
+        //     .negative(
+        //         ResultStatus.NotFound,
+        //         'blogId',
+        //         'There is no blog with this ID.'
+        //         );
 
         const isExistBlog: BlogDbType | null = await blogsRepository
             .findBlog(blogId);
 
-        if (!isExistBlog) return ResultObject
-            .negative(
-                ResultStatus.NotFound,
-                'blogId',
-                'There is no blog with this ID.'
-            );
+        if (!isExistBlog) return {
+            status: ResultStatus.NotFound,
+            errorMessage: 'blog not found',
+            extensions: [{
+                field: 'blogId',
+                message: 'There is no blog with this ID.'
+            }],
+            data: null
+        };
+        // ResultObject
+        //     .negative(
+        //         ResultStatus.NotFound,
+        //         'blogId',
+        //         'There is no blog with this ID.'
+        //     );
 
-        return ResultObject
-            .positive<string>(
-                ResultStatus.Success,
-                blogId
-            );
+        return SuccessResult
+            .create<string>(blogId);
     }
 };
 
