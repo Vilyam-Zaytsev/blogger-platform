@@ -3,13 +3,13 @@ import {ExtensionsType} from "../types/result-types/extensions-type";
 
 class ResultObject<T> {
     status: ResultStatus;
-    data: T;
+    data: T | null;
     extensions: ExtensionsType;
     errorMessage?: string;
 
     protected constructor(
         status: ResultStatus,
-        data: T,
+        data: T | null,
         extensions: ExtensionsType,
         errorMessage?: string,
     ) {
@@ -39,8 +39,6 @@ class BadRequestResult<T = null> extends ResultObject<T> {
         extensions: ExtensionsType,
         errorMessage: string
     ) {
-
-
 
         super(
             ResultStatus.BadRequest,
