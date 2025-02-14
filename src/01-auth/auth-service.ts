@@ -14,7 +14,7 @@ import {emailTemplates} from "../common/adapters/email-templates";
 import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
 import {UserInputModel} from "../02-users/types/input-output-types";
-import {ResultObject} from "../common/helpers/result-object";
+import {BadRequestResult, ResultObject, SuccessResult, UnauthorizedResult} from "../common/helpers/result-object";
 
 const authService = {
 
@@ -22,21 +22,18 @@ const authService = {
 
         const resultCheckUserCredentials: ResultType<string | null> = await this.checkUserCredentials(authParamsDto);
 
-        if (resultCheckUserCredentials.status !== ResultStatus.Success) return ResultObject
-            .negative(
-                ResultStatus.Unauthorized,
+        if (resultCheckUserCredentials.status !== ResultStatus.Success) return UnauthorizedResult
+            .create(
                 'loginOrEmailOrPassword',
-                'Login, email or password incorrect.'
+                'Login, email or password incorrect.',
+                'The user did not pass the verification of credentials.'
             );
 
         const accessToken: LoginSuccessViewModel = await jwtService
             .createToken(resultCheckUserCredentials.data!);
 
-        return ResultObject
-            .positive(
-                ResultStatus.Success,
-                accessToken
-            );
+        return SuccessResult
+            .create<LoginSuccessViewModel>(accessToken);
     },
 
     async registration(registrationUserDto: UserInputModel): Promise<ResultType<string | null>> {
@@ -57,8 +54,8 @@ const authService = {
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 
-        return ResultObject
-            .positive(ResultStatus.Success);
+        return SuccessResult
+            .create(null);
     },
 
     async registrationConfirmation(confirmationCode: string): Promise<ResultType> {
@@ -67,46 +64,39 @@ const authService = {
             .findByConfirmationCode(confirmationCode);
 
 
-        if (!user) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
+        if (!user) return BadRequestResult
+            .create(
                 'code',
-                'Confirmation code incorrect.'
+                'Confirmation code incorrect.',
+                'Registration could not be confirmed.'
             );
 
-        if (user.emailConfirmation.confirmationCode !== confirmationCode) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
+        if (user.emailConfirmation.confirmationCode !== confirmationCode) return BadRequestResult
+            .create(
                 'code',
-                'Confirmation code incorrect.'
+                'Confirmation code incorrect.',
+                'Registration could not be confirmed.'
             );
 
-        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
+        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) return BadRequestResult
+            .create(
                 'code',
-                'The confirmation code has already been used. The account has already been verified.'
+                'The confirmation code has already been used. The account has already been verified.',
+                'Registration could not be confirmed.'
             );
 
-        if (user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
+        if (user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()) return BadRequestResult
+            .create(
                 'code',
-                'The code has expired.'
+                'The code has expired.',
+                'Registration could not be confirmed.'
             );
 
-        const resultUpdateConfirmationStatus = await usersRepository
+        await usersRepository
             .updateConfirmationStatus(user._id);
 
-        if (!resultUpdateConfirmationStatus) return ResultObject
-            .negative(
-                ResultStatus.InternalServerError,
-                'confirmationStatus',
-                'The confirmation status could not be updated. Server error.'
-            );
-
-        return ResultObject
-            .positive(ResultStatus.Success);
+        return SuccessResult
+            .create(null);
     },
 
     async registrationEmailResending(email: string): Promise<ResultType> {
@@ -114,18 +104,18 @@ const authService = {
         const user: WithId<UserDbType> | null = await usersRepository
             .findByEmail(email);
 
-        if (!user) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
+        if (!user) return BadRequestResult
+            .create(
                 'email',
-                'There is no user with this email address.'
+                'There is no user with this email address.',
+                'Couldn\'t send an email with a confirmation code.'
             );
 
-        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
+        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) return BadRequestResult
+            .create(
                 'email',
-                'The users have already confirmed their credentials.'
+                'The user have already confirmed their credentials.',
+                'Couldn\'t send an email with a confirmation code.'
             );
 
         const confirmationCode: string = randomUUID();
@@ -134,18 +124,11 @@ const authService = {
             {hours: 1, minutes: 1}
         );
 
-        const resultUpdateEmailConfirmation = await usersRepository
+        await usersRepository
             .updateEmailConfirmation(
                 user._id,
                 confirmationCode,
                 expirationDate);
-
-        if (!resultUpdateEmailConfirmation) return ResultObject
-            .negative(
-                ResultStatus.InternalServerError,
-                'emailConfirmation',
-                'The confirmation code and  could not be updated. Server error.'
-            );
 
         nodemailerService
             .sendEmail(
@@ -155,8 +138,8 @@ const authService = {
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 
-        return ResultObject
-            .positive(ResultStatus.Success);
+        return SuccessResult
+            .create(null);
     },
 
     async checkUserCredentials(authParamsDto: LoginInputModel): Promise<ResultType<string | null>> {
@@ -168,28 +151,25 @@ const authService = {
         const user: WithId<UserDbType> | null = await usersRepository
             .findByLoginOrEmail(loginOrEmail);
 
-        if (!user) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
+        if (!user) return BadRequestResult
+            .create(
                 'loginOrEmail',
-                'There is no user with such data.'
+                'There is no user with such data.',
+                'The credentials were not verified.'
             );
 
         const isPasswordCorrect: boolean = await bcryptService
             .checkPassword(password, user.passwordHash);
 
-        if (!isPasswordCorrect) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
+        if (!isPasswordCorrect) return BadRequestResult
+            .create(
                 'password',
-                'Incorrect password.'
+                'Incorrect password.',
+                'The credentials were not verified.'
             );
 
-        return ResultObject
-            .positive<string>(
-                ResultStatus.Success,
-                String(user._id)
-            );
+        return SuccessResult
+            .create<string>(String(user._id));
     }
 };
 
