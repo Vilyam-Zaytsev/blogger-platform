@@ -14,7 +14,7 @@ import {emailTemplates} from "../common/adapters/email-templates";
 import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
 import {UserInputModel} from "../02-users/types/input-output-types";
-import {BadRequestResult, ResultObject, SuccessResult, UnauthorizedResult} from "../common/helpers/result-object";
+import {BadRequestResult, SuccessResult, UnauthorizedResult} from "../common/helpers/result-object";
 
 const authService = {
 

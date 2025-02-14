@@ -3,7 +3,7 @@ import {usersRepository} from "./repositoryes/users-repository";
 import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {WithId} from "mongodb";
-import {ResultObject} from "../common/helpers/result-object";
+import {BadRequestResult, ResultObject, SuccessResult} from "../common/helpers/result-object";
 
 const usersService = {
 
@@ -16,8 +16,8 @@ const usersService = {
         const result = await usersRepository
             .insertUser(user);
 
-        return ResultObject
-            .positive<string>(ResultStatus.Success, String(result.insertedId));
+        return SuccessResult
+            .create<string>(String(result.insertedId));
     },
 
     async deleteUser(id: string): Promise<boolean> {
@@ -31,25 +31,25 @@ const usersService = {
         const findByLogin: WithId<UserDbType> | null = await usersRepository
             .findByLoginOrEmail(login);
 
-        if (findByLogin) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
+        if (findByLogin) return BadRequestResult
+            .create(
                 'login',
-                'The user with this login already exists.'
+                'The user with this login already exists.',
+                'Failed to create a new user record.'
             );
 
         const findByEmail: WithId<UserDbType> | null = await usersRepository
             .findByLoginOrEmail(email);
 
-        if (findByEmail) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
+        if (findByEmail) return BadRequestResult
+            .create(
                 'email',
-                'The user with this email already exists.'
+                'The user with this email already exists.',
+                'Failed to create a new user record.'
             );
 
-        return ResultObject
-            .positive(ResultStatus.Success);
+        return SuccessResult
+            .create(null);
     },
 
 };
