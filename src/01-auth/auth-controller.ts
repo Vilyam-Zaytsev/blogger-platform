@@ -15,6 +15,7 @@ import {RegistrationConfirmationCodeModel} from "./types/registration-confirmati
 import {RegistrationEmailResendingType} from "./types/registration-email-resending-type";
 import {usersQueryRepository} from "../02-users/repositoryes/users-query-repository";
 import {AuthTokens} from "./types/auth-tokens-type";
+import {jwtService} from "../common/adapters/jwt-service";
 
 const authController = {
 
@@ -53,6 +54,26 @@ const authController = {
                 {httpOnly: true, secure: true,}
             )
             .json({accessToken});
+    },
+
+    refreshToken: async (
+        req: RequestWithUserId<IdType>,
+        res: Response<ApiErrorResult | LoginSuccessViewModel>
+    ) => {
+
+        const userId: string = String(req.user?.id);
+
+        if (!userId) {
+
+            res
+                .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+        }
+
+        const accessToken: string = await jwtService
+            .createAccessToken(userId);
+
+        const refreshToken: string = await jwtService
+            .createRefreshToken(userId);
     },
 
     registration: async (

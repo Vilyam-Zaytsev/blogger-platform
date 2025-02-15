@@ -26,6 +26,10 @@ authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION,
     inputCheckErrorsMiddleware,
     authController.registration
 );
+authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION,
+    bearerAuthorizationMiddleware,
+    authController.refreshToken
+);
 authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION_CONFIRMATION,
     authConfirmationCodeInputValidator,
     inputCheckErrorsMiddleware,

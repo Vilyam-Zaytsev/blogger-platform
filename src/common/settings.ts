@@ -8,6 +8,7 @@ const SETTINGS = {
         AUTH: {
             BASE: '/auth',
             LOGIN: '/login',
+            REFRESH_TOKEN: '/refresh-token',
             REGISTRATION: '/registration',
             REGISTRATION_CONFIRMATION: '/registration-confirmation',
             REGISTRATION_EMAIL_RESENDING: '/registration-email-resending',
