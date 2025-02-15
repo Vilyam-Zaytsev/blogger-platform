@@ -8,7 +8,13 @@ import {commentRepository} from "./repositoryes/comment-repository";
 import {CommentDbType} from "./types/comment-db-type";
 import {UserDbType} from "../02-users/types/user-db-type";
 import {usersRepository} from "../02-users/repositoryes/users-repository";
-import {BadRequestResult, ResultObject, SuccessResult} from "../common/helpers/result-object";
+import {
+    BadRequestResult,
+    ForbiddenResult,
+    NotFoundResult,
+    ResultObject,
+    SuccessResult
+} from "../common/helpers/result-object";
 
 const commentsService = {
 
@@ -16,19 +22,15 @@ const commentsService = {
 
         const resultCheckPostId: ResultType<string | null> = await this._checkPostId(postId);
 
-        //TODO:**********************************
-        if (resultCheckPostId.status !== ResultStatus.Success) return BadRequestResult
-            .create(
-                'commentId',
-                'Invalid ID format: The provided post ID is not a valid MongoDB ObjectId.',
-                'postId invalid.'
-            );
-        // ResultObject
-        //     .negative(
-        //         ResultStatus.NotFound,
-        //         'postId',
-        //         'There is no post with this ID.'
-        //     );
+        if (resultCheckPostId.status !== ResultStatus.Success) {
+
+            return BadRequestResult
+                .create(
+                    'postId',
+                    'Field postId incorrect.',
+                    'Couldn\'t create a new comment entry.'
+                );
+        }
 
         const commentator: WithId<UserDbType> | null = await usersRepository
             .findUser(commentatorId);
@@ -54,7 +56,10 @@ const commentsService = {
 
         const resultCheckingExistenceCommentAndOwner: ResultType = await this._checkingExistenceCommentAndOwner(commentId, userId);
 
-        if (resultCheckingExistenceCommentAndOwner.status !== ResultStatus.Success) return resultCheckingExistenceCommentAndOwner;
+        if (resultCheckingExistenceCommentAndOwner.status !== ResultStatus.Success) {
+
+            return resultCheckingExistenceCommentAndOwner;
+        }
 
         await commentRepository
             .updateComment(commentId, data);
@@ -78,22 +83,28 @@ const commentsService = {
 
     async _checkPostId(postId: string): Promise<ResultType<string | null>> {
 
-        if (!ObjectId.isValid(postId)) return BadRequestResult
-            .create(
-                'postId',
-                'Invalid ID format: The provided post ID is not a valid MongoDB ObjectId.',
-                'postId invalid.'
-            );
+        if (!ObjectId.isValid(postId)) {
+
+            return BadRequestResult
+                .create(
+                    'postId',
+                    'Invalid ID format: The provided post ID is not a valid MongoDB ObjectId.',
+                    'The postId field failed verification.'
+                );
+        }
 
         const isExistPost: WithId<PostDbType> | null = await postsService
             .findPost(postId);
 
-        if (!isExistPost) return BadRequestResult
-            .create(
-                'postId',
-                'There is no post with this ID.',
-                'postId incorrect.'
-            );
+        if (!isExistPost) {
+
+            return NotFoundResult
+                .create(
+                    'postId',
+                    'There is no post with this ID.',
+                    'The postId field failed verification.'
+                );
+        }
 
         return SuccessResult
             .create<string>(String(isExistPost._id));
@@ -104,32 +115,25 @@ const commentsService = {
         const comment: WithId<CommentDbType> | null = await commentRepository
             .findComment(commentId);
 
-        //TODO:********************************
-        if (!comment) return BadRequestResult
-            .create(
-                'commentId',
-                'Invalid ID format: The provided post ID is not a valid MongoDB ObjectId.',
-                'postId invalid.'
-            );
-        // ResultObject
-        //     .negative(
-        //         ResultStatus.NotFound,
-        //         'commentId',
-        //         'There is no comment with this ID.'
-        //     );
+        if (!comment) {
 
-        if (comment.commentatorInfo.userId !== userId) return BadRequestResult
-            .create(
-                'commentId',
-                'Invalid ID format: The provided post ID is not a valid MongoDB ObjectId.',
-                'postId invalid.'
-            );
-        // ResultObject
-        //     .negative(
-        //         ResultStatus.Forbidden,
-        //         'userId',
-        //         'This user is not the owner of this comment.'
-        //     );
+            return NotFoundResult
+                .create(
+                    'commentId',
+                    'A comment with this ID does not exist.',
+                    'The commentId field failed validation.'
+                );
+        }
+
+        if (comment.commentatorInfo.userId !== userId) {
+
+            return ForbiddenResult
+                .create(
+                    'userId',
+                    'The user does not have permission to edit this comment.',
+                    'The userId field failed validation.'
+                );
+        }
 
         return SuccessResult
             .create(null);

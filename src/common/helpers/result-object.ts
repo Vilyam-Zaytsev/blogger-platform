@@ -72,10 +72,72 @@ class UnauthorizedResult<T = null> extends ResultObject<T> {
         errorMessage: string
     ) {
 
+        super(
+            ResultStatus.Unauthorized,
+            null,
+            extensions,
+            errorMessage
+        );
+    };
 
+    static create(
+        field: string,
+        extensionsMessage: string,
+        errorMessage: string
+    ) {
+
+        const extensions: ExtensionsType = [
+            {
+                field,
+                message: extensionsMessage
+            }
+        ];
+
+        return new this(extensions, errorMessage);
+    };
+}
+
+class ForbiddenResult<T = null> extends ResultObject<T> {
+
+    private constructor(
+        extensions: ExtensionsType,
+        errorMessage: string
+    ) {
 
         super(
-            ResultStatus.BadRequest,
+            ResultStatus.Forbidden,
+            null,
+            extensions,
+            errorMessage
+        );
+    };
+
+    static create(
+        field: string,
+        extensionsMessage: string,
+        errorMessage: string
+    ) {
+
+        const extensions: ExtensionsType = [
+            {
+                field,
+                message: extensionsMessage
+            }
+        ];
+
+        return new this(extensions, errorMessage);
+    };
+}
+
+class NotFoundResult<T = null> extends ResultObject<T> {
+
+    private constructor(
+        extensions: ExtensionsType,
+        errorMessage: string
+    ) {
+
+        super(
+            ResultStatus.NotFound,
             null,
             extensions,
             errorMessage
@@ -103,5 +165,7 @@ export {
     ResultObject,
     SuccessResult,
     BadRequestResult,
-    UnauthorizedResult
+    UnauthorizedResult,
+    ForbiddenResult,
+    NotFoundResult
 };

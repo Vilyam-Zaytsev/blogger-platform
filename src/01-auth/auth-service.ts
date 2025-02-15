@@ -22,12 +22,15 @@ const authService = {
 
         const resultCheckUserCredentials: ResultType<string | null> = await this.checkUserCredentials(authParamsDto);
 
-        if (resultCheckUserCredentials.status !== ResultStatus.Success) return UnauthorizedResult
-            .create(
-                'loginOrEmailOrPassword',
-                'Login, email or password incorrect.',
-                'The user did not pass the verification of credentials.'
-            );
+        if (resultCheckUserCredentials.status !== ResultStatus.Success) {
+
+            return UnauthorizedResult
+                .create(
+                    'loginOrEmailOrPassword',
+                    'Login, email or password incorrect.',
+                    'The user did not pass the verification of credentials.'
+                );
+        }
 
         const accessToken: LoginSuccessViewModel = await jwtService
             .createToken(resultCheckUserCredentials.data!);
@@ -64,33 +67,44 @@ const authService = {
             .findByConfirmationCode(confirmationCode);
 
 
-        if (!user) return BadRequestResult
-            .create(
-                'code',
-                'Confirmation code incorrect.',
-                'Registration could not be confirmed.'
-            );
+        if (!user) {
 
-        if (user.emailConfirmation.confirmationCode !== confirmationCode) return BadRequestResult
-            .create(
-                'code',
-                'Confirmation code incorrect.',
-                'Registration could not be confirmed.'
-            );
+            return BadRequestResult
+                .create(
+                    'code',
+                    'Confirmation code incorrect.',
+                    'Failed to complete user registration.'
+                );
+        }
 
-        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) return BadRequestResult
-            .create(
-                'code',
-                'The confirmation code has already been used. The account has already been verified.',
-                'Registration could not be confirmed.'
-            );
+        //TODO:  Эта проверка лишняя???
 
-        if (user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()) return BadRequestResult
-            .create(
-                'code',
-                'The code has expired.',
-                'Registration could not be confirmed.'
-            );
+        // if (user.emailConfirmation.confirmationCode !== confirmationCode) return BadRequestResult
+        //     .create(
+        //         'code',
+        //         'Confirmation code incorrect.',
+        //         'Registration could not be confirmed.'
+        //     );
+
+        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) {
+
+            return BadRequestResult
+                .create(
+                    'code',
+                    'The confirmation code has already been used. The account has already been verified.',
+                    'Failed to complete user registration.'
+                );
+        }
+
+        if (user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()) {
+
+            return BadRequestResult
+                .create(
+                    'code',
+                    'The code has expired.',
+                    'Failed to complete user registration.'
+                );
+        }
 
         await usersRepository
             .updateConfirmationStatus(user._id);
@@ -104,19 +118,25 @@ const authService = {
         const user: WithId<UserDbType> | null = await usersRepository
             .findByEmail(email);
 
-        if (!user) return BadRequestResult
-            .create(
-                'email',
-                'There is no user with this email address.',
-                'Couldn\'t send an email with a confirmation code.'
-            );
+        if (!user) {
 
-        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) return BadRequestResult
-            .create(
-                'email',
-                'The user have already confirmed their credentials.',
-                'Couldn\'t send an email with a confirmation code.'
-            );
+            return BadRequestResult
+                .create(
+                    'email',
+                    'There is no user with this email address.',
+                    'Couldn\'t send an email with a confirmation code.'
+                );
+        }
+
+        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) {
+
+            return BadRequestResult
+                .create(
+                    'email',
+                    'The user have already confirmed their credentials.',
+                    'Couldn\'t send an email with a confirmation code.'
+                );
+        }
 
         const confirmationCode: string = randomUUID();
         const expirationDate: Date = add(
@@ -151,22 +171,28 @@ const authService = {
         const user: WithId<UserDbType> | null = await usersRepository
             .findByLoginOrEmail(loginOrEmail);
 
-        if (!user) return BadRequestResult
-            .create(
-                'loginOrEmail',
-                'There is no user with such data.',
-                'The credentials were not verified.'
-            );
+        if (!user) {
+
+            return BadRequestResult
+                .create(
+                    'loginOrEmail',
+                    'There is no user with such data.',
+                    'The credentials failed verification.'
+                );
+        }
 
         const isPasswordCorrect: boolean = await bcryptService
             .checkPassword(password, user.passwordHash);
 
-        if (!isPasswordCorrect) return BadRequestResult
-            .create(
-                'password',
-                'Incorrect password.',
-                'The credentials were not verified.'
-            );
+        if (!isPasswordCorrect) {
+
+            return BadRequestResult
+                .create(
+                    'password',
+                    'Incorrect password.',
+                    'The credentials failed verification.'
+                );
+        }
 
         return SuccessResult
             .create<string>(String(user._id));

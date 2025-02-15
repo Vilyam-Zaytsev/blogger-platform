@@ -1,5 +1,5 @@
 import {console_log_unit} from "../../../../../__tests__/helpers/test-helpers";
-import {BadRequestResult, ResultObject, SuccessResult} from "../../result-object";
+import {BadRequestResult, SuccessResult, UnauthorizedResult} from "../../result-object";
 import {ResultStatus} from "../../../types/result-types/result-status";
 
 describe('CREATE RESULT OBJECT', () => {
@@ -32,7 +32,7 @@ describe('CREATE RESULT OBJECT', () => {
         console_log_unit(resultObject, 'Test 2: Create result object');
     });
 
-    it('...', () => {
+    it('should create a result object with the status BadRequest, (using the BadRequestResult class).', () => {
 
         const resultObject = BadRequestResult
             .create(
@@ -52,5 +52,27 @@ describe('CREATE RESULT OBJECT', () => {
         });
 
         console_log_unit(resultObject, 'Test 3: Create result object');
+    });
+
+    it('should create a result object with the status Unauthorized, (using the UnauthorizedResult class).', () => {
+
+        const resultObject = UnauthorizedResult
+            .create(
+                'fieldName',
+                'Extension error.',
+                'Common error.'
+            );
+
+        expect(resultObject).toMatchObject({
+            status: ResultStatus.Unauthorized,
+            errorMessage: 'Common error.',
+            extensions: [{
+                field: 'fieldName',
+                message: 'Extension error.'
+            }],
+            data: null
+        });
+
+        console_log_unit(resultObject, 'Test 4: Create result object');
     });
 });

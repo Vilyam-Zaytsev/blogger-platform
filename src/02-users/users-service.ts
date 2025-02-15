@@ -31,22 +31,28 @@ const usersService = {
         const findByLogin: WithId<UserDbType> | null = await usersRepository
             .findByLoginOrEmail(login);
 
-        if (findByLogin) return BadRequestResult
-            .create(
-                'login',
-                'The user with this login already exists.',
-                'Failed to create a new user record.'
-            );
+        if (findByLogin) {
+
+            return BadRequestResult
+                .create(
+                    'login',
+                    'The user with this login already exists.',
+                    'Failed to create a new user record.'
+                );
+        }
 
         const findByEmail: WithId<UserDbType> | null = await usersRepository
             .findByLoginOrEmail(email);
 
-        if (findByEmail) return BadRequestResult
-            .create(
-                'email',
-                'The user with this email already exists.',
-                'Failed to create a new user record.'
-            );
+        if (findByEmail) {
+
+            return BadRequestResult
+                .create(
+                    'email',
+                    'The user with this email already exists.',
+                    'Failed to create a new user record.'
+                );
+        }
 
         return SuccessResult
             .create(null);
