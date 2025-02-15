@@ -5,7 +5,7 @@ import {ResultType} from "../common/types/result-types/result-type";
 import {ObjectId} from "mongodb";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {postsService} from "../04-posts/posts-service";
-import {ResultObject} from "../common/helpers/result-object";
+import {BadRequestResult, NotFoundResult, SuccessResult} from "../common/helpers/result-object";
 
 const blogsService = {
 
@@ -30,24 +30,21 @@ const blogsService = {
 
         const resultCheckBlogId: ResultType<string | null> = await this.checkBlogId(blogId);
 
-        if (resultCheckBlogId.status !== ResultStatus.Success) return {
-            status: ResultStatus.NotFound,
-            errorMessage: 'blog not found',
-            extensions: [{
-                field: 'blogId',
-                message: 'There is no blog with this ID.'
-            }],
-            data: null
-        };
+        if (resultCheckBlogId.status !== ResultStatus.Success) {
+
+            return NotFoundResult
+                .create(
+                    'blogId',
+                    'There is no blog with this ID.',
+                    'Couldn\'t create a new post entry.'
+                )
+        }
 
         const resultCreatedPost: string = await postsService
             .createPost({...dataForCreatingPost, blogId});
 
-        return {
-            status: ResultStatus.Success,
-            extensions: [],
-            data: resultCreatedPost
-        };
+        return SuccessResult
+            .create<string>(resultCreatedPost);
     },
 
     async updateBlog(id: string, data: BlogInputModel): Promise<boolean> {
@@ -64,28 +61,31 @@ const blogsService = {
 
     async checkBlogId(blogId: string): Promise<ResultType<string | null>> {
 
-        if (!ObjectId.isValid(blogId)) return ResultObject
-            .negative(
-                ResultStatus.NotFound,
-                'blogId',
-                'There is no blog with this ID.'
+        if (!ObjectId.isValid(blogId)) {
+
+            return BadRequestResult
+                .create(
+                    'blogId',
+                    'Invalid ID format: The provided post ID is not a valid MongoDB ObjectId.',
+                    'The BlogId field failed verification'
                 );
+        }
 
         const isExistBlog: BlogDbType | null = await blogsRepository
             .findBlog(blogId);
 
-        if (!isExistBlog) return ResultObject
-            .negative(
-                ResultStatus.NotFound,
-                'blogId',
-                'There is no blog with this ID.'
-            );
+        if (!isExistBlog) {
 
-        return ResultObject
-            .positive<string>(
-                ResultStatus.Success,
-                blogId
-            );
+            return NotFoundResult
+                .create(
+                    'blogId',
+                    'There is no blog with this ID.',
+                    'The BlogId field failed verification'
+                );
+        }
+
+        return SuccessResult
+            .create<string>(blogId);
     }
 };
 

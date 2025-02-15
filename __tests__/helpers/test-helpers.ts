@@ -17,7 +17,7 @@ const console_log_unit = (result: any, descriptions: string) => {
     console.log(
         `\x1b[4;36m***************${descriptions}***************\x1b[0m\n`,
         JSON.stringify({
-            Result: result,
+            TestResult: result,
         }, (key, value) => (typeof value === "object" && value !== null ? value : value), 4),
     )
 };

@@ -8,7 +8,12 @@ import {commentRepository} from "./repositoryes/comment-repository";
 import {CommentDbType} from "./types/comment-db-type";
 import {UserDbType} from "../02-users/types/user-db-type";
 import {usersRepository} from "../02-users/repositoryes/users-repository";
-import {ResultObject} from "../common/helpers/result-object";
+import {
+    BadRequestResult,
+    ForbiddenResult,
+    NotFoundResult,
+    SuccessResult
+} from "../common/helpers/result-object";
 
 const commentsService = {
 
@@ -16,12 +21,15 @@ const commentsService = {
 
         const resultCheckPostId: ResultType<string | null> = await this._checkPostId(postId);
 
-        if (resultCheckPostId.status !== ResultStatus.Success) return ResultObject
-            .negative(
-                ResultStatus.NotFound,
-                'postId',
-                'There is no post with this ID.'
-            );
+        if (resultCheckPostId.status !== ResultStatus.Success) {
+
+            return NotFoundResult
+                .create(
+                    'postId',
+                    'A post with this ID does not exist.',
+                    'Couldn\'t create a new comment entry.'
+                );
+        }
 
         const commentator: WithId<UserDbType> | null = await usersRepository
             .findUser(commentatorId);
@@ -39,24 +47,24 @@ const commentsService = {
         const result = await commentRepository
             .insertComment(newComment);
 
-        return ResultObject
-            .positive<string>(
-                ResultStatus.Success,
-                String(result.insertedId)
-            );
+        return SuccessResult
+            .create<string>(String(result.insertedId));
     },
 
     async updateComment(commentId: string, userId: string, data: CommentInputModel): Promise<ResultType> {
 
         const resultCheckingExistenceCommentAndOwner: ResultType = await this._checkingExistenceCommentAndOwner(commentId, userId);
 
-        if (resultCheckingExistenceCommentAndOwner.status !== ResultStatus.Success) return resultCheckingExistenceCommentAndOwner;
+        if (resultCheckingExistenceCommentAndOwner.status !== ResultStatus.Success) {
+
+            return resultCheckingExistenceCommentAndOwner;
+        }
 
         await commentRepository
             .updateComment(commentId, data);
 
-        return ResultObject
-            .positive(ResultStatus.Success);
+        return SuccessResult
+            .create(null);
     },
 
     async deleteComment(commentId: string, userId: string): Promise<ResultType> {
@@ -68,34 +76,37 @@ const commentsService = {
         await commentRepository
             .deleteComment(commentId);
 
-        return ResultObject
-            .positive(ResultStatus.Success);
+        return SuccessResult
+            .create(null);
     },
 
     async _checkPostId(postId: string): Promise<ResultType<string | null>> {
 
-        if (!ObjectId.isValid(postId)) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
-                'postId',
-                'Invalid ID format: The provided post ID is not a valid MongoDB ObjectId.'
-            );
+        if (!ObjectId.isValid(postId)) {
+
+            return BadRequestResult
+                .create(
+                    'postId',
+                    'Invalid ID format: The provided post ID is not a valid MongoDB ObjectId.',
+                    'The postId field failed verification.'
+                );
+        }
 
         const isExistPost: WithId<PostDbType> | null = await postsService
             .findPost(postId);
 
-        if (!isExistPost) return ResultObject
-            .negative(
-                ResultStatus.NotFound,
-                'postId',
-                'There is no post with this ID.'
-            );
+        if (!isExistPost) {
 
-        return ResultObject
-            .positive<string>(
-                ResultStatus.Success,
-                String(isExistPost._id)
-            );
+            return NotFoundResult
+                .create(
+                    'postId',
+                    'There is no post with this ID.',
+                    'The postId field failed verification.'
+                );
+        }
+
+        return SuccessResult
+            .create<string>(String(isExistPost._id));
     },
 
     async _checkingExistenceCommentAndOwner(commentId: string, userId: string): Promise<ResultType> {
@@ -103,22 +114,28 @@ const commentsService = {
         const comment: WithId<CommentDbType> | null = await commentRepository
             .findComment(commentId);
 
-        if (!comment) return ResultObject
-            .negative(
-                ResultStatus.NotFound,
-                'commentId',
-                'There is no comment with this ID.'
-            );
+        if (!comment) {
 
-        if (comment.commentatorInfo.userId !== userId) return ResultObject
-            .negative(
-                ResultStatus.Forbidden,
-                'userId',
-                'This user is not the owner of this comment.'
-            );
+            return NotFoundResult
+                .create(
+                    'commentId',
+                    'A comment with this ID does not exist.',
+                    'The commentId field failed validation.'
+                );
+        }
 
-        return ResultObject
-            .positive(ResultStatus.Success);
+        if (comment.commentatorInfo.userId !== userId) {
+
+            return ForbiddenResult
+                .create(
+                    'userId',
+                    'The user does not have permission to edit this comment.',
+                    'The userId field failed validation.'
+                );
+        }
+
+        return SuccessResult
+            .create(null);
     }
 };
 

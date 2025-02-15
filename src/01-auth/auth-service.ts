@@ -14,7 +14,7 @@ import {emailTemplates} from "../common/adapters/email-templates";
 import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
 import {UserInputModel} from "../02-users/types/input-output-types";
-import {ResultObject} from "../common/helpers/result-object";
+import {BadRequestResult, SuccessResult, UnauthorizedResult} from "../common/helpers/result-object";
 
 const authService = {
 
@@ -22,21 +22,21 @@ const authService = {
 
         const resultCheckUserCredentials: ResultType<string | null> = await this.checkUserCredentials(authParamsDto);
 
-        if (resultCheckUserCredentials.status !== ResultStatus.Success) return ResultObject
-            .negative(
-                ResultStatus.Unauthorized,
-                'loginOrEmailOrPassword',
-                'Login, email or password incorrect.'
-            );
+        if (resultCheckUserCredentials.status !== ResultStatus.Success) {
+
+            return UnauthorizedResult
+                .create(
+                    'loginOrEmailOrPassword',
+                    'Login, email or password incorrect.',
+                    'The user did not pass the verification of credentials.'
+                );
+        }
 
         const accessToken: LoginSuccessViewModel = await jwtService
             .createToken(resultCheckUserCredentials.data!);
 
-        return ResultObject
-            .positive(
-                ResultStatus.Success,
-                accessToken
-            );
+        return SuccessResult
+            .create<LoginSuccessViewModel>(accessToken);
     },
 
     async registration(registrationUserDto: UserInputModel): Promise<ResultType<string | null>> {
@@ -57,8 +57,8 @@ const authService = {
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 
-        return ResultObject
-            .positive(ResultStatus.Success);
+        return SuccessResult
+            .create(null);
     },
 
     async registrationConfirmation(confirmationCode: string): Promise<ResultType> {
@@ -67,46 +67,50 @@ const authService = {
             .findByConfirmationCode(confirmationCode);
 
 
-        if (!user) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
-                'code',
-                'Confirmation code incorrect.'
-            );
+        if (!user) {
 
-        if (user.emailConfirmation.confirmationCode !== confirmationCode) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
-                'code',
-                'Confirmation code incorrect.'
-            );
+            return BadRequestResult
+                .create(
+                    'code',
+                    'Confirmation code incorrect.',
+                    'Failed to complete user registration.'
+                );
+        }
 
-        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
-                'code',
-                'The confirmation code has already been used. The account has already been verified.'
-            );
+        //TODO:  Эта проверка лишняя???
 
-        if (user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
-                'code',
-                'The code has expired.'
-            );
+        // if (user.emailConfirmation.confirmationCode !== confirmationCode) return BadRequestResult
+        //     .create(
+        //         'code',
+        //         'Confirmation code incorrect.',
+        //         'Registration could not be confirmed.'
+        //     );
 
-        const resultUpdateConfirmationStatus = await usersRepository
+        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) {
+
+            return BadRequestResult
+                .create(
+                    'code',
+                    'The confirmation code has already been used. The account has already been verified.',
+                    'Failed to complete user registration.'
+                );
+        }
+
+        if (user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()) {
+
+            return BadRequestResult
+                .create(
+                    'code',
+                    'The code has expired.',
+                    'Failed to complete user registration.'
+                );
+        }
+
+        await usersRepository
             .updateConfirmationStatus(user._id);
 
-        if (!resultUpdateConfirmationStatus) return ResultObject
-            .negative(
-                ResultStatus.InternalServerError,
-                'confirmationStatus',
-                'The confirmation status could not be updated. Server error.'
-            );
-
-        return ResultObject
-            .positive(ResultStatus.Success);
+        return SuccessResult
+            .create(null);
     },
 
     async registrationEmailResending(email: string): Promise<ResultType> {
@@ -114,19 +118,25 @@ const authService = {
         const user: WithId<UserDbType> | null = await usersRepository
             .findByEmail(email);
 
-        if (!user) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
-                'email',
-                'There is no user with this email address.'
-            );
+        if (!user) {
 
-        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
-                'email',
-                'The users have already confirmed their credentials.'
-            );
+            return BadRequestResult
+                .create(
+                    'email',
+                    'There is no user with this email address.',
+                    'Couldn\'t send an email with a confirmation code.'
+                );
+        }
+
+        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) {
+
+            return BadRequestResult
+                .create(
+                    'email',
+                    'The user have already confirmed their credentials.',
+                    'Couldn\'t send an email with a confirmation code.'
+                );
+        }
 
         const confirmationCode: string = randomUUID();
         const expirationDate: Date = add(
@@ -134,18 +144,11 @@ const authService = {
             {hours: 1, minutes: 1}
         );
 
-        const resultUpdateEmailConfirmation = await usersRepository
+        await usersRepository
             .updateEmailConfirmation(
                 user._id,
                 confirmationCode,
                 expirationDate);
-
-        if (!resultUpdateEmailConfirmation) return ResultObject
-            .negative(
-                ResultStatus.InternalServerError,
-                'emailConfirmation',
-                'The confirmation code and  could not be updated. Server error.'
-            );
 
         nodemailerService
             .sendEmail(
@@ -155,8 +158,8 @@ const authService = {
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 
-        return ResultObject
-            .positive(ResultStatus.Success);
+        return SuccessResult
+            .create(null);
     },
 
     async checkUserCredentials(authParamsDto: LoginInputModel): Promise<ResultType<string | null>> {
@@ -168,28 +171,31 @@ const authService = {
         const user: WithId<UserDbType> | null = await usersRepository
             .findByLoginOrEmail(loginOrEmail);
 
-        if (!user) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
-                'loginOrEmail',
-                'There is no user with such data.'
-            );
+        if (!user) {
+
+            return BadRequestResult
+                .create(
+                    'loginOrEmail',
+                    'There is no user with such data.',
+                    'The credentials failed verification.'
+                );
+        }
 
         const isPasswordCorrect: boolean = await bcryptService
             .checkPassword(password, user.passwordHash);
 
-        if (!isPasswordCorrect) return ResultObject
-            .negative(
-                ResultStatus.BadRequest,
-                'password',
-                'Incorrect password.'
-            );
+        if (!isPasswordCorrect) {
 
-        return ResultObject
-            .positive<string>(
-                ResultStatus.Success,
-                String(user._id)
-            );
+            return BadRequestResult
+                .create(
+                    'password',
+                    'Incorrect password.',
+                    'The credentials failed verification.'
+                );
+        }
+
+        return SuccessResult
+            .create<string>(String(user._id));
     }
 };
 
