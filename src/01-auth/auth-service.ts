@@ -15,10 +15,11 @@ import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
 import {UserInputModel} from "../02-users/types/input-output-types";
 import {BadRequestResult, SuccessResult, UnauthorizedResult} from "../common/helpers/result-object";
+import {AuthTokens} from "./types/auth-tokens-type";
 
 const authService = {
 
-    async login(authParamsDto: LoginInputModel): Promise<ResultType<LoginSuccessViewModel | null>> {
+    async login(authParamsDto: LoginInputModel): Promise<ResultType<AuthTokens | null>> {
 
         const resultCheckUserCredentials: ResultType<string | null> = await this.checkUserCredentials(authParamsDto);
 
@@ -39,7 +40,7 @@ const authService = {
             .createRefreshToken(resultCheckUserCredentials.data!);
 
         return SuccessResult
-            .create<LoginSuccessViewModel>({accessToken, refreshToken});
+            .create<AuthTokens>({accessToken, refreshToken});
     },
 
     async registration(registrationUserDto: UserInputModel): Promise<ResultType<string | null>> {

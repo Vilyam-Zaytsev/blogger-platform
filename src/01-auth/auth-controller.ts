@@ -14,12 +14,13 @@ import {SETTINGS} from "../common/settings";
 import {RegistrationConfirmationCodeModel} from "./types/registration-confirmation-code-model";
 import {RegistrationEmailResendingType} from "./types/registration-email-resending-type";
 import {usersQueryRepository} from "../02-users/repositoryes/users-query-repository";
+import {AuthTokens} from "./types/auth-tokens-type";
 
 const authController = {
 
     login: async (
         req: RequestWithBody<LoginInputModel>,
-        res: Response<ApiErrorResult | string>
+        res: Response<ApiErrorResult | LoginSuccessViewModel>
     ) => {
 
         const authParams: LoginInputModel = {
@@ -27,7 +28,7 @@ const authController = {
             password: req.body.password
         };
 
-        const resultLogin: ResultType<LoginSuccessViewModel | null> = await authService
+        const resultLogin: ResultType<AuthTokens | null> = await authService
             .login(authParams);
 
         if (resultLogin.status !== ResultStatus.Success) {
@@ -39,14 +40,19 @@ const authController = {
             return;
         }
 
+        const {
+            accessToken,
+            refreshToken
+        } = resultLogin.data!;
+
         res
             .status(mapResultStatusToHttpStatus(resultLogin.status))
             .cookie(
                 'refreshToken',
-                resultLogin.data!.refreshToken,
+                refreshToken,
                 {httpOnly: true, secure: true,}
             )
-            .json(resultLogin.data!.accessToken);
+            .json({accessToken});
     },
 
     registration: async (
