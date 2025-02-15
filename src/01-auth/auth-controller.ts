@@ -19,7 +19,7 @@ const authController = {
 
     login: async (
         req: RequestWithBody<LoginInputModel>,
-        res: Response<ApiErrorResult | LoginSuccessViewModel>
+        res: Response<ApiErrorResult | string>
     ) => {
 
         const authParams: LoginInputModel = {
@@ -41,7 +41,7 @@ const authController = {
 
         res
             .status(mapResultStatusToHttpStatus(resultLogin.status))
-            .json({...resultLogin.data!});
+            .json(resultLogin.data!.accessToken);
     },
 
     registration: async (

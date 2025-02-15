@@ -32,11 +32,14 @@ const authService = {
                 );
         }
 
-        const accessToken: LoginSuccessViewModel = await jwtService
-            .createToken(resultCheckUserCredentials.data!);
+        const accessToken: string = await jwtService
+            .createAccessToken(resultCheckUserCredentials.data!);
+
+        const refreshToken: string = await jwtService
+            .createRefreshToken(resultCheckUserCredentials.data!);
 
         return SuccessResult
-            .create<LoginSuccessViewModel>(accessToken);
+            .create<LoginSuccessViewModel>({accessToken, refreshToken});
     },
 
     async registration(registrationUserDto: UserInputModel): Promise<ResultType<string | null>> {

@@ -35,7 +35,10 @@ const SETTINGS = {
     },
     MONGO_URL: process.env.MONGO_URL || 'mongodb://localhost:27017',
     DB_NAME: process.env.DB_NAME || 'blogger-platform-dev-local',
-    JWT_SECRET: process.env.JWT_SECRET || 'my_secret',
+    JWT_SECRET_AT: process.env.JWT_SECRET_AT || 'my_secret_AT',
+    JWT_SECRET_RT: process.env.JWT_SECRET_RT || 'my_secret_RT',
+    JWT_EXPIRATION_AT: process.env.JWT_EXPIRATION_AT || 10000,
+    JWT_EXPIRATION_RT: process.env.JWT_EXPIRATION_RT || 20000,
 };
 
 export {SETTINGS};
