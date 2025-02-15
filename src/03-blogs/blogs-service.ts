@@ -61,14 +61,13 @@ const blogsService = {
 
     async checkBlogId(blogId: string): Promise<ResultType<string | null>> {
 
-        //TODO: какой статус возвращать??
         if (!ObjectId.isValid(blogId)) {
 
             return BadRequestResult
                 .create(
                     'blogId',
                     'Invalid ID format: The provided post ID is not a valid MongoDB ObjectId.',
-                    'The BlogId field failed verification'//?????????????????
+                    'The BlogId field failed verification'
                 );
         }
 
@@ -81,7 +80,7 @@ const blogsService = {
                 .create(
                     'blogId',
                     'There is no blog with this ID.',
-                    'The BlogId field failed verification'//????????????????
+                    'The BlogId field failed verification'
                 );
         }
 

@@ -1,5 +1,11 @@
 import {console_log_unit} from "../../../../../__tests__/helpers/test-helpers";
-import {BadRequestResult, SuccessResult, UnauthorizedResult} from "../../result-object";
+import {
+    BadRequestResult,
+    ForbiddenResult,
+    NotFoundResult,
+    SuccessResult,
+    UnauthorizedResult
+} from "../../result-object";
 import {ResultStatus} from "../../../types/result-types/result-status";
 
 describe('CREATE RESULT OBJECT', () => {
@@ -74,5 +80,49 @@ describe('CREATE RESULT OBJECT', () => {
         });
 
         console_log_unit(resultObject, 'Test 4: Create result object');
+    });
+
+    it('should create a result object with the status Forbidden, (using the ForbiddenResult class).', () => {
+
+        const resultObject = ForbiddenResult
+            .create(
+                'fieldName',
+                'Extension error.',
+                'Common error.'
+            );
+
+        expect(resultObject).toMatchObject({
+            status: ResultStatus.Forbidden,
+            errorMessage: 'Common error.',
+            extensions: [{
+                field: 'fieldName',
+                message: 'Extension error.'
+            }],
+            data: null
+        });
+
+        console_log_unit(resultObject, 'Test 5: Create result object');
+    });
+
+    it('should create a result object with the status NotFound, (using the NotFoundResult class).', () => {
+
+        const resultObject = NotFoundResult
+            .create(
+                'fieldName',
+                'Extension error.',
+                'Common error.'
+            );
+
+        expect(resultObject).toMatchObject({
+            status: ResultStatus.NotFound,
+            errorMessage: 'Common error.',
+            extensions: [{
+                field: 'fieldName',
+                message: 'Extension error.'
+            }],
+            data: null
+        });
+
+        console_log_unit(resultObject, 'Test 6: Create result object');
     });
 });

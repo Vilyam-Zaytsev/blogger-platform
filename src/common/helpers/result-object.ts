@@ -3,9 +3,9 @@ import {ExtensionsType} from "../types/result-types/extensions-type";
 
 class ResultObject<T> {
     status: ResultStatus;
-    data: T | null;
-    extensions: ExtensionsType;
     errorMessage?: string;
+    extensions: ExtensionsType;
+    data: T | null;
 
     protected constructor(
         status: ResultStatus,
@@ -15,7 +15,7 @@ class ResultObject<T> {
     ) {
         this.status = status;
         errorMessage ? this.errorMessage = errorMessage : -1;
-        this.extensions = extensions ? extensions : [];
+        this.extensions = extensions;
         this.data = data;
     };
 }
@@ -162,7 +162,6 @@ class NotFoundResult<T = null> extends ResultObject<T> {
 }
 
 export {
-    ResultObject,
     SuccessResult,
     BadRequestResult,
     UnauthorizedResult,

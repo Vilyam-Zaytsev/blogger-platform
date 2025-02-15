@@ -12,7 +12,6 @@ import {
     BadRequestResult,
     ForbiddenResult,
     NotFoundResult,
-    ResultObject,
     SuccessResult
 } from "../common/helpers/result-object";
 
@@ -24,10 +23,10 @@ const commentsService = {
 
         if (resultCheckPostId.status !== ResultStatus.Success) {
 
-            return BadRequestResult
+            return NotFoundResult
                 .create(
                     'postId',
-                    'Field postId incorrect.',
+                    'A post with this ID does not exist.',
                     'Couldn\'t create a new comment entry.'
                 );
         }
