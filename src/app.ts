@@ -6,10 +6,12 @@ import {testsRouter} from "./autotest/tests-router";
 import {authRouter} from "./01-auth/auth-router";
 import {usersRouter} from "./02-users/users-router";
 import {commentsRouter} from "./05-comments/comments-router";
+import cookieParser from "cookie-parser";
 
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 app.get('/', (req: Request, res: Response) => {
     res
