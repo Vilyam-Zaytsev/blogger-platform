@@ -41,6 +41,11 @@ const authController = {
 
         res
             .status(mapResultStatusToHttpStatus(resultLogin.status))
+            .cookie(
+                'refreshToken',
+                resultLogin.data!.refreshToken,
+                {httpOnly: true, secure: true,}
+            )
             .json(resultLogin.data!.accessToken);
     },
 
