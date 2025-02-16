@@ -26,7 +26,7 @@ authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION,
     inputCheckErrorsMiddleware,
     authController.registration
 );
-authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION,
+authRouter.post(SETTINGS.PATH.AUTH.REFRESH_TOKEN,
     accessTokenGuard,
     authController.refreshToken
 );
