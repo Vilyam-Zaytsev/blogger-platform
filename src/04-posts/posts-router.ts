@@ -1,6 +1,6 @@
 import {Router} from "express";
 import {postsController} from './posts-controller';
-import {baseAuthMiddleware} from "../common/middlewares/base-authorization-middleware";
+import {baseAuthGuard} from "../01-auth/api/guards/base-auth-guard";
 import {
     postBlogIdInputValidator,
     postContentInputValidator,
@@ -14,7 +14,7 @@ import {
 } from "../common/middlewares/query-parameters-validator";
 import {SETTINGS} from "../common/settings";
 import {commentsController} from "../05-comments/comments-controller";
-import {bearerAuthorizationMiddleware} from "../common/middlewares/bearer-authorization-middleware";
+import {accessTokenGuard} from "../01-auth/api/guards/access-token-guard";
 import {commentContentInputValidator} from "../05-comments/middlewares/comment-validators";
 
 const postsRouter = Router();
@@ -37,7 +37,7 @@ postsRouter.get(`/:id${SETTINGS.PATH.COMMENTS}`,
     commentsController.getComments
 );
 postsRouter.post('/',
-    baseAuthMiddleware,
+    baseAuthGuard,
     postTitleInputValidator,
     postShortDescriptionInputValidator,
     postContentInputValidator,
@@ -46,13 +46,13 @@ postsRouter.post('/',
     postsController.createPost
 );
 postsRouter.post(`/:id${SETTINGS.PATH.COMMENTS}`,
-    bearerAuthorizationMiddleware,
+    accessTokenGuard,
     commentContentInputValidator,
     inputCheckErrorsMiddleware,
     commentsController.createComment
 );
 postsRouter.put('/:id',
-    baseAuthMiddleware,
+    baseAuthGuard,
     postTitleInputValidator,
     postShortDescriptionInputValidator,
     postContentInputValidator,
@@ -61,7 +61,7 @@ postsRouter.put('/:id',
     postsController.updatePost
 );
 postsRouter.delete('/:id',
-    baseAuthMiddleware,
+    baseAuthGuard,
     postsController.deletePost
 );
 

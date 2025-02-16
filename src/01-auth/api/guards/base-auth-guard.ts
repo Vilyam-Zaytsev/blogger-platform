@@ -1,7 +1,7 @@
 import {Request, Response, NextFunction} from "express";
-import {SETTINGS} from "../settings";
+import {SETTINGS} from "../../../common/settings";
 
-const baseAuthMiddleware = (
+const baseAuthGuard = (
     req: Request,
     res: Response,
     next: NextFunction
@@ -27,4 +27,4 @@ const baseAuthMiddleware = (
     next();
 }
 
-export {baseAuthMiddleware};
+export {baseAuthGuard};

@@ -2,19 +2,19 @@ import {Router} from "express";
 import {commentsController} from "./comments-controller";
 import {commentContentInputValidator} from "./middlewares/comment-validators";
 import {inputCheckErrorsMiddleware} from "../common/middlewares/input-check-errors-middleware";
-import {bearerAuthorizationMiddleware} from "../common/middlewares/bearer-authorization-middleware";
+import {accessTokenGuard} from "../01-auth/api/guards/access-token-guard";
 
 const commentsRouter = Router();
 
 commentsRouter.get('/:id', commentsController.getComment);
 commentsRouter.put('/:id',
-    bearerAuthorizationMiddleware,
+    accessTokenGuard,
     commentContentInputValidator,
     inputCheckErrorsMiddleware,
     commentsController.updateComment
 );
 commentsRouter.delete('/:id',
-    bearerAuthorizationMiddleware,
+    accessTokenGuard,
     commentsController.deleteComment
 );
 

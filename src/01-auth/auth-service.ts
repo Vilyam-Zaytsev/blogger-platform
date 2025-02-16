@@ -14,8 +14,10 @@ import {emailTemplates} from "../common/adapters/email-templates";
 import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
 import {UserInputModel} from "../02-users/types/input-output-types";
-import {BadRequestResult, SuccessResult, UnauthorizedResult} from "../common/helpers/result-object";
+import {BadRequestResult, NotFoundResult, SuccessResult, UnauthorizedResult} from "../common/helpers/result-object";
 import {AuthTokens} from "./types/auth-tokens-type";
+import {IdType} from "../common/types/input-output-types/id-type";
+import {SETTINGS} from "../common/settings";
 
 const authService = {
 
@@ -200,6 +202,42 @@ const authService = {
 
         return SuccessResult
             .create<string>(String(user._id));
+    },
+
+    async checkAccessToken(authHeader: string): Promise<ResultType<string | null>> {
+
+        const token: string = authHeader.split(' ')[1];
+
+        const payload= await jwtService
+            .verifyToken(token);
+
+        if (!payload) {
+
+            return BadRequestResult
+                .create(
+                'token',
+                    'Payload incorrect.',
+                    'Access token failed verification.'
+                );
+        }
+
+        const {userId} = payload;
+
+        const isUser: UserDbType | null = await usersRepository
+            .findUser(userId);
+
+        if (!isUser) {
+
+            return NotFoundResult
+                .create(
+                    'userId',
+                    'A user with this ID was not found.',
+                    'Access token failed verification.'
+                );
+        }
+
+        return SuccessResult
+            .create<string>(userId);
     }
 };
 

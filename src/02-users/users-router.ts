@@ -6,16 +6,16 @@ import {
     userPasswordInputValidator
 } from "./middlewares/user-validators";
 import {inputCheckErrorsMiddleware} from "../common/middlewares/input-check-errors-middleware";
-import {baseAuthMiddleware} from "../common/middlewares/base-authorization-middleware";
+import {baseAuthGuard} from "../01-auth/api/guards/base-auth-guard";
 
 const usersRouter = Router();
 
 usersRouter.get('/',
-    baseAuthMiddleware,
+    baseAuthGuard,
     usersController.getUsers
 );
 usersRouter.post('/',
-    baseAuthMiddleware,
+    baseAuthGuard,
     userLoginInputValidator,
     userEmailInputValidator,
     userPasswordInputValidator,
@@ -23,7 +23,7 @@ usersRouter.post('/',
     usersController.createUser
 );
 usersRouter.delete('/:id',
-    baseAuthMiddleware,
+    baseAuthGuard,
     usersController.deleteUser
 );
 
