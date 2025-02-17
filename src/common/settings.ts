@@ -39,7 +39,7 @@ const SETTINGS = {
     DB_NAME: process.env.DB_NAME || 'blogger-platform-dev-local',
     JWT_SECRET_AT: process.env.JWT_SECRET_AT || 'my_secret_AT',
     JWT_SECRET_RT: process.env.JWT_SECRET_RT || 'my_secret_RT',
-    JWT_EXPIRATION_AT: process.env.JWT_EXPIRATION_AT || 10,
+    JWT_EXPIRATION_AT: process.env.JWT_EXPIRATION_AT || 9,
     JWT_EXPIRATION_RT: process.env.JWT_EXPIRATION_RT || 20,
 };
 
