@@ -60,6 +60,7 @@ const authController = {
         req: RequestWithUserId<IdType>,
         res: Response<ApiErrorResult | LoginSuccessViewModel>
     ) => {
+        console.log('*****')
 
         const userId: string = String(req.user?.id);
 
@@ -69,11 +70,23 @@ const authController = {
                 .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
         }
 
+        const resultTokenReviews: ResultType<string | null> = await authService
+            .revokeRefreshToken(req.cookies.refreshToken);
+
         const accessToken: string = await jwtService
             .createAccessToken(userId);
 
         const refreshToken: string = await jwtService
             .createRefreshToken(userId);
+
+        res
+            .status(SETTINGS.HTTP_STATUSES.OK_200)
+            .cookie(
+                'refreshToken',
+                refreshToken,
+                {httpOnly: true, secure: true,}
+            )
+            .json({accessToken});
     },
 
     registration: async (

@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
 import {SETTINGS} from "../common/settings";
-import {blogsCollection, postsCollection, usersCollection} from "../db/mongoDb";
+import {blackListCollection, blogsCollection, postsCollection, usersCollection} from "../db/mongoDb";
 
 const testsController = {
     deleteAllData: async (
@@ -10,6 +10,7 @@ const testsController = {
             const resultBlogsDeletion = await blogsCollection.deleteMany();
             const resultPostsDeletion = await postsCollection.deleteMany();
             const resultUsersDeletion = await usersCollection.deleteMany();
+            const resultBlacklistDeletion = await blackListCollection.deleteMany();
 
             res
                 .status(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)

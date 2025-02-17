@@ -10,6 +10,7 @@ import {inputCheckErrorsMiddleware} from "../../common/middlewares/input-check-e
 import {SETTINGS} from "../../common/settings";
 import {accessTokenGuard} from "./guards/access-token-guard";
 import {authConfirmationCodeInputValidator} from "../middlewares/auth-validators";
+import {refreshTokenGuard} from "./guards/refresh-token-guard";
 
 const authRouter = Router();
 
@@ -27,7 +28,7 @@ authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION,
     authController.registration
 );
 authRouter.post(SETTINGS.PATH.AUTH.REFRESH_TOKEN,
-    accessTokenGuard,
+    refreshTokenGuard,
     authController.refreshToken
 );
 authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION_CONFIRMATION,

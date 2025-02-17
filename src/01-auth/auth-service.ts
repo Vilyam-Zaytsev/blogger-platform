@@ -18,6 +18,8 @@ import {BadRequestResult, NotFoundResult, SuccessResult, UnauthorizedResult} fro
 import {AuthTokens} from "./types/auth-tokens-type";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {SETTINGS} from "../common/settings";
+import {BlacklistedTokenModel} from "./types/blacklisted-token-model";
+import {authRepository} from "./auth-repository";
 
 const authService = {
 
@@ -208,14 +210,14 @@ const authService = {
 
         const token: string = authHeader.split(' ')[1];
 
-        const payload= await jwtService
-            .verifyToken(token);
+        const payload = await jwtService
+            .verifyAccessToken(token);
 
         if (!payload) {
 
             return BadRequestResult
                 .create(
-                'token',
+                    'token',
                     'Payload incorrect.',
                     'Access token failed verification.'
                 );
@@ -238,6 +240,72 @@ const authService = {
 
         return SuccessResult
             .create<string>(userId);
+    },
+
+    async checkRefreshToken(refreshToken: string): Promise<ResultType<string | null>> {
+
+        const isTokenBlacklisted: BlacklistedTokenModel | null = await authRepository
+            .isRefreshTokenBlacklisted(refreshToken);
+
+        if (isTokenBlacklisted) {
+
+            return UnauthorizedResult
+                .create(
+                    'refreshToken',
+                    'The refresh token is blacklisted.',
+                    'Refresh token failed verification.'
+                );
+        }
+
+        const payload = await jwtService
+            .verifyRefreshToken(refreshToken);
+
+        if (!payload) {
+
+            return BadRequestResult
+                .create(
+                    'token',
+                    'Payload incorrect.',
+                    'Refresh token failed verification.'
+                );
+        }
+
+        const {userId} = payload;
+
+        const isUser: UserDbType | null = await usersRepository
+            .findUser(userId);
+
+        if (!isUser) {
+
+            return NotFoundResult
+                .create(
+                    'userId',
+                    'A user with this ID was not found.',
+                    'Refresh token failed verification.'
+                );
+        }
+
+        return SuccessResult
+            .create<string>(userId);
+    },
+
+    async revokeRefreshToken(refreshToken: string): Promise<ResultType<string | null>> {
+
+        const decodedToken: any = await jwtService
+            .decodeToken(refreshToken);
+
+        const revokedToken: BlacklistedTokenModel = {
+            refreshToken,
+            userId: decodedToken.userId,
+            revokedAt: new Date(),
+            expiresAt: new Date(decodedToken.exp * 1000)
+        };
+
+        const resultAddingTokenToBlacklist = await authRepository
+            .addTokenToBlacklist(revokedToken);
+
+        return SuccessResult
+            .create<string>(String(resultAddingTokenToBlacklist));
     }
 };
 
