@@ -9,7 +9,7 @@ const jwtService = {
         return jwt.sign(
             {userId},
             SETTINGS.JWT_SECRET_AT,
-            {expiresIn: SETTINGS.JWT_EXPIRATION_RT}
+            {expiresIn: SETTINGS.JWT_EXPIRATION_AT}
         );
     },
 
