@@ -26,7 +26,14 @@ const authTestManager = {
                 })
             );
 
-            presets.accessTokens.push(res.body);
+            const authTokens = {
+                accessToken: res.body.accessToken,
+                refreshToken: res.headers['set-cookie'][0].split(';')[0].split('=')[1]
+            }
+
+            presets.authTokens.push({...authTokens});
+
+            responses.push(res);
         }
 
         return responses;

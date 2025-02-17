@@ -1,6 +1,6 @@
 import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {presets} from "../helpers/datasets-for-tests";
+import {clearPresets, presets} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {blackListCollection, setBlackListCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
@@ -9,6 +9,7 @@ import {UserDbType} from "../../src/02-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
 import {BlacklistedTokenModel} from "../../src/01-auth/types/blacklisted-token-model";
+import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -34,7 +35,7 @@ beforeEach(async () => {
     await usersCollection.deleteMany({});
     await blackListCollection.deleteMany({});
 
-    presets.users = [];
+    clearPresets();
 });
 
 describe('POST /auth/refresh-token', () => {
@@ -44,23 +45,33 @@ describe('POST /auth/refresh-token', () => {
         await usersTestManager
             .createUser(1);
 
-        const resLogin: Response = await req
-            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
-            .send({
-                loginOrEmail: presets.users[0].login,
-                password: presets.users[0].login
-            })
+        const resLogin: Response[] = await authTestManager
+            .login(presets.users.map(u => u.login));
+
+        const authTokens1 = {
+            ...resLogin[0].body,
+            refreshToken: resLogin[0].headers['set-cookie'][0].split(';')[0].split('=')[1]
+        }
+
+        console.log('TEST LOGIN:', authTokens1)//********************************
+
+        const cookies = resLogin[0].headers['set-cookie'];
+
+        const resRefreshToken: Response = await req
+            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REFRESH_TOKEN}`)
+            .set('Cookie', [...cookies])
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-        expect(resLogin.body).toEqual<LoginSuccessViewModel>(
-            expect.objectContaining({
-                accessToken: expect.any(String)
-            })
-        );
+        const authTokens2 = {
+            ...resRefreshToken.body,
+            refreshToken: resRefreshToken.headers['set-cookie'][0].split(';')[0].split('=')[1]
+        }
 
-        expect(resLogin.headers['set-cookie']).toBeDefined();
-        expect(resLogin.headers['set-cookie'][0]).toMatch(/refreshToken=.*;/);
+        // expect(presets.authTokens[0]).not.toEqual(authTokens);
 
-        console_log_e2e(resLogin.body, resLogin.status, 'Test 1: post(/auth/login)');
+        console.log('TEST REFRESH(RESPONSE):', authTokens2)
+        console.log('TEST REFRESH(PRESETS):', presets.authTokens[0])
+
+        // console_log_e2e(resLogin.body, resLogin.status, 'Test 1: post(/auth/login)');
     });
 });

@@ -46,6 +46,9 @@ const authController = {
             refreshToken
         } = resultLogin.data!;
 
+        console.log('CONTROLLER(LOGIN):', {accessToken, refreshToken})//***************************
+
+
         res
             .status(mapResultStatusToHttpStatus(resultLogin.status))
             .cookie(
@@ -97,6 +100,8 @@ const authController = {
 
         const refreshToken: string = await jwtService
             .createRefreshToken(userId);
+
+        console.log('CONTROLLER(REFRESH):', {accessToken, refreshToken})//**************************
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
