@@ -56,11 +56,30 @@ const authController = {
             .json({accessToken});
     },
 
+    logout: async (
+        req: RequestWithUserId<IdType>,
+        res: Response
+    ) => {
+
+        const userId: string = String(req.user?.id);
+
+        if (!userId) {
+
+            res
+                .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+        }
+
+        const resultTokenReviews: ResultType<string | null> = await authService
+            .revokeRefreshToken(req.cookies.refreshToken);
+
+        res
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+    },
+
     refreshToken: async (
         req: RequestWithUserId<IdType>,
         res: Response<ApiErrorResult | LoginSuccessViewModel>
     ) => {
-        console.log('*****')
 
         const userId: string = String(req.user?.id);
 

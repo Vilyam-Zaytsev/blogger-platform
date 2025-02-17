@@ -20,6 +20,10 @@ authRouter.post(SETTINGS.PATH.AUTH.LOGIN,
     inputCheckErrorsMiddleware,
     authController.login
 );
+authRouter.post(SETTINGS.PATH.AUTH.LOGOUT,
+    accessTokenGuard,
+    authController.logout
+);
 authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION,
     userLoginInputValidator,
     userEmailInputValidator,
