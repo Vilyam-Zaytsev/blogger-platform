@@ -55,6 +55,9 @@ describe('POST /auth/login', () => {
             })
         );
 
+        expect(resLogin.headers['set-cookie']).toBeDefined();
+        expect(resLogin.headers['set-cookie'][0]).toMatch(/refreshToken=.*;/);
+
         console_log_e2e(resLogin.body, resLogin.status, 'Test 1: post(/auth/login)');
     });
 
@@ -82,6 +85,8 @@ describe('POST /auth/login', () => {
                 ]
             }
         );
+
+        expect(resLogin.headers['set-cookie']).toBeUndefined();
 
         console_log_e2e(resLogin.body, resLogin.status, 'Test 2: post(/auth/login)');
     });
@@ -112,6 +117,8 @@ describe('POST /auth/login', () => {
             ]
         });
 
+        expect(resLogin.headers['set-cookie']).toBeUndefined();
+
         console_log_e2e(resLogin.body, resLogin.status, 'Test 3: post(/auth/login)');
     });
 
@@ -140,6 +147,8 @@ describe('POST /auth/login', () => {
                 }
             ]
         });
+
+        expect(resLogin.headers['set-cookie']).toBeUndefined();
 
         console_log_e2e(resLogin.body, resLogin.status, 'Test 4: post(/auth/login)');
     });
@@ -170,6 +179,8 @@ describe('POST /auth/login', () => {
             ]
         });
 
+        expect(resLogin.headers['set-cookie']).toBeUndefined();
+
         console_log_e2e(resLogin.body, resLogin.status, 'Test 5: post(/auth/login)');
     });
 
@@ -178,7 +189,7 @@ describe('POST /auth/login', () => {
         await usersTestManager
             .createUser(1);
 
-        const resAuth: Response = await req
+        const resLogin: Response = await req
             .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
             .send({
                 loginOrEmail: generateRandomString(10),
@@ -186,7 +197,7 @@ describe('POST /auth/login', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
 
-        expect(resAuth.body).toEqual({
+        expect(resLogin.body).toEqual({
             errorsMessages: [
                 {
                     field: 'loginOrEmailOrPassword',
@@ -195,7 +206,9 @@ describe('POST /auth/login', () => {
             ]
         });
 
-        console_log_e2e(resAuth.body, resAuth.status, 'Test 6: post(/auth/login)');
+        expect(resLogin.headers['set-cookie']).toBeUndefined();
+
+        console_log_e2e(resLogin.body, resLogin.status, 'Test 6: post(/auth/login)');
     });
 
     it('should not be authorized if the user has sent incorrect data (password: invalid password).', async () => {
@@ -203,7 +216,7 @@ describe('POST /auth/login', () => {
         await usersTestManager
             .createUser(1);
 
-        const resAuth: Response = await req
+        const resLogin: Response = await req
             .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
             .send({
                 loginOrEmail: presets.users[0].login,
@@ -211,7 +224,7 @@ describe('POST /auth/login', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
 
-        expect(resAuth.body).toEqual({
+        expect(resLogin.body).toEqual({
             errorsMessages: [
                 {
                     field: 'loginOrEmailOrPassword',
@@ -220,6 +233,8 @@ describe('POST /auth/login', () => {
             ]
         });
 
-        console_log_e2e(resAuth.body, resAuth.status, 'Test 7: post(/auth/login)');
+        expect(resLogin.headers['set-cookie']).toBeUndefined();
+
+        console_log_e2e(resLogin.body, resLogin.status, 'Test 7: post(/auth/login)');
     });
 });

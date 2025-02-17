@@ -4,22 +4,54 @@ import {LoginSuccessViewModel} from "../../01-auth/types/login-success-view-mode
 
 const jwtService = {
 
-    async createToken(userId: string): Promise<LoginSuccessViewModel> {
+    async createAccessToken(userId: string,): Promise<string> {
 
-        const accessToken: string = jwt.sign(
+        return jwt.sign(
             {userId},
-            SETTINGS.JWT_SECRET,
-            {expiresIn: '48h'}
+            SETTINGS.JWT_SECRET_AT,
+            {expiresIn: SETTINGS.JWT_EXPIRATION_RT}
         );
-
-        return {accessToken};
     },
 
-    async verifyToken(token: string): Promise<{ userId: string } | null> {
+    async createRefreshToken(userId: string,): Promise<string> {
+
+        return jwt.sign(
+            {userId},
+            SETTINGS.JWT_SECRET_RT,
+            {expiresIn: SETTINGS.JWT_EXPIRATION_RT}
+        );
+    },
+
+    async decodeToken(token: string): Promise<any> {
 
         try {
 
-            return jwt.verify(token, SETTINGS.JWT_SECRET) as { userId: string };
+            return jwt.decode(token);
+        } catch (error: unknown) {
+
+            console.error("Can't decode token", error);
+
+            return null;
+        }
+    },
+
+    async verifyAccessToken(token: string): Promise<{ userId: string } | null> {
+
+        try {
+
+            return jwt.verify(token, SETTINGS.JWT_SECRET_AT) as { userId: string };
+        } catch (error) {
+            console.error(error);
+
+            return null;
+        }
+    },
+
+    async verifyRefreshToken(token: string): Promise<{ userId: string } | null> {
+
+        try {
+
+            return jwt.verify(token, SETTINGS.JWT_SECRET_RT) as { userId: string };
         } catch (error) {
             console.error(error);
 

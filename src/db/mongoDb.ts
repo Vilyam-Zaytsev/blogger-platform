@@ -4,13 +4,17 @@ import {BlogDbType} from "../03-blogs/types/blog-db-type";
 import {PostDbType} from "../04-posts/types/post-db-type";
 import {UserDbType} from "../02-users/types/user-db-type";
 import {CommentDbType} from "../05-comments/types/comment-db-type";
+import {BlacklistedTokenModel} from "../01-auth/types/blacklisted-token-model";
 
 let blogsCollection: Collection<BlogDbType>;
+
 let postsCollection: Collection<PostDbType>;
 
 let usersCollection: Collection<UserDbType>;
 
 let commentsCollection: Collection<CommentDbType>;
+
+let blackListCollection: Collection<BlacklistedTokenModel>;
 
 const setBlogsCollection = (collection: Collection<BlogDbType>) => {
     blogsCollection = collection;
@@ -36,6 +40,8 @@ async function runDb(url: string) {
     postsCollection = db.collection<PostDbType>('posts');
     usersCollection = db.collection<UserDbType>('users');
     commentsCollection = db.collection<CommentDbType>('comments');
+    blackListCollection = db.collection<BlacklistedTokenModel>('blackList');
+
     try {
         await client.connect();
         await db.command({ping: 1});
@@ -61,5 +67,6 @@ export {
     postsCollection,
     usersCollection,
     commentsCollection,
+    blackListCollection,
     runDb
 };

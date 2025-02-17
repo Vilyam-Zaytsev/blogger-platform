@@ -14,6 +14,8 @@ import {SETTINGS} from "../common/settings";
 import {RegistrationConfirmationCodeModel} from "./types/registration-confirmation-code-model";
 import {RegistrationEmailResendingType} from "./types/registration-email-resending-type";
 import {usersQueryRepository} from "../02-users/repositoryes/users-query-repository";
+import {AuthTokens} from "./types/auth-tokens-type";
+import {jwtService} from "../common/adapters/jwt-service";
 
 const authController = {
 
@@ -27,7 +29,7 @@ const authController = {
             password: req.body.password
         };
 
-        const resultLogin: ResultType<LoginSuccessViewModel | null> = await authService
+        const resultLogin: ResultType<AuthTokens | null> = await authService
             .login(authParams);
 
         if (resultLogin.status !== ResultStatus.Success) {
@@ -39,9 +41,71 @@ const authController = {
             return;
         }
 
+        const {
+            accessToken,
+            refreshToken
+        } = resultLogin.data!;
+
         res
             .status(mapResultStatusToHttpStatus(resultLogin.status))
-            .json({...resultLogin.data!});
+            .cookie(
+                'refreshToken',
+                refreshToken,
+                {httpOnly: true, secure: true,}
+            )
+            .json({accessToken});
+    },
+
+    logout: async (
+        req: RequestWithUserId<IdType>,
+        res: Response
+    ) => {
+
+        const userId: string = String(req.user?.id);
+
+        if (!userId) {
+
+            res
+                .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+        }
+
+        const resultTokenReviews: ResultType<string | null> = await authService
+            .revokeRefreshToken(req.cookies.refreshToken);
+
+        res
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+    },
+
+    refreshToken: async (
+        req: RequestWithUserId<IdType>,
+        res: Response<ApiErrorResult | LoginSuccessViewModel>
+    ) => {
+
+        const userId: string = String(req.user?.id);
+
+        if (!userId) {
+
+            res
+                .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+        }
+
+        const resultTokenReviews: ResultType<string | null> = await authService
+            .revokeRefreshToken(req.cookies.refreshToken);
+
+        const accessToken: string = await jwtService
+            .createAccessToken(userId);
+
+        const refreshToken: string = await jwtService
+            .createRefreshToken(userId);
+
+        res
+            .status(SETTINGS.HTTP_STATUSES.OK_200)
+            .cookie(
+                'refreshToken',
+                refreshToken,
+                {httpOnly: true, secure: true,}
+            )
+            .json({accessToken});
     },
 
     registration: async (
