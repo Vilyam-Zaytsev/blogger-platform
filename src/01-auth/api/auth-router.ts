@@ -21,7 +21,7 @@ authRouter.post(SETTINGS.PATH.AUTH.LOGIN,
     authController.login
 );
 authRouter.post(SETTINGS.PATH.AUTH.LOGOUT,
-    accessTokenGuard,
+    refreshTokenGuard,
     authController.logout
 );
 authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION,
