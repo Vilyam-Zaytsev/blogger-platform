@@ -32,6 +32,10 @@ const setCommentsCollection = (collection: Collection<CommentDbType>) => {
     commentsCollection = collection;
 };
 
+const setBlackListCollection = (collection: Collection<BlacklistedTokenModel>) => {
+    blackListCollection = collection;
+};
+
 async function runDb(url: string) {
     let client = new MongoClient(url);
     let db = client.db(SETTINGS.DB_NAME);
@@ -63,6 +67,7 @@ export {
     setPostsCollection,
     setUsersCollection,
     setCommentsCollection,
+    setBlackListCollection,
     blogsCollection,
     postsCollection,
     usersCollection,

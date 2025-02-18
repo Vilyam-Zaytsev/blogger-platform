@@ -2,13 +2,11 @@ import {Response} from "supertest";
 import {req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";
 import {LoginSuccessViewModel} from "../../../src/01-auth/types/login-success-view-model";
-import {presets, user} from "../datasets-for-tests";
+import {presets} from "../datasets-for-tests";
 import {UserInputModel} from "../../../src/02-users/types/input-output-types";
-import {ObjectId, WithId} from "mongodb";
-import {ConfirmationStatus, UserDbType} from "../../../src/02-users/types/user-db-type";
-import {usersRepository} from "../../../src/02-users/repositoryes/users-repository";
 
 const authTestManager = {
+
     async login(logins: string[]) {
 
         const responses: Response[] = [];
@@ -28,7 +26,14 @@ const authTestManager = {
                 })
             );
 
-            presets.accessTokens.push(res.body);
+            const authTokens = {
+                accessToken: res.body.accessToken,
+                refreshToken: res.headers['set-cookie'][0].split(';')[0].split('=')[1]
+            }
+
+            presets.authTokens.push({...authTokens});
+
+            responses.push(res);
         }
 
         return responses;

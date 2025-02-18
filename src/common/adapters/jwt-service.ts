@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 import {SETTINGS} from "../settings";
-import {LoginSuccessViewModel} from "../../01-auth/types/login-success-view-model";
 
 const jwtService = {
 
