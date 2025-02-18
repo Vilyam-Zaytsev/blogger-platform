@@ -16,8 +16,6 @@ import {add} from "date-fns";
 import {UserInputModel} from "../02-users/types/input-output-types";
 import {BadRequestResult, NotFoundResult, SuccessResult, UnauthorizedResult} from "../common/helpers/result-object";
 import {AuthTokens} from "./types/auth-tokens-type";
-import {IdType} from "../common/types/input-output-types/id-type";
-import {SETTINGS} from "../common/settings";
 import {BlacklistedTokenModel} from "./types/blacklisted-token-model";
 import {authRepository} from "./auth-repository";
 

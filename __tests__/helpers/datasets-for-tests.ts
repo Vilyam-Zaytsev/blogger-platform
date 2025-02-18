@@ -4,7 +4,6 @@ import {UserInputModel, UserViewModel} from "../../src/02-users/types/input-outp
 import {BlogViewModel} from "../../src/03-blogs/types/input-output-types";
 import {PostViewModel} from "../../src/04-posts/types/input-output-types";
 import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
-import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
 import {AuthTokens} from "../../src/01-auth/types/auth-tokens-type";
 
 const blog: BlogDbType = {
