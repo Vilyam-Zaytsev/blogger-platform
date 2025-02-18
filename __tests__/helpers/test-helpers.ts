@@ -40,8 +40,17 @@ const encodingAdminDataInBase64 = (login: string, password: string) => {
     return `Basic ${adminDataBase64}`;
 };
 
+const delay = (ms: number): Promise<void> => {
+    return new Promise((res, rej) => {
+        setTimeout(() => {
+            res();
+        }, ms);
+    });
+}
+
 export {
     req,
+    delay,
     console_log_e2e,
     console_log_unit,
     generateRandomString,
