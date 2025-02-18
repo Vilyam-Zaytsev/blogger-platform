@@ -1,4 +1,4 @@
-import {console_log_e2e, delay, generateRandomString, req} from '../helpers/test-helpers';
+import {console_log_e2e, delay, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, presets} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
@@ -12,6 +12,17 @@ import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
+
+jest.mock('../../src/common/settings', () => {
+    const actualSettings = jest.requireActual('../../src/common/settings').SETTINGS;
+    return {
+        SETTINGS: {
+            ...actualSettings,
+            JWT_EXPIRATION_AT: '2s',
+            JWT_EXPIRATION_RT: '4s',
+        },
+    };
+});
 
 beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
@@ -35,6 +46,8 @@ beforeEach(async () => {
     await blackListCollection.deleteMany({});
 
     clearPresets();
+
+    jest.resetModules();
 });
 
 describe('POST /auth/refresh-token', () => {
@@ -76,7 +89,7 @@ describe('POST /auth/refresh-token', () => {
 
         const cookies = resLogin[0].headers['set-cookie'];
 
-        await delay(4000);
+        await delay(4500);
 
         let resRefreshToken = await req
             .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REFRESH_TOKEN}`)
