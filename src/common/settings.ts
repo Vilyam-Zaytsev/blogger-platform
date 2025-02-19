@@ -19,6 +19,10 @@ const SETTINGS = {
         BLOGS: '/blogs',
         POSTS: '/posts',
         COMMENTS: '/comments',
+        SECURITY_DEVICES: {
+            BASE: '/security',
+            DEVICES: '/devices',
+        },
         TESTS: '/testing/all-data',
     },
     ADMIN_DATA: {
