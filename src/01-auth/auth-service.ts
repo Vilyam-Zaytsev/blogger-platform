@@ -6,7 +6,6 @@ import {ResultStatus} from "../common/types/result-types/result-status";
 import {ResultType} from "../common/types/result-types/result-type";
 import {jwtService} from "../common/adapters/jwt-service";
 import {WithId} from "mongodb";
-import {LoginSuccessViewModel} from "./types/login-success-view-model";
 import {usersService} from "../02-users/users-service";
 import {User} from "../02-users/domain/user.entity";
 import {nodemailerService} from "../common/adapters/nodemailer-service";
@@ -16,7 +15,7 @@ import {add} from "date-fns";
 import {UserInputModel} from "../02-users/types/input-output-types";
 import {BadRequestResult, NotFoundResult, SuccessResult, UnauthorizedResult} from "../common/helpers/result-object";
 import {AuthTokens} from "./types/auth-tokens-type";
-import {BlacklistedTokenModel} from "./types/blacklisted-token-model";
+import {SessionModel} from "./types/session-model";
 import {authRepository} from "./auth-repository";
 
 const authService = {
@@ -242,7 +241,7 @@ const authService = {
 
     async checkRefreshToken(refreshToken: string): Promise<ResultType<string | null>> {
 
-        const isTokenBlacklisted: BlacklistedTokenModel | null = await authRepository
+        const isTokenBlacklisted: SessionModel | null = await authRepository
             .isRefreshTokenBlacklisted(refreshToken);
 
         if (isTokenBlacklisted) {
@@ -292,7 +291,7 @@ const authService = {
         const decodedToken: any = await jwtService
             .decodeToken(refreshToken);
 
-        const revokedToken: BlacklistedTokenModel = {
+        const revokedToken: SessionModel = {
             refreshToken,
             userId: decodedToken.userId,
             revokedAt: new Date(),

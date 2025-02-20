@@ -32,6 +32,8 @@ beforeEach(async () => {
     await usersCollection.deleteMany({});
 });
 
+//TODO create helper with mock email sending
+
 describe('POST /auth/registration-confirmation', () => {
 
     it('should be confirmed if the user has sent the correct verification code.', async () => {

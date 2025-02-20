@@ -20,6 +20,10 @@ beforeAll(async () => {
     await client.connect();
 
     const db = client.db();
+
+    // const user = db.collection('user')
+    //TODO: replace with runDB func
+
     setUsersCollection(db.collection<UserDbType>('users'));
 });
 
@@ -38,7 +42,7 @@ describe('POST /auth/login', () => {
 
     it('should be authorized if the user has sent the correct data (loginOrEmail and password).', async () => {
 
-        await usersTestManager
+      await usersTestManager
             .createUser(1);
 
         const resLogin: Response = await req
@@ -50,9 +54,9 @@ describe('POST /auth/login', () => {
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
         expect(resLogin.body).toEqual<LoginSuccessViewModel>(
-            expect.objectContaining({
+            {
                 accessToken: expect.any(String)
-            })
+            }
         );
 
         expect(resLogin.headers['set-cookie']).toBeDefined();

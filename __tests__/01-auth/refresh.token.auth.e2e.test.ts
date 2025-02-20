@@ -7,7 +7,7 @@ import {blackListCollection, setBlackListCollection, setUsersCollection, usersCo
 import {Response} from "supertest";
 import {UserDbType} from "../../src/02-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
-import {BlacklistedTokenModel} from "../../src/01-auth/types/blacklisted-token-model";
+import {SessionModel} from "../../src/01-auth/types/session-model";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 
 let mongoServer: MongoMemoryServer;
@@ -33,7 +33,7 @@ beforeAll(async () => {
 
     const db = client.db();
     setUsersCollection(db.collection<UserDbType>('users'));
-    setBlackListCollection(db.collection<BlacklistedTokenModel>('blackList'));
+    setBlackListCollection(db.collection<SessionModel>('blackList'));
 });
 
 afterAll(async () => {
