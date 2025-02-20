@@ -6,7 +6,6 @@ import {ResultStatus} from "../common/types/result-types/result-status";
 import {ResultType} from "../common/types/result-types/result-type";
 import {jwtService} from "../common/adapters/jwt-service";
 import {WithId} from "mongodb";
-import {LoginSuccessViewModel} from "./types/login-success-view-model";
 import {usersService} from "../02-users/users-service";
 import {User} from "../02-users/domain/user.entity";
 import {nodemailerService} from "../common/adapters/nodemailer-service";
