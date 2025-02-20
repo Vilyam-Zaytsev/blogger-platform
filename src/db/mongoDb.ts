@@ -4,7 +4,7 @@ import {BlogDbType} from "../03-blogs/types/blog-db-type";
 import {PostDbType} from "../04-posts/types/post-db-type";
 import {UserDbType} from "../02-users/types/user-db-type";
 import {CommentDbType} from "../05-comments/types/comment-db-type";
-import {BlacklistedTokenModel} from "../01-auth/types/blacklisted-token-model";
+import {SessionModel} from "../01-auth/types/session-model";
 
 let blogsCollection: Collection<BlogDbType>;
 
@@ -14,7 +14,7 @@ let usersCollection: Collection<UserDbType>;
 
 let commentsCollection: Collection<CommentDbType>;
 
-let blackListCollection: Collection<BlacklistedTokenModel>;
+let sessionsCollection: Collection<SessionModel>;
 
 const setBlogsCollection = (collection: Collection<BlogDbType>) => {
     blogsCollection = collection;
@@ -32,8 +32,8 @@ const setCommentsCollection = (collection: Collection<CommentDbType>) => {
     commentsCollection = collection;
 };
 
-const setBlackListCollection = (collection: Collection<BlacklistedTokenModel>) => {
-    blackListCollection = collection;
+const setSessionsCollection = (collection: Collection<SessionModel>) => {
+    sessionsCollection = collection;
 };
 
 async function runDb(url: string) {
@@ -44,7 +44,7 @@ async function runDb(url: string) {
     postsCollection = db.collection<PostDbType>('posts');
     usersCollection = db.collection<UserDbType>('users');
     commentsCollection = db.collection<CommentDbType>('comments');
-    blackListCollection = db.collection<BlacklistedTokenModel>('blackList');
+    sessionsCollection = db.collection<SessionModel>('sessions');
 
     try {
         await client.connect();
@@ -67,11 +67,11 @@ export {
     setPostsCollection,
     setUsersCollection,
     setCommentsCollection,
-    setBlackListCollection,
+    setSessionsCollection,
     blogsCollection,
     postsCollection,
     usersCollection,
     commentsCollection,
-    blackListCollection,
+    sessionsCollection,
     runDb
 };

@@ -1,15 +1,15 @@
 import {blackListCollection} from "../db/mongoDb";
-import {BlacklistedTokenModel} from "./types/blacklisted-token-model";
+import {SessionModel} from "./types/session-model";
 
 const authRepository = {
 
-    async addTokenToBlacklist(revokedToken: BlacklistedTokenModel) {
+    async addTokenToBlacklist(revokedToken: SessionModel) {
 
         return await blackListCollection
             .insertOne(revokedToken);
     },
 
-    async isRefreshTokenBlacklisted(refreshToken: string): Promise<BlacklistedTokenModel | null> {
+    async isRefreshTokenBlacklisted(refreshToken: string): Promise<SessionModel | null> {
 
         return await blackListCollection
             .findOne({refreshToken});
