@@ -1,9 +1,9 @@
-import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
-import {PostDbType} from "../../src/04-posts/types/post-db-type";
-import {UserInputModel, UserViewModel} from "../../src/02-users/types/input-output-types";
-import {BlogViewModel} from "../../src/03-blogs/types/input-output-types";
-import {PostViewModel} from "../../src/04-posts/types/input-output-types";
-import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
+import {BlogDbType} from "../../src/04-blogs/types/blog-db-type";
+import {PostDbType} from "../../src/05-posts/types/post-db-type";
+import {UserInputModel, UserViewModel} from "../../src/03-users/types/input-output-types";
+import {BlogViewModel} from "../../src/04-blogs/types/input-output-types";
+import {PostViewModel} from "../../src/05-posts/types/input-output-types";
+import {CommentViewModel} from "../../src/06-comments/types/input-output-types";
 import {AuthTokens} from "../../src/01-auth/types/auth-tokens-type";
 
 const blog: BlogDbType = {

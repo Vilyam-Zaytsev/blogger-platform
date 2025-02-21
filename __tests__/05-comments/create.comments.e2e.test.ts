@@ -21,12 +21,12 @@ import {
 import {postsTestManager} from "../helpers/managers/04_posts-test-manager";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
-import {CommentDbType} from "../../src/05-comments/types/comment-db-type";
-import {UserDbType} from "../../src/02-users/types/user-db-type";
-import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
-import {PostDbType} from "../../src/04-posts/types/post-db-type";
+import {CommentDbType} from "../../src/06-comments/types/comment-db-type";
+import {UserDbType} from "../../src/03-users/types/user-db-type";
+import {BlogDbType} from "../../src/04-blogs/types/blog-db-type";
+import {PostDbType} from "../../src/05-posts/types/post-db-type";
 import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
-import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
+import {CommentViewModel} from "../../src/06-comments/types/input-output-types";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {ApiErrorResult} from "../../src/common/types/input-output-types/api-error-result";
 import {commentsTestManager} from "../helpers/managers/05_comments-test-manager";

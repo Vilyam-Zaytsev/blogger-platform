@@ -8,7 +8,7 @@ import {
 } from "../../common/types/input-output-types/pagination-sort-types";
 import {createPostsSearchFilter} from "../helpers/create-posts-search-filter";
 import {PostViewModel} from "../types/input-output-types";
-import {BlogViewModel} from "../../03-blogs/types/input-output-types";
+import {BlogViewModel} from "../../04-blogs/types/input-output-types";
 
 
 const postsQueryRepository = {

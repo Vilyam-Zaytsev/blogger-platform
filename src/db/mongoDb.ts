@@ -1,10 +1,10 @@
 import {Collection, MongoClient} from "mongodb";
 import {SETTINGS} from "../common/settings";
-import {BlogDbType} from "../03-blogs/types/blog-db-type";
-import {PostDbType} from "../04-posts/types/post-db-type";
-import {UserDbType} from "../02-users/types/user-db-type";
-import {CommentDbType} from "../05-comments/types/comment-db-type";
-import {SessionModel} from "../01-auth/types/session-model";
+import {BlogDbType} from "../04-blogs/types/blog-db-type";
+import {PostDbType} from "../05-posts/types/post-db-type";
+import {UserDbType} from "../03-users/types/user-db-type";
+import {CommentDbType} from "../06-comments/types/comment-db-type";
+import {SessionModel} from "../02-sessions/types/session-model";
 
 let blogsCollection: Collection<BlogDbType>;
 

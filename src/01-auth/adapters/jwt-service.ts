@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import {SETTINGS} from "../settings";
+import {SETTINGS} from "../../common/settings";
 
 const jwtService = {
 
@@ -12,10 +12,13 @@ const jwtService = {
         );
     },
 
-    async createRefreshToken(userId: string,): Promise<string> {
+    async createRefreshToken(userId: string, deviceId: string): Promise<string> {
 
         return jwt.sign(
-            {userId},
+            {
+                userId,
+                deviceId
+            },
             SETTINGS.JWT_SECRET_RT,
             {expiresIn: SETTINGS.JWT_EXPIRATION_RT}
         );

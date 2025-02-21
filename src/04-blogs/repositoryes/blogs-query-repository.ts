@@ -8,7 +8,7 @@ import {
 } from "../../common/types/input-output-types/pagination-sort-types";
 import {createBlogsSearchFilter} from "../helpers/create-blogs-search-filter";
 import {BlogViewModel} from "../types/input-output-types";
-import {CommentViewModel} from "../../05-comments/types/input-output-types";
+import {CommentViewModel} from "../../06-comments/types/input-output-types";
 
 const blogsQueryRepository = {
 

@@ -13,9 +13,9 @@ import {
     pageSizeInputValidator, sortByInputValidator, sortDirectionInputValidator
 } from "../common/middlewares/query-parameters-validator";
 import {SETTINGS} from "../common/settings";
-import {commentsController} from "../05-comments/comments-controller";
+import {commentsController} from "../06-comments/comments-controller";
 import {accessTokenGuard} from "../01-auth/api/guards/access-token-guard";
-import {commentContentInputValidator} from "../05-comments/middlewares/comment-validators";
+import {commentContentInputValidator} from "../06-comments/middlewares/comment-validators";
 
 const postsRouter = Router();
 

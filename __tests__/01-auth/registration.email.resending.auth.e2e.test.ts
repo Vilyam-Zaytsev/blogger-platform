@@ -5,12 +5,12 @@ import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, WithId} from "mongodb";
 import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
-import {UserDbType} from "../../src/02-users/types/user-db-type";
+import {UserDbType} from "../../src/03-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
-import {nodemailerService} from "../../src/common/adapters/nodemailer-service";
+import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
 import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
-import {usersRepository} from "../../src/02-users/repositoryes/users-repository";
-import {emailTemplates} from "../../src/common/adapters/email-templates";
+import {usersRepository} from "../../src/03-users/repositoryes/users-repository";
+import {emailTemplates} from "../../src/01-auth/adapters/email-templates";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 
 let mongoServer: MongoMemoryServer;

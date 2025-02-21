@@ -5,9 +5,9 @@ import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {blackListCollection, setBlackListCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
-import {UserDbType} from "../../src/02-users/types/user-db-type";
+import {UserDbType} from "../../src/03-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
-import {SessionModel} from "../../src/01-auth/types/session-model";
+import {SessionModel} from "../../src/02-sessions/types/session-model";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 
 let mongoServer: MongoMemoryServer;

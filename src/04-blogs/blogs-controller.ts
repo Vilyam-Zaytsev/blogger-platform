@@ -17,11 +17,11 @@ import {
 } from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {blogsQueryRepository} from "./repositoryes/blogs-query-repository";
-import {PostViewModel} from "../04-posts/types/input-output-types";
+import {PostViewModel} from "../05-posts/types/input-output-types";
 import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
-import {postsQueryRepository} from "../04-posts/repositoryes/posts-query-repository";
+import {postsQueryRepository} from "../05-posts/repositoryes/posts-query-repository";
 
 
 const blogsController = {

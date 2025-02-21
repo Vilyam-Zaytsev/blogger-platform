@@ -4,7 +4,7 @@ import {BlogDbType} from "./types/blog-db-type";
 import {ResultType} from "../common/types/result-types/result-type";
 import {ObjectId} from "mongodb";
 import {ResultStatus} from "../common/types/result-types/result-status";
-import {postsService} from "../04-posts/posts-service";
+import {postsService} from "../05-posts/posts-service";
 import {BadRequestResult, NotFoundResult, SuccessResult} from "../common/helpers/result-object";
 
 const blogsService = {

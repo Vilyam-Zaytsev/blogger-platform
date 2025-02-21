@@ -1,5 +1,5 @@
 import {blackListCollection} from "../db/mongoDb";
-import {SessionModel} from "./types/session-model";
+import {SessionModel} from "../02-sessions/types/session-model";
 
 const authRepository = {
 

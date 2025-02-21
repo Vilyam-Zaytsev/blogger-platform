@@ -1,6 +1,6 @@
 import {body} from "express-validator";
-import {blogsQueryRepository} from "../../03-blogs/repositoryes/blogs-query-repository";
-import {BlogDbType} from "../../03-blogs/types/blog-db-type";
+import {blogsQueryRepository} from "../../04-blogs/repositoryes/blogs-query-repository";
+import {BlogDbType} from "../../04-blogs/types/blog-db-type";
 
 const postTitleInputValidator =
     body('title')

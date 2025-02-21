@@ -1,7 +1,7 @@
 import {encodingAdminDataInBase64, req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";
 import {Response} from "supertest";
-import {BlogInputModel, BlogViewModel} from "../../../src/03-blogs/types/input-output-types";
+import {BlogInputModel, BlogViewModel} from "../../../src/04-blogs/types/input-output-types";
 import {
     blogDescriptions,
     blogNames,

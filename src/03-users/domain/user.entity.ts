@@ -1,5 +1,5 @@
 import {ConfirmationStatus, UserDbType} from "../types/user-db-type";
-import {bcryptService} from "../../common/adapters/bcrypt-service";
+import {bcryptService} from "../../01-auth/adapters/bcrypt-service";
 import {randomUUID} from "node:crypto";
 import { add } from "date-fns";
 import {UserInputModel} from "../types/input-output-types";

@@ -9,7 +9,7 @@ import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
-import {UserDbType} from "../../src/02-users/types/user-db-type";
+import {UserDbType} from "../../src/03-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 

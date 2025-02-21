@@ -10,10 +10,10 @@ import {
     setPostsCollection,
     setUsersCollection,
 } from "../../src/db/mongoDb";
-import {UserDbType} from "../../src/02-users/types/user-db-type";
-import {BlogDbType} from "../../src/03-blogs/types/blog-db-type";
-import {PostDbType} from "../../src/04-posts/types/post-db-type";
-import {CommentDbType} from "../../src/05-comments/types/comment-db-type";
+import {UserDbType} from "../../src/03-users/types/user-db-type";
+import {BlogDbType} from "../../src/04-blogs/types/blog-db-type";
+import {PostDbType} from "../../src/05-posts/types/post-db-type";
+import {CommentDbType} from "../../src/06-comments/types/comment-db-type";
 import {
     clearPresets,
     commentPropertyMap,
@@ -27,7 +27,7 @@ import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {Response} from "supertest";
 import {console_log_e2e, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
-import {CommentViewModel} from "../../src/05-comments/types/input-output-types";
+import {CommentViewModel} from "../../src/06-comments/types/input-output-types";
 import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {commentsTestManager} from "../helpers/managers/05_comments-test-manager";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";

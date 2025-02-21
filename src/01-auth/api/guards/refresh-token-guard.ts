@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {SETTINGS} from "../../../common/settings";
 import {ResultType} from "../../../common/types/result-types/result-type";
-import {authService} from "../../auth-service";
+import {authService} from "../../domain/auth-service";
 import {ResultStatus} from "../../../common/types/result-types/result-status";
 
 const refreshTokenGuard = async (

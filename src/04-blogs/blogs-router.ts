@@ -19,7 +19,7 @@ import {
     postContentInputValidator,
     postShortDescriptionInputValidator,
     postTitleInputValidator
-} from "../04-posts/middlewares/post-validators";
+} from "../05-posts/middlewares/post-validators";
 
 const blogsRouter = Router();
 

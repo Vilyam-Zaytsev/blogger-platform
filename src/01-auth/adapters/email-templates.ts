@@ -1,4 +1,4 @@
-import {EmailTemplateType} from "../types/input-output-types/email-template-type";
+import {EmailTemplateType} from "../../common/types/input-output-types/email-template-type";
 
 const emailTemplates = {
 

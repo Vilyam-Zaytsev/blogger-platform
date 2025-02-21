@@ -1,21 +1,21 @@
 import {Response} from "express";
 import {RequestWithBody, RequestWithUserId} from "../common/types/input-output-types/request-types";
 import {LoginInputModel} from "./types/login-input-model";
-import {authService} from "./auth-service";
+import {authService} from "./domain/auth-service";
 import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
 import {ApiErrorResult} from "../common/types/input-output-types/api-error-result";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {UserInputModel, UserMeViewModel} from "../02-users/types/input-output-types";
+import {UserInputModel, UserMeViewModel} from "../03-users/types/input-output-types";
 import {LoginSuccessViewModel} from "./types/login-success-view-model";
 import {SETTINGS} from "../common/settings";
 import {RegistrationConfirmationCodeModel} from "./types/registration-confirmation-code-model";
 import {RegistrationEmailResendingType} from "./types/registration-email-resending-type";
-import {usersQueryRepository} from "../02-users/repositoryes/users-query-repository";
+import {usersQueryRepository} from "../03-users/repositoryes/users-query-repository";
 import {AuthTokens} from "./types/auth-tokens-type";
-import {jwtService} from "../common/adapters/jwt-service";
+import {jwtService} from "./adapters/jwt-service";
 
 const authController = {
 

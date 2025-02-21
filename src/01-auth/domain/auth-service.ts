@@ -1,22 +1,22 @@
-import {bcryptService} from "../common/adapters/bcrypt-service";
-import {LoginInputModel} from "./types/login-input-model";
-import {ConfirmationStatus, UserDbType} from "../02-users/types/user-db-type";
-import {usersRepository} from "../02-users/repositoryes/users-repository";
-import {ResultStatus} from "../common/types/result-types/result-status";
-import {ResultType} from "../common/types/result-types/result-type";
-import {jwtService} from "../common/adapters/jwt-service";
+import {bcryptService} from "../adapters/bcrypt-service";
+import {LoginInputModel} from "../types/login-input-model";
+import {ConfirmationStatus, UserDbType} from "../../03-users/types/user-db-type";
+import {usersRepository} from "../../03-users/repositoryes/users-repository";
+import {ResultStatus} from "../../common/types/result-types/result-status";
+import {ResultType} from "../../common/types/result-types/result-type";
+import {jwtService} from "../adapters/jwt-service";
 import {WithId} from "mongodb";
-import {usersService} from "../02-users/users-service";
-import {User} from "../02-users/domain/user.entity";
-import {nodemailerService} from "../common/adapters/nodemailer-service";
-import {emailTemplates} from "../common/adapters/email-templates";
+import {usersService} from "../../03-users/users-service";
+import {User} from "../../03-users/domain/user.entity";
+import {nodemailerService} from "../adapters/nodemailer-service";
+import {emailTemplates} from "../adapters/email-templates";
 import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
-import {UserInputModel} from "../02-users/types/input-output-types";
-import {BadRequestResult, NotFoundResult, SuccessResult, UnauthorizedResult} from "../common/helpers/result-object";
-import {AuthTokens} from "./types/auth-tokens-type";
-import {SessionModel} from "./types/session-model";
-import {authRepository} from "./auth-repository";
+import {UserInputModel} from "../../03-users/types/input-output-types";
+import {BadRequestResult, NotFoundResult, SuccessResult, UnauthorizedResult} from "../../common/helpers/result-object";
+import {AuthTokens} from "../types/auth-tokens-type";
+import {SessionModel} from "../../02-sessions/types/session-model";
+import {authRepository} from "../auth-repository";
 
 const authService = {
 
@@ -39,6 +39,8 @@ const authService = {
 
         const refreshToken: string = await jwtService
             .createRefreshToken(resultCheckUserCredentials.data!);
+
+        //затем создаю и сохраняю сессию
 
         return SuccessResult
             .create<AuthTokens>({accessToken, refreshToken});

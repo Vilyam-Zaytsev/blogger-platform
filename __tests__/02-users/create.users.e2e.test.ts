@@ -5,8 +5,8 @@ import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
-import {UserDbType} from "../../src/02-users/types/user-db-type";
-import {UserViewModel} from "../../src/02-users/types/input-output-types";
+import {UserDbType} from "../../src/03-users/types/user-db-type";
+import {UserViewModel} from "../../src/03-users/types/input-output-types";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
 
