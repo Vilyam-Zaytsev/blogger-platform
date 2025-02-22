@@ -37,3 +37,5 @@ const activeSessionGuard = async (
     res
         .sendStatus(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 }
+
+export {activeSessionGuard};

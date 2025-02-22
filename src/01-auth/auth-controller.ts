@@ -16,6 +16,8 @@ import {RegistrationEmailResendingType} from "./types/registration-email-resendi
 import {usersQueryRepository} from "../03-users/repositoryes/users-query-repository";
 import {AuthTokens} from "./types/auth-tokens-type";
 import {jwtService} from "./adapters/jwt-service";
+import {SessionModel} from "../02-sessions/types/session-model";
+import {sessionsService} from "../02-sessions/domain/sessions-service";
 
 const authController = {
 
@@ -26,7 +28,7 @@ const authController = {
 
         const authParams: LoginInputModel = {
             loginOrEmail: req.body.loginOrEmail,
-            password: req.body.password
+            password: req.body.password,
         };
 
         const resultLogin: ResultType<AuthTokens | null> = await authService
@@ -40,6 +42,34 @@ const authController = {
 
             return;
         }
+
+        const deviceName: string = req.headers['user-agent'] || 'Unknown device';
+
+        const ip: string = req.headers['x-forwarded-for']?.toString().split(',')[0]
+            || req.socket.remoteAddress
+            || '0.0.0.0';
+
+        const payload = await jwtService
+            .decodeToken(resultLogin.data!.refreshToken);
+
+        const {
+            userId,
+            deviceId,
+            iat,
+            exp
+        } = payload;
+
+        const sessionParams: SessionModel = {
+            userId,
+            deviceId,
+            deviceName,
+            ip,
+            iat,
+            exp
+        };
+
+        await sessionsService
+            .createSession(sessionParams);
 
         const {
             accessToken,

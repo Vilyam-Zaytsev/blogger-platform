@@ -37,10 +37,13 @@ const authService = {
         const accessToken: string = await jwtService
             .createAccessToken(resultCheckUserCredentials.data!);
 
-        const refreshToken: string = await jwtService
-            .createRefreshToken(resultCheckUserCredentials.data!);
+        const deviceId: string = randomUUID();
 
-        //затем создаю и сохраняю сессию
+        const refreshToken: string = await jwtService
+            .createRefreshToken(
+                resultCheckUserCredentials.data!,
+                deviceId
+            );
 
         return SuccessResult
             .create<AuthTokens>({accessToken, refreshToken});

@@ -12,7 +12,10 @@ const jwtService = {
         );
     },
 
-    async createRefreshToken(userId: string, deviceId: string): Promise<string> {
+    async createRefreshToken(
+        userId: string,
+        deviceId: string
+    ): Promise<string> {
 
         return jwt.sign(
             {
@@ -53,7 +56,10 @@ const jwtService = {
 
         try {
 
-            return jwt.verify(token, SETTINGS.JWT_SECRET_RT) as { userId: string };
+            return jwt.verify(token, SETTINGS.JWT_SECRET_RT) as {
+                userId: string,
+                deviceId: string
+            };
         } catch (error) {
             console.error(error);
 
