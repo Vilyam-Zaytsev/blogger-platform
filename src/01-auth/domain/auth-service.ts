@@ -17,6 +17,7 @@ import {BadRequestResult, NotFoundResult, SuccessResult, UnauthorizedResult} fro
 import {AuthTokens} from "../types/auth-tokens-type";
 import {SessionModel} from "../../02-sessions/types/session-model";
 import {authRepository} from "../auth-repository";
+import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
 
 const authService = {
 
@@ -244,22 +245,9 @@ const authService = {
             .create<string>(userId);
     },
 
-    async checkRefreshToken(refreshToken: string): Promise<ResultType<string | null>> {
+    async checkRefreshToken(refreshToken: string): Promise<ResultType<PayloadRefreshTokenType | null>> {
 
-        const isTokenBlacklisted: SessionModel | null = await authRepository
-            .isRefreshTokenBlacklisted(refreshToken);
-
-        if (isTokenBlacklisted) {
-
-            return UnauthorizedResult
-                .create(
-                    'refreshToken',
-                    'The refresh token is blacklisted.',
-                    'Refresh token failed verification.'
-                );
-        }
-
-        const payload = await jwtService
+        const payload: PayloadRefreshTokenType | null = await jwtService
             .verifyRefreshToken(refreshToken);
 
         if (!payload) {
@@ -271,6 +259,8 @@ const authService = {
                     'Refresh token failed verification.'
                 );
         }
+
+        //TODO: есть ли необходимость проверять сессию???
 
         const {userId} = payload;
 
@@ -288,7 +278,7 @@ const authService = {
         }
 
         return SuccessResult
-            .create<string>(userId);
+            .create<PayloadRefreshTokenType>(payload);
     },
 
     async revokeRefreshToken(refreshToken: string): Promise<ResultType<string | null>> {

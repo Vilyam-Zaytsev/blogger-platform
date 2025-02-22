@@ -5,6 +5,7 @@ import {ResultStatus} from "../../../common/types/result-types/result-status";
 import {sessionsService} from "../../../02-sessions/domain/sessions-service";
 import {jwtService} from "../../adapters/jwt-service";
 import {SETTINGS} from "../../../common/settings";
+import {PayloadRefreshTokenType} from "../../types/payload.refresh.token.type";
 
 const activeSessionGuard = async (
     req: Request,
@@ -16,18 +17,15 @@ const activeSessionGuard = async (
 
     const token: string = req.cookies.refreshToken;
 
-    const resultCheckRefreshToken: ResultType<string | null> = await authService
+    const resultCheckRefreshToken: ResultType<PayloadRefreshTokenType | null> = await authService
         .checkRefreshToken(token);
 
     if (resultCheckRefreshToken.status !== ResultStatus.Success) next();
 
-    const payload = await jwtService
-        .decodeToken(token);
-
     const {
         iat,
         deviceId
-    } = payload;
+    } = resultCheckRefreshToken.data;
 
     const resultIsSessionActive: ResultType<string | null> = await sessionsService
         .isSessionActive(iat, deviceId);

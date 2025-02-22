@@ -119,9 +119,6 @@ const authController = {
                 .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
         }
 
-        const resultTokenReviews: ResultType<string | null> = await authService
-            .revokeRefreshToken(req.cookies.refreshToken);
-
         const accessToken: string = await jwtService
             .createAccessToken(userId);
 

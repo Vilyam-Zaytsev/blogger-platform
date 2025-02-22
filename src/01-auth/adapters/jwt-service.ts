@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import {SETTINGS} from "../../common/settings";
+import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
 
 const jwtService = {
 
@@ -52,14 +53,11 @@ const jwtService = {
         }
     },
 
-    async verifyRefreshToken(token: string): Promise<{ userId: string } | null> {
+    async verifyRefreshToken(token: string): Promise<PayloadRefreshTokenType | null> {
 
         try {
 
-            return jwt.verify(token, SETTINGS.JWT_SECRET_RT) as {
-                userId: string,
-                deviceId: string
-            };
+            return jwt.verify(token, SETTINGS.JWT_SECRET_RT) as PayloadRefreshTokenType;
         } catch (error) {
             console.error(error);
 
