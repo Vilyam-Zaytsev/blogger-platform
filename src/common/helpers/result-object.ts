@@ -161,10 +161,43 @@ class NotFoundResult<T = null> extends ResultObject<T> {
     };
 }
 
+class InternalServerErrorResult<T = null> extends ResultObject<T> {
+
+    private constructor(
+        extensions: ExtensionsType,
+        errorMessage: string
+    ) {
+
+        super(
+            ResultStatus.InternalServerError,
+            null,
+            extensions,
+            errorMessage
+        );
+    };
+
+    static create(
+        field: string,
+        extensionsMessage: string,
+        errorMessage: string
+    ) {
+
+        const extensions: ExtensionsType = [
+            {
+                field,
+                message: extensionsMessage
+            }
+        ];
+
+        return new this(extensions, errorMessage);
+    };
+}
+
 export {
     SuccessResult,
     BadRequestResult,
     UnauthorizedResult,
     ForbiddenResult,
-    NotFoundResult
+    NotFoundResult,
+    InternalServerErrorResult
 };

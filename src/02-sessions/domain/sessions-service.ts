@@ -1,12 +1,10 @@
-import {ResultType} from "../../common/types/result-types/result-type";
-import {SessionModel} from "../types/session-model";
+import {SessionDbType} from "../types/session-db-type";
 import {sessionsRepository} from "../sessions-repository";
-import {BadRequestResult, SuccessResult} from "../../common/helpers/result-object";
-import {WithId} from "mongodb";
+import {SuccessResult} from "../../common/helpers/result-object";
 
 const sessionsService = {
 
-    async createSession(sessionParams: SessionModel) {
+    async createSession(sessionParams: SessionDbType) {
 
         const resultInsertSession = await sessionsRepository
             .insertSession(sessionParams);
@@ -15,23 +13,10 @@ const sessionsService = {
             .create<string>(String(resultInsertSession.insertedId));
     },
 
-    async isSessionActive(iat: Date, deviceId: string): ResultType<string | null> {
+    async deleteSession(id: string) {
 
-        const session: WithId<SessionModel> | null = await sessionsRepository
-            .findSession(iat, deviceId);
-
-        if (!session) {
-
-            return BadRequestResult
-                .create(
-                    'versionToken',
-                    'There is no such session.',
-                    'The session was not found.'
-                );
-        }
-
-        return SuccessResult
-            .create<string>(String(session._id));
+        return await sessionsRepository
+            .deleteSession(id);
     }
 }
 

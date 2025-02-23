@@ -32,7 +32,11 @@ const refreshTokenGuard = async (
         return;
     }
 
-    req.user = {id: resultCheckRefreshToken.data!};
+    req.session = {
+        iat: new Date(resultCheckRefreshToken.data!.iat),
+        userId: resultCheckRefreshToken.data!.userId,
+        deviceId: resultCheckRefreshToken.data!.deviceId
+    };
 
     return next();
 };

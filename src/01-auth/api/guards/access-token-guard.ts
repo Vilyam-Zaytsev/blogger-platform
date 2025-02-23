@@ -18,8 +18,10 @@ const accessTokenGuard = async (
         return;
     }
 
+    const token: string = req.headers.authorization.split(' ')[1];
+
     const resultCheckAccessToken: ResultType<string | null> = await authService
-        .checkAccessToken(req.headers.authorization);
+        .checkAccessToken(token);
 
     if (resultCheckAccessToken.status !== ResultStatus.Success) {
 

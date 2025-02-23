@@ -4,7 +4,7 @@ import {BlogDbType} from "../04-blogs/types/blog-db-type";
 import {PostDbType} from "../05-posts/types/post-db-type";
 import {UserDbType} from "../03-users/types/user-db-type";
 import {CommentDbType} from "../06-comments/types/comment-db-type";
-import {SessionModel} from "../02-sessions/types/session-model";
+import {SessionDbType} from "../02-sessions/types/session-db-type";
 
 let blogsCollection: Collection<BlogDbType>;
 
@@ -14,7 +14,7 @@ let usersCollection: Collection<UserDbType>;
 
 let commentsCollection: Collection<CommentDbType>;
 
-let sessionsCollection: Collection<SessionModel>;
+let sessionsCollection: Collection<SessionDbType>;
 
 const setBlogsCollection = (collection: Collection<BlogDbType>) => {
     blogsCollection = collection;
@@ -32,7 +32,7 @@ const setCommentsCollection = (collection: Collection<CommentDbType>) => {
     commentsCollection = collection;
 };
 
-const setSessionsCollection = (collection: Collection<SessionModel>) => {
+const setSessionsCollection = (collection: Collection<SessionDbType>) => {
     sessionsCollection = collection;
 };
 
@@ -44,7 +44,7 @@ async function runDb(url: string) {
     postsCollection = db.collection<PostDbType>('posts');
     usersCollection = db.collection<UserDbType>('users');
     commentsCollection = db.collection<CommentDbType>('comments');
-    sessionsCollection = db.collection<SessionModel>('sessions');
+    sessionsCollection = db.collection<SessionDbType>('sessions');
 
     try {
         await client.connect();

@@ -1,5 +1,5 @@
 import {Response} from "express";
-import {RequestWithBody, RequestWithUserId} from "../common/types/input-output-types/request-types";
+import {RequestWithBody, RequestWithSession, RequestWithUserId} from "../common/types/input-output-types/request-types";
 import {LoginInputModel} from "./types/login-input-model";
 import {authService} from "./domain/auth-service";
 import {ResultType} from "../common/types/result-types/result-type";
@@ -16,8 +16,11 @@ import {RegistrationEmailResendingType} from "./types/registration-email-resendi
 import {usersQueryRepository} from "../03-users/repositoryes/users-query-repository";
 import {AuthTokens} from "./types/auth-tokens-type";
 import {jwtService} from "./adapters/jwt-service";
-import {SessionModel} from "../02-sessions/types/session-model";
+import {SessionDbType} from "../02-sessions/types/session-db-type";
 import {sessionsService} from "../02-sessions/domain/sessions-service";
+import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
+import {sessionsRepository} from "../02-sessions/sessions-repository";
+import {WithId} from "mongodb";
 
 const authController = {
 
@@ -59,7 +62,7 @@ const authController = {
             exp
         } = payload;
 
-        const sessionParams: SessionModel = {
+        const sessionParams: SessionDbType = {
             userId,
             deviceId,
             deviceName,
@@ -87,52 +90,72 @@ const authController = {
     },
 
     logout: async (
-        req: RequestWithUserId<IdType>,
+        req: RequestWithSession<TokenSessionDataType>,
         res: Response
     ) => {
 
-        const userId: string = String(req.user?.id);
-
-        if (!userId) {
+        if (!req.session) {
 
             res
-                .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+                .sendStatus(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
         }
 
-        const resultTokenReviews: ResultType<string | null> = await authService
-            .revokeRefreshToken(req.cookies.refreshToken);
+        const {
+            iat,
+            deviceId
+        } = req.session!;
+
+        const session: WithId<SessionDbType> | null = await sessionsRepository
+            .findSessionByIatAndDeviceId(iat, deviceId);
+
+        if (!session) {
+
+            res
+                .sendStatus(SETTINGS.HTTP_STATUSES.INTERNAL_SERVER_ERROR_500);
+
+            return;
+        }
+
+        await sessionsService
+            .deleteSession(String(session._id));
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     },
 
     refreshToken: async (
-        req: RequestWithUserId<IdType>,
+        req: RequestWithSession<TokenSessionDataType>,
         res: Response<ApiErrorResult | LoginSuccessViewModel>
     ) => {
 
-        const userId: string = String(req.user?.id);
+        const dataForRefreshToken: TokenSessionDataType = {
+            iat: req.session!.iat,
+            userId: req.session!.userId,
+            deviceId: req.session!.deviceId
+        };
 
-        if (!userId) {
+
+
+        const resultRefreshToken: ResultType<AuthTokens | null> = await authService
+            .refreshToken(dataForRefreshToken);
+
+        if (resultRefreshToken.status !== ResultStatus.Success) {
 
             res
-                .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+                .status(mapResultStatusToHttpStatus(resultRefreshToken.status))
+                .json(mapResultExtensionsToErrorMessage(resultRefreshToken.extensions));
+
+            return;
         }
-
-        const accessToken: string = await jwtService
-            .createAccessToken(userId);
-
-        const refreshToken: string = await jwtService
-            .createRefreshToken(userId);
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .cookie(
                 'refreshToken',
-                refreshToken,
+                resultRefreshToken.data!.refreshToken,
                 {httpOnly: true, secure: true,}
             )
-            .json({accessToken});
+            .json({accessToken: resultRefreshToken.data!.accessToken});
     },
 
     registration: async (

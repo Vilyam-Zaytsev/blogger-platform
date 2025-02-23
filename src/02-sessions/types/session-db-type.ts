@@ -1,4 +1,4 @@
-type SessionModel = {
+type SessionDbType = {
     userId: string;
     deviceId: string;
     deviceName: string;
@@ -7,4 +7,4 @@ type SessionModel = {
     exp: Date;
 };
 
-export {SessionModel};
+export {SessionDbType};

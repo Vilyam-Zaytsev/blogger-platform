@@ -13,11 +13,19 @@ import {emailTemplates} from "../adapters/email-templates";
 import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
 import {UserInputModel} from "../../03-users/types/input-output-types";
-import {BadRequestResult, NotFoundResult, SuccessResult, UnauthorizedResult} from "../../common/helpers/result-object";
+import {
+    BadRequestResult,
+    InternalServerErrorResult,
+    NotFoundResult,
+    SuccessResult,
+    UnauthorizedResult
+} from "../../common/helpers/result-object";
 import {AuthTokens} from "../types/auth-tokens-type";
-import {SessionModel} from "../../02-sessions/types/session-model";
-import {authRepository} from "../auth-repository";
+import {SessionDbType} from "../../02-sessions/types/session-db-type";
 import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
+import {sessionsRepository} from "../../02-sessions/sessions-repository";
+import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-type";
+import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
 
 const authService = {
 
@@ -48,6 +56,49 @@ const authService = {
 
         return SuccessResult
             .create<AuthTokens>({accessToken, refreshToken});
+    },
+
+    async refreshToken(tokenData: TokenSessionDataType) {
+
+        const {
+            iat,
+            userId,
+            deviceId
+        } = tokenData;
+
+        const accessToken: string = await jwtService
+            .createAccessToken(userId);
+
+        const refreshToken: string = await jwtService
+            .createRefreshToken(userId, deviceId);
+
+        const payloadRefreshToken: PayloadRefreshTokenType = await jwtService
+            .decodeToken(refreshToken);
+
+        const session: WithId<SessionDbType> | null = await sessionsRepository
+            .findSessionByIatAndDeviceId(iat, deviceId);
+
+        const timestamps: SessionTimestampsType = {
+            iat: new Date(payloadRefreshToken.iat),
+            exp: new Date(payloadRefreshToken.exp)
+        };
+
+        const resultUpdateSession: boolean = await sessionsRepository
+            .updateSessionTimestamps(session!._id, timestamps);
+
+        if (!resultUpdateSession) {
+
+            return InternalServerErrorResult
+                .create(
+                    'iat, exp',
+                    'Failed to update session timestamps.',
+                    'Failed to refresh the token pair.'
+                );
+        }
+
+        return SuccessResult
+            .create<AuthTokens>({accessToken, refreshToken});
+
     },
 
     async registration(registrationUserDto: UserInputModel): Promise<ResultType<string | null>> {
@@ -87,15 +138,6 @@ const authService = {
                     'Failed to complete user registration.'
                 );
         }
-
-        //TODO:  Эта проверка лишняя???
-
-        // if (user.emailConfirmation.confirmationCode !== confirmationCode) return BadRequestResult
-        //     .create(
-        //         'code',
-        //         'Confirmation code incorrect.',
-        //         'Registration could not be confirmed.'
-        //     );
 
         if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) {
 
@@ -209,9 +251,7 @@ const authService = {
             .create<string>(String(user._id));
     },
 
-    async checkAccessToken(authHeader: string): Promise<ResultType<string | null>> {
-
-        const token: string = authHeader.split(' ')[1];
+    async checkAccessToken(token: string): Promise<ResultType<string | null>> {
 
         const payload = await jwtService
             .verifyAccessToken(token);
@@ -260,19 +300,34 @@ const authService = {
                 );
         }
 
-        //TODO: есть ли необходимость проверять сессию???
-
-        const {userId} = payload;
+        const {
+            userId,
+            deviceId,
+            iat
+        } = payload;
 
         const isUser: UserDbType | null = await usersRepository
             .findUser(userId);
 
         if (!isUser) {
 
-            return NotFoundResult
+            return BadRequestResult
                 .create(
-                    'userId',
-                    'A user with this ID was not found.',
+                    'token',
+                    'Payload incorrect.',
+                    'Refresh token failed verification.'
+                );
+        }
+
+        const isSessionActive: WithId<SessionDbType> | null = await sessionsRepository
+            .findSessionByIatAndDeviceId(new Date(iat), deviceId);
+
+        if (!isSessionActive) {
+
+            return BadRequestResult
+                .create(
+                    'token',
+                    'Payload incorrect.',
                     'Refresh token failed verification.'
                 );
         }
@@ -280,25 +335,6 @@ const authService = {
         return SuccessResult
             .create<PayloadRefreshTokenType>(payload);
     },
-
-    async revokeRefreshToken(refreshToken: string): Promise<ResultType<string | null>> {
-
-        const decodedToken: any = await jwtService
-            .decodeToken(refreshToken);
-
-        const revokedToken: SessionModel = {
-            refreshToken,
-            userId: decodedToken.userId,
-            revokedAt: new Date(),
-            expiresAt: new Date(decodedToken.exp * 1000)
-        };
-
-        const resultAddingTokenToBlacklist = await authRepository
-            .addTokenToBlacklist(revokedToken);
-
-        return SuccessResult
-            .create<string>(String(resultAddingTokenToBlacklist));
-    }
 };
 
 export {authService};

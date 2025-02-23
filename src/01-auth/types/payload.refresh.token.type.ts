@@ -1,7 +1,7 @@
 type PayloadRefreshTokenType = {
     userId: string,
     deviceId: string,
-    ait: number,
+    iat: number,
     exp: number
 }
 
