@@ -19,8 +19,10 @@ const refreshTokenGuard = async (
         return;
     }
 
+    const token: string = req.cookies.refreshToken;
+
     const resultCheckRefreshToken: ResultType<PayloadRefreshTokenType | null> = await authService
-        .checkRefreshToken(req.cookies.refreshToken);
+        .checkRefreshToken(token);
 
     if (resultCheckRefreshToken.status !== ResultStatus.Success) {
 
