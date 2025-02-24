@@ -1,8 +1,8 @@
-import {PostDbType} from "./types/post-db-type";
-import {PostInputModel} from "./types/input-output-types";
+import {PostDbType} from "../types/post-db-type";
+import {PostInputModel} from "../types/input-output-types";
 import {WithId} from "mongodb";
-import {postsRepository} from "./repositoryes/posts-repository";
-import {blogsRepository} from "../04-blogs/repositoryes/blogs-repository";
+import {postsRepository} from "../repositoryes/posts-repository";
+import {blogsRepository} from "../../05-blogs/repositoryes/blogs-repository";
 
 const postsService = {
 

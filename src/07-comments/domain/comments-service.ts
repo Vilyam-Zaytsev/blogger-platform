@@ -1,19 +1,19 @@
-import {CommentInputModel} from "./types/input-output-types";
+import {CommentInputModel} from "../types/input-output-types";
 import {ObjectId, WithId} from "mongodb";
-import {ResultType} from "../common/types/result-types/result-type";
-import {ResultStatus} from "../common/types/result-types/result-status";
-import {PostDbType} from "../05-posts/types/post-db-type";
-import {postsService} from "../05-posts/posts-service";
-import {commentRepository} from "./repositoryes/comment-repository";
-import {CommentDbType} from "./types/comment-db-type";
-import {UserDbType} from "../03-users/types/user-db-type";
-import {usersRepository} from "../03-users/repositoryes/users-repository";
+import {ResultType} from "../../common/types/result-types/result-type";
+import {ResultStatus} from "../../common/types/result-types/result-status";
+import {PostDbType} from "../../06-posts/types/post-db-type";
+import {postsService} from "../../06-posts/domain/posts-service";
+import {commentRepository} from "../repositoryes/comment-repository";
+import {CommentDbType} from "../types/comment-db-type";
+import {UserDbType} from "../../04-users/types/user-db-type";
+import {usersRepository} from "../../04-users/repositoryes/users-repository";
 import {
     BadRequestResult,
     ForbiddenResult,
     NotFoundResult,
     SuccessResult
-} from "../common/helpers/result-object";
+} from "../../common/helpers/result-object";
 
 const commentsService = {
 

@@ -7,7 +7,7 @@ import {
 import {IdType} from "../common/types/input-output-types/id-type";
 import {CommentInputModel, CommentViewModel} from "./types/input-output-types";
 import {ResultType} from "../common/types/result-types/result-type";
-import {commentsService} from "./comments-service";
+import {commentsService} from "./domain/comments-service";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {SETTINGS} from "../common/settings";

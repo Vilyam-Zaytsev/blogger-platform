@@ -1,9 +1,9 @@
-import {UserDbType} from "./types/user-db-type";
-import {usersRepository} from "./repositoryes/users-repository";
-import {ResultType} from "../common/types/result-types/result-type";
-import {ResultStatus} from "../common/types/result-types/result-status";
+import {UserDbType} from "../types/user-db-type";
+import {usersRepository} from "../repositoryes/users-repository";
+import {ResultType} from "../../common/types/result-types/result-type";
+import {ResultStatus} from "../../common/types/result-types/result-status";
 import {WithId} from "mongodb";
-import {BadRequestResult, SuccessResult} from "../common/helpers/result-object";
+import {BadRequestResult, SuccessResult} from "../../common/helpers/result-object";
 
 const usersService = {
 

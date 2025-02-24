@@ -1,25 +1,25 @@
 import {Router} from "express";
-import {blogsController} from './blogs-controller';
+import {blogsController} from '../blogs-controller';
 import {
     blogDescriptionInputValidator,
     blogNameInputValidator,
     blogWebsiteUrlInputValidator
 } from "./middlewares/blog-validators";
-import {inputCheckErrorsMiddleware} from "../common/middlewares/input-check-errors-middleware";
-import {baseAuthGuard} from "../01-auth/api/guards/base-auth-guard";
+import {inputCheckErrorsMiddleware} from "../../common/middlewares/input-check-errors-middleware";
+import {baseAuthGuard} from "../../01-auth/api/guards/base-auth-guard";
 import {
     pageNumberInputValidator,
     pageSizeInputValidator,
     searchNameTermInputValidator,
     sortByInputValidator,
     sortDirectionInputValidator
-} from "../common/middlewares/query-parameters-validator";
-import {SETTINGS} from "../common/settings";
+} from "../../common/middlewares/query-parameters-validator";
+import {SETTINGS} from "../../common/settings";
 import {
     postContentInputValidator,
     postShortDescriptionInputValidator,
     postTitleInputValidator
-} from "../05-posts/middlewares/post-validators";
+} from "../../06-posts/api/middlewares/post-validators";
 
 const blogsRouter = Router();
 

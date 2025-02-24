@@ -1,5 +1,5 @@
 import {Response} from "supertest";
-import {PostInputModel, PostViewModel} from "../../../src/05-posts/types/input-output-types";
+import {PostInputModel, PostViewModel} from "../../../src/06-posts/types/input-output-types";
 import {
     blogNames,
     postContents,

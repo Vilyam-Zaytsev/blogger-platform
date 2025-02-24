@@ -8,12 +8,12 @@ import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-t
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
 import {ApiErrorResult} from "../common/types/input-output-types/api-error-result";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {UserInputModel, UserMeViewModel} from "../03-users/types/input-output-types";
+import {UserInputModel, UserMeViewModel} from "../04-users/types/input-output-types";
 import {LoginSuccessViewModel} from "./types/login-success-view-model";
 import {SETTINGS} from "../common/settings";
 import {RegistrationConfirmationCodeModel} from "./types/registration-confirmation-code-model";
 import {RegistrationEmailResendingType} from "./types/registration-email-resending-type";
-import {usersQueryRepository} from "../03-users/repositoryes/users-query-repository";
+import {usersQueryRepository} from "../04-users/repositoryes/users-query-repository";
 import {AuthTokens} from "./types/auth-tokens-type";
 import {jwtService} from "./adapters/jwt-service";
 import {SessionDbType} from "../02-sessions/types/session-db-type";

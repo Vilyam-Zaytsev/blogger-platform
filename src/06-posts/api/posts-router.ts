@@ -1,21 +1,21 @@
 import {Router} from "express";
-import {postsController} from './posts-controller';
-import {baseAuthGuard} from "../01-auth/api/guards/base-auth-guard";
+import {postsController} from '../posts-controller';
+import {baseAuthGuard} from "../../01-auth/api/guards/base-auth-guard";
 import {
     postBlogIdInputValidator,
     postContentInputValidator,
     postShortDescriptionInputValidator,
     postTitleInputValidator
 } from "./middlewares/post-validators";
-import {inputCheckErrorsMiddleware} from "../common/middlewares/input-check-errors-middleware";
+import {inputCheckErrorsMiddleware} from "../../common/middlewares/input-check-errors-middleware";
 import {
     pageNumberInputValidator,
     pageSizeInputValidator, sortByInputValidator, sortDirectionInputValidator
-} from "../common/middlewares/query-parameters-validator";
-import {SETTINGS} from "../common/settings";
-import {commentsController} from "../06-comments/comments-controller";
-import {accessTokenGuard} from "../01-auth/api/guards/access-token-guard";
-import {commentContentInputValidator} from "../06-comments/middlewares/comment-validators";
+} from "../../common/middlewares/query-parameters-validator";
+import {SETTINGS} from "../../common/settings";
+import {commentsController} from "../../07-comments/comments-controller";
+import {accessTokenGuard} from "../../01-auth/api/guards/access-token-guard";
+import {commentContentInputValidator} from "../../07-comments/api/middlewares/comment-validators";
 
 const postsRouter = Router();
 

@@ -1,18 +1,18 @@
 import {bcryptService} from "../adapters/bcrypt-service";
 import {LoginInputModel} from "../types/login-input-model";
-import {ConfirmationStatus, UserDbType} from "../../03-users/types/user-db-type";
-import {usersRepository} from "../../03-users/repositoryes/users-repository";
+import {ConfirmationStatus, UserDbType} from "../../04-users/types/user-db-type";
+import {usersRepository} from "../../04-users/repositoryes/users-repository";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {jwtService} from "../adapters/jwt-service";
 import {WithId} from "mongodb";
-import {usersService} from "../../03-users/users-service";
-import {User} from "../../03-users/domain/user.entity";
+import {usersService} from "../../04-users/domain/users-service";
+import {User} from "../../04-users/domain/user.entity";
 import {nodemailerService} from "../adapters/nodemailer-service";
 import {emailTemplates} from "../adapters/email-templates";
 import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
-import {UserInputModel} from "../../03-users/types/input-output-types";
+import {UserInputModel} from "../../04-users/types/input-output-types";
 import {
     BadRequestResult,
     InternalServerErrorResult,

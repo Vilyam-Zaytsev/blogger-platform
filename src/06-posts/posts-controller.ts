@@ -7,7 +7,7 @@ import {
     RequestWithQuery
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
-import {postsService} from "./posts-service";
+import {postsService} from "./domain/posts-service";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 import {
     PaginationAndSortFilterType,

@@ -14,8 +14,8 @@ import {
     setBlogsCollection,
     setPostsCollection
 } from "../../src/db/mongoDb";
-import {BlogDbType} from "../../src/04-blogs/types/blog-db-type";
-import {PostDbType} from "../../src/05-posts/types/post-db-type";
+import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
+import {PostDbType} from "../../src/06-posts/types/post-db-type";
 import {postsTestManager} from "../helpers/managers/04_posts-test-manager";
 import {Response} from "supertest";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
