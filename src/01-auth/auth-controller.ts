@@ -21,7 +21,6 @@ import {sessionsService} from "../02-sessions/domain/sessions-service";
 import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
 import {sessionsRepository} from "../02-sessions/sessions-repository";
 import {WithId} from "mongodb";
-import {sessionsCollection} from "../db/mongoDb";
 
 const authController = {
 
