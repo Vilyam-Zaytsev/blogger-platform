@@ -4,6 +4,7 @@ import {ResultType} from "../../../common/types/result-types/result-type";
 import {authService} from "../../domain/auth-service";
 import {ResultStatus} from "../../../common/types/result-types/result-status";
 import {PayloadRefreshTokenType} from "../../types/payload.refresh.token.type";
+import {log} from "node:util";
 
 const refreshTokenGuard = async (
     req: Request,
@@ -33,7 +34,7 @@ const refreshTokenGuard = async (
     }
 
     req.session = {
-        iat: new Date(resultCheckRefreshToken.data!.iat),
+        iat: new Date(resultCheckRefreshToken.data!.iat * 1000),
         userId: resultCheckRefreshToken.data!.userId,
         deviceId: resultCheckRefreshToken.data!.deviceId
     };

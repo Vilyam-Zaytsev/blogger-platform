@@ -11,17 +11,18 @@ const activeSessionGuard = async (
     next: NextFunction
 ) => {
 
-    if (!req.cookies.refreshToken) next();
+    if (!req.cookies.refreshToken) return next();
 
     const token: string = req.cookies.refreshToken;
 
     const resultCheckRefreshToken: ResultType<PayloadRefreshTokenType | null> = await authService
         .checkRefreshToken(token);
 
-    if (resultCheckRefreshToken.status !== ResultStatus.Success) next();
+    if (resultCheckRefreshToken.status !== ResultStatus.Success) return next();
 
     res
         .sendStatus(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
+
 }
 
 export {activeSessionGuard};

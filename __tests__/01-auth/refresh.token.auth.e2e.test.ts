@@ -3,7 +3,7 @@ import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, presets} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
-import {blackListCollection, setBlackListCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
+import {sessionsCollection, setSessionsCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
 import {UserDbType} from "../../src/03-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
@@ -33,7 +33,7 @@ beforeAll(async () => {
 
     const db = client.db();
     setUsersCollection(db.collection<UserDbType>('users'));
-    setBlackListCollection(db.collection<SessionDbType>('blackList'));
+    setSessionsCollection(db.collection<SessionDbType>('sessions'));
 });
 
 afterAll(async () => {
@@ -43,7 +43,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
     await usersCollection.deleteMany({});
-    await blackListCollection.deleteMany({});
+    await sessionsCollection.deleteMany({});
 
     clearPresets();
 

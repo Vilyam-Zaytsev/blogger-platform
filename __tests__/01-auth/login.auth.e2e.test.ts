@@ -3,11 +3,12 @@ import {SETTINGS} from "../../src/common/settings";
 import {presets} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
-import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
+import {sessionsCollection, setSessionsCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
 import {UserDbType} from "../../src/03-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
+import {SessionDbType} from "../../src/02-sessions/types/session-db-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -25,6 +26,7 @@ beforeAll(async () => {
     //TODO: replace with runDB func
 
     setUsersCollection(db.collection<UserDbType>('users'));
+    setSessionsCollection(db.collection<SessionDbType>('sessions'));
 });
 
 afterAll(async () => {
@@ -34,6 +36,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
     await usersCollection.deleteMany({});
+    await sessionsCollection.deleteMany({});
 
     presets.users = [];
 });

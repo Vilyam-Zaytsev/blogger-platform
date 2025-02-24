@@ -4,10 +4,10 @@ import {SuccessResult} from "../../common/helpers/result-object";
 
 const sessionsService = {
 
-    async createSession(sessionParams: SessionDbType) {
+    async createSession(newSession: SessionDbType) {
 
         const resultInsertSession = await sessionsRepository
-            .insertSession(sessionParams);
+            .insertSession(newSession);
 
         return SuccessResult
             .create<string>(String(resultInsertSession.insertedId));

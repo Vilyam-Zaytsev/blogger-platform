@@ -52,14 +52,14 @@ const jwtService = {
             return null;
         }
     },
-
+//TODO: как убрать простыню из консоли при ошибке???
     async verifyRefreshToken(token: string): Promise<PayloadRefreshTokenType | null> {
 
         try {
 
             return jwt.verify(token, SETTINGS.JWT_SECRET_RT) as PayloadRefreshTokenType;
         } catch (error) {
-            console.error(error);
+            console.error((error as Error).message);
 
             return null;
         }

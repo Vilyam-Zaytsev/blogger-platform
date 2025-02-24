@@ -320,7 +320,7 @@ const authService = {
         }
 
         const isSessionActive: WithId<SessionDbType> | null = await sessionsRepository
-            .findSessionByIatAndDeviceId(new Date(iat), deviceId);
+            .findSessionByIatAndDeviceId(new Date(iat * 1000), deviceId);
 
         if (!isSessionActive) {
 

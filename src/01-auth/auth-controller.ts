@@ -21,6 +21,7 @@ import {sessionsService} from "../02-sessions/domain/sessions-service";
 import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
 import {sessionsRepository} from "../02-sessions/sessions-repository";
 import {WithId} from "mongodb";
+import {sessionsCollection} from "../db/mongoDb";
 
 const authController = {
 
@@ -62,17 +63,17 @@ const authController = {
             exp
         } = payload;
 
-        const sessionParams: SessionDbType = {
+        const newSession: SessionDbType = {
             userId,
             deviceId,
             deviceName,
             ip,
-            iat,
+            iat: new Date(iat * 1000),
             exp
         };
 
         await sessionsService
-            .createSession(sessionParams);
+            .createSession(newSession);
 
         const {
             accessToken,
@@ -133,8 +134,6 @@ const authController = {
             userId: req.session!.userId,
             deviceId: req.session!.deviceId
         };
-
-
 
         const resultRefreshToken: ResultType<AuthTokens | null> = await authService
             .refreshToken(dataForRefreshToken);
