@@ -12,6 +12,7 @@ devicesRouter.get(
 );
 devicesRouter.delete(
     SETTINGS.PATH.SECURITY_DEVICES.DEVICES,
+    refreshTokenGuard,
     devicesController.deleteDevices
 );
 devicesRouter.delete(

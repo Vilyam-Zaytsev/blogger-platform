@@ -1,7 +1,7 @@
-import {sessionsCollection} from "../db/mongoDb";
+import {sessionsCollection} from "../../db/mongoDb";
 import {InsertOneResult, ObjectId, WithId} from "mongodb";
-import {SessionDbType} from "./types/session-db-type";
-import {SessionTimestampsType} from "./types/session-timestamps-type";
+import {SessionDbType} from "../types/session-db-type";
+import {SessionTimestampsType} from "../types/session-timestamps-type";
 
 const sessionsRepository = {
 
@@ -36,8 +36,29 @@ const sessionsRepository = {
             .deleteOne({_id: new ObjectId(id)});
 
         return result.deletedCount === 1;
-    }
+    },
 
+    async deleteSessionByUserIdAndDeviceId(userId: string, deviceId: string): Promise<boolean> {
+
+        const result = await sessionsCollection
+            .deleteOne({
+                userId,
+                deviceId
+            });
+
+        return result.deletedCount === 1;
+    },
+
+    async deleteAllSessionsExceptCurrent(userId: string, iat: Date) {
+
+        const result = await sessionsCollection
+            .deleteMany({
+                userId,
+                iat: {$ne: iat}
+            });
+
+        return result.deletedCount > 0;
+    }
 }
 
 export {sessionsRepository};

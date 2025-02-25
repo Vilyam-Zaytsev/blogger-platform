@@ -23,7 +23,7 @@ import {
 import {AuthTokens} from "../types/auth-tokens-type";
 import {SessionDbType} from "../../02-sessions/types/session-db-type";
 import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
-import {sessionsRepository} from "../../02-sessions/sessions-repository";
+import {sessionsRepository} from "../../02-sessions/repositoryes/sessions-repository";
 import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-type";
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
 
