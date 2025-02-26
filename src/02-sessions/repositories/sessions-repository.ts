@@ -1,17 +1,23 @@
 import {sessionsCollection} from "../../db/mongoDb";
 import {InsertOneResult, ObjectId, WithId} from "mongodb";
-import {SessionDbType} from "../types/session-db-type";
+import {ActiveSessionType} from "../types/active-session-type";
 import {SessionTimestampsType} from "../types/session-timestamps-type";
 
 const sessionsRepository = {
 
-    async findSessionByIatAndDeviceId(iat: Date, deviceId: string): Promise<WithId<SessionDbType> | null> {
+    async findSessionByIatAndDeviceId(iat: string, deviceId: string): Promise<WithId<ActiveSessionType> | null> {
 
         return sessionsCollection
             .findOne({iat, deviceId});
     },
 
-    async insertSession(newSession: SessionDbType): Promise<InsertOneResult> {
+    async findSessionByDeviceId(deviceId: string): Promise<WithId<ActiveSessionType> | null> {
+
+        return sessionsCollection
+            .findOne({deviceId});
+    },
+
+    async insertSession(newSession: ActiveSessionType): Promise<InsertOneResult> {
 
         return await sessionsCollection
             .insertOne(newSession);
@@ -38,18 +44,7 @@ const sessionsRepository = {
         return result.deletedCount === 1;
     },
 
-    async deleteSessionByUserIdAndDeviceId(userId: string, deviceId: string): Promise<boolean> {
-
-        const result = await sessionsCollection
-            .deleteOne({
-                userId,
-                deviceId
-            });
-
-        return result.deletedCount === 1;
-    },
-
-    async deleteAllSessionsExceptCurrent(userId: string, iat: Date) {
+    async deleteAllSessionsExceptCurrent(userId: string, iat: string) {
 
         const result = await sessionsCollection
             .deleteMany({

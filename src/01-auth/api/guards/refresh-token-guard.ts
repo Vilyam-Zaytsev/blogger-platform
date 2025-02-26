@@ -34,7 +34,7 @@ const refreshTokenGuard = async (
     }
 
     req.session = {
-        iat: new Date(resultCheckRefreshToken.data!.iat * 1000),
+        iat: new Date(resultCheckRefreshToken.data!.iat * 1000).toISOString(),
         userId: resultCheckRefreshToken.data!.userId,
         deviceId: resultCheckRefreshToken.data!.deviceId
     };

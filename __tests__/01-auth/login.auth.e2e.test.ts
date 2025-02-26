@@ -8,7 +8,7 @@ import {Response} from "supertest";
 import {UserDbType} from "../../src/04-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
-import {SessionDbType} from "../../src/02-sessions/types/session-db-type";
+import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -26,7 +26,7 @@ beforeAll(async () => {
     //TODO: replace with runDB func
 
     setUsersCollection(db.collection<UserDbType>('users'));
-    setSessionsCollection(db.collection<SessionDbType>('sessions'));
+    setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
 });
 
 afterAll(async () => {

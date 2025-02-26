@@ -16,7 +16,7 @@ import {RegistrationEmailResendingType} from "./types/registration-email-resendi
 import {usersQueryRepository} from "../04-users/repositoryes/users-query-repository";
 import {AuthTokens} from "./types/auth-tokens-type";
 import {jwtService} from "./adapters/jwt-service";
-import {SessionDbType} from "../02-sessions/types/session-db-type";
+import {ActiveSessionType} from "../02-sessions/types/active-session-type";
 import {sessionsService} from "../02-sessions/domain/sessions-service";
 import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
 import {sessionsRepository} from "../02-sessions/repositories/sessions-repository";
@@ -62,12 +62,12 @@ const authController = {
             exp
         } = payload;
 
-        const newSession: SessionDbType = {
+        const newSession: ActiveSessionType = {
             userId,
             deviceId,
             deviceName,
             ip,
-            iat: new Date(iat * 1000),
+            iat: new Date(iat * 1000).toISOString(),
             exp
         };
 
@@ -105,7 +105,7 @@ const authController = {
             deviceId
         } = req.session!;
 
-        const session: WithId<SessionDbType> | null = await sessionsRepository
+        const session: WithId<ActiveSessionType> | null = await sessionsRepository
             .findSessionByIatAndDeviceId(iat, deviceId);
 
         if (!session) {

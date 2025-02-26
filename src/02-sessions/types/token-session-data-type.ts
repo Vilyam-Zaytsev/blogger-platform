@@ -1,5 +1,5 @@
 type TokenSessionDataType = {
-    iat: Date,
+    iat: string,
     userId: string,
     deviceId: string
 };

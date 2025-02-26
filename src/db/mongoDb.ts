@@ -4,7 +4,7 @@ import {BlogDbType} from "../05-blogs/types/blog-db-type";
 import {PostDbType} from "../06-posts/types/post-db-type";
 import {UserDbType} from "../04-users/types/user-db-type";
 import {CommentDbType} from "../07-comments/types/comment-db-type";
-import {SessionDbType} from "../02-sessions/types/session-db-type";
+import {ActiveSessionType} from "../02-sessions/types/active-session-type";
 
 let blogsCollection: Collection<BlogDbType>;
 
@@ -14,7 +14,7 @@ let usersCollection: Collection<UserDbType>;
 
 let commentsCollection: Collection<CommentDbType>;
 
-let sessionsCollection: Collection<SessionDbType>;
+let sessionsCollection: Collection<ActiveSessionType>;
 
 const setBlogsCollection = (collection: Collection<BlogDbType>) => {
     blogsCollection = collection;
@@ -32,7 +32,7 @@ const setCommentsCollection = (collection: Collection<CommentDbType>) => {
     commentsCollection = collection;
 };
 
-const setSessionsCollection = (collection: Collection<SessionDbType>) => {
+const setSessionsCollection = (collection: Collection<ActiveSessionType>) => {
     sessionsCollection = collection;
 };
 
@@ -44,7 +44,7 @@ async function runDb(url: string) {
     postsCollection = db.collection<PostDbType>('posts');
     usersCollection = db.collection<UserDbType>('users');
     commentsCollection = db.collection<CommentDbType>('comments');
-    sessionsCollection = db.collection<SessionDbType>('sessions');
+    sessionsCollection = db.collection<ActiveSessionType>('sessions');
 
     try {
         await client.connect();

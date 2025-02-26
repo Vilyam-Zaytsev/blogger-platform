@@ -1,17 +1,17 @@
-import {Request, Response} from "express";
+import {Response} from "express";
 import {RequestWithParams, RequestWithSession} from "../common/types/input-output-types/request-types";
-import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
+import {TokenSessionDataType} from "./types/token-session-data-type";
 import {SETTINGS} from "../common/settings";
 import {DeviceViewModel} from "./types/input-output-types";
-import {sessionsQueryRepository} from "../02-sessions/repositories/sessions-query-repository";
+import {sessionsQueryRepository} from "./repositories/sessions-query-repository";
 import {ResultType} from "../common/types/result-types/result-type";
-import {sessionsService} from "../02-sessions/domain/sessions-service";
+import {sessionsService} from "./domain/sessions-service";
 import {ResultStatus} from "../common/types/result-types/result-status";
-import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {IdType} from "../common/types/input-output-types/id-type";
+import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 
 
-const devicesController = {
+const sessionsController = {
 
     getDevices: async (
         req: RequestWithSession<TokenSessionDataType>,
@@ -69,13 +69,15 @@ const devicesController = {
         const deviceId: string = req.params.id;
         const userId: string = req.session!.userId
 
-        const resultDeleteSession: boolean = await sessionsService
-            .deleteSessionByUserIdAndDeviceId(userId, deviceId);
+        const {
+            status: sessionDeletionStatus
+        }: ResultType = await sessionsService
+            .deleteSessionByDeviceId(userId, deviceId);
 
-        if (!resultDeleteSession) {
+        if (sessionDeletionStatus !== ResultStatus.Success) {
 
             res
-                .sendStatus(SETTINGS.HTTP_STATUSES.FORBIDDEN_403);
+                .sendStatus(mapResultStatusToHttpStatus(sessionDeletionStatus));
 
             return;
         }
@@ -85,4 +87,4 @@ const devicesController = {
     }
 };
 
-export {devicesController};
+export {sessionsController};

@@ -1,25 +1,25 @@
 import {sessionsCollection} from "../../db/mongoDb";
 import {WithId} from "mongodb";
-import {SessionDbType} from "../types/session-db-type";
-import {DeviceViewModel} from "../../03_devices/types/input-output-types";
+import {ActiveSessionType} from "../types/active-session-type";
+import {DeviceViewModel} from "../types/input-output-types";
 
 const sessionsQueryRepository = {
 
     async findSessionsByUserId(userId: string): Promise<DeviceViewModel[]> {
 
-        const sessions: WithId<SessionDbType>[] | null = await sessionsCollection
+        const sessions: WithId<ActiveSessionType>[] | null = await sessionsCollection
             .find({userId})
             .toArray();
 
         return sessions.map(s => this._mapSessionDbTypeToDeviceViewModel(s))
     },
 
-    _mapSessionDbTypeToDeviceViewModel(session: WithId<SessionDbType>): DeviceViewModel {
+    _mapSessionDbTypeToDeviceViewModel(session: WithId<ActiveSessionType>): DeviceViewModel {
 
         return {
             ip: session.ip,
             title: session.deviceName,
-            lastActiveDate: session.iat.toISOString(),
+            lastActiveDate: session.iat,
             deviceId: session.deviceId
         };
     }

@@ -21,7 +21,7 @@ import {
     UnauthorizedResult
 } from "../../common/helpers/result-object";
 import {AuthTokens} from "../types/auth-tokens-type";
-import {SessionDbType} from "../../02-sessions/types/session-db-type";
+import {ActiveSessionType} from "../../02-sessions/types/active-session-type";
 import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
 import {sessionsRepository} from "../../02-sessions/repositories/sessions-repository";
 import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-type";
@@ -78,12 +78,12 @@ const authService = {
         const payloadRefreshToken: PayloadRefreshTokenType = await jwtService
             .decodeToken(refreshToken);
 
-        const session: WithId<SessionDbType> | null = await sessionsRepository
+        const session: WithId<ActiveSessionType> | null = await sessionsRepository
             .findSessionByIatAndDeviceId(iat, deviceId);
 
         const timestamps: SessionTimestampsType = {
-            iat: new Date(payloadRefreshToken.iat * 1000),
-            exp: new Date(payloadRefreshToken.exp * 1000)
+            iat: new Date(payloadRefreshToken.iat * 1000).toISOString(),
+            exp: new Date(payloadRefreshToken.exp * 1000).toISOString()
         };
 
         const resultUpdateSession: boolean = await sessionsRepository
@@ -322,8 +322,8 @@ const authService = {
                 );
         }
 
-        const isSessionActive: WithId<SessionDbType> | null = await sessionsRepository
-            .findSessionByIatAndDeviceId(new Date(iat * 1000), deviceId);
+        const isSessionActive: WithId<ActiveSessionType> | null = await sessionsRepository
+            .findSessionByIatAndDeviceId(new Date(iat * 1000).toISOString(), deviceId);
 
         if (!isSessionActive) {
 

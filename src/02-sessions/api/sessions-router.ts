@@ -1,23 +1,23 @@
 import {Router} from "express";
 import {SETTINGS} from "../../common/settings";
-import {devicesController} from "../devices-controller";
+import {sessionsController} from "../sessions-controller";
 import {refreshTokenGuard} from "../../01-auth/api/guards/refresh-token-guard";
 
-const devicesRouter = Router();
+const sessionsRouter = Router();
 
-devicesRouter.get(
+sessionsRouter.get(
     SETTINGS.PATH.SECURITY_DEVICES.DEVICES,
     refreshTokenGuard,
-    devicesController.getDevices
+    sessionsController.getDevices
 );
-devicesRouter.delete(
+sessionsRouter.delete(
     SETTINGS.PATH.SECURITY_DEVICES.DEVICES,
     refreshTokenGuard,
-    devicesController.deleteDevices
+    sessionsController.deleteDevices
 );
-devicesRouter.delete(
+sessionsRouter.delete(
     `${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}/:id`,
-    devicesController.deleteDevice
+    sessionsController.deleteDevice
 );
 
-export {devicesRouter};
+export {sessionsRouter};

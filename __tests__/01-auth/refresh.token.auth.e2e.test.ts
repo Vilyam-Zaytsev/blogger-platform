@@ -7,7 +7,7 @@ import {sessionsCollection, setSessionsCollection, setUsersCollection, usersColl
 import {Response} from "supertest";
 import {UserDbType} from "../../src/04-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/02_users-test-manager";
-import {SessionDbType} from "../../src/02-sessions/types/session-db-type";
+import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 
 let mongoServer: MongoMemoryServer;
@@ -33,7 +33,7 @@ beforeAll(async () => {
 
     const db = client.db();
     setUsersCollection(db.collection<UserDbType>('users'));
-    setSessionsCollection(db.collection<SessionDbType>('sessions'));
+    setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
 });
 
 afterAll(async () => {
