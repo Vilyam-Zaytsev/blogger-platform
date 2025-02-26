@@ -3,7 +3,7 @@ import {RequestWithParams, RequestWithSession} from "../common/types/input-outpu
 import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
 import {SETTINGS} from "../common/settings";
 import {DeviceViewModel} from "./types/input-output-types";
-import {sessionsQueryRepository} from "../02-sessions/repositoryes/sessions-query-repository";
+import {sessionsQueryRepository} from "../02-sessions/repositories/sessions-query-repository";
 import {ResultType} from "../common/types/result-types/result-type";
 import {sessionsService} from "../02-sessions/domain/sessions-service";
 import {ResultStatus} from "../common/types/result-types/result-status";

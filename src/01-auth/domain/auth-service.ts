@@ -23,7 +23,7 @@ import {
 import {AuthTokens} from "../types/auth-tokens-type";
 import {SessionDbType} from "../../02-sessions/types/session-db-type";
 import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
-import {sessionsRepository} from "../../02-sessions/repositoryes/sessions-repository";
+import {sessionsRepository} from "../../02-sessions/repositories/sessions-repository";
 import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-type";
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
 
@@ -31,9 +31,12 @@ const authService = {
 
     async login(authParamsDto: LoginInputModel): Promise<ResultType<AuthTokens | null>> {
 
-        const resultCheckUserCredentials: ResultType<string | null> = await this.checkUserCredentials(authParamsDto);
+        const {
+            data: checkedUserId,
+            status: userVerificationStatus
+        }: ResultType<string | null> = await this.checkUserCredentials(authParamsDto);
 
-        if (resultCheckUserCredentials.status !== ResultStatus.Success) {
+        if (userVerificationStatus !== ResultStatus.Success) {
 
             return UnauthorizedResult
                 .create(
@@ -44,13 +47,13 @@ const authService = {
         }
 
         const accessToken: string = await jwtService
-            .createAccessToken(resultCheckUserCredentials.data!);
+            .createAccessToken(checkedUserId!);
 
         const deviceId: string = randomUUID();
 
         const refreshToken: string = await jwtService
             .createRefreshToken(
-                resultCheckUserCredentials.data!,
+                checkedUserId!,
                 deviceId
             );
 
@@ -79,8 +82,8 @@ const authService = {
             .findSessionByIatAndDeviceId(iat, deviceId);
 
         const timestamps: SessionTimestampsType = {
-            iat: new Date(payloadRefreshToken.iat),
-            exp: new Date(payloadRefreshToken.exp)
+            iat: new Date(payloadRefreshToken.iat * 1000),
+            exp: new Date(payloadRefreshToken.exp * 1000)
         };
 
         const resultUpdateSession: boolean = await sessionsRepository

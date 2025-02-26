@@ -1,5 +1,5 @@
 import {SessionDbType} from "../types/session-db-type";
-import {sessionsRepository} from "../repositoryes/sessions-repository";
+import {sessionsRepository} from "../repositories/sessions-repository";
 import {InternalServerErrorResult, SuccessResult} from "../../common/helpers/result-object";
 import {ResultType} from "../../common/types/result-types/result-type";
 

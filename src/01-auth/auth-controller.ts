@@ -19,7 +19,7 @@ import {jwtService} from "./adapters/jwt-service";
 import {SessionDbType} from "../02-sessions/types/session-db-type";
 import {sessionsService} from "../02-sessions/domain/sessions-service";
 import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
-import {sessionsRepository} from "../02-sessions/repositoryes/sessions-repository";
+import {sessionsRepository} from "../02-sessions/repositories/sessions-repository";
 import {WithId} from "mongodb";
 
 const authController = {

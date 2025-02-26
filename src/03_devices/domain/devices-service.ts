@@ -1,5 +1,5 @@
 import {DeviceViewModel} from "../types/input-output-types";
-import {sessionsQueryRepository} from "../../02-sessions/repositoryes/sessions-query-repository";
+import {sessionsQueryRepository} from "../../02-sessions/repositories/sessions-query-repository";
 
 const devicesService = {
 
