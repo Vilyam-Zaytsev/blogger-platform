@@ -1,4 +1,4 @@
-import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
+import {console_log_e2e, delay, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, devices, presets, userLogins} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
@@ -42,14 +42,14 @@ beforeEach(async () => {
     clearPresets();
 });
 
-describe('GET ACTIVE SESSION /security/devices', () => {
+describe('DEVICES /security/devices', () => {
 
     it('should return an array with active sessions if the user is logged in.', async () => {
 
         await usersTestManager
-            .createUser(1);
+            .createUser(2);
 
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < devices.length; i++) {
 
             const res: Response = await req
                 .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
@@ -74,9 +74,76 @@ describe('GET ACTIVE SESSION /security/devices', () => {
             presets.authTokens.push({...authTokens});
         }
 
+        const createdDevices: DeviceViewModel[] = await sessionsTestManager
+            .getActiveSessions();
 
+        expect(createdDevices.length).toEqual(4);
 
-        // console_log_e2e(resGetActiveSessions.body, resGetActiveSessions.status, 'Test 1: get active' +
-        //     ' session(/security/devices)');
+        presets.devices = [...createdDevices];
+
+        //GET: it should return a 401 if the refreshToken has failed validation.
+
+        const resGetDevices: Response = await req
+            .get(`${SETTINGS.PATH.SECURITY_DEVICES.BASE}${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}`)
+            .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+
+        console_log_e2e(resGetDevices.body, resGetDevices.status, 'Test 1: get devices(/security/devices)');
+
+        //DELETE (all devices except the current one): it should return a 401 if the refreshToken has failed validation.
+
+        const resDeleteDevices: Response = await req
+            .delete(`${SETTINGS.PATH.SECURITY_DEVICES.BASE}${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}`)
+            .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+
+        console_log_e2e(resDeleteDevices.body, resDeleteDevices.status, 'Test 2: delete devices(/security/devices)');
+
+        //DELETE (by deviceId): it should return a 401 if the refreshToken has failed validation.
+
+        await delay(1000);
+
+        const resDeleteDevice_Test3: Response = await req
+            .delete(`${SETTINGS.PATH.SECURITY_DEVICES.BASE}${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}/${presets.devices[0].deviceId}`)
+            .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+
+        console_log_e2e(resDeleteDevice_Test3.body, resDeleteDevice_Test3.status, 'Test 3: delete device by ID(/security/devices)');
+
+        //DELETE (by deviceId): it should return the value 403 if the device does not belong to the user.
+
+        const resLogin: Response = await req
+            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
+            .set("User-Agent", devices[0])
+            .send({
+                loginOrEmail: presets.users[1].login,
+                password: presets.users[1].login
+            })
+            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        expect(resLogin.body).toEqual<LoginSuccessViewModel>(
+            expect.objectContaining({
+                accessToken: expect.any(String)
+            })
+        );
+
+        const authTokens = {
+            accessToken: resLogin.body.accessToken,
+            refreshToken: resLogin.headers['set-cookie'][0].split(';')[0].split('=')[1]
+        };
+
+        presets.authTokens.push({...authTokens});
+
+        const resGetDevices_Test4: Response = await req
+            .get(`${SETTINGS.PATH.SECURITY_DEVICES.BASE}${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}`)
+            .set('Cookie', [`refreshToken=${presets.authTokens[4].refreshToken}`])
+            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        const deviceId: string = resGetDevices_Test4.body[0].deviceId;
+
+        const resDeleteDevice_Test4: Response = await req
+            .delete(`${SETTINGS.PATH.SECURITY_DEVICES.BASE}${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}/${deviceId}`).set('Cookie', [`refreshToken=${presets.authTokens[0].refreshToken}`])
+            .expect(SETTINGS.HTTP_STATUSES.FORBIDDEN_403);
+
+        console_log_e2e(resDeleteDevice_Test4.body, resDeleteDevice_Test4.status, 'Test 4: delete device by' +
+            ' ID(/security/devices)');
+
     });
 });

@@ -17,6 +17,7 @@ sessionsRouter.delete(
 );
 sessionsRouter.delete(
     `${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}/:id`,
+    refreshTokenGuard,
     sessionsController.deleteDevice
 );
 

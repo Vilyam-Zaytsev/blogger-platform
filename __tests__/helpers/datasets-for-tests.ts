@@ -5,6 +5,7 @@ import {BlogViewModel} from "../../src/05-blogs/types/input-output-types";
 import {PostViewModel} from "../../src/06-posts/types/input-output-types";
 import {CommentViewModel} from "../../src/07-comments/types/input-output-types";
 import {AuthTokens} from "../../src/01-auth/types/auth-tokens-type";
+import {DeviceViewModel} from "../../src/02-sessions/types/input-output-types";
 
 const blog: BlogDbType = {
     name: 'BLOG',
@@ -63,6 +64,7 @@ const clearPresets = () => {
     presets.posts = [];
     presets.comments = [];
     presets.authTokens = [];
+    presets.devices = [];
 };
 
 type PresetsType = {
@@ -70,7 +72,8 @@ type PresetsType = {
     blogs: BlogViewModel[],
     posts: PostViewModel[],
     comments: CommentViewModel[],
-    authTokens: AuthTokens[]
+    authTokens: AuthTokens[],
+    devices: DeviceViewModel[]
 };
 
 const presets: PresetsType = {
@@ -78,7 +81,8 @@ const presets: PresetsType = {
     blogs: [],
     posts: [],
     comments: [],
-    authTokens: []
+    authTokens: [],
+    devices: []
 };
 
 const devices = ["iPhone 15", "Samsung Galaxy S24", "MacBook Pro", "iPad Pro"];
