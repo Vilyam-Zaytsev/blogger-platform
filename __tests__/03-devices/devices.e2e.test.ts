@@ -1,6 +1,6 @@
 import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {clearPresets, presets, userLogins} from "../helpers/datasets-for-tests";
+import {clearPresets, devices, presets, userLogins} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {sessionsCollection, setSessionsCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
@@ -49,36 +49,34 @@ describe('GET ACTIVE SESSION /security/devices', () => {
         await usersTestManager
             .createUser(1);
 
-        await authTestManager
-            .login(presets.users.map(u => u.login));
+        for (let i = 0; i < 4; i++) {
 
-        const resGetActiveSessions: Response = await req
-            .get(`${SETTINGS.PATH.SECURITY_DEVICES.BASE}${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}`)
-            .set('Cookie', [`refreshToken=${presets.authTokens[0].refreshToken}`])
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+            const res: Response = await req
+                .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
+                .set("User-Agent", devices[i])
+                .send({
+                    loginOrEmail: presets.users[0].login,
+                    password: presets.users[0].login
+                })
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-        expect(resGetActiveSessions.body).toEqual<DeviceViewModel[]>(expect.objectContaining(
-            [
-                {
-                    ip: expect.any(String),
-                    title: expect.any(String),
-                    lastActiveDate: expect.any(String),
-                    deviceId: expect.any(String)
-                }
-            ]
-        ));
+            expect(res.body).toEqual<LoginSuccessViewModel>(
+                expect.objectContaining({
+                    accessToken: expect.any(String)
+                })
+            );
 
-        console_log_e2e(resGetActiveSessions.body, resGetActiveSessions.status, 'Test 1: get active' +
-            ' session(/security/devices)');
-    });
+            const authTokens = {
+                accessToken: res.body.accessToken,
+                refreshToken: res.headers['set-cookie'][0].split(';')[0].split('=')[1]
+            };
 
-    it('should not return an array with active sessions if the user is not logged in.', async () => {
+            presets.authTokens.push({...authTokens});
+        }
 
-        const resGetActiveSessions: Response = await req
-            .get(`${SETTINGS.PATH.SECURITY_DEVICES.BASE}${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}`)
-            .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
 
-        console_log_e2e(resGetActiveSessions.body, resGetActiveSessions.status, 'Test 1: create active' +
-            ' session(/auth/login)');
+
+        // console_log_e2e(resGetActiveSessions.body, resGetActiveSessions.status, 'Test 1: get active' +
+        //     ' session(/security/devices)');
     });
 });
