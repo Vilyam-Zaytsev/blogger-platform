@@ -1,17 +1,18 @@
 import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {clearPresets, presets} from "../helpers/datasets-for-tests";
+import {clearPresets, presets, userLogins} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {sessionsCollection, setSessionsCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
 import {UserDbType} from "../../src/04-users/types/user-db-type";
-import {usersTestManager} from "../helpers/managers/02_users-test-manager";
+import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 import {authService} from "../../src/01-auth/domain/auth-service";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {DeviceViewModel} from "../../src/02-sessions/types/input-output-types";
+import {sessionsTestManager} from "../helpers/managers/02_sessions-test-manager";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -41,9 +42,9 @@ beforeEach(async () => {
     clearPresets();
 });
 
-describe('CREATE ACTIVE SESSION /security/devices', () => {
+describe('GET ACTIVE SESSION /security/devices', () => {
 
-    it('should create a new active session when the user logs in.', async () => {
+    it('should return an array with active sessions if the user is logged in.', async () => {
 
         await usersTestManager
             .createUser(1);
@@ -51,12 +52,12 @@ describe('CREATE ACTIVE SESSION /security/devices', () => {
         await authTestManager
             .login(presets.users.map(u => u.login));
 
-        const resActiveSession_2: Response = await req
+        const resGetActiveSessions: Response = await req
             .get(`${SETTINGS.PATH.SECURITY_DEVICES.BASE}${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}`)
             .set('Cookie', [`refreshToken=${presets.authTokens[0].refreshToken}`])
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-        expect(resActiveSession_2.body).toEqual<DeviceViewModel[]>(expect.objectContaining(
+        expect(resGetActiveSessions.body).toEqual<DeviceViewModel[]>(expect.objectContaining(
             [
                 {
                     ip: expect.any(String),
@@ -67,7 +68,17 @@ describe('CREATE ACTIVE SESSION /security/devices', () => {
             ]
         ));
 
-        console_log_e2e(resActiveSession_2.body, resActiveSession_2.status, 'Test 1: create active' +
+        console_log_e2e(resGetActiveSessions.body, resGetActiveSessions.status, 'Test 1: get active' +
             ' session(/security/devices)');
+    });
+
+    it('should not return an array with active sessions if the user is not logged in.', async () => {
+
+        const resGetActiveSessions: Response = await req
+            .get(`${SETTINGS.PATH.SECURITY_DEVICES.BASE}${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}`)
+            .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+
+        console_log_e2e(resGetActiveSessions.body, resGetActiveSessions.status, 'Test 1: create active' +
+            ' session(/auth/login)');
     });
 });

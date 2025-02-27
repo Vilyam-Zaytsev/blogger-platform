@@ -6,7 +6,7 @@ import {
 } from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, presets} from "../helpers/datasets-for-tests";
-import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
+import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
 import {blogsCollection, setBlogsCollection} from "../../src/db/mongoDb";

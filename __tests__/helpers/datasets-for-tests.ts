@@ -81,6 +81,8 @@ const presets: PresetsType = {
     authTokens: []
 };
 
+const devices = ["iPhone 15", "Samsung Galaxy S24", "MacBook Pro", "iPad Pro"];
+
 const userLogins = [
     'robert85',
     'anna404',
@@ -206,6 +208,7 @@ export {
     postPropertyMap,
     commentPropertyMap,
     presets,
+    devices,
     userLogins,
     blogNames,
     blogDescriptions,

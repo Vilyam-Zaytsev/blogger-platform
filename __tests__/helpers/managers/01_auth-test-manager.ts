@@ -51,6 +51,21 @@ const authTestManager = {
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
         return res;
+    },
+
+    async refreshToken(refreshToken: string) {
+
+        const res: Response = await req
+            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REFRESH_TOKEN}`)
+            .set('Cookie', [`refreshToken=${presets.authTokens[0].refreshToken}`])
+            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        presets.authTokens[0] = {
+            ...res.body,
+            refreshToken: res.headers['set-cookie'][0].split(';')[0].split('=')[1]
+        };
+
+        return res;
     }
 };
 

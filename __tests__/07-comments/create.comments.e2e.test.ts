@@ -18,18 +18,18 @@ import {
     setUsersCollection,
     usersCollection
 } from "../../src/db/mongoDb";
-import {postsTestManager} from "../helpers/managers/04_posts-test-manager";
+import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {Response} from "supertest";
-import {usersTestManager} from "../helpers/managers/02_users-test-manager";
+import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {CommentDbType} from "../../src/07-comments/types/comment-db-type";
 import {UserDbType} from "../../src/04-users/types/user-db-type";
 import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
 import {PostDbType} from "../../src/06-posts/types/post-db-type";
-import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
+import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
 import {CommentViewModel} from "../../src/07-comments/types/input-output-types";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {ApiErrorResult} from "../../src/common/types/input-output-types/api-error-result";
-import {commentsTestManager} from "../helpers/managers/05_comments-test-manager";
+import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 
 let mongoServer: MongoMemoryServer;

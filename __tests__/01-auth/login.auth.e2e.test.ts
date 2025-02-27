@@ -6,7 +6,7 @@ import {MongoClient} from "mongodb";
 import {sessionsCollection, setSessionsCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
 import {UserDbType} from "../../src/04-users/types/user-db-type";
-import {usersTestManager} from "../helpers/managers/02_users-test-manager";
+import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 

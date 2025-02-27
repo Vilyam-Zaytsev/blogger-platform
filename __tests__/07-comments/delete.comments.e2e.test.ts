@@ -20,15 +20,15 @@ import {
     incorrectAccessToken,
     presets
 } from "../helpers/datasets-for-tests";
-import {blogsTestManager} from "../helpers/managers/03_blogs-test-manager";
-import {postsTestManager} from "../helpers/managers/04_posts-test-manager";
-import {usersTestManager} from "../helpers/managers/02_users-test-manager";
+import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
+import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
+import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {Response} from "supertest";
 import {console_log_e2e, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/07-comments/types/input-output-types";
-import {commentsTestManager} from "../helpers/managers/05_comments-test-manager";
+import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 
 let mongoServer: MongoMemoryServer;
