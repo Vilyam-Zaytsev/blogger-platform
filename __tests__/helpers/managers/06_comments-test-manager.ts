@@ -24,7 +24,7 @@ const commentsTestManager = {
                 .send(comment)
                 .set(
                     'Authorization',
-                    `Bearer ${presets.accessTokens[i < numberOfCommentator ? i : 0].accessToken}`
+                    `Bearer ${presets.authTokens[i < numberOfCommentator ? i : 0].accessToken}`
                 )
                 .expect(SETTINGS.HTTP_STATUSES.CREATED_201);
 

@@ -11,10 +11,10 @@ import {MongoClient} from "mongodb";
 import {
     blogsCollection,
     commentsCollection,
-    postsCollection,
+    postsCollection, sessionsCollection,
     setBlogsCollection,
     setCommentsCollection,
-    setPostsCollection,
+    setPostsCollection, setSessionsCollection,
     setUsersCollection,
     usersCollection
 } from "../../src/db/mongoDb";
@@ -31,6 +31,7 @@ import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {ApiErrorResult} from "../../src/common/types/input-output-types/api-error-result";
 import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
+import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -47,6 +48,7 @@ beforeAll(async () => {
     setBlogsCollection(db.collection<BlogDbType>('blogs'));
     setPostsCollection(db.collection<PostDbType>('posts'));
     setCommentsCollection(db.collection<CommentDbType>('comments'));
+    setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
 });
 
 afterAll(async () => {
@@ -59,6 +61,7 @@ beforeEach(async () => {
     await blogsCollection.deleteMany({});
     await postsCollection.deleteMany({});
     await commentsCollection.deleteMany({});
+    await sessionsCollection.deleteMany({});
 
     clearPresets();
 });
@@ -86,7 +89,7 @@ describe('POST /posts/{postId}/comments', () => {
             })
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[0].accessToken}`
+                `Bearer ${presets.authTokens[0].accessToken}`
             )
             .expect(SETTINGS.HTTP_STATUSES.CREATED_201);
 
@@ -157,7 +160,7 @@ describe('POST /posts/{postId}/comments', () => {
             })
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[0].accessToken}`
+                `Bearer ${presets.authTokens[0].accessToken}`
             )
             .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
@@ -188,7 +191,7 @@ describe('POST /posts/{postId}/comments', () => {
             .send({})
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[0].accessToken}`
+                `Bearer ${presets.authTokens[0].accessToken}`
             )
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
@@ -230,7 +233,7 @@ describe('POST /posts/{postId}/comments', () => {
             })
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[0].accessToken}`
+                `Bearer ${presets.authTokens[0].accessToken}`
             )
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
@@ -272,7 +275,7 @@ describe('POST /posts/{postId}/comments', () => {
             })
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[0].accessToken}`
+                `Bearer ${presets.authTokens[0].accessToken}`
             )
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
@@ -314,7 +317,7 @@ describe('POST /posts/{postId}/comments', () => {
             })
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[0].accessToken}`
+                `Bearer ${presets.authTokens[0].accessToken}`
             )
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 

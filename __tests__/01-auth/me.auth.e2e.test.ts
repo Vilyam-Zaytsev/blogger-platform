@@ -7,11 +7,12 @@ import {
 } from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
-import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
+import {sessionsCollection, setSessionsCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
 import {UserDbType} from "../../src/04-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
+import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -25,6 +26,7 @@ beforeAll(async () => {
 
     const db = client.db();
     setUsersCollection(db.collection<UserDbType>('users'));
+    setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
 });
 
 afterAll(async () => {
@@ -34,6 +36,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
     await usersCollection.deleteMany({});
+    await sessionsCollection.deleteMany({});
 
     clearPresets();
 });
@@ -52,7 +55,7 @@ beforeEach(async () => {
                 .get(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.ME}`)
                 .set(
                     'Authorization',
-                    `Bearer ${presets.accessTokens[0].accessToken}`
+                    `Bearer ${presets.authTokens[0].accessToken}`
                 )
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
@@ -62,7 +65,7 @@ beforeEach(async () => {
                     login: presets.users[0].login,
                     userId: presets.users[0].id
                 })
-            )
+            );
 
             console_log_e2e(resMe.body, resMe.status, 'Test 1: get(/auth/me)');
         });
