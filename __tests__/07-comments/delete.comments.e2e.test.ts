@@ -85,7 +85,7 @@ describe('DELETE /comments', () => {
             .delete(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[0].accessToken}`
+                `Bearer ${presets.authTokens[0].accessToken}`
             )
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
@@ -151,7 +151,7 @@ describe('DELETE /comments', () => {
             .delete(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[1].accessToken}`
+                `Bearer ${presets.authTokens[1].accessToken}`
             )
             .expect(SETTINGS.HTTP_STATUSES.FORBIDDEN_403);
 
@@ -159,7 +159,7 @@ describe('DELETE /comments', () => {
             .delete(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[0].accessToken}`
+                `Bearer ${presets.authTokens[0].accessToken}`
             )
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
@@ -187,7 +187,7 @@ describe('DELETE /comments', () => {
             .delete(`${SETTINGS.PATH.COMMENTS}/${new ObjectId()}`)
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[0].accessToken}`
+                `Bearer ${presets.authTokens[0].accessToken}`
             )
             .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
