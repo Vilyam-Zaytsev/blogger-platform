@@ -1,6 +1,6 @@
-import {console_log_e2e, delay, generateRandomString, req} from '../helpers/test-helpers';
+import {console_log_e2e, delay, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {clearPresets, devices, presets, userLogins} from "../helpers/datasets-for-tests";
+import {clearPresets, deviceNames, presets} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {sessionsCollection, setSessionsCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
@@ -9,10 +9,7 @@ import {UserDbType} from "../../src/04-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
-import {authService} from "../../src/01-auth/domain/auth-service";
-import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {DeviceViewModel} from "../../src/02-sessions/types/input-output-types";
-import {sessionsTestManager} from "../helpers/managers/02_sessions-test-manager";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -55,18 +52,23 @@ beforeEach(async () => {
 
 describe('UPDATE /security/devices', () => {
 
-    it('should return an array with one device if the user is logged in on only one device.', async () => {
+    it('should update the lifetime of active sessions on different devices if the user has logged in.', async () => {
 
         await usersTestManager
             .createUser(2);
 
+        const resLogins: Record<string, Response[]> = {
+            resLogins_user1: [],
+            resLogins_user2: []
+        };
+
         for (let i = 0; i < presets.users.length; i++) {
 
-            for (let j = 0; j < devices.length; j++) {
+            for (let j = 0; j < deviceNames.length; j++) {
 
                 const res: Response = await req
                     .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
-                    .set("User-Agent", devices[j])
+                    .set("User-Agent", deviceNames[j])
                     .send({
                         loginOrEmail: presets.users[i].login,
                         password: presets.users[i].login
@@ -79,30 +81,28 @@ describe('UPDATE /security/devices', () => {
                     }
                 );
 
-                const authTokens = {
-                    accessToken: res.body.accessToken,
-                    refreshToken: res.headers['set-cookie'][0].split(';')[0].split('=')[1]
-                }
-
-                presets.authTokens.push({...authTokens});
+                resLogins[`resLogins_user${i + 1}`].push(res);
             }
         }
 
+        //update refreshTokens user1 /*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/
+
+        const refreshToken_user1_device1: string = resLogins.resLogins_user1[0].headers['set-cookie'][0].split(';')[0].split('=')[1];
+
         const resGetDevices_user1: Response = await req
             .get(`${SETTINGS.PATH.SECURITY_DEVICES.BASE}${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}`)
-            .set('Cookie', [`refreshToken=${presets.authTokens[0].refreshToken}`])
+            .set('Cookie', [`refreshToken=${refreshToken_user1_device1}`])
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-        const resGetDevices_user2: Response = await req
-            .get(`${SETTINGS.PATH.SECURITY_DEVICES.BASE}${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}`)
-            .set('Cookie', [`refreshToken=${presets.authTokens[resGetDevices_user1.body.length].refreshToken}`])
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        for (let i = 0; i < resLogins.resLogins_user1.length; i++) {
 
-        for (let i = 0; i < presets.authTokens.length; i++) {
+            await delay(1000);
+
+            const refreshToken: string = resLogins.resLogins_user1[i].headers['set-cookie'][0].split(';')[0].split('=')[1];
 
             const resRefreshToken: Response = await req
                 .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REFRESH_TOKEN}`)
-                .set('Cookie', [`refreshToken=${presets.authTokens[i].refreshToken}`])
+                .set('Cookie', [`refreshToken=${refreshToken}`])
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
             const resGetDevices: Response = await req
@@ -110,146 +110,47 @@ describe('UPDATE /security/devices', () => {
                 .set('Cookie', [`refreshToken=${resRefreshToken.headers['set-cookie'][0].split(';')[0].split('=')[1]}`])
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-            if (i < (presets.authTokens.length / 2)) {
+            expect(resGetDevices.body[i].lastActiveDate).not.toEqual(resGetDevices_user1.body[i].lastActiveDate)
 
-                expect(resGetDevices.body[i].lastActiveDate).not.toEqual(resGetDevices_user1.body[i].lastActiveDate);
+            for (let j = i + 1; j < resGetDevices_user1.body.length; j++) {
 
-                for (let j = i + 1; j < resGetDevices_user1.body.length; j++) {
-
-                    expect(resGetDevices.body[j].lastActiveDate).toEqual(resGetDevices_user1.body[j].lastActiveDate);
-                }
+                expect(resGetDevices.body[j].lastActiveDate).toEqual(resGetDevices_user1.body[j].lastActiveDate);
             }
         }
 
+        //update refreshTokens user2 /*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/
 
-        // console_log_e2e(resGetDevices.body, resGetDevices.status, 'Test 1: get (/security/devices)');
-    });
-
-    it('should return an array with four devices if the user is logged in on four different devices.', async () => {
-
-        await usersTestManager
-            .createUser(1);
-
-        for (let i = 0; i < devices.length; i++) {
-
-            const res: Response = await req
-                .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
-                .set("User-Agent", devices[i])
-                .send({
-                    loginOrEmail: presets.users[0].login,
-                    password: presets.users[0].login
-                })
-                .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
-            expect(res.body).toEqual<LoginSuccessViewModel>(
-                {
-                    accessToken: expect.any(String)
-                }
-            );
-
-            const authTokens = {
-                accessToken: res.body.accessToken,
-                refreshToken: res.headers['set-cookie'][0].split(';')[0].split('=')[1]
-            };
-
-            presets.authTokens.push({...authTokens});
-        }
-
-        const resGetDevices: Response = await req
-            .get(`${SETTINGS.PATH.SECURITY_DEVICES.BASE}${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}`)
-            .set('Cookie', [`refreshToken=${presets.authTokens[0].refreshToken}`])
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
-        expect(resGetDevices.body.length).toEqual(4);
-
-        for (let i = 0; i < resGetDevices.body.length; i++) {
-
-            expect(resGetDevices.body[i]).toEqual<DeviceViewModel>(
-                {
-                    ip: expect.any(String),
-                    title: expect.any(String),
-                    lastActiveDate: expect.any(String),
-                    deviceId: expect.any(String)
-                }
-            );
-        }
-
-        console_log_e2e(resGetDevices.body, resGetDevices.status, 'Test 2: get (/security/devices)');
-    });
-
-    it('should return an array with devices of only the user who makes the request.', async () => {
-
-        await usersTestManager
-            .createUser(2);
-
-        for (let i = 0; i < presets.users.length; i++) {
-
-            for (let j = 0; j < devices.length; j++) {
-
-                const res: Response = await req
-                    .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
-                    .set("User-Agent", devices[i])
-                    .send({
-                        loginOrEmail: presets.users[i].login,
-                        password: presets.users[i].login
-                    })
-                    .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
-                expect(res.body).toEqual<LoginSuccessViewModel>(
-                    {
-                        accessToken: expect.any(String)
-                    }
-                );
-
-                const authTokens = {
-                    accessToken: res.body.accessToken,
-                    refreshToken: res.headers['set-cookie'][0].split(';')[0].split('=')[1]
-                };
-
-                presets.authTokens.push({...authTokens});
-            }
-        }
-
-        const resGetDevices_user1: Response = await req
-            .get(`${SETTINGS.PATH.SECURITY_DEVICES.BASE}${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}`)
-            .set('Cookie', [`refreshToken=${presets.authTokens[0].refreshToken}`])
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
-        expect(resGetDevices_user1.body.length).toEqual(4);
-
-        for (let i = 0; i < resGetDevices_user1.body.length; i++) {
-
-            expect(resGetDevices_user1.body[i]).toEqual<DeviceViewModel>(
-                {
-                    ip: expect.any(String),
-                    title: expect.any(String),
-                    lastActiveDate: expect.any(String),
-                    deviceId: expect.any(String)
-                }
-            );
-        }
+        const refreshToken_user2_device1: string = resLogins.resLogins_user2[0].headers['set-cookie'][0].split(';')[0].split('=')[1];
 
         const resGetDevices_user2: Response = await req
             .get(`${SETTINGS.PATH.SECURITY_DEVICES.BASE}${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}`)
-            .set('Cookie', [`refreshToken=${presets.authTokens[1].refreshToken}`])
+            .set('Cookie', [`refreshToken=${refreshToken_user2_device1}`])
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
-        expect(resGetDevices_user2.body.length).toEqual(4);
+        for (let i = 0; i < resLogins.resLogins_user2.length; i++) {
 
-        for (let i = 0; i < resGetDevices_user2.body.length; i++) {
+            await delay(1000);
 
-            expect(resGetDevices_user2.body[i]).toEqual<DeviceViewModel>(
-                {
-                    ip: expect.any(String),
-                    title: expect.any(String),
-                    lastActiveDate: expect.any(String),
-                    deviceId: expect.any(String)
-                }
-            );
+            const refreshToken: string = resLogins.resLogins_user2[i].headers['set-cookie'][0].split(';')[0].split('=')[1];
+
+            const resRefreshToken: Response = await req
+                .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REFRESH_TOKEN}`)
+                .set('Cookie', [`refreshToken=${refreshToken}`])
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            const resGetDevices: Response = await req
+                .get(`${SETTINGS.PATH.SECURITY_DEVICES.BASE}${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}`)
+                .set('Cookie', [`refreshToken=${resRefreshToken.headers['set-cookie'][0].split(';')[0].split('=')[1]}`])
+                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+            expect(resGetDevices.body[i].lastActiveDate).not.toEqual(resGetDevices_user2.body[i].lastActiveDate)
+
+            for (let j = i + 1; j < resGetDevices_user2.body.length; j++) {
+
+                expect(resGetDevices.body[j].lastActiveDate).toEqual(resGetDevices_user2.body[j].lastActiveDate);
+            }
         }
 
-        expect(resGetDevices_user1).not.toEqual(resGetDevices_user2);
-
-        console_log_e2e(resGetDevices_user1.body, resGetDevices_user1.status, 'Test 3: get (/security/devices)');
-    });
+        console_log_e2e('No Body', 200, 'Test 1: update (/security/devices)');
+    }, 10000);
 });

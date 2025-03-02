@@ -85,7 +85,7 @@ const presets: PresetsType = {
     devices: []
 };
 
-const devices = ["iPhone 15", "Samsung Galaxy S24", "MacBook Pro", "iPad Pro"];
+const deviceNames = ["iPhone 15", "Samsung Galaxy S24", "MacBook Pro", "iPad Pro"];
 
 const userLogins = [
     'robert85',
@@ -212,7 +212,7 @@ export {
     postPropertyMap,
     commentPropertyMap,
     presets,
-    devices,
+    deviceNames,
     userLogins,
     blogNames,
     blogDescriptions,

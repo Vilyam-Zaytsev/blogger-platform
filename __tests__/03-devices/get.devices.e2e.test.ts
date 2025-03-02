@@ -1,6 +1,6 @@
 import {console_log_e2e, delay, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {clearPresets, devices, presets, userLogins} from "../helpers/datasets-for-tests";
+import {clearPresets, deviceNames, presets, userLogins} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {sessionsCollection, setSessionsCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
@@ -78,11 +78,11 @@ describe('GET /security/devices', () => {
         await usersTestManager
             .createUser(1);
 
-        for (let i = 0; i < devices.length; i++) {
+        for (let i = 0; i < deviceNames.length; i++) {
 
             const res: Response = await req
                 .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
-                .set("User-Agent", devices[i])
+                .set("User-Agent", deviceNames[i])
                 .send({
                     loginOrEmail: presets.users[0].login,
                     password: presets.users[0].login
@@ -132,11 +132,11 @@ describe('GET /security/devices', () => {
 
         for (let i = 0; i < presets.users.length; i++) {
 
-            for (let j = 0; j < devices.length; j++) {
+            for (let j = 0; j < deviceNames.length; j++) {
 
                 const res: Response = await req
                     .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.LOGIN}`)
-                    .set("User-Agent", devices[i])
+                    .set("User-Agent", deviceNames[i])
                     .send({
                         loginOrEmail: presets.users[i].login,
                         password: presets.users[i].login
