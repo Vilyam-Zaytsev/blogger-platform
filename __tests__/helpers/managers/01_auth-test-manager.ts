@@ -3,7 +3,7 @@ import {req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";
 import {LoginSuccessViewModel} from "../../../src/01-auth/types/login-success-view-model";
 import {presets} from "../datasets-for-tests";
-import {UserInputModel} from "../../../src/02-users/types/input-output-types";
+import {UserInputModel} from "../../../src/04-users/types/input-output-types";
 
 const authTestManager = {
 
@@ -49,6 +49,21 @@ const authTestManager = {
                 password: userData.password
             })
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+
+        return res;
+    },
+
+    async refreshToken(refreshToken: string) {
+
+        const res: Response = await req
+            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REFRESH_TOKEN}`)
+            .set('Cookie', [`refreshToken=${presets.authTokens[0].refreshToken}`])
+            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        presets.authTokens[0] = {
+            ...res.body,
+            refreshToken: res.headers['set-cookie'][0].split(';')[0].split('=')[1]
+        };
 
         return res;
     }

@@ -1,7 +1,7 @@
 import {Request, Response, NextFunction} from "express";
 import {SETTINGS} from "../../../common/settings";
 import {ResultType} from "../../../common/types/result-types/result-type";
-import {authService} from "../../auth-service";
+import {authService} from "../../domain/auth-service";
 import {ResultStatus} from "../../../common/types/result-types/result-status";
 
 const accessTokenGuard = async (
@@ -18,8 +18,10 @@ const accessTokenGuard = async (
         return;
     }
 
+    const token: string = req.headers.authorization.split(' ')[1];
+
     const resultCheckAccessToken: ResultType<string | null> = await authService
-        .checkAccessToken(req.headers.authorization);
+        .checkAccessToken(token);
 
     if (resultCheckAccessToken.status !== ResultStatus.Success) {
 

@@ -3,11 +3,11 @@ import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, presets} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
-import {blackListCollection, setBlackListCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
+import {sessionsCollection, setSessionsCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
-import {UserDbType} from "../../src/02-users/types/user-db-type";
-import {usersTestManager} from "../helpers/managers/02_users-test-manager";
-import {BlacklistedTokenModel} from "../../src/01-auth/types/blacklisted-token-model";
+import {UserDbType} from "../../src/04-users/types/user-db-type";
+import {usersTestManager} from "../helpers/managers/03_users-test-manager";
+import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 
 let mongoServer: MongoMemoryServer;
@@ -33,7 +33,7 @@ beforeAll(async () => {
 
     const db = client.db();
     setUsersCollection(db.collection<UserDbType>('users'));
-    setBlackListCollection(db.collection<BlacklistedTokenModel>('blackList'));
+    setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
 });
 
 afterAll(async () => {
@@ -43,7 +43,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
     await usersCollection.deleteMany({});
-    await blackListCollection.deleteMany({});
+    await sessionsCollection.deleteMany({});
 
     clearPresets();
 

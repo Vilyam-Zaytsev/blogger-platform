@@ -3,11 +3,12 @@ import {SETTINGS} from "../../src/common/settings";
 import {presets} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
-import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
+import {sessionsCollection, setSessionsCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
-import {UserDbType} from "../../src/02-users/types/user-db-type";
-import {usersTestManager} from "../helpers/managers/02_users-test-manager";
+import {UserDbType} from "../../src/04-users/types/user-db-type";
+import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
+import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -20,7 +21,12 @@ beforeAll(async () => {
     await client.connect();
 
     const db = client.db();
+
+    // const user = db.collection('user')
+    //TODO: replace with runDB func
+
     setUsersCollection(db.collection<UserDbType>('users'));
+    setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
 });
 
 afterAll(async () => {
@@ -30,6 +36,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
     await usersCollection.deleteMany({});
+    await sessionsCollection.deleteMany({});
 
     presets.users = [];
 });
@@ -38,7 +45,7 @@ describe('POST /auth/login', () => {
 
     it('should be authorized if the user has sent the correct data (loginOrEmail and password).', async () => {
 
-        await usersTestManager
+      await usersTestManager
             .createUser(1);
 
         const resLogin: Response = await req
@@ -50,9 +57,9 @@ describe('POST /auth/login', () => {
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
         expect(resLogin.body).toEqual<LoginSuccessViewModel>(
-            expect.objectContaining({
+            {
                 accessToken: expect.any(String)
-            })
+            }
         );
 
         expect(resLogin.headers['set-cookie']).toBeDefined();

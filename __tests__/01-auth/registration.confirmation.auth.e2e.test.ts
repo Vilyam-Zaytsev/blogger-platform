@@ -5,8 +5,8 @@ import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId, WithId} from "mongodb";
 import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
-import {ConfirmationStatus, UserDbType} from "../../src/02-users/types/user-db-type";
-import {usersRepository} from "../../src/02-users/repositoryes/users-repository";
+import {ConfirmationStatus, UserDbType} from "../../src/04-users/types/user-db-type";
+import {usersRepository} from "../../src/04-users/repositoryes/users-repository";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 
 let mongoServer: MongoMemoryServer;
@@ -31,6 +31,8 @@ afterAll(async () => {
 beforeEach(async () => {
     await usersCollection.deleteMany({});
 });
+
+//TODO create helper with mock email sending
 
 describe('POST /auth/registration-confirmation', () => {
 

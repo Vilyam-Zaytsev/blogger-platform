@@ -1,21 +1,26 @@
 import {Response} from "express";
-import {RequestWithBody, RequestWithUserId} from "../common/types/input-output-types/request-types";
+import {RequestWithBody, RequestWithSession, RequestWithUserId} from "../common/types/input-output-types/request-types";
 import {LoginInputModel} from "./types/login-input-model";
-import {authService} from "./auth-service";
+import {authService} from "./domain/auth-service";
 import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
 import {ApiErrorResult} from "../common/types/input-output-types/api-error-result";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {UserInputModel, UserMeViewModel} from "../02-users/types/input-output-types";
+import {UserInputModel, UserMeViewModel} from "../04-users/types/input-output-types";
 import {LoginSuccessViewModel} from "./types/login-success-view-model";
 import {SETTINGS} from "../common/settings";
 import {RegistrationConfirmationCodeModel} from "./types/registration-confirmation-code-model";
 import {RegistrationEmailResendingType} from "./types/registration-email-resending-type";
-import {usersQueryRepository} from "../02-users/repositoryes/users-query-repository";
+import {usersQueryRepository} from "../04-users/repositoryes/users-query-repository";
 import {AuthTokens} from "./types/auth-tokens-type";
-import {jwtService} from "../common/adapters/jwt-service";
+import {jwtService} from "./adapters/jwt-service";
+import {ActiveSessionType} from "../02-sessions/types/active-session-type";
+import {sessionsService} from "../02-sessions/domain/sessions-service";
+import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
+import {sessionsRepository} from "../02-sessions/repositories/sessions-repository";
+import {WithId} from "mongodb";
 
 const authController = {
 
@@ -26,7 +31,7 @@ const authController = {
 
         const authParams: LoginInputModel = {
             loginOrEmail: req.body.loginOrEmail,
-            password: req.body.password
+            password: req.body.password,
         };
 
         const resultLogin: ResultType<AuthTokens | null> = await authService
@@ -40,6 +45,34 @@ const authController = {
 
             return;
         }
+
+        const deviceName: string = req.headers['user-agent'] || 'Unknown device';
+
+        const ip: string = req.headers['x-forwarded-for']?.toString().split(',')[0]
+            || req.socket.remoteAddress
+            || '0.0.0.0';
+
+        const payload = await jwtService
+            .decodeToken(resultLogin.data!.refreshToken);
+
+        const {
+            userId,
+            deviceId,
+            iat,
+            exp
+        } = payload;
+
+        const newSession: ActiveSessionType = {
+            userId,
+            deviceId,
+            deviceName,
+            ip,
+            iat: new Date(iat * 1000).toISOString(),
+            exp
+        };
+
+        await sessionsService
+            .createSession(newSession);
 
         const {
             accessToken,
@@ -57,55 +90,70 @@ const authController = {
     },
 
     logout: async (
-        req: RequestWithUserId<IdType>,
+        req: RequestWithSession<TokenSessionDataType>,
         res: Response
     ) => {
 
-        const userId: string = String(req.user?.id);
-
-        if (!userId) {
+        if (!req.session) {
 
             res
-                .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+                .sendStatus(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
         }
 
-        const resultTokenReviews: ResultType<string | null> = await authService
-            .revokeRefreshToken(req.cookies.refreshToken);
+        const {
+            iat,
+            deviceId
+        } = req.session!;
+
+        const session: WithId<ActiveSessionType> | null = await sessionsRepository
+            .findSessionByIatAndDeviceId(iat, deviceId);
+
+        if (!session) {
+
+            res
+                .sendStatus(SETTINGS.HTTP_STATUSES.INTERNAL_SERVER_ERROR_500);
+
+            return;
+        }
+
+        await sessionsService
+            .deleteSession(String(session._id));
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     },
 
     refreshToken: async (
-        req: RequestWithUserId<IdType>,
+        req: RequestWithSession<TokenSessionDataType>,
         res: Response<ApiErrorResult | LoginSuccessViewModel>
     ) => {
 
-        const userId: string = String(req.user?.id);
+        const dataForRefreshToken: TokenSessionDataType = {
+            iat: req.session!.iat,
+            userId: req.session!.userId,
+            deviceId: req.session!.deviceId
+        };
 
-        if (!userId) {
+        const resultRefreshToken: ResultType<AuthTokens | null> = await authService
+            .refreshToken(dataForRefreshToken);
+
+        if (resultRefreshToken.status !== ResultStatus.Success) {
 
             res
-                .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+                .status(mapResultStatusToHttpStatus(resultRefreshToken.status))
+                .json(mapResultExtensionsToErrorMessage(resultRefreshToken.extensions));
+
+            return;
         }
-
-        const resultTokenReviews: ResultType<string | null> = await authService
-            .revokeRefreshToken(req.cookies.refreshToken);
-
-        const accessToken: string = await jwtService
-            .createAccessToken(userId);
-
-        const refreshToken: string = await jwtService
-            .createRefreshToken(userId);
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .cookie(
                 'refreshToken',
-                refreshToken,
+                resultRefreshToken.data!.refreshToken,
                 {httpOnly: true, secure: true,}
             )
-            .json({accessToken});
+            .json({accessToken: resultRefreshToken.data!.accessToken});
     },
 
     registration: async (

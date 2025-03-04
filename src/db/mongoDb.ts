@@ -1,10 +1,10 @@
 import {Collection, MongoClient} from "mongodb";
 import {SETTINGS} from "../common/settings";
-import {BlogDbType} from "../03-blogs/types/blog-db-type";
-import {PostDbType} from "../04-posts/types/post-db-type";
-import {UserDbType} from "../02-users/types/user-db-type";
-import {CommentDbType} from "../05-comments/types/comment-db-type";
-import {BlacklistedTokenModel} from "../01-auth/types/blacklisted-token-model";
+import {BlogDbType} from "../05-blogs/types/blog-db-type";
+import {PostDbType} from "../06-posts/types/post-db-type";
+import {UserDbType} from "../04-users/types/user-db-type";
+import {CommentDbType} from "../07-comments/types/comment-db-type";
+import {ActiveSessionType} from "../02-sessions/types/active-session-type";
 
 let blogsCollection: Collection<BlogDbType>;
 
@@ -14,7 +14,7 @@ let usersCollection: Collection<UserDbType>;
 
 let commentsCollection: Collection<CommentDbType>;
 
-let blackListCollection: Collection<BlacklistedTokenModel>;
+let sessionsCollection: Collection<ActiveSessionType>;
 
 const setBlogsCollection = (collection: Collection<BlogDbType>) => {
     blogsCollection = collection;
@@ -32,8 +32,8 @@ const setCommentsCollection = (collection: Collection<CommentDbType>) => {
     commentsCollection = collection;
 };
 
-const setBlackListCollection = (collection: Collection<BlacklistedTokenModel>) => {
-    blackListCollection = collection;
+const setSessionsCollection = (collection: Collection<ActiveSessionType>) => {
+    sessionsCollection = collection;
 };
 
 async function runDb(url: string) {
@@ -44,7 +44,7 @@ async function runDb(url: string) {
     postsCollection = db.collection<PostDbType>('posts');
     usersCollection = db.collection<UserDbType>('users');
     commentsCollection = db.collection<CommentDbType>('comments');
-    blackListCollection = db.collection<BlacklistedTokenModel>('blackList');
+    sessionsCollection = db.collection<ActiveSessionType>('sessions');
 
     try {
         await client.connect();
@@ -67,11 +67,11 @@ export {
     setPostsCollection,
     setUsersCollection,
     setCommentsCollection,
-    setBlackListCollection,
+    setSessionsCollection,
     blogsCollection,
     postsCollection,
     usersCollection,
     commentsCollection,
-    blackListCollection,
+    sessionsCollection,
     runDb
 };
