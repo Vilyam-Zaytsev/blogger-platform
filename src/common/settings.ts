@@ -37,6 +37,7 @@ const SETTINGS = {
         UNAUTHORIZED_401: 401,
         FORBIDDEN_403: 403,
         NOT_FOUND_404: 404,
+        TOO_MANY_REQUESTS_429: 429,
         INTERNAL_SERVER_ERROR_500: 500
     },
     MONGO_URL: process.env.MONGO_URL || 'mongodb://localhost:27017',

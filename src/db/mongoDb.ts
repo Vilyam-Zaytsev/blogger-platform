@@ -5,6 +5,7 @@ import {PostDbType} from "../06-posts/types/post-db-type";
 import {UserDbType} from "../04-users/types/user-db-type";
 import {CommentDbType} from "../07-comments/types/comment-db-type";
 import {ActiveSessionType} from "../02-sessions/types/active-session-type";
+import {ApiTrafficType} from "../common/types/api-traffic-type";
 
 let blogsCollection: Collection<BlogDbType>;
 
@@ -15,6 +16,8 @@ let usersCollection: Collection<UserDbType>;
 let commentsCollection: Collection<CommentDbType>;
 
 let sessionsCollection: Collection<ActiveSessionType>;
+
+let apiTrafficCollection: Collection<ApiTrafficType>;
 
 const setBlogsCollection = (collection: Collection<BlogDbType>) => {
     blogsCollection = collection;
@@ -34,6 +37,10 @@ const setCommentsCollection = (collection: Collection<CommentDbType>) => {
 
 const setSessionsCollection = (collection: Collection<ActiveSessionType>) => {
     sessionsCollection = collection;
+};
+
+const setApiTrafficCollection = (collection: Collection<ApiTrafficType>) => {
+    apiTrafficCollection = collection;
 };
 
 async function runDb(url: string) {
@@ -68,10 +75,12 @@ export {
     setUsersCollection,
     setCommentsCollection,
     setSessionsCollection,
+    setApiTrafficCollection,
     blogsCollection,
     postsCollection,
     usersCollection,
     commentsCollection,
     sessionsCollection,
+    apiTrafficCollection,
     runDb
 };
