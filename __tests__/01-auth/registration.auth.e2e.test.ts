@@ -1,9 +1,9 @@
 import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {presets, user, userLogins} from "../helpers/datasets-for-tests";
+import {clearPresets, deviceNames, presets, user, userLogins} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId, WithId} from "mongodb";
-import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
+import {apiTrafficCollection, setApiTrafficCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
 import {ConfirmationStatus, UserDbType} from "../../src/04-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
@@ -13,6 +13,7 @@ import {usersRepository} from "../../src/04-users/repositoryes/users-repository"
 import {emailTemplates} from "../../src/01-auth/adapters/email-templates";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {UserViewModel} from "../../src/04-users/types/input-output-types";
+import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -26,6 +27,7 @@ beforeAll(async () => {
 
     const db = client.db();
     setUsersCollection(db.collection<UserDbType>('users'));
+    setApiTrafficCollection(db.collection<ApiTrafficType>('ApiTraffic'));
 });
 
 afterAll(async () => {
@@ -35,7 +37,9 @@ afterAll(async () => {
 
 beforeEach(async () => {
     await usersCollection.deleteMany({});
-    presets.users = [];
+    await apiTrafficCollection.deleteMany({});
+
+    clearPresets();
 
     nodemailerService.sendEmail = jest
         .fn()
@@ -44,7 +48,7 @@ beforeEach(async () => {
                 email,
                 template
             });
-        })
+        });
 });
 
 describe('POST /auth/registration', () => {
@@ -86,6 +90,32 @@ describe('POST /auth/registration', () => {
         console_log_e2e(resRegistration.body, resRegistration.status, 'Test 1: post(/auth/registration)');
     });
 
+    it('should not register if the user has sent more than 5 requests from one IP to "/login" in the last 10 seconds.', async () => {
+
+        for (let i = 0; i < 5; i++) {
+
+            await req
+                .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION}`)
+                .send({
+                    login: userLogins[i],
+                    email: `${userLogins[i]}@example.com`,
+                    password: userLogins[i]
+                })
+                .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+        }
+
+        const resRegistration: Response = await req
+            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION}`)
+            .send({
+                login: user.login,
+                email: user.email,
+                password: user.password
+            })
+            .expect(SETTINGS.HTTP_STATUSES.TOO_MANY_REQUESTS_429);
+
+        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 2: post(/auth/registration)');
+    });
+
     it('should not be registered if a user with such data already exists (login).', async () => {
 
         await usersTestManager
@@ -107,7 +137,7 @@ describe('POST /auth/registration', () => {
 
         expect(foundUsers.items.length).toEqual(1);
 
-        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 2: post(/auth/registration)');
+        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 3: post(/auth/registration)');
     });
 
     it('should not be registered if a user with such data already exists (email).', async () => {
@@ -131,7 +161,7 @@ describe('POST /auth/registration', () => {
 
         expect(foundUsers.items.length).toEqual(1);
 
-        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 3: post(/auth/registration)');
+        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 4: post(/auth/registration)');
     });
 
     it('should not be registered a user if the data in the request body is incorrect (an empty object is passed).', async () => {
@@ -167,7 +197,7 @@ describe('POST /auth/registration', () => {
 
         expect(foundUsers.items.length).toEqual(0);
 
-        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 4: post(/auth/registration)');
+        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 5: post(/auth/registration)');
     });
 
     it('should not be registered a user if the data in the request body is incorrect (login: empty line, email: empty line, password: empty line).', async () => {
@@ -207,7 +237,7 @@ describe('POST /auth/registration', () => {
 
         expect(foundUsers.items.length).toEqual(0);
 
-        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 5: post(/auth/registration)');
+        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 6: post(/auth/registration)');
     });
 
     it('should not be registered a user if the data in the request body is incorrect (login: less than the minimum length, email: incorrect, password: less than the minimum length).', async () => {
@@ -247,7 +277,7 @@ describe('POST /auth/registration', () => {
 
         expect(foundUsers.items.length).toEqual(0);
 
-        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 6: post(/auth/registration)');
+        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 7: post(/auth/registration)');
     });
 
     it('should not be registered a user if the data in the request body is incorrect (login: exceeds max length,  email: incorrect, password: exceeds max length).', async () => {
@@ -287,7 +317,7 @@ describe('POST /auth/registration', () => {
 
         expect(foundUsers.items.length).toEqual(0);
 
-        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 7: post(/auth/registration)');
+        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 8: post(/auth/registration)');
     });
 
     it('should not be registered a user if the data in the request body is incorrect (login: type number,  email: type number, password: type number).', async () => {
@@ -327,6 +357,6 @@ describe('POST /auth/registration', () => {
 
         expect(foundUsers.items.length).toEqual(0);
 
-        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 8: post(/auth/registration)');
+        console_log_e2e(resRegistration.body, resRegistration.status, 'Test 9: post(/auth/registration)');
     });
 });

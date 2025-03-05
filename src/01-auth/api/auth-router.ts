@@ -18,7 +18,7 @@ const authRouter = Router();
 
 authRouter.post(SETTINGS.PATH.AUTH.LOGIN,
     rateLimitsGuard,
-    // activeSessionGuard,
+    activeSessionGuard,
     userLoginOrEmailInputValidator,
     userPasswordInputValidator,
     inputCheckErrorsMiddleware,
