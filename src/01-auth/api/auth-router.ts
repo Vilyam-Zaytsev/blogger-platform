@@ -18,7 +18,7 @@ const authRouter = Router();
 
 authRouter.post(SETTINGS.PATH.AUTH.LOGIN,
     rateLimitsGuard,
-    // activeSessionGuard,
+    activeSessionGuard,
     userLoginOrEmailInputValidator,
     userPasswordInputValidator,
     inputCheckErrorsMiddleware,
@@ -29,6 +29,7 @@ authRouter.post(SETTINGS.PATH.AUTH.LOGOUT,
     authController.logout
 );
 authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION,
+    rateLimitsGuard,
     userLoginInputValidator,
     userEmailInputValidator,
     userPasswordInputValidator,
@@ -40,11 +41,13 @@ authRouter.post(SETTINGS.PATH.AUTH.REFRESH_TOKEN,
     authController.refreshToken
 );
 authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION_CONFIRMATION,
+    rateLimitsGuard,
     authConfirmationCodeInputValidator,
     inputCheckErrorsMiddleware,
     authController.registrationConfirmation
 );
 authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION_EMAIL_RESENDING,
+    rateLimitsGuard,
     userEmailInputValidator,
     inputCheckErrorsMiddleware,
     authController.registrationEmailResending
