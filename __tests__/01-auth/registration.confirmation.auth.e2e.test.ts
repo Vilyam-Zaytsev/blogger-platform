@@ -13,6 +13,7 @@ import {EmailTemplateType} from "../../src/common/types/input-output-types/email
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 import {UserInputModel} from "../../src/04-users/types/input-output-types";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
+import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -47,8 +48,6 @@ beforeEach(async () => {
             });
         });
 });
-
-//TODO create helper with mock email sending
 
 describe('POST /auth/registration-confirmation', () => {
 
@@ -87,7 +86,7 @@ describe('POST /auth/registration-confirmation', () => {
         console_log_e2e(resRegistrationConfirmation.body, resRegistrationConfirmation.status, 'Test 1: post(/auth/registration-confirmation)');
     });
 
-    it('should not register if the user has sent more than 5 requests from one IP to "/login" in the last 10 seconds.', async () => {
+    it('should not be confirmed registration if the user has sent more than 5 requests from one IP to "/registration-confirmation" in the last 10 seconds.', async () => {
 
         for (let i = 0; i < 5; i++) {
 
@@ -97,49 +96,33 @@ describe('POST /auth/registration-confirmation', () => {
                 password: userLogins[i]
             }
 
-           await authTestManager
+            await authTestManager
                 .registration(user);
         }
 
-        const resGetUsers: Response = await req
-            .get(SETTINGS.PATH.USERS)
-            .set(
-                'Authorization',
-                encodingAdminDataInBase64(
-                    SETTINGS.ADMIN_DATA.LOGIN,
-                    SETTINGS.ADMIN_DATA.PASSWORD
-                )
-            )
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        const users: UserDbType[] = await usersRepository
+            .findUsers(createPaginationAndSortFilter({}))
 
-        const items: UserDbType[] = resGetUsers.body.items;
-        // const confirmationCodes: string[] = items.map(u => u.emailConfirmation.confirmationCode!);
+        const confirmationCodes: string[] = users.map(u => u.emailConfirmation.confirmationCode!);
 
-        console.log(resGetUsers.body.items)
+        for (let i = 0; i < confirmationCodes.length; i++) {
 
+            await req
+                .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION_CONFIRMATION}`)
+                .send({
+                    code: confirmationCodes[i]
+                })
+                .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+        }
 
-        // for (let i = 0; i < 5; i++) {
-        //
-        //     await req
-        //         .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION}`)
-        //         .send({
-        //             login: userLogins[i],
-        //             email: `${userLogins[i]}@example.com`,
-        //             password: userLogins[i]
-        //         })
-        //         .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-        // }
-        //
-        // const resRegistration: Response = await req
-        //     .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION}`)
-        //     .send({
-        //         login: user.login,
-        //         email: user.email,
-        //         password: user.password
-        //     })
-        //     .expect(SETTINGS.HTTP_STATUSES.TOO_MANY_REQUESTS_429);
-        //
-        // console_log_e2e(resRegistration.body, resRegistration.status, 'Test 2: post(/auth/registration)');
+        const resRegistrationConfirmation = await req
+            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION_CONFIRMATION}`)
+            .send({
+                code: generateRandomString(15)
+            })
+            .expect(SETTINGS.HTTP_STATUSES.TOO_MANY_REQUESTS_429);
+
+        console_log_e2e(resRegistrationConfirmation.body, resRegistrationConfirmation.status, 'Test 2: post(/auth/registration-confirmation)');
     });
 
     it('should not be confirmed if the user has sent an incorrect verification code.', async () => {
@@ -179,7 +162,8 @@ describe('POST /auth/registration-confirmation', () => {
             }
         });
 
-        console_log_e2e(resRegistrationConfirmation.body, resRegistrationConfirmation.status, 'Test 2: post(/auth/registration-confirmation)');
+        console_log_e2e(resRegistrationConfirmation.body, resRegistrationConfirmation.status, 'Test 3:' +
+            ' post(/auth/registration-confirmation)');
     });
 
     it('should not be confirmed if the user has sent an incorrect verification code (the code has already been used)', async () => {
@@ -242,6 +226,7 @@ describe('POST /auth/registration-confirmation', () => {
             }
         });
 
-        console_log_e2e(resRegistrationConfirmation_2.body, resRegistrationConfirmation_2.status, 'Test 3: post(/auth/registration-confirmation)');
+        console_log_e2e(resRegistrationConfirmation_2.body, resRegistrationConfirmation_2.status, 'Test 4:' +
+            ' post(/auth/registration-confirmation)');
     });
 });

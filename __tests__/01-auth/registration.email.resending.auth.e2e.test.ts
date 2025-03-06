@@ -1,9 +1,9 @@
 import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {presets, user} from "../helpers/datasets-for-tests";
+import {clearPresets, presets, user, userLogins} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, WithId} from "mongodb";
-import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
+import {apiTrafficCollection, setApiTrafficCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
 import {UserDbType} from "../../src/04-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
@@ -12,6 +12,9 @@ import {EmailTemplateType} from "../../src/common/types/input-output-types/email
 import {usersRepository} from "../../src/04-users/repositoryes/users-repository";
 import {emailTemplates} from "../../src/01-auth/adapters/email-templates";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
+import {UserInputModel} from "../../src/04-users/types/input-output-types";
+import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
+import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -25,6 +28,7 @@ beforeAll(async () => {
 
     const db = client.db();
     setUsersCollection(db.collection<UserDbType>('users'));
+    setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });
 
 afterAll(async () => {
@@ -34,7 +38,9 @@ afterAll(async () => {
 
 beforeEach(async () => {
     await usersCollection.deleteMany({});
-    presets.users = [];
+    await apiTrafficCollection.deleteMany({});
+
+    clearPresets();
 
     nodemailerService.sendEmail = jest
         .fn()
@@ -74,6 +80,45 @@ describe('POST /auth/registration-email-resending', () => {
             ' post(/auth/registration-email-resending)');
     });
 
+    it('should email not be resent if the user has sent more than 5 requests from one IP to "/registration-email-resend" in the last 10 seconds.', async () => {
+
+        for (let i = 0; i < 5; i++) {
+
+            const user: UserInputModel = {
+                login: userLogins[i],
+                email: `${userLogins[i]}@example.com`,
+                password: userLogins[i]
+            }
+
+            await authTestManager
+                .registration(user);
+        }
+
+        const users: UserDbType[] = await usersRepository
+            .findUsers(createPaginationAndSortFilter({}))
+
+        const emails: string[] = users.map(u => u.email);
+
+        for (let i = 0; i < emails.length; i++) {
+
+            await req
+                .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION_EMAIL_RESENDING}`)
+                .send({
+                    email: emails[i]
+                })
+                .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+        }
+
+        const resRegistrationEmailResending = await req
+            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION_EMAIL_RESENDING}`)
+            .send({
+                email: generateRandomString(15)
+            })
+            .expect(SETTINGS.HTTP_STATUSES.TOO_MANY_REQUESTS_429);
+
+        console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 2: post(/auth/registration-email-resending)');
+    });
+
     it('should not resend the verification code if the user has sent incorrect data(an empty object is passed).', async () => {
 
         await authTestManager
@@ -97,7 +142,8 @@ describe('POST /auth/registration-email-resending', () => {
 
         expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(1);
 
-        console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 2: post(/auth/registration-email-resending)');
+        console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 3:' +
+            ' post(/auth/registration-email-resending)');
     });
 
     it('should not resend the verification code if the user has sent incorrect data(email: empty line)', async () => {
@@ -125,7 +171,8 @@ describe('POST /auth/registration-email-resending', () => {
 
         expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(1);
 
-        console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 3: post(/auth/registration-email-resending)');
+        console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 4:' +
+            ' post(/auth/registration-email-resending)');
     });
 
     it('should not resend the verification code if the user has sent incorrect data(email: incorrect)', async () => {
@@ -153,7 +200,7 @@ describe('POST /auth/registration-email-resending', () => {
 
         expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(1);
 
-        console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 4:' +
+        console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 5:' +
             ' post(/auth/registration-email-resending)');
     });
 
@@ -182,7 +229,7 @@ describe('POST /auth/registration-email-resending', () => {
 
         expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(1);
 
-        console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 5:' +
+        console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 6:' +
             ' post(/auth/registration-email-resending)');
     });
 
@@ -209,7 +256,7 @@ describe('POST /auth/registration-email-resending', () => {
             },
         );
 
-        console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 6:' +
+        console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 7:' +
             ' post(/auth/registration-email-resending)');
     });
 });

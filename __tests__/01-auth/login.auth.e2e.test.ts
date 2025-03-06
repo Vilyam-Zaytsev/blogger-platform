@@ -35,7 +35,7 @@ beforeAll(async () => {
 
     setUsersCollection(db.collection<UserDbType>('users'));
     setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
-    setApiTrafficCollection(db.collection<ApiTrafficType>('ApiTraffic'));
+    setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });
 
 afterAll(async () => {

@@ -9,9 +9,10 @@ import {
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {
+    apiTrafficCollection,
     blogsCollection,
     commentsCollection,
-    postsCollection, sessionsCollection,
+    postsCollection, sessionsCollection, setApiTrafficCollection,
     setBlogsCollection,
     setCommentsCollection,
     setPostsCollection, setSessionsCollection,
@@ -32,6 +33,7 @@ import {ApiErrorResult} from "../../src/common/types/input-output-types/api-erro
 import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
+import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -49,6 +51,7 @@ beforeAll(async () => {
     setPostsCollection(db.collection<PostDbType>('posts'));
     setCommentsCollection(db.collection<CommentDbType>('comments'));
     setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
+    setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });
 
 afterAll(async () => {
@@ -62,6 +65,7 @@ beforeEach(async () => {
     await postsCollection.deleteMany({});
     await commentsCollection.deleteMany({});
     await sessionsCollection.deleteMany({});
+    await apiTrafficCollection.deleteMany({});
 
     clearPresets();
 });

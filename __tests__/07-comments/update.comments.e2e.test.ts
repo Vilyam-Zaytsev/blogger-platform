@@ -8,7 +8,7 @@ import {
     setBlogsCollection,
     setCommentsCollection,
     setPostsCollection,
-    setUsersCollection,
+    setUsersCollection, setSessionsCollection, setApiTrafficCollection, sessionsCollection, apiTrafficCollection,
 } from "../../src/db/mongoDb";
 import {UserDbType} from "../../src/04-users/types/user-db-type";
 import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
@@ -30,6 +30,8 @@ import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/07-comments/types/input-output-types";
 import {ApiErrorResult} from "../../src/common/types/input-output-types/api-error-result";
 import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
+import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
+import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -46,6 +48,8 @@ beforeAll(async () => {
     setBlogsCollection(db.collection<BlogDbType>('blogs'));
     setPostsCollection(db.collection<PostDbType>('posts'));
     setCommentsCollection(db.collection<CommentDbType>('comments'));
+    setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
+    setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });
 
 afterAll(async () => {
@@ -58,6 +62,8 @@ beforeEach(async () => {
     await blogsCollection.deleteMany({});
     await postsCollection.deleteMany({});
     await commentsCollection.deleteMany({});
+    await sessionsCollection.deleteMany({});
+    await apiTrafficCollection.deleteMany({});
 
     clearPresets();
 });
@@ -85,7 +91,7 @@ describe('PUT /comments', () => {
             .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[0].accessToken}`
+                `Bearer ${presets.authTokens[0].accessToken}`
             )
             .send({
                 content: comments[1]
@@ -166,7 +172,7 @@ describe('PUT /comments', () => {
             .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[0].accessToken}`
+                `Bearer ${presets.authTokens[0].accessToken}`
             )
             .send({})
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
@@ -209,7 +215,7 @@ describe('PUT /comments', () => {
             .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[0].accessToken}`
+                `Bearer ${presets.authTokens[0].accessToken}`
             )
             .send({
                 content: 123
@@ -254,7 +260,7 @@ describe('PUT /comments', () => {
             .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[0].accessToken}`
+                `Bearer ${presets.authTokens[0].accessToken}`
             )
             .send({
                 content: generateRandomString(19)
@@ -299,7 +305,7 @@ describe('PUT /comments', () => {
             .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[0].accessToken}`
+                `Bearer ${presets.authTokens[0].accessToken}`
             )
             .send({
                 content: generateRandomString(301)
@@ -344,7 +350,7 @@ describe('PUT /comments', () => {
             .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[1].accessToken}`
+                `Bearer ${presets.authTokens[1].accessToken}`
             )
             .send({
                 content: comments[1]
@@ -355,7 +361,7 @@ describe('PUT /comments', () => {
             .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[0].accessToken}`
+                `Bearer ${presets.authTokens[0].accessToken}`
             )
             .send({
                 content: comments[1]
@@ -386,7 +392,7 @@ describe('PUT /comments', () => {
             .put(`${SETTINGS.PATH.COMMENTS}/${new ObjectId()}`)
             .set(
                 'Authorization',
-                `Bearer ${presets.accessTokens[0].accessToken}`
+                `Bearer ${presets.authTokens[0].accessToken}`
             )
             .send({
                 content: comments[1]

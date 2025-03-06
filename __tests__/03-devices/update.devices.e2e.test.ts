@@ -3,13 +3,21 @@ import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, deviceNames, presets} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
-import {sessionsCollection, setSessionsCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
+import {
+    apiTrafficCollection,
+    sessionsCollection,
+    setApiTrafficCollection,
+    setSessionsCollection,
+    setUsersCollection,
+    usersCollection
+} from "../../src/db/mongoDb";
 import {Response} from "supertest";
 import {UserDbType} from "../../src/04-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 import {DeviceViewModel} from "../../src/02-sessions/types/input-output-types";
+import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -36,6 +44,7 @@ beforeAll(async () => {
 
     setUsersCollection(db.collection<UserDbType>('users'));
     setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
+    setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });
 
 afterAll(async () => {
@@ -46,6 +55,7 @@ afterAll(async () => {
 beforeEach(async () => {
     await usersCollection.deleteMany({});
     await sessionsCollection.deleteMany({});
+    await apiTrafficCollection.deleteMany({});
 
     clearPresets();
 });
@@ -83,6 +93,8 @@ describe('UPDATE /security/devices', () => {
 
                 resLogins[`resLogins_user${i + 1}`].push(res);
             }
+
+            await delay(10000);
         }
 
         //update refreshTokens user1 /*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/
@@ -152,5 +164,5 @@ describe('UPDATE /security/devices', () => {
         }
 
         console_log_e2e('No Body', 200, 'Test 1: update (/security/devices)');
-    }, 10000);
+    }, 30000);
 });

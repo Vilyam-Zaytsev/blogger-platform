@@ -8,7 +8,7 @@ import {
     setBlogsCollection,
     setCommentsCollection,
     setPostsCollection,
-    setUsersCollection,
+    setUsersCollection, setSessionsCollection, setApiTrafficCollection, sessionsCollection, apiTrafficCollection,
 } from "../../src/db/mongoDb";
 import {UserDbType} from "../../src/04-users/types/user-db-type";
 import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
@@ -31,6 +31,8 @@ import {CommentViewModel} from "../../src/07-comments/types/input-output-types";
 import {Paginator, SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
+import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
+import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -47,6 +49,8 @@ beforeAll(async () => {
     setBlogsCollection(db.collection<BlogDbType>('blogs'));
     setPostsCollection(db.collection<PostDbType>('posts'));
     setCommentsCollection(db.collection<CommentDbType>('comments'));
+    setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
+    setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });
 
 afterAll(async () => {
@@ -59,6 +63,8 @@ beforeEach(async () => {
     await blogsCollection.deleteMany({});
     await postsCollection.deleteMany({});
     await commentsCollection.deleteMany({});
+    await sessionsCollection.deleteMany({});
+    await apiTrafficCollection.deleteMany({});
 
     clearPresets();
 });
