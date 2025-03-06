@@ -52,6 +52,7 @@ async function runDb(url: string) {
     usersCollection = db.collection<UserDbType>('users');
     commentsCollection = db.collection<CommentDbType>('comments');
     sessionsCollection = db.collection<ActiveSessionType>('sessions');
+    apiTrafficCollection = db.collection<ApiTrafficType>('ApiTraffic');
 
     try {
         await client.connect();

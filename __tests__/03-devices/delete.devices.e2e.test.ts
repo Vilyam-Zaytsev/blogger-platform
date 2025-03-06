@@ -3,7 +3,14 @@ import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, deviceNames, presets} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
-import {sessionsCollection, setSessionsCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
+import {
+    apiTrafficCollection,
+    sessionsCollection,
+    setApiTrafficCollection,
+    setSessionsCollection,
+    setUsersCollection,
+    usersCollection
+} from "../../src/db/mongoDb";
 import {Response} from "supertest";
 import {UserDbType} from "../../src/04-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
@@ -11,6 +18,7 @@ import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 import {DeviceViewModel} from "../../src/02-sessions/types/input-output-types";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
+import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -37,6 +45,7 @@ beforeAll(async () => {
 
     setUsersCollection(db.collection<UserDbType>('users'));
     setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
+    setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });
 
 afterAll(async () => {
@@ -47,6 +56,7 @@ afterAll(async () => {
 beforeEach(async () => {
     await usersCollection.deleteMany({});
     await sessionsCollection.deleteMany({});
+    await apiTrafficCollection.deleteMany({});
 
     clearPresets();
 });
@@ -326,6 +336,8 @@ describe('DELETE /security/devices', () => {
 
                 resLogins[`resLogins_user${i + 1}`].push(res);
             }
+
+            await delay(10000);
         }
 
         //delete device by id /*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/
@@ -355,7 +367,7 @@ describe('DELETE /security/devices', () => {
         expect(resGetDevices_user2.body).toEqual(resGetDevices_user2_2.body);
 
         console_log_e2e(resDeleteDevice.body, resDeleteDevice.status, 'Test 5: delete (/security/devices/:id)');
-    });
+    }, 30000);
 
     it('should not delete a specific session of a specific user if no such session exists.', async () => {
 

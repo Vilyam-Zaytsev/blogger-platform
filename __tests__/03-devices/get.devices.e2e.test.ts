@@ -3,7 +3,14 @@ import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, deviceNames, presets, userLogins} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
-import {sessionsCollection, setSessionsCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
+import {
+    apiTrafficCollection,
+    sessionsCollection,
+    setApiTrafficCollection,
+    setSessionsCollection,
+    setUsersCollection,
+    usersCollection
+} from "../../src/db/mongoDb";
 import {Response} from "supertest";
 import {UserDbType} from "../../src/04-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
@@ -13,9 +20,21 @@ import {authService} from "../../src/01-auth/domain/auth-service";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {DeviceViewModel} from "../../src/02-sessions/types/input-output-types";
 import {sessionsTestManager} from "../helpers/managers/02_sessions-test-manager";
+import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
+
+jest.mock('../../src/common/settings', () => {
+    const actualSettings = jest.requireActual('../../src/common/settings').SETTINGS;
+    return {
+        SETTINGS: {
+            ...actualSettings,
+            JWT_EXPIRATION_AT: '50s',
+            JWT_EXPIRATION_RT: '60s',
+        },
+    };
+});
 
 beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
@@ -28,6 +47,7 @@ beforeAll(async () => {
 
     setUsersCollection(db.collection<UserDbType>('users'));
     setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
+    setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });
 
 afterAll(async () => {
@@ -38,6 +58,7 @@ afterAll(async () => {
 beforeEach(async () => {
     await usersCollection.deleteMany({});
     await sessionsCollection.deleteMany({});
+    await apiTrafficCollection.deleteMany({});
 
     clearPresets();
 });
@@ -156,6 +177,8 @@ describe('GET /security/devices', () => {
 
                 presets.authTokens.push({...authTokens});
             }
+
+            await delay(10000);
         }
 
         const resGetDevices_user1: Response = await req
@@ -199,5 +222,5 @@ describe('GET /security/devices', () => {
         expect(resGetDevices_user1).not.toEqual(resGetDevices_user2);
 
         console_log_e2e(resGetDevices_user1.body, resGetDevices_user1.status, 'Test 3: get (/security/devices)');
-    });
+    }, 30000);
 });

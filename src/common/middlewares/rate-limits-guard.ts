@@ -25,7 +25,7 @@ const rateLimitsGuard = async (
     const recentRequestCount: number = await apiTrafficCollection
         .countDocuments(filter);
 
-    if (recentRequestCount > 5) {
+    if (recentRequestCount >= 5) {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.TOO_MANY_REQUESTS_429);
