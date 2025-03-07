@@ -1,6 +1,6 @@
 import {EmailTemplateType} from "../../common/types/input-output-types/email-template-type";
 
-const emailTemplates = {
+class EmailTemplates {
 
     registrationEmail(code: string): EmailTemplateType {
 
@@ -12,7 +12,7 @@ const emailTemplates = {
               </p>`
         }
 
-    },
+    }
 
     passwordRecoveryEmail(code: string) {
 
@@ -21,6 +21,6 @@ const emailTemplates = {
             <a href='https://somesite.com/password-recovery?recoveryCode=${code}'>recovery password</a>
         </p>`
     }
-};
+}
 
-export {emailTemplates}
+export {EmailTemplates};

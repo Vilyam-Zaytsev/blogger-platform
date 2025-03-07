@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import {SETTINGS} from "../../common/settings";
 import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
 
-const jwtService = {
+class JwtService {
 
     async createAccessToken(userId: string,): Promise<string> {
 
@@ -11,7 +11,7 @@ const jwtService = {
             SETTINGS.JWT_SECRET_AT,
             {expiresIn: SETTINGS.JWT_EXPIRATION_AT}
         );
-    },
+    }
 
     async createRefreshToken(
         userId: string,
@@ -26,7 +26,7 @@ const jwtService = {
             SETTINGS.JWT_SECRET_RT,
             {expiresIn: SETTINGS.JWT_EXPIRATION_RT}
         );
-    },
+    }
 
     async decodeToken(token: string): Promise<any> {
 
@@ -39,7 +39,7 @@ const jwtService = {
 
             return null;
         }
-    },
+    }
 
     async verifyAccessToken(token: string): Promise<{ userId: string } | null> {
 
@@ -51,7 +51,7 @@ const jwtService = {
 
             return null;
         }
-    },
+    }
 //TODO: как убрать простыню из консоли при ошибке???
     async verifyRefreshToken(token: string): Promise<PayloadRefreshTokenType | null> {
 
@@ -64,6 +64,6 @@ const jwtService = {
             return null;
         }
     }
-};
+}
 
-export {jwtService};
+export {JwtService};
