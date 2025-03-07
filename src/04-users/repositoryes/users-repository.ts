@@ -7,7 +7,7 @@ import {
 } from "../../common/types/input-output-types/pagination-sort-types";
 import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
 
-const usersRepository = {
+class UsersRepository {
 
     async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<WithId<UserDbType>[]> {
 
@@ -34,13 +34,13 @@ const usersRepository = {
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
             .toArray();
-    },
+    }
 
     async findUser(id: string): Promise<WithId<UserDbType> | null> {
 
         return usersCollection
             .findOne({_id: new ObjectId(id)});
-    },
+    }
 
     async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<UserDbType> | null> {
 
@@ -48,25 +48,25 @@ const usersRepository = {
             .findOne({
                 $or: [{email: loginOrEmail}, {login: loginOrEmail}],
             });
-    },
+    }
 
     async findByEmail(email: string): Promise<WithId<UserDbType> | null> {
 
         return usersCollection
             .findOne({email});
-    },
+    }
 
     async findByConfirmationCode(confirmationCode: string): Promise<WithId<UserDbType> | null> {
 
         return usersCollection
             .findOne({'emailConfirmation.confirmationCode': confirmationCode});
-    },
+    }
 
     async insertUser(newUser: UserDbType): Promise<InsertOneResult> {
 
         return await usersCollection
             .insertOne(newUser);
-    },
+    }
 
     async updateEmailConfirmation(
         _id: ObjectId,
@@ -83,7 +83,7 @@ const usersRepository = {
             });
 
         return result.matchedCount === 1;
-    },
+    }
 
     async updateConfirmationStatus(_id: ObjectId): Promise<boolean> {
 
@@ -95,7 +95,7 @@ const usersRepository = {
             });
 
         return result.modifiedCount === 1;
-    },
+    }
 
     async deleteUser(id: string): Promise<boolean> {
 
@@ -103,7 +103,7 @@ const usersRepository = {
             .deleteOne({_id: new ObjectId(id)});
 
         return result.deletedCount === 1;
-    },
-};
+    }
+}
 
-export {usersRepository};
+export {UsersRepository};

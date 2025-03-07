@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {blogsController} from '../blogs-controller';
+import {BlogsController} from '../blogs-controller';
 import {
     blogDescriptionInputValidator,
     blogNameInputValidator,
@@ -20,6 +20,8 @@ import {
     postShortDescriptionInputValidator,
     postTitleInputValidator
 } from "../../06-posts/api/middlewares/post-validators";
+
+const blogsController: BlogsController = new BlogsController();
 
 const blogsRouter = Router();
 

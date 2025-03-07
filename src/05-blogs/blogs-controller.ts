@@ -7,7 +7,7 @@ import {
     RequestWithQuery
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
-import {blogsService} from "./domain/blogs-service";
+import {BlogsService} from "./domain/blogs-service";
 import {BlogDbType} from "./types/blog-db-type";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 import {
@@ -16,20 +16,24 @@ import {
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {blogsQueryRepository} from "./repositoryes/blogs-query-repository";
+import {BlogsQueryRepository} from "./repositoryes/blogs-query-repository";
 import {PostViewModel} from "../06-posts/types/input-output-types";
 import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
-import {postsQueryRepository} from "../06-posts/repositoryes/posts-query-repository";
+import {PostsQueryRepository} from "../06-posts/repositoryes/posts-query-repository";
+
+const blogsQueryRepository: BlogsQueryRepository = new BlogsQueryRepository();
+const blogsService: BlogsService = new BlogsService();
+const postsQueryRepository: PostsQueryRepository = new PostsQueryRepository();
 
 
-const blogsController = {
+class BlogsController {
 
-    getBlogs: async (
+    async getBlogs(
         req: RequestWithQuery<SortingAndPaginationParamsType>,
         res: Response<Paginator<BlogDbType>>
-    ) => {
+    ){
 
         const sortingAndPaginationParams: SortingAndPaginationParamsType = {
             pageNumber: req.query.pageNumber,
@@ -58,12 +62,12 @@ const blogsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(paginationResponse);
-    },
+    }
 
-    getBlog: async (
+    async getBlog(
         req: RequestWithParams<IdType>,
         res: Response<BlogViewModel>
-    ) => {
+    ){
 
         const foundBlog: BlogViewModel | null = await blogsQueryRepository
             .findBlog(req.params.id);
@@ -78,12 +82,12 @@ const blogsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(foundBlog);
-    },
+    }
 
-    createBlog: async (
+    async createBlog(
         req: RequestWithBody<BlogInputModel>,
         res: Response<BlogViewModel>
-    ) => {
+    ){
 
         const dataForCreatingBlog: BlogInputModel = {
             name: req.body.name,
@@ -100,12 +104,12 @@ const blogsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
             .json(createdBlog!);
-    },
+    }
 
-    updateBlog: async (
+    async updateBlog(
         req: RequestWithParamsAndBody<IdType, BlogInputModel>,
         res: Response<BlogViewModel>
-    ) => {
+    ){
 
         const dataForBlogUpdates: BlogInputModel = {
             name: req.body.name,
@@ -125,12 +129,12 @@ const blogsController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    },
+    }
 
-    deleteBlog: async (
+    async deleteBlog(
         req: RequestWithParams<IdType>,
         res: Response
-    ) => {
+    ){
 
         const isDeletedBlog: boolean = await blogsService
             .deleteBlog(req.params.id);
@@ -144,12 +148,12 @@ const blogsController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    },
+    }
 
-    getPosts: async (
+    async getPosts(
         req: RequestWithParamsAndQuery<IdType, SortingAndPaginationParamsType>,
         res: Response<Paginator<PostViewModel>>
-    ) => {
+    ){
 
         const blogId: string = req.params.id;
 
@@ -190,12 +194,12 @@ const blogsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(paginationResponse);
-    },
+    }
 
-    createPost: async (
+    async createPost(
         req: RequestWithParamsAndBody<IdType, BlogPostInputModel>,
         res: Response<PostViewModel>
-    ) => {
+    ){
 
         const blogId: string = req.params.id;
 
@@ -222,7 +226,7 @@ const blogsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
             .json(createdPost!)
-    },
-};
+    }
+}
 
-export {blogsController};
+export {BlogsController};

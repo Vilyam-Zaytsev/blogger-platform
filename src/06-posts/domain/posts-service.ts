@@ -1,16 +1,19 @@
 import {PostDbType} from "../types/post-db-type";
 import {PostInputModel} from "../types/input-output-types";
 import {WithId} from "mongodb";
-import {postsRepository} from "../repositoryes/posts-repository";
-import {blogsRepository} from "../../05-blogs/repositoryes/blogs-repository";
+import {PostsRepository} from "../repositoryes/posts-repository";
+import {BlogsRepository} from "../../05-blogs/repositoryes/blogs-repository";
 
-const postsService = {
+const blogsRepository: BlogsRepository = new BlogsRepository();
+const postsRepository: PostsRepository = new PostsRepository();
+
+class PostsService {
 
     async findPost(id: string): Promise<WithId<PostDbType> | null> {
 
         return await postsRepository
             .findPost(id);
-    },
+    }
 
     async createPost(data: PostInputModel): Promise<string> {
 
@@ -24,19 +27,19 @@ const postsService = {
             .insertPost(newPost);
 
         return String(result.insertedId);
-    },
+    }
 
     async updatePost(id: string, data: PostInputModel): Promise<boolean> {
 
         return await postsRepository
             .updatePost(id, data);
-    },
+    }
 
     async deletePost(id: string): Promise<boolean> {
 
         return await postsRepository
             .deletePost(id);
-    },
-};
+    }
+}
 
-export {postsService};
+export {PostsService};

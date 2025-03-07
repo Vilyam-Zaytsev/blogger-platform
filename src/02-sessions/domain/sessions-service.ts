@@ -1,5 +1,5 @@
 import {ActiveSessionType} from "../types/active-session-type";
-import {sessionsRepository} from "../repositories/sessions-repository";
+import {SessionsRepository} from "../repositories/sessions-repository";
 import {
     ForbiddenResult,
     InternalServerErrorResult,
@@ -9,7 +9,9 @@ import {
 import {ResultType} from "../../common/types/result-types/result-type";
 import {WithId} from "mongodb";
 
-const sessionsService = {
+const sessionsRepository: SessionsRepository = new SessionsRepository();
+
+class SessionsService {
 
     async createSession(newSession: ActiveSessionType) {
 
@@ -18,13 +20,13 @@ const sessionsService = {
 
         return SuccessResult
             .create<string>(String(resultInsertSession.insertedId));
-    },
+    }
 
     async deleteSession(id: string) {
 
         return await sessionsRepository
             .deleteSession(id);
-    },
+    }
 
     async deleteSessionByDeviceId(userId: string, deviceId: string): Promise<ResultType> {
 
@@ -66,7 +68,7 @@ const sessionsService = {
 
         return SuccessResult
             .create(null);
-    },
+    }
 
     async deleteAllSessionsExceptCurrent(userId: string, iat: string): Promise<boolean> {
 
@@ -75,4 +77,4 @@ const sessionsService = {
     }
 }
 
-export {sessionsService};
+export {SessionsService};

@@ -1,11 +1,13 @@
 import {UserDbType} from "../types/user-db-type";
-import {usersRepository} from "../repositoryes/users-repository";
+import {UsersRepository} from "../repositoryes/users-repository";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {WithId} from "mongodb";
 import {BadRequestResult, SuccessResult} from "../../common/helpers/result-object";
 
-const usersService = {
+const usersRepository: UsersRepository = new UsersRepository();
+
+class UsersService {
 
     async createUser(user: UserDbType): Promise<ResultType<string | null>> {
 
@@ -18,13 +20,13 @@ const usersService = {
 
         return SuccessResult
             .create<string>(String(result.insertedId));
-    },
+    }
 
     async deleteUser(id: string): Promise<boolean> {
 
         return await usersRepository
             .deleteUser(id);
-    },
+    }
 
     async validateCandidateUniqueness(login: string, email: string): Promise<ResultType> {
 
@@ -56,8 +58,8 @@ const usersService = {
 
         return SuccessResult
             .create(null);
-    },
+    }
 
-};
+}
 
-export {usersService};
+export {UsersService};

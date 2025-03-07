@@ -6,7 +6,7 @@ import {
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {UserInputModel, UserViewModel} from "./types/input-output-types";
-import {usersService} from "./domain/users-service";
+import {UsersService} from "./domain/users-service";
 import {SETTINGS} from "../common/settings";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 import {ResultType} from "../common/types/result-types/result-type";
@@ -16,15 +16,18 @@ import {ApiErrorResult} from "../common/types/input-output-types/api-error-resul
 import {IdType} from "../common/types/input-output-types/id-type";
 import {UserDbType} from "./types/user-db-type";
 import {User} from "./domain/user.entity";
-import {usersQueryRepository} from "./repositoryes/users-query-repository";
+import {UsersQueryRepository} from "./repositoryes/users-query-repository";
 import {ResultStatus} from "../common/types/result-types/result-status";
 
-const usersController = {
+const usersQueryRepository: UsersQueryRepository = new UsersQueryRepository();
+const usersService: UsersService = new UsersService();
 
-    getUsers: async (
+class UsersController {
+
+    async getUsers(
         req: RequestWithQuery<SortingAndPaginationParamsType>,
         res: Response<Paginator<UserViewModel>>
-    ) => {
+    ){
 
         const sortingAndPaginationParams: SortingAndPaginationParamsType = {
             pageNumber: req.query.pageNumber,
@@ -57,12 +60,12 @@ const usersController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(paginationResponse);
-    },
+    }
 
-    createUser: async (
+    async createUser(
         req: RequestWithBody<UserInputModel>,
         res: Response<UserViewModel | ApiErrorResult>
-    ) => {
+    ){
 
         const {
             login,
@@ -90,12 +93,12 @@ const usersController = {
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
             .json(createdUser!);
-    },
+    }
 
-    deleteUser: async (
+    async deleteUser(
         req: RequestWithParams<IdType>,
         res: Response
-    ) => {
+    ){
 
         const isDeletedUser: boolean = await usersService
             .deleteUser(req.params.id);
@@ -110,9 +113,9 @@ const usersController = {
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     }
-};
+}
 
-export {usersController};
+export {UsersController};
 
 
 

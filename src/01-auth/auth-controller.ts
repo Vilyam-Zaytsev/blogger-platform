@@ -13,17 +13,20 @@ import {LoginSuccessViewModel} from "./types/login-success-view-model";
 import {SETTINGS} from "../common/settings";
 import {RegistrationConfirmationCodeModel} from "./types/registration-confirmation-code-model";
 import {RegistrationEmailResendingType} from "./types/registration-email-resending-type";
-import {usersQueryRepository} from "../04-users/repositoryes/users-query-repository";
+import {UsersQueryRepository} from "../04-users/repositoryes/users-query-repository";
 import {AuthTokens} from "./types/auth-tokens-type";
 import {JwtService} from "./adapters/jwt-service";
 import {ActiveSessionType} from "../02-sessions/types/active-session-type";
-import {sessionsService} from "../02-sessions/domain/sessions-service";
+import {SessionsService} from "../02-sessions/domain/sessions-service";
 import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
-import {sessionsRepository} from "../02-sessions/repositories/sessions-repository";
+import {SessionsRepository} from "../02-sessions/repositories/sessions-repository";
 import {WithId} from "mongodb";
 
 const authService: AuthService = new AuthService();
 const jwtService: JwtService = new JwtService();
+const sessionsRepository: SessionsRepository = new SessionsRepository();
+const sessionsService: SessionsService = new SessionsService();
+const usersQueryRepository: UsersQueryRepository = new UsersQueryRepository();
 
 class AuthController {
 

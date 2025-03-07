@@ -7,11 +7,11 @@ import {
 import {IdType} from "../common/types/input-output-types/id-type";
 import {CommentInputModel, CommentViewModel} from "./types/input-output-types";
 import {ResultType} from "../common/types/result-types/result-type";
-import {commentsService} from "./domain/comments-service";
+import {CommentsService} from "./domain/comments-service";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {SETTINGS} from "../common/settings";
-import {commentQueryRepository} from "./repositoryes/comment-query-repository";
+import {CommentQueryRepository} from "./repositoryes/comment-query-repository";
 import {
     PaginationAndSortFilterType,
     Paginator,
@@ -19,7 +19,10 @@ import {
 } from "../common/types/input-output-types/pagination-sort-types";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 
-const commentsController = {
+const commentQueryRepository: CommentQueryRepository = new CommentQueryRepository();
+const commentsService: CommentsService = new CommentsService();
+
+class CommentsController {
 
     async getComments(
         req: RequestWithParamsAndQuery<IdType, SortingAndPaginationParamsType>,
@@ -65,7 +68,7 @@ const commentsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(paginationResponse);
-    },
+    }
 
     async getComment(
         req: RequestWithParams<IdType>,
@@ -86,7 +89,7 @@ const commentsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(foundComment);
-    },
+    }
 
     async createComment(
         req: RequestWithParamsAndBody<IdType, CommentInputModel>,
@@ -116,7 +119,7 @@ const commentsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
             .json(createdComment!);
-    },
+    }
 
     async updateComment(
         req: RequestWithParamsAndBody<IdType, CommentInputModel>,
@@ -144,7 +147,7 @@ const commentsController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    },
+    }
 
     async deleteComment(
         req: RequestWithParams<IdType>,
@@ -169,6 +172,6 @@ const commentsController = {
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     }
-};
+}
 
-export {commentsController};
+export {CommentsController};

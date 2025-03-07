@@ -10,7 +10,7 @@ import {createBlogsSearchFilter} from "../helpers/create-blogs-search-filter";
 import {BlogViewModel} from "../types/input-output-types";
 import {CommentViewModel} from "../../07-comments/types/input-output-types";
 
-const blogsQueryRepository = {
+class BlogsQueryRepository {
 
     async findBlogs(sortQueryDto: PaginationAndSortFilterType): Promise<BlogViewModel[]> {
 
@@ -36,7 +36,7 @@ const blogsQueryRepository = {
             .toArray();
 
         return blogs.map(b => this._mapDbBlogToViewModel(b));
-    },
+    }
 
     async findBlog(id: string): Promise<BlogViewModel | null> {
 
@@ -46,7 +46,7 @@ const blogsQueryRepository = {
         if (!blog) return null;
 
         return this._mapDbBlogToViewModel(blog);
-    },
+    }
 
     async getBlogsCount(searchNameTerm: string | null): Promise<number> {
 
@@ -58,7 +58,7 @@ const blogsQueryRepository = {
 
         return blogsCollection
             .countDocuments(filter);
-    },
+    }
 
     _mapDbBlogToViewModel(blog: WithId<BlogDbType>): BlogViewModel {
 
@@ -70,7 +70,7 @@ const blogsQueryRepository = {
             createdAt: blog.createdAt,
             isMembership: blog.isMembership
         };
-    },
+    }
 
     _mapBlogsViewModelToPaginationResponse(
         blogs: BlogViewModel[],
@@ -86,6 +86,6 @@ const blogsQueryRepository = {
             items: blogs
         };
     }
-};
+}
 
-export {blogsQueryRepository};
+export {BlogsQueryRepository};

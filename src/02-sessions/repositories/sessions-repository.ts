@@ -3,25 +3,25 @@ import {InsertOneResult, ObjectId, WithId} from "mongodb";
 import {ActiveSessionType} from "../types/active-session-type";
 import {SessionTimestampsType} from "../types/session-timestamps-type";
 
-const sessionsRepository = {
+class SessionsRepository {
 
     async findSessionByIatAndDeviceId(iat: string, deviceId: string): Promise<WithId<ActiveSessionType> | null> {
 
         return sessionsCollection
             .findOne({iat, deviceId});
-    },
+    }
 
     async findSessionByDeviceId(deviceId: string): Promise<WithId<ActiveSessionType> | null> {
 
         return sessionsCollection
             .findOne({deviceId});
-    },
+    }
 
     async insertSession(newSession: ActiveSessionType): Promise<InsertOneResult> {
 
         return await sessionsCollection
             .insertOne(newSession);
-    },
+    }
 
     async updateSessionTimestamps(_id: ObjectId, data: SessionTimestampsType): Promise<boolean> {
 
@@ -34,7 +34,7 @@ const sessionsRepository = {
             });
 
         return result.matchedCount === 1;
-    },
+    }
 
     async deleteSession(id: string): Promise<boolean> {
 
@@ -42,7 +42,7 @@ const sessionsRepository = {
             .deleteOne({_id: new ObjectId(id)});
 
         return result.deletedCount === 1;
-    },
+    }
 
     async deleteAllSessionsExceptCurrent(userId: string, iat: string) {
 
@@ -56,4 +56,4 @@ const sessionsRepository = {
     }
 }
 
-export {sessionsRepository};
+export {SessionsRepository};

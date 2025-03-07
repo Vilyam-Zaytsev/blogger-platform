@@ -7,7 +7,7 @@ import {
     RequestWithQuery
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
-import {postsService} from "./domain/posts-service";
+import {PostsService} from "./domain/posts-service";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 import {
     PaginationAndSortFilterType,
@@ -15,14 +15,17 @@ import {
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {postsQueryRepository} from "./repositoryes/posts-query-repository";
+import {PostsQueryRepository} from "./repositoryes/posts-query-repository";
 
-const postsController = {
+const postsQueryRepository: PostsQueryRepository = new PostsQueryRepository();
+const postsService: PostsService = new PostsService();
 
-    getPosts: async (
+class PostsController {
+
+    async getPosts(
         req: RequestWithQuery<SortingAndPaginationParamsType>,
         res: Response<Paginator<PostViewModel>>
-    ) => {
+    ){
 
         const sortingAndPaginationParams: SortingAndPaginationParamsType = {
             pageNumber: req.query.pageNumber,
@@ -49,12 +52,12 @@ const postsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(paginationResponse);
-    },
+    }
 
-    getPost: async (
+    async getPost(
         req: RequestWithParams<IdType>,
         res: Response<PostViewModel>
-    ) => {
+    ){
 
         const foundPost: PostViewModel | null = await postsQueryRepository
             .findPost(req.params.id);
@@ -69,12 +72,12 @@ const postsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(foundPost);
-    },
+    }
 
-    createPost: async (
+    async createPost(
         req: RequestWithBody<PostInputModel>,
         res: Response<PostViewModel>
-    ) => {
+    ){
 
         const dataForCreatingPost: PostInputModel = {
             title: req.body.title,
@@ -92,12 +95,12 @@ const postsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
             .json(createdPost!);
-    },
+    }
 
-    updatePost: async (
+    async updatePost(
         req: RequestWithParamsAndBody<IdType, PostInputModel>,
         res: Response<PostViewModel>
-    ) => {
+    ){
 
         const dataForPostUpdates: PostInputModel = {
             title: req.body.title,
@@ -118,12 +121,12 @@ const postsController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
-    },
+    }
 
-    deletePost: async (
+    async deletePost(
         req: RequestWithParams<IdType>,
         res: Response
-    ) => {
+    ){
 
         const isDeletedPost: boolean = await postsService
             .deletePost(req.params.id);
@@ -137,7 +140,7 @@ const postsController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
-    },
-};
+    }
+}
 
-export {postsController};
+export {PostsController};

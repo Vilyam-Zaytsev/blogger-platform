@@ -1,13 +1,16 @@
-import {blogsRepository} from "../repositoryes/blogs-repository";
+import {BlogsRepository} from "../repositoryes/blogs-repository";
 import {BlogInputModel, BlogPostInputModel} from "../types/input-output-types";
 import {BlogDbType} from "../types/blog-db-type";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ObjectId} from "mongodb";
 import {ResultStatus} from "../../common/types/result-types/result-status";
-import {postsService} from "../../06-posts/domain/posts-service";
+import {PostsService} from "../../06-posts/domain/posts-service";
 import {BadRequestResult, NotFoundResult, SuccessResult} from "../../common/helpers/result-object";
 
-const blogsService = {
+const blogsRepository: BlogsRepository = new BlogsRepository();
+const postsService: PostsService = new PostsService();
+
+class BlogsService {
 
     async createBlog(blogData: BlogInputModel): Promise<string> {
 
@@ -21,7 +24,7 @@ const blogsService = {
             .insertBlog(newBlog);
 
         return String(resultInsertBlog.insertedId);
-    },
+    }
 
     async createPost(
         blogId: string,
@@ -45,19 +48,19 @@ const blogsService = {
 
         return SuccessResult
             .create<string>(resultCreatedPost);
-    },
+    }
 
     async updateBlog(id: string, data: BlogInputModel): Promise<boolean> {
 
         return await blogsRepository
             .updateBlog(id, data);
-    },
+    }
 
     async deleteBlog(id: string): Promise<boolean> {
 
         return await blogsRepository
             .deleteBlog(id);
-    },
+    }
 
     async checkBlogId(blogId: string): Promise<ResultType<string | null>> {
 
@@ -87,6 +90,6 @@ const blogsService = {
         return SuccessResult
             .create<string>(blogId);
     }
-};
+}
 
-export {blogsService};
+export {BlogsService};
