@@ -1,7 +1,7 @@
 import {Response} from "express";
 import {RequestWithBody, RequestWithSession, RequestWithUserId} from "../common/types/input-output-types/request-types";
 import {LoginInputModel} from "./types/login-input-model";
-import {authService} from "./domain/auth-service";
+import {AuthService} from "./domain/auth-service";
 import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
@@ -21,6 +21,8 @@ import {sessionsService} from "../02-sessions/domain/sessions-service";
 import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
 import {sessionsRepository} from "../02-sessions/repositories/sessions-repository";
 import {WithId} from "mongodb";
+
+const authService: AuthService = new AuthService();
 
 class AuthController {
 

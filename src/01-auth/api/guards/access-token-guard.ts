@@ -1,8 +1,10 @@
 import {Request, Response, NextFunction} from "express";
 import {SETTINGS} from "../../../common/settings";
 import {ResultType} from "../../../common/types/result-types/result-type";
-import {authService} from "../../domain/auth-service";
+import {AuthService} from "../../domain/auth-service";
 import {ResultStatus} from "../../../common/types/result-types/result-status";
+
+const authService: AuthService = new AuthService();
 
 const accessTokenGuard = async (
     req: Request,
