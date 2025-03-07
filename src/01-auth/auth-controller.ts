@@ -22,12 +22,12 @@ import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type
 import {sessionsRepository} from "../02-sessions/repositories/sessions-repository";
 import {WithId} from "mongodb";
 
-const authController = {
+class AuthController {
 
-    login: async (
+    async login(
         req: RequestWithBody<LoginInputModel>,
         res: Response<ApiErrorResult | LoginSuccessViewModel>
-    ) => {
+    ) {
 
         const authParams: LoginInputModel = {
             loginOrEmail: req.body.loginOrEmail,
@@ -87,12 +87,12 @@ const authController = {
                 {httpOnly: true, secure: true,}
             )
             .json({accessToken});
-    },
+    }
 
-    logout: async (
+    async logout(
         req: RequestWithSession<TokenSessionDataType>,
         res: Response
-    ) => {
+    ){
 
         if (!req.session) {
 
@@ -121,12 +121,12 @@ const authController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    },
+    }
 
-    refreshToken: async (
+    async refreshToken(
         req: RequestWithSession<TokenSessionDataType>,
         res: Response<ApiErrorResult | LoginSuccessViewModel>
-    ) => {
+    ){
 
         const dataForRefreshToken: TokenSessionDataType = {
             iat: req.session!.iat,
@@ -154,12 +154,12 @@ const authController = {
                 {httpOnly: true, secure: true,}
             )
             .json({accessToken: resultRefreshToken.data!.accessToken});
-    },
+    }
 
-    registration: async (
+    async registration(
         req: RequestWithBody<UserInputModel>,
         res: Response
-    ) => {
+    ){
 
         const dataForRegistrationUser: UserInputModel = {
             login: req.body.login,
@@ -181,12 +181,12 @@ const authController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    },
+    }
 
-    registrationConfirmation: async (
+    async registrationConfirmation(
         req: RequestWithBody<RegistrationConfirmationCodeModel>,
         res: Response
-    ) => {
+    ){
 
         const {code} = req.body
 
@@ -204,12 +204,12 @@ const authController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    },
+    }
 
-    registrationEmailResending: async (
+    async registrationEmailResending(
         req: RequestWithBody<RegistrationEmailResendingType>,
         res: Response
-    ) => {
+    ){
 
         const {email} = req.body;
 
@@ -227,12 +227,12 @@ const authController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    },
+    }
 
-    me: async (
+    async me(
         req: RequestWithUserId<IdType>,
         res: Response<UserMeViewModel>
-    ) => {
+    ){
 
         const userId: string = String(req.user?.id);
 
@@ -248,7 +248,237 @@ const authController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(me!);
-    },
-};
+    }
+}
 
-export {authController};
+
+// const authController = {
+//
+//     login: async (
+//         req: RequestWithBody<LoginInputModel>,
+//         res: Response<ApiErrorResult | LoginSuccessViewModel>
+//     ) => {
+//
+//         const authParams: LoginInputModel = {
+//             loginOrEmail: req.body.loginOrEmail,
+//             password: req.body.password,
+//         };
+//
+//         const resultLogin: ResultType<AuthTokens | null> = await authService
+//             .login(authParams);
+//
+//         if (resultLogin.status !== ResultStatus.Success) {
+//
+//             res
+//                 .status(mapResultStatusToHttpStatus(resultLogin.status))
+//                 .json(mapResultExtensionsToErrorMessage(resultLogin.extensions));
+//
+//             return;
+//         }
+//
+//         const deviceName: string = req.headers['user-agent'] || 'Unknown device';
+//
+//         const ip: string = req.headers['x-forwarded-for']?.toString().split(',')[0]
+//             || req.socket.remoteAddress
+//             || '0.0.0.0';
+//
+//         const payload = await jwtService
+//             .decodeToken(resultLogin.data!.refreshToken);
+//
+//         const {
+//             userId,
+//             deviceId,
+//             iat,
+//             exp
+//         } = payload;
+//
+//         const newSession: ActiveSessionType = {
+//             userId,
+//             deviceId,
+//             deviceName,
+//             ip,
+//             iat: new Date(iat * 1000).toISOString(),
+//             exp
+//         };
+//
+//         await sessionsService
+//             .createSession(newSession);
+//
+//         const {
+//             accessToken,
+//             refreshToken
+//         } = resultLogin.data!;
+//
+//         res
+//             .status(mapResultStatusToHttpStatus(resultLogin.status))
+//             .cookie(
+//                 'refreshToken',
+//                 refreshToken,
+//                 {httpOnly: true, secure: true,}
+//             )
+//             .json({accessToken});
+//     },
+//
+//     logout: async (
+//         req: RequestWithSession<TokenSessionDataType>,
+//         res: Response
+//     ) => {
+//
+//         if (!req.session) {
+//
+//             res
+//                 .sendStatus(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
+//         }
+//
+//         const {
+//             iat,
+//             deviceId
+//         } = req.session!;
+//
+//         const session: WithId<ActiveSessionType> | null = await sessionsRepository
+//             .findSessionByIatAndDeviceId(iat, deviceId);
+//
+//         if (!session) {
+//
+//             res
+//                 .sendStatus(SETTINGS.HTTP_STATUSES.INTERNAL_SERVER_ERROR_500);
+//
+//             return;
+//         }
+//
+//         await sessionsService
+//             .deleteSession(String(session._id));
+//
+//         res
+//             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+//     },
+//
+//     refreshToken: async (
+//         req: RequestWithSession<TokenSessionDataType>,
+//         res: Response<ApiErrorResult | LoginSuccessViewModel>
+//     ) => {
+//
+//         const dataForRefreshToken: TokenSessionDataType = {
+//             iat: req.session!.iat,
+//             userId: req.session!.userId,
+//             deviceId: req.session!.deviceId
+//         };
+//
+//         const resultRefreshToken: ResultType<AuthTokens | null> = await authService
+//             .refreshToken(dataForRefreshToken);
+//
+//         if (resultRefreshToken.status !== ResultStatus.Success) {
+//
+//             res
+//                 .status(mapResultStatusToHttpStatus(resultRefreshToken.status))
+//                 .json(mapResultExtensionsToErrorMessage(resultRefreshToken.extensions));
+//
+//             return;
+//         }
+//
+//         res
+//             .status(SETTINGS.HTTP_STATUSES.OK_200)
+//             .cookie(
+//                 'refreshToken',
+//                 resultRefreshToken.data!.refreshToken,
+//                 {httpOnly: true, secure: true,}
+//             )
+//             .json({accessToken: resultRefreshToken.data!.accessToken});
+//     },
+//
+//     registration: async (
+//         req: RequestWithBody<UserInputModel>,
+//         res: Response
+//     ) => {
+//
+//         const dataForRegistrationUser: UserInputModel = {
+//             login: req.body.login,
+//             email: req.body.email,
+//             password: req.body.password
+//         };
+//
+//         const resultRegistration: ResultType<string | null> = await authService
+//             .registration(dataForRegistrationUser);
+//
+//         if (resultRegistration.status !== ResultStatus.Success) {
+//
+//             res
+//                 .status(mapResultStatusToHttpStatus(resultRegistration.status))
+//                 .json(mapResultExtensionsToErrorMessage(resultRegistration.extensions));
+//
+//             return;
+//         }
+//
+//         res
+//             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+//     },
+//
+//     registrationConfirmation: async (
+//         req: RequestWithBody<RegistrationConfirmationCodeModel>,
+//         res: Response
+//     ) => {
+//
+//         const {code} = req.body
+//
+//         const resultRegistrationConfirmation: ResultType = await authService
+//             .registrationConfirmation(code);
+//
+//         if (resultRegistrationConfirmation.status !== ResultStatus.Success) {
+//
+//             res
+//                 .status(mapResultStatusToHttpStatus(resultRegistrationConfirmation.status))
+//                 .json(mapResultExtensionsToErrorMessage(resultRegistrationConfirmation.extensions));
+//
+//             return;
+//         }
+//
+//         res
+//             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+//     },
+//
+//     registrationEmailResending: async (
+//         req: RequestWithBody<RegistrationEmailResendingType>,
+//         res: Response
+//     ) => {
+//
+//         const {email} = req.body;
+//
+//         const resultEmailResending = await authService
+//             .registrationEmailResending(email);
+//
+//         if (resultEmailResending.status !== ResultStatus.Success) {
+//
+//             res
+//                 .status(mapResultStatusToHttpStatus(resultEmailResending.status))
+//                 .json(mapResultExtensionsToErrorMessage(resultEmailResending.extensions));
+//
+//             return;
+//         }
+//
+//         res
+//             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+//     },
+//
+//     me: async (
+//         req: RequestWithUserId<IdType>,
+//         res: Response<UserMeViewModel>
+//     ) => {
+//
+//         const userId: string = String(req.user?.id);
+//
+//         if (!userId) {
+//
+//             res
+//                 .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+//         }
+//
+//         const me: UserMeViewModel | null = await usersQueryRepository
+//             .findUserAndMapToMeViewModel(userId);
+//
+//         res
+//             .status(SETTINGS.HTTP_STATUSES.OK_200)
+//             .json(me!);
+//     },
+// };
+
+export {AuthController};

@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {authController} from "../auth-controller";
+import {AuthController} from "../auth-controller";
 import {
     userEmailInputValidator,
     userLoginInputValidator,
@@ -15,6 +15,7 @@ import {activeSessionGuard} from "./guards/active-session-guard";
 import {rateLimitsGuard} from "../../common/middlewares/rate-limits-guard";
 
 const authRouter = Router();
+const authController: AuthController = new AuthController();
 
 authRouter.post(SETTINGS.PATH.AUTH.LOGIN,
     rateLimitsGuard,
