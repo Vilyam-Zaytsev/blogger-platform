@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {UsersController} from "../users-controller";
+import {usersController} from "../users-controller";
 import {
     userEmailInputValidator,
     userLoginInputValidator,
@@ -7,8 +7,6 @@ import {
 } from "./middlewares/user-validators";
 import {inputCheckErrorsMiddleware} from "../../common/middlewares/input-check-errors-middleware";
 import {baseAuthGuard} from "../../01-auth/api/guards/base-auth-guard";
-
-const usersController: UsersController = new UsersController();
 
 const usersRouter = Router();
 

@@ -1,11 +1,9 @@
 import {UserDbType} from "../types/user-db-type";
-import {UsersRepository} from "../repositoryes/users-repository";
+import {usersRepository} from "../repositoryes/users-repository";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {WithId} from "mongodb";
 import {BadRequestResult, SuccessResult} from "../../common/helpers/result-object";
-
-const usersRepository: UsersRepository = new UsersRepository();
 
 class UsersService {
 
@@ -62,4 +60,6 @@ class UsersService {
 
 }
 
-export {UsersService};
+const usersService: UsersService = new UsersService();
+
+export {usersService};

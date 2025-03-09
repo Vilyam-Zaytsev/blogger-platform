@@ -33,4 +33,6 @@ class BlogsRepository {
     }
 }
 
-export {BlogsRepository};
+const blogsRepository: BlogsRepository = new BlogsRepository();
+
+export {blogsRepository};

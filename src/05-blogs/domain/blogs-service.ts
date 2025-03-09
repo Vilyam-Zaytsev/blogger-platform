@@ -1,14 +1,11 @@
-import {BlogsRepository} from "../repositoryes/blogs-repository";
+import {blogsRepository} from "../repositoryes/blogs-repository";
 import {BlogInputModel, BlogPostInputModel} from "../types/input-output-types";
 import {BlogDbType} from "../types/blog-db-type";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ObjectId} from "mongodb";
 import {ResultStatus} from "../../common/types/result-types/result-status";
-import {PostsService} from "../../06-posts/domain/posts-service";
+import {postsService} from "../../06-posts/domain/posts-service";
 import {BadRequestResult, NotFoundResult, SuccessResult} from "../../common/helpers/result-object";
-
-const blogsRepository: BlogsRepository = new BlogsRepository();
-const postsService: PostsService = new PostsService();
 
 class BlogsService {
 
@@ -92,4 +89,6 @@ class BlogsService {
     }
 }
 
-export {BlogsService};
+const blogsService: BlogsService = new BlogsService();
+
+export {blogsService};

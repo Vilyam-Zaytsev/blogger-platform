@@ -1,15 +1,15 @@
 import {BcryptService} from "../adapters/bcrypt-service";
 import {LoginInputModel} from "../types/login-input-model";
 import {ConfirmationStatus, UserDbType} from "../../04-users/types/user-db-type";
-import {UsersRepository} from "../../04-users/repositoryes/users-repository";
+import {usersRepository} from "../../04-users/repositoryes/users-repository";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {JwtService} from "../adapters/jwt-service";
 import {WithId} from "mongodb";
-import {UsersService} from "../../04-users/domain/users-service";
+import {usersService} from "../../04-users/domain/users-service";
 import {User} from "../../04-users/domain/user.entity";
-import {NodemailerService} from "../adapters/nodemailer-service";
-import {EmailTemplates} from "../adapters/email-templates";
+import {nodemailerService} from "../adapters/nodemailer-service";
+import {emailTemplates} from "../adapters/email-templates";
 import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
 import {UserInputModel} from "../../04-users/types/input-output-types";
@@ -23,17 +23,12 @@ import {
 import {AuthTokens} from "../types/auth-tokens-type";
 import {ActiveSessionType} from "../../02-sessions/types/active-session-type";
 import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
-import {SessionsRepository} from "../../02-sessions/repositories/sessions-repository";
+import {sessionsRepository} from "../../02-sessions/repositories/sessions-repository";
 import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-type";
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
 
 const bcryptService: BcryptService = new BcryptService();
 const jwtService: JwtService = new JwtService();
-const nodemailerService: NodemailerService = new NodemailerService();
-const emailTemplates: EmailTemplates = new EmailTemplates();
-const sessionsRepository: SessionsRepository = new SessionsRepository();
-const usersRepository: UsersRepository = new UsersRepository();
-const usersService: UsersService = new UsersService();
 
 class AuthService {
 
@@ -348,4 +343,6 @@ class AuthService {
     }
 }
 
-export {AuthService};
+const authService: AuthService = new AuthService();
+
+export {authService};

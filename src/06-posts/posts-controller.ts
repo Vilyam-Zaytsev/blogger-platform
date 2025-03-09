@@ -7,7 +7,7 @@ import {
     RequestWithQuery
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
-import {PostsService} from "./domain/posts-service";
+import {postsService} from "./domain/posts-service";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 import {
     PaginationAndSortFilterType,
@@ -15,10 +15,7 @@ import {
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {PostsQueryRepository} from "./repositoryes/posts-query-repository";
-
-const postsQueryRepository: PostsQueryRepository = new PostsQueryRepository();
-const postsService: PostsService = new PostsService();
+import {postsQueryRepository} from "./repositoryes/posts-query-repository";
 
 class PostsController {
 
@@ -143,4 +140,6 @@ class PostsController {
     }
 }
 
-export {PostsController};
+const postsController: PostsController = new PostsController();
+
+export {postsController};

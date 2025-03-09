@@ -1,7 +1,7 @@
 import {Response} from "express";
 import {RequestWithBody, RequestWithSession, RequestWithUserId} from "../common/types/input-output-types/request-types";
 import {LoginInputModel} from "./types/login-input-model";
-import {AuthService} from "./domain/auth-service";
+import {authService} from "./domain/auth-service";
 import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
@@ -13,20 +13,16 @@ import {LoginSuccessViewModel} from "./types/login-success-view-model";
 import {SETTINGS} from "../common/settings";
 import {RegistrationConfirmationCodeModel} from "./types/registration-confirmation-code-model";
 import {RegistrationEmailResendingType} from "./types/registration-email-resending-type";
-import {UsersQueryRepository} from "../04-users/repositoryes/users-query-repository";
+import {usersQueryRepository} from "../04-users/repositoryes/users-query-repository";
 import {AuthTokens} from "./types/auth-tokens-type";
 import {JwtService} from "./adapters/jwt-service";
 import {ActiveSessionType} from "../02-sessions/types/active-session-type";
-import {SessionsService} from "../02-sessions/domain/sessions-service";
+import {sessionsService} from "../02-sessions/domain/sessions-service";
 import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
-import {SessionsRepository} from "../02-sessions/repositories/sessions-repository";
+import {sessionsRepository} from "../02-sessions/repositories/sessions-repository";
 import {WithId} from "mongodb";
 
-const authService: AuthService = new AuthService();
 const jwtService: JwtService = new JwtService();
-const sessionsRepository: SessionsRepository = new SessionsRepository();
-const sessionsService: SessionsService = new SessionsService();
-const usersQueryRepository: UsersQueryRepository = new UsersQueryRepository();
 
 class AuthController {
 
@@ -257,4 +253,6 @@ class AuthController {
     }
 }
 
-export {AuthController};
+const authController: AuthController = new AuthController();
+
+export {authController};

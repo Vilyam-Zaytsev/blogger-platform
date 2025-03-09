@@ -3,21 +3,17 @@ import {ObjectId, WithId} from "mongodb";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {PostDbType} from "../../06-posts/types/post-db-type";
-import {PostsService} from "../../06-posts/domain/posts-service";
-import {CommentRepository} from "../repositoryes/comment-repository";
+import {postsService} from "../../06-posts/domain/posts-service";
+import {commentRepository} from "../repositoryes/comment-repository";
 import {CommentDbType} from "../types/comment-db-type";
 import {UserDbType} from "../../04-users/types/user-db-type";
-import {UsersRepository} from "../../04-users/repositoryes/users-repository";
+import {usersRepository} from "../../04-users/repositoryes/users-repository";
 import {
     BadRequestResult,
     ForbiddenResult,
     NotFoundResult,
     SuccessResult
 } from "../../common/helpers/result-object";
-
-const usersRepository: UsersRepository = new UsersRepository();
-const postsService: PostsService = new PostsService();
-const commentRepository: CommentRepository = new CommentRepository();
 
 class CommentsService {
 
@@ -143,4 +139,6 @@ class CommentsService {
     }
 }
 
-export {CommentsService};
+const commentsService: CommentsService = new CommentsService();
+
+export {commentsService};

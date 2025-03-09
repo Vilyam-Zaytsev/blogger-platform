@@ -27,4 +27,6 @@ class NodemailerService {
     }
 }
 
-export {NodemailerService};
+const nodemailerService: NodemailerService = new NodemailerService();
+
+export {nodemailerService};

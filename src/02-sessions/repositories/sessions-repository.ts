@@ -56,4 +56,6 @@ class SessionsRepository {
     }
 }
 
-export {SessionsRepository};
+const sessionsRepository: SessionsRepository = new SessionsRepository();
+
+export {sessionsRepository};

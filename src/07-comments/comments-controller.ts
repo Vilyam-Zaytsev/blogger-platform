@@ -7,20 +7,17 @@ import {
 import {IdType} from "../common/types/input-output-types/id-type";
 import {CommentInputModel, CommentViewModel} from "./types/input-output-types";
 import {ResultType} from "../common/types/result-types/result-type";
-import {CommentsService} from "./domain/comments-service";
+import {commentsService} from "./domain/comments-service";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {SETTINGS} from "../common/settings";
-import {CommentQueryRepository} from "./repositoryes/comment-query-repository";
+import {commentQueryRepository} from "./repositoryes/comment-query-repository";
 import {
     PaginationAndSortFilterType,
     Paginator,
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
-
-const commentQueryRepository: CommentQueryRepository = new CommentQueryRepository();
-const commentsService: CommentsService = new CommentsService();
 
 class CommentsController {
 
@@ -174,4 +171,6 @@ class CommentsController {
     }
 }
 
-export {CommentsController};
+const commentsController: CommentsController = new CommentsController();
+
+export {commentsController};

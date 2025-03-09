@@ -25,4 +25,6 @@ class SessionsQueryRepository {
     }
 }
 
-export {SessionsQueryRepository};
+const sessionsQueryRepository: SessionsQueryRepository = new SessionsQueryRepository();
+
+export {sessionsQueryRepository};

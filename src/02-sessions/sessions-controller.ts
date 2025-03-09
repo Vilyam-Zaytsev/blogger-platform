@@ -3,15 +3,12 @@ import {RequestWithParams, RequestWithSession} from "../common/types/input-outpu
 import {TokenSessionDataType} from "./types/token-session-data-type";
 import {SETTINGS} from "../common/settings";
 import {DeviceViewModel} from "./types/input-output-types";
-import {SessionsQueryRepository} from "./repositories/sessions-query-repository";
+import {sessionsQueryRepository} from "./repositories/sessions-query-repository";
 import {ResultType} from "../common/types/result-types/result-type";
-import {SessionsService} from "./domain/sessions-service";
+import {sessionsService} from "./domain/sessions-service";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
-
-const sessionsQueryRepository: SessionsQueryRepository = new SessionsQueryRepository();
-const sessionsService: SessionsService = new SessionsService();
 
 class SessionsController {
 
@@ -89,4 +86,6 @@ class SessionsController {
     }
 }
 
-export {SessionsController};
+const sessionsController: SessionsController = new SessionsController();
+
+export {sessionsController};

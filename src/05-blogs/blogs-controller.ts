@@ -7,7 +7,7 @@ import {
     RequestWithQuery
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
-import {BlogsService} from "./domain/blogs-service";
+import {blogsService} from "./domain/blogs-service";
 import {BlogDbType} from "./types/blog-db-type";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 import {
@@ -16,17 +16,12 @@ import {
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {BlogsQueryRepository} from "./repositoryes/blogs-query-repository";
+import {blogsQueryRepository} from "./repositoryes/blogs-query-repository";
 import {PostViewModel} from "../06-posts/types/input-output-types";
 import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
-import {PostsQueryRepository} from "../06-posts/repositoryes/posts-query-repository";
-
-const blogsQueryRepository: BlogsQueryRepository = new BlogsQueryRepository();
-const blogsService: BlogsService = new BlogsService();
-const postsQueryRepository: PostsQueryRepository = new PostsQueryRepository();
-
+import {postsQueryRepository} from "../06-posts/repositoryes/posts-query-repository";
 
 class BlogsController {
 
@@ -229,4 +224,6 @@ class BlogsController {
     }
 }
 
-export {BlogsController};
+const blogsController: BlogsController = new BlogsController();
+
+export {blogsController};

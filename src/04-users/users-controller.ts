@@ -6,7 +6,7 @@ import {
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {UserInputModel, UserViewModel} from "./types/input-output-types";
-import {UsersService} from "./domain/users-service";
+import {usersService} from "./domain/users-service";
 import {SETTINGS} from "../common/settings";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 import {ResultType} from "../common/types/result-types/result-type";
@@ -16,11 +16,8 @@ import {ApiErrorResult} from "../common/types/input-output-types/api-error-resul
 import {IdType} from "../common/types/input-output-types/id-type";
 import {UserDbType} from "./types/user-db-type";
 import {User} from "./domain/user.entity";
-import {UsersQueryRepository} from "./repositoryes/users-query-repository";
+import {usersQueryRepository} from "./repositoryes/users-query-repository";
 import {ResultStatus} from "../common/types/result-types/result-status";
-
-const usersQueryRepository: UsersQueryRepository = new UsersQueryRepository();
-const usersService: UsersService = new UsersService();
 
 class UsersController {
 
@@ -115,7 +112,9 @@ class UsersController {
     }
 }
 
-export {UsersController};
+const usersController: UsersController = new UsersController();
+
+export {usersController};
 
 
 

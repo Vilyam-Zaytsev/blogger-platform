@@ -1,5 +1,5 @@
 import {ActiveSessionType} from "../types/active-session-type";
-import {SessionsRepository} from "../repositories/sessions-repository";
+import {sessionsRepository} from "../repositories/sessions-repository";
 import {
     ForbiddenResult,
     InternalServerErrorResult,
@@ -8,8 +8,6 @@ import {
 } from "../../common/helpers/result-object";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {WithId} from "mongodb";
-
-const sessionsRepository: SessionsRepository = new SessionsRepository();
 
 class SessionsService {
 
@@ -77,4 +75,6 @@ class SessionsService {
     }
 }
 
-export {SessionsService};
+const sessionsService: SessionsService = new SessionsService();
+
+export {sessionsService};

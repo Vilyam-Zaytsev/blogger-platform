@@ -23,4 +23,6 @@ class EmailTemplates {
     }
 }
 
-export {EmailTemplates};
+const emailTemplates: EmailTemplates = new EmailTemplates();
+
+export {emailTemplates};

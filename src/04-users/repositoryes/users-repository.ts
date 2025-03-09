@@ -106,4 +106,6 @@ class UsersRepository {
     }
 }
 
-export {UsersRepository};
+const usersRepository: UsersRepository = new UsersRepository();
+
+export {usersRepository};
