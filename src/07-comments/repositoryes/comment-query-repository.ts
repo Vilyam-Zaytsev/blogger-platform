@@ -74,6 +74,4 @@ class CommentQueryRepository {
     }
 }
 
-const commentQueryRepository: CommentQueryRepository = new CommentQueryRepository();
-
-export {commentQueryRepository};
+export {CommentQueryRepository};

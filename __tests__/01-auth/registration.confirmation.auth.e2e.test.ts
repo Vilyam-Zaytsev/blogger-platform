@@ -6,7 +6,7 @@ import {MongoClient, ObjectId, WithId} from "mongodb";
 import {apiTrafficCollection, setApiTrafficCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
 import {ConfirmationStatus, UserDbType} from "../../src/04-users/types/user-db-type";
-import {usersRepository} from "../../src/04-users/repositoryes/users-repository";
+import {UsersRepository} from "../../src/04-users/repositoryes/users-repository";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
 import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
@@ -14,6 +14,8 @@ import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 import {UserInputModel} from "../../src/04-users/types/input-output-types";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
+
+const usersRepository: UsersRepository = new UsersRepository();
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -56,9 +58,9 @@ describe('POST /auth/registration-confirmation', () => {
         await authTestManager
             .registration(user);
 
+
         const foundUser_1: WithId<UserDbType> | null = await usersRepository
             .findByEmail(user.email);
-
 
         const resRegistrationConfirmation: Response = await req
             .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION_CONFIRMATION}`)

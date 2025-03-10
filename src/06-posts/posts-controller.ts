@@ -7,7 +7,7 @@ import {
     RequestWithQuery
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
-import {postsService} from "./domain/posts-service";
+import {PostsService} from "./domain/posts-service";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 import {
     PaginationAndSortFilterType,
@@ -15,9 +15,14 @@ import {
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {postsQueryRepository} from "./repositoryes/posts-query-repository";
+import {PostsQueryRepository} from "./repositoryes/posts-query-repository";
 
 class PostsController {
+
+    constructor(
+        private postsService: PostsService = new PostsService(),
+        private postsQueryRepository: PostsQueryRepository = new PostsQueryRepository()
+    ) {};
 
     async getPosts(
         req: RequestWithQuery<SortingAndPaginationParamsType>,
@@ -33,13 +38,13 @@ class PostsController {
 
         const paginationAndSortFilter: PaginationAndSortFilterType = createPaginationAndSortFilter(sortingAndPaginationParams)
 
-        const foundPosts: PostViewModel[] = await postsQueryRepository
+        const foundPosts: PostViewModel[] = await this.postsQueryRepository
             .findPosts(paginationAndSortFilter);
 
-        const postsCount: number = await postsQueryRepository
+        const postsCount: number = await this.postsQueryRepository
             .getPostsCount();
 
-        const paginationResponse: Paginator<PostViewModel> = await postsQueryRepository
+        const paginationResponse: Paginator<PostViewModel> = await this.postsQueryRepository
             ._mapPostsViewModelToPaginationResponse(
                 foundPosts,
                 postsCount,
@@ -56,7 +61,7 @@ class PostsController {
         res: Response<PostViewModel>
     ){
 
-        const foundPost: PostViewModel | null = await postsQueryRepository
+        const foundPost: PostViewModel | null = await this.postsQueryRepository
             .findPost(req.params.id);
 
         if (!foundPost) {
@@ -83,10 +88,10 @@ class PostsController {
             blogId: req.body.blogId,
         };
 
-        const idCreatedPost: string | null = await postsService
+        const idCreatedPost: string | null = await this.postsService
             .createPost(dataForCreatingPost);
 
-        const createdPost: PostViewModel | null = await postsQueryRepository
+        const createdPost: PostViewModel | null = await this.postsQueryRepository
             .findPost(idCreatedPost);
 
         res
@@ -106,7 +111,7 @@ class PostsController {
             blogId: req.body.blogId
         };
 
-        const updatedPost: boolean = await postsService
+        const updatedPost: boolean = await this.postsService
             .updatePost(req.params.id, dataForPostUpdates);
 
         if (!updatedPost) {
@@ -125,7 +130,7 @@ class PostsController {
         res: Response
     ){
 
-        const isDeletedPost: boolean = await postsService
+        const isDeletedPost: boolean = await this.postsService
             .deletePost(req.params.id);
 
         if (!isDeletedPost) {

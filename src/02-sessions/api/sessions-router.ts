@@ -8,17 +8,17 @@ const sessionsRouter = Router();
 sessionsRouter.get(
     SETTINGS.PATH.SECURITY_DEVICES.DEVICES,
     refreshTokenGuard,
-    sessionsController.getDevices
+    sessionsController.getDevices.bind(sessionsController)
 );
 sessionsRouter.delete(
     SETTINGS.PATH.SECURITY_DEVICES.DEVICES,
     refreshTokenGuard,
-    sessionsController.deleteDevices
+    sessionsController.deleteDevices.bind(sessionsController)
 );
 sessionsRouter.delete(
     `${SETTINGS.PATH.SECURITY_DEVICES.DEVICES}/:id`,
     refreshTokenGuard,
-    sessionsController.deleteDevice
+    sessionsController.deleteDevice.bind(sessionsController)
 );
 
 export {sessionsRouter};

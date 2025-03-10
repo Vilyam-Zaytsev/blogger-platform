@@ -1,13 +1,18 @@
-import {blogsRepository} from "../repositoryes/blogs-repository";
+import {BlogsRepository} from "../repositoryes/blogs-repository";
 import {BlogInputModel, BlogPostInputModel} from "../types/input-output-types";
 import {BlogDbType} from "../types/blog-db-type";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ObjectId} from "mongodb";
 import {ResultStatus} from "../../common/types/result-types/result-status";
-import {postsService} from "../../06-posts/domain/posts-service";
+import {PostsService} from "../../06-posts/domain/posts-service";
 import {BadRequestResult, NotFoundResult, SuccessResult} from "../../common/helpers/result-object";
 
 class BlogsService {
+
+    constructor(
+        private blogsRepository: BlogsRepository = new BlogsRepository(),
+        private postsService: PostsService = new PostsService()
+    ) {};
 
     async createBlog(blogData: BlogInputModel): Promise<string> {
 
@@ -17,7 +22,7 @@ class BlogsService {
             isMembership: false,
         };
 
-        const resultInsertBlog =  await blogsRepository
+        const resultInsertBlog =  await this.blogsRepository
             .insertBlog(newBlog);
 
         return String(resultInsertBlog.insertedId);
@@ -40,7 +45,7 @@ class BlogsService {
                 )
         }
 
-        const resultCreatedPost: string = await postsService
+        const resultCreatedPost: string = await this.postsService
             .createPost({...dataForCreatingPost, blogId});
 
         return SuccessResult
@@ -49,13 +54,13 @@ class BlogsService {
 
     async updateBlog(id: string, data: BlogInputModel): Promise<boolean> {
 
-        return await blogsRepository
+        return await this.blogsRepository
             .updateBlog(id, data);
     }
 
     async deleteBlog(id: string): Promise<boolean> {
 
-        return await blogsRepository
+        return await this.blogsRepository
             .deleteBlog(id);
     }
 
@@ -71,7 +76,7 @@ class BlogsService {
                 );
         }
 
-        const isExistBlog: BlogDbType | null = await blogsRepository
+        const isExistBlog: BlogDbType | null = await this.blogsRepository
             .findBlog(blogId);
 
         if (!isExistBlog) {
@@ -89,6 +94,4 @@ class BlogsService {
     }
 }
 
-const blogsService: BlogsService = new BlogsService();
-
-export {blogsService};
+export {BlogsService};

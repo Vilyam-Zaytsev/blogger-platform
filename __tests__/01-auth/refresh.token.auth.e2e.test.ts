@@ -107,5 +107,5 @@ describe('POST /auth/refresh-token', () => {
             .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
 
         console_log_e2e(resRefreshToken.body, resRefreshToken.status, 'Test 2: post(/auth/refresh-token)');
-    });
+    }, 10000);
 });

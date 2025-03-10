@@ -88,6 +88,4 @@ class BlogsQueryRepository {
     }
 }
 
-const blogsQueryRepository: BlogsQueryRepository = new BlogsQueryRepository();
-
-export {blogsQueryRepository};
+export {BlogsQueryRepository};

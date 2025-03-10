@@ -1,14 +1,19 @@
 import {PostDbType} from "../types/post-db-type";
 import {PostInputModel} from "../types/input-output-types";
 import {WithId} from "mongodb";
-import {postsRepository} from "../repositoryes/posts-repository";
-import {blogsRepository} from "../../05-blogs/repositoryes/blogs-repository";
+import {PostsRepository} from "../repositoryes/posts-repository";
+import {BlogsRepository} from "../../05-blogs/repositoryes/blogs-repository";
 
 class PostsService {
 
+    constructor(
+        private blogsRepository: BlogsRepository = new BlogsRepository(),
+        private postsRepository: PostsRepository = new PostsRepository()
+    ) {};
+
     async findPost(id: string): Promise<WithId<PostDbType> | null> {
 
-        return await postsRepository
+        return await this.postsRepository
             .findPost(id);
     }
 
@@ -16,11 +21,11 @@ class PostsService {
 
         const newPost: PostDbType = {
             ...data,
-            blogName: (await blogsRepository.findBlog(data.blogId))!.name,
+            blogName: (await this.blogsRepository.findBlog(data.blogId))!.name,
             createdAt: new Date().toISOString(),
         };
 
-        const result = await postsRepository
+        const result = await this.postsRepository
             .insertPost(newPost);
 
         return String(result.insertedId);
@@ -28,17 +33,15 @@ class PostsService {
 
     async updatePost(id: string, data: PostInputModel): Promise<boolean> {
 
-        return await postsRepository
+        return await this.postsRepository
             .updatePost(id, data);
     }
 
     async deletePost(id: string): Promise<boolean> {
 
-        return await postsRepository
+        return await this.postsRepository
             .deletePost(id);
     }
 }
 
-const postsService: PostsService = new PostsService();
-
-export {postsService};
+export {PostsService};

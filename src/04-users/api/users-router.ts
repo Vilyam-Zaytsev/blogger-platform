@@ -12,7 +12,7 @@ const usersRouter = Router();
 
 usersRouter.get('/',
     baseAuthGuard,
-    usersController.getUsers
+    usersController.getUsers.bind(usersController)
 );
 usersRouter.post('/',
     baseAuthGuard,
@@ -20,11 +20,11 @@ usersRouter.post('/',
     userEmailInputValidator,
     userPasswordInputValidator,
     inputCheckErrorsMiddleware,
-    usersController.createUser
+    usersController.createUser.bind(usersController)
 );
 usersRouter.delete('/:id',
     baseAuthGuard,
-    usersController.deleteUser
+    usersController.deleteUser.bind(usersController)
 );
 
 

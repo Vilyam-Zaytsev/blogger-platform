@@ -1,5 +1,5 @@
 import {ActiveSessionType} from "../types/active-session-type";
-import {sessionsRepository} from "../repositories/sessions-repository";
+import {SessionsRepository} from "../repositories/sessions-repository";
 import {
     ForbiddenResult,
     InternalServerErrorResult,
@@ -11,9 +11,11 @@ import {WithId} from "mongodb";
 
 class SessionsService {
 
+    constructor(private sessionsRepository: SessionsRepository = new SessionsRepository()) {}
+
     async createSession(newSession: ActiveSessionType) {
 
-        const resultInsertSession = await sessionsRepository
+        const resultInsertSession = await this.sessionsRepository
             .insertSession(newSession);
 
         return SuccessResult
@@ -22,13 +24,13 @@ class SessionsService {
 
     async deleteSession(id: string) {
 
-        return await sessionsRepository
+        return await this.sessionsRepository
             .deleteSession(id);
     }
 
     async deleteSessionByDeviceId(userId: string, deviceId: string): Promise<ResultType> {
 
-        const activeSession: WithId<ActiveSessionType> | null = await sessionsRepository
+        const activeSession: WithId<ActiveSessionType> | null = await this.sessionsRepository
             .findSessionByDeviceId(deviceId);
 
         if (!activeSession) {
@@ -51,7 +53,7 @@ class SessionsService {
                 );
         }
 
-        const resultDeleteActiveSession: boolean = await sessionsRepository
+        const resultDeleteActiveSession: boolean = await this.sessionsRepository
             .deleteSession(String(activeSession._id));
 
         if (!resultDeleteActiveSession) {
@@ -70,11 +72,9 @@ class SessionsService {
 
     async deleteAllSessionsExceptCurrent(userId: string, iat: string): Promise<boolean> {
 
-        return await sessionsRepository
+        return await this.sessionsRepository
             .deleteAllSessionsExceptCurrent(userId, iat);
     }
 }
 
-const sessionsService: SessionsService = new SessionsService();
-
-export {sessionsService};
+export {SessionsService};

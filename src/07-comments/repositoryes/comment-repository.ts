@@ -31,6 +31,4 @@ class CommentRepository {
     }
 }
 
-const commentRepository: CommentRepository = new CommentRepository();
-
-export {commentRepository};
+export {CommentRepository};

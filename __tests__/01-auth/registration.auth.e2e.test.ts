@@ -9,8 +9,8 @@ import {ConfirmationStatus, UserDbType} from "../../src/04-users/types/user-db-t
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
 import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
-import {usersRepository} from "../../src/04-users/repositoryes/users-repository";
-import {emailTemplates} from "../../src/01-auth/adapters/email-templates";
+import {UsersRepository} from "../../src/04-users/repositoryes/users-repository";
+import {EmailTemplates} from "../../src/01-auth/adapters/email-templates";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {UserViewModel} from "../../src/04-users/types/input-output-types";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
@@ -64,6 +64,8 @@ describe('POST /auth/registration', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
+        const usersRepository: UsersRepository = new UsersRepository();
+
         const foundUser: WithId<UserDbType> | null = await usersRepository
             .findByEmail(user.email);
 
@@ -79,6 +81,8 @@ describe('POST /auth/registration', () => {
                 confirmationStatus: ConfirmationStatus.NotConfirmed
             }
         });
+
+        const emailTemplates: EmailTemplates = new EmailTemplates();
 
         expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(1);
         expect(await (nodemailerService.sendEmail as jest.Mock).mock.results[0].value)

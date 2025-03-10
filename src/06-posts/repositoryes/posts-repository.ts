@@ -34,6 +34,4 @@ class PostsRepository {
     }
 }
 
-const postsRepository: PostsRepository = new PostsRepository();
-
-export {postsRepository};
+export {PostsRepository};

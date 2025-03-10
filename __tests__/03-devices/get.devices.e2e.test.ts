@@ -16,10 +16,8 @@ import {UserDbType} from "../../src/04-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
-import {authService} from "../../src/01-auth/domain/auth-service";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {DeviceViewModel} from "../../src/02-sessions/types/input-output-types";
-import {sessionsTestManager} from "../helpers/managers/02_sessions-test-manager";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 
 let mongoServer: MongoMemoryServer;

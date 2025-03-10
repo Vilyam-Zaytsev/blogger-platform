@@ -112,6 +112,4 @@ class UsersQueryRepository {
     }
 }
 
-const usersQueryRepository: UsersQueryRepository = new UsersQueryRepository();
-
-export {usersQueryRepository};
+export {UsersQueryRepository};

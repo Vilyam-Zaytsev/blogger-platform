@@ -22,11 +22,11 @@ authRouter.post(SETTINGS.PATH.AUTH.LOGIN,
     userLoginOrEmailInputValidator,
     userPasswordInputValidator,
     inputCheckErrorsMiddleware,
-    authController.login
+    authController.login.bind(authController)
 );
 authRouter.post(SETTINGS.PATH.AUTH.LOGOUT,
     refreshTokenGuard,
-    authController.logout
+    authController.logout.bind(authController)
 );
 authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION,
     rateLimitsGuard,
@@ -34,27 +34,27 @@ authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION,
     userEmailInputValidator,
     userPasswordInputValidator,
     inputCheckErrorsMiddleware,
-    authController.registration
+    authController.registration.bind(authController)
 );
 authRouter.post(SETTINGS.PATH.AUTH.REFRESH_TOKEN,
     refreshTokenGuard,
-    authController.refreshToken
+    authController.refreshToken.bind(authController)
 );
 authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION_CONFIRMATION,
     rateLimitsGuard,
     authConfirmationCodeInputValidator,
     inputCheckErrorsMiddleware,
-    authController.registrationConfirmation
+    authController.registrationConfirmation.bind(authController)
 );
 authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION_EMAIL_RESENDING,
     rateLimitsGuard,
     userEmailInputValidator,
     inputCheckErrorsMiddleware,
-    authController.registrationEmailResending
+    authController.registrationEmailResending.bind(authController)
 );
 authRouter.get(SETTINGS.PATH.AUTH.ME,
     accessTokenGuard,
-    authController.me
+    authController.me.bind(authController)
 );
 
 export {authRouter};

@@ -3,14 +3,19 @@ import {RequestWithParams, RequestWithSession} from "../common/types/input-outpu
 import {TokenSessionDataType} from "./types/token-session-data-type";
 import {SETTINGS} from "../common/settings";
 import {DeviceViewModel} from "./types/input-output-types";
-import {sessionsQueryRepository} from "./repositories/sessions-query-repository";
+import {SessionsQueryRepository} from "./repositories/sessions-query-repository";
 import {ResultType} from "../common/types/result-types/result-type";
-import {sessionsService} from "./domain/sessions-service";
+import {SessionsService} from "./domain/sessions-service";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 
 class SessionsController {
+
+    constructor(
+        private sessionsService: SessionsService = new SessionsService(),
+        private sessionsQueryRepository: SessionsQueryRepository = new SessionsQueryRepository(),
+    ) {}
 
     async getDevices(
         req: RequestWithSession<TokenSessionDataType>,
@@ -27,7 +32,7 @@ class SessionsController {
             return;
         }
 
-        const devicesActiveSessions: DeviceViewModel[] = await sessionsQueryRepository
+        const devicesActiveSessions: DeviceViewModel[] = await this.sessionsQueryRepository
             .findSessionsByUserId(userId);
 
         res
@@ -45,7 +50,7 @@ class SessionsController {
             iat
         } = req.session!;
 
-        const resultDeleteSessions: boolean = await sessionsService
+        const resultDeleteSessions: boolean = await this.sessionsService
             .deleteAllSessionsExceptCurrent(userId, iat);
 
         if (!resultDeleteSessions) {
@@ -70,7 +75,7 @@ class SessionsController {
 
         const {
             status: sessionDeletionStatus
-        }: ResultType = await sessionsService
+        }: ResultType = await this.sessionsService
             .deleteSessionByDeviceId(userId, deviceId);
 
         if (sessionDeletionStatus !== ResultStatus.Success) {

@@ -85,6 +85,4 @@ class PostsQueryRepository {
     }
 }
 
-const postsQueryRepository: PostsQueryRepository = new PostsQueryRepository();
-
-export {postsQueryRepository};
+export {PostsQueryRepository};

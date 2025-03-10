@@ -6,7 +6,7 @@ import {
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {UserInputModel, UserViewModel} from "./types/input-output-types";
-import {usersService} from "./domain/users-service";
+import {UsersService} from "./domain/users-service";
 import {SETTINGS} from "../common/settings";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 import {ResultType} from "../common/types/result-types/result-type";
@@ -16,10 +16,15 @@ import {ApiErrorResult} from "../common/types/input-output-types/api-error-resul
 import {IdType} from "../common/types/input-output-types/id-type";
 import {UserDbType} from "./types/user-db-type";
 import {User} from "./domain/user.entity";
-import {usersQueryRepository} from "./repositoryes/users-query-repository";
+import {UsersQueryRepository} from "./repositoryes/users-query-repository";
 import {ResultStatus} from "../common/types/result-types/result-status";
 
 class UsersController {
+
+    constructor(
+        private usersService: UsersService = new UsersService(),
+        private usersQueryRepository: UsersQueryRepository = new UsersQueryRepository()
+    ) {};
 
     async getUsers(
         req: RequestWithQuery<SortingAndPaginationParamsType>,
@@ -38,16 +43,16 @@ class UsersController {
         const paginationAndSortFilter: PaginationAndSortFilterType =
             createPaginationAndSortFilter(sortingAndPaginationParams);
 
-        const foundUsers: UserViewModel[] = await usersQueryRepository
+        const foundUsers: UserViewModel[] = await this.usersQueryRepository
             .findUsers(paginationAndSortFilter);
 
-        const usersCount: number = await usersQueryRepository
+        const usersCount: number = await this.usersQueryRepository
             .getUsersCount(
                 paginationAndSortFilter.searchLoginTerm,
                 paginationAndSortFilter.searchEmailTerm
                 );
 
-        const paginationResponse: Paginator<UserViewModel> = await usersQueryRepository
+        const paginationResponse: Paginator<UserViewModel> = await this.usersQueryRepository
             ._mapUsersViewModelToPaginationResponse(
                 foundUsers,
                 usersCount,
@@ -73,7 +78,7 @@ class UsersController {
         const candidate: UserDbType = await User
             .createByAdmin(login, email, password);
 
-        const result: ResultType<string | null> = await usersService
+        const result: ResultType<string | null> = await this.usersService
             .createUser(candidate);
 
         if (result.status !== ResultStatus.Success) {
@@ -84,7 +89,7 @@ class UsersController {
             return;
         }
 
-        const createdUser: UserViewModel | null = await usersQueryRepository
+        const createdUser: UserViewModel | null = await this.usersQueryRepository
             .findUser(result.data!);
 
         res
@@ -97,7 +102,7 @@ class UsersController {
         res: Response
     ){
 
-        const isDeletedUser: boolean = await usersService
+        const isDeletedUser: boolean = await this.usersService
             .deleteUser(req.params.id);
 
         if (!isDeletedUser) {

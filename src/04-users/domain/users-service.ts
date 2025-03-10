@@ -1,5 +1,5 @@
 import {UserDbType} from "../types/user-db-type";
-import {usersRepository} from "../repositoryes/users-repository";
+import {UsersRepository} from "../repositoryes/users-repository";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {WithId} from "mongodb";
@@ -7,13 +7,15 @@ import {BadRequestResult, SuccessResult} from "../../common/helpers/result-objec
 
 class UsersService {
 
+    constructor(private usersRepository: UsersRepository = new UsersRepository()) {};
+
     async createUser(user: UserDbType): Promise<ResultType<string | null>> {
 
         const resultCandidateValidation: ResultType = await this.validateCandidateUniqueness(user.login, user.email);
 
         if (resultCandidateValidation.status !== ResultStatus.Success) return resultCandidateValidation;
 
-        const result = await usersRepository
+        const result = await this.usersRepository
             .insertUser(user);
 
         return SuccessResult
@@ -22,13 +24,13 @@ class UsersService {
 
     async deleteUser(id: string): Promise<boolean> {
 
-        return await usersRepository
+        return await this.usersRepository
             .deleteUser(id);
     }
 
     async validateCandidateUniqueness(login: string, email: string): Promise<ResultType> {
 
-        const findByLogin: WithId<UserDbType> | null = await usersRepository
+        const findByLogin: WithId<UserDbType> | null = await this.usersRepository
             .findByLoginOrEmail(login);
 
         if (findByLogin) {
@@ -41,7 +43,7 @@ class UsersService {
                 );
         }
 
-        const findByEmail: WithId<UserDbType> | null = await usersRepository
+        const findByEmail: WithId<UserDbType> | null = await this.usersRepository
             .findByLoginOrEmail(email);
 
         if (findByEmail) {
@@ -60,6 +62,4 @@ class UsersService {
 
 }
 
-const usersService: UsersService = new UsersService();
-
-export {usersService};
+export {UsersService};
