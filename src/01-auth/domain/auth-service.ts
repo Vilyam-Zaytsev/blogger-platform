@@ -80,17 +80,16 @@ class AuthService {
             deviceId
         } = tokenData;
 
-        const accessToken: string = await this.jwtService
-            .createAccessToken(userId);
+        const [accessToken, refreshToken] = await Promise.all([
+            this.jwtService.createAccessToken(userId),
+            this.jwtService.createRefreshToken(userId, deviceId)
+        ]);
 
-        const refreshToken: string = await this.jwtService
-            .createRefreshToken(userId, deviceId);
-
-        const payloadRefreshToken: PayloadRefreshTokenType = await this.jwtService
-            .decodeToken(refreshToken);
-
-        const session: WithId<ActiveSessionType> | null = await this.sessionsRepository
-            .findSessionByIatAndDeviceId(iat, deviceId);
+        //TODO: что если переделать поиск сессии только по deviceId???
+        const [payloadRefreshToken, session] = await Promise.all([
+            this.jwtService.decodeToken(refreshToken),
+            this.sessionsRepository.findSessionByIatAndDeviceId(iat, deviceId)
+        ]);
 
         const timestamps: SessionTimestampsType = {
             iat: new Date(payloadRefreshToken.iat * 1000).toISOString(),
