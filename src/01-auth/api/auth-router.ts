@@ -3,7 +3,7 @@ import {authController} from "../auth-controller";
 import {
     userEmailInputValidator,
     userLoginInputValidator,
-    userLoginOrEmailInputValidator,
+    userLoginOrEmailInputValidator, userNewPasswordInputValidator,
     userPasswordInputValidator
 } from "../../04-users/api/middlewares/user-validators";
 import {inputCheckErrorsMiddleware} from "../../common/middlewares/input-check-errors-middleware";
@@ -51,6 +51,18 @@ authRouter.post(SETTINGS.PATH.AUTH.REGISTRATION_EMAIL_RESENDING,
     userEmailInputValidator,
     inputCheckErrorsMiddleware,
     authController.registrationEmailResending.bind(authController)
+);
+authRouter.post(SETTINGS.PATH.AUTH.PASSWORD_RECOVERY,
+    rateLimitsGuard,
+    userEmailInputValidator,
+    inputCheckErrorsMiddleware,
+    authController.passwordRecovery.bind(authController)
+);
+authRouter.post(SETTINGS.PATH.AUTH.NEW_PASSWORD,
+    rateLimitsGuard,
+    userNewPasswordInputValidator,
+    inputCheckErrorsMiddleware,
+    authController.newPassword.bind(authController)
 );
 authRouter.get(SETTINGS.PATH.AUTH.ME,
     accessTokenGuard,

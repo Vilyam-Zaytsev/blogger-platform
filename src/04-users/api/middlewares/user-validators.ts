@@ -33,10 +33,19 @@ const userPasswordInputValidator =
         .isLength({min: 6, max: 20})
         .withMessage('The length of the "password" field should be from 6 to 20.')
 
+const userNewPasswordInputValidator =
+    body('newPassword')
+        .isString()
+        .withMessage('The "password" field must be of the string type.')
+        .trim()
+        .isLength({min: 6, max: 20})
+        .withMessage('The length of the "password" field should be from 6 to 20.')
+
 
 export {
     userLoginInputValidator,
     userEmailInputValidator,
     userLoginOrEmailInputValidator,
-    userPasswordInputValidator
-}
+    userPasswordInputValidator,
+    userNewPasswordInputValidator
+};
