@@ -59,6 +59,7 @@ class AuthService {
         const accessToken: string = await this.jwtService
             .createAccessToken(checkedUserId!);
 
+        //TODO: генерировать пароль через ObjectId!!!
         const deviceId: string = randomUUID();
 
         const refreshToken: string = await this.jwtService
