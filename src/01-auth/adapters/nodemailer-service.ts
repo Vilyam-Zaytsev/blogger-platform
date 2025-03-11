@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import {EmailTemplateType} from "../../common/types/input-output-types/email-template-type";
 
-const nodemailerService = {
+class NodemailerService {
 
     async sendEmail(
         email: string,
@@ -25,6 +25,8 @@ const nodemailerService = {
 
         return !!info;
     }
-};
+}
+
+const nodemailerService: NodemailerService = new NodemailerService();
 
 export {nodemailerService};

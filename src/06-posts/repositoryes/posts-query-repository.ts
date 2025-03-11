@@ -11,7 +11,7 @@ import {PostViewModel} from "../types/input-output-types";
 import {BlogViewModel} from "../../05-blogs/types/input-output-types";
 
 
-const postsQueryRepository = {
+class PostsQueryRepository {
 
     async findPosts(sortQueryDto: PaginationAndSortFilterType, blogId?: string): Promise<PostViewModel[]> {
 
@@ -35,7 +35,7 @@ const postsQueryRepository = {
             .toArray();
 
         return posts.map(p => this._mapDbPostToViewModel(p));
-    },
+    }
 
     async getPostsCount(blogId?: string ): Promise<number> {
 
@@ -46,7 +46,7 @@ const postsQueryRepository = {
 
         return await postsCollection
             .countDocuments(filter);
-    },
+    }
 
     async findPost(id: string): Promise<PostViewModel | null> {
             const post: WithId<PostDbType> | null = await postsCollection
@@ -55,7 +55,7 @@ const postsQueryRepository = {
             if (!post) return null;
 
             return this._mapDbPostToViewModel(post);
-    },
+    }
 
     _mapDbPostToViewModel(post: WithId<PostDbType>): PostViewModel {
         return {
@@ -67,7 +67,7 @@ const postsQueryRepository = {
             blogName: post.blogName,
             createdAt: post.createdAt
         };
-    },
+    }
 
     _mapPostsViewModelToPaginationResponse(
         posts: PostViewModel[],
@@ -83,6 +83,6 @@ const postsQueryRepository = {
             items: posts
         };
     }
-};
+}
 
-export {postsQueryRepository};
+export {PostsQueryRepository};

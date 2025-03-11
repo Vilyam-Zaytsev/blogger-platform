@@ -1,5 +1,5 @@
 import {ActiveSessionType} from "../types/active-session-type";
-import {sessionsRepository} from "../repositories/sessions-repository";
+import {SessionsRepository} from "../repositories/sessions-repository";
 import {
     ForbiddenResult,
     InternalServerErrorResult,
@@ -9,26 +9,28 @@ import {
 import {ResultType} from "../../common/types/result-types/result-type";
 import {WithId} from "mongodb";
 
-const sessionsService = {
+class SessionsService {
+
+    constructor(private sessionsRepository: SessionsRepository = new SessionsRepository()) {}
 
     async createSession(newSession: ActiveSessionType) {
 
-        const resultInsertSession = await sessionsRepository
+        const resultInsertSession = await this.sessionsRepository
             .insertSession(newSession);
 
         return SuccessResult
             .create<string>(String(resultInsertSession.insertedId));
-    },
+    }
 
     async deleteSession(id: string) {
 
-        return await sessionsRepository
+        return await this.sessionsRepository
             .deleteSession(id);
-    },
+    }
 
     async deleteSessionByDeviceId(userId: string, deviceId: string): Promise<ResultType> {
 
-        const activeSession: WithId<ActiveSessionType> | null = await sessionsRepository
+        const activeSession: WithId<ActiveSessionType> | null = await this.sessionsRepository
             .findSessionByDeviceId(deviceId);
 
         if (!activeSession) {
@@ -51,7 +53,7 @@ const sessionsService = {
                 );
         }
 
-        const resultDeleteActiveSession: boolean = await sessionsRepository
+        const resultDeleteActiveSession: boolean = await this.sessionsRepository
             .deleteSession(String(activeSession._id));
 
         if (!resultDeleteActiveSession) {
@@ -66,13 +68,13 @@ const sessionsService = {
 
         return SuccessResult
             .create(null);
-    },
+    }
 
     async deleteAllSessionsExceptCurrent(userId: string, iat: string): Promise<boolean> {
 
-        return await sessionsRepository
+        return await this.sessionsRepository
             .deleteAllSessionsExceptCurrent(userId, iat);
     }
 }
 
-export {sessionsService};
+export {SessionsService};

@@ -3,11 +3,11 @@ import {ObjectId, WithId} from "mongodb";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {PostDbType} from "../../06-posts/types/post-db-type";
-import {postsService} from "../../06-posts/domain/posts-service";
-import {commentRepository} from "../repositoryes/comment-repository";
+import {PostsService} from "../../06-posts/domain/posts-service";
+import {CommentRepository} from "../repositoryes/comment-repository";
 import {CommentDbType} from "../types/comment-db-type";
 import {UserDbType} from "../../04-users/types/user-db-type";
-import {usersRepository} from "../../04-users/repositoryes/users-repository";
+import {UsersRepository} from "../../04-users/repositoryes/users-repository";
 import {
     BadRequestResult,
     ForbiddenResult,
@@ -15,7 +15,13 @@ import {
     SuccessResult
 } from "../../common/helpers/result-object";
 
-const commentsService = {
+class CommentsService {
+
+    constructor(
+        private usersRepository: UsersRepository = new UsersRepository(),
+        private postsService: PostsService = new PostsService(),
+        private commentRepository: CommentRepository = new CommentRepository()
+    ) {};
 
     async createComment(data: CommentInputModel, postId: string, commentatorId: string): Promise<ResultType<string | null>> {
 
@@ -31,7 +37,7 @@ const commentsService = {
                 );
         }
 
-        const commentator: WithId<UserDbType> | null = await usersRepository
+        const commentator: WithId<UserDbType> | null = await this.usersRepository
             .findUser(commentatorId);
 
         const newComment: CommentDbType = {
@@ -44,12 +50,12 @@ const commentsService = {
             createdAt: new Date().toISOString()
         }
 
-        const result = await commentRepository
+        const result = await this.commentRepository
             .insertComment(newComment);
 
         return SuccessResult
             .create<string>(String(result.insertedId));
-    },
+    }
 
     async updateComment(commentId: string, userId: string, data: CommentInputModel): Promise<ResultType> {
 
@@ -60,12 +66,12 @@ const commentsService = {
             return resultCheckingExistenceCommentAndOwner;
         }
 
-        await commentRepository
+        await this.commentRepository
             .updateComment(commentId, data);
 
         return SuccessResult
             .create(null);
-    },
+    }
 
     async deleteComment(commentId: string, userId: string): Promise<ResultType> {
 
@@ -73,12 +79,12 @@ const commentsService = {
 
         if (resultCheckingExistenceCommentAndOwner.status !== ResultStatus.Success) return resultCheckingExistenceCommentAndOwner;
 
-        await commentRepository
+        await this.commentRepository
             .deleteComment(commentId);
 
         return SuccessResult
             .create(null);
-    },
+    }
 
     async _checkPostId(postId: string): Promise<ResultType<string | null>> {
 
@@ -92,7 +98,7 @@ const commentsService = {
                 );
         }
 
-        const isExistPost: WithId<PostDbType> | null = await postsService
+        const isExistPost: WithId<PostDbType> | null = await this.postsService
             .findPost(postId);
 
         if (!isExistPost) {
@@ -107,11 +113,11 @@ const commentsService = {
 
         return SuccessResult
             .create<string>(String(isExistPost._id));
-    },
+    }
 
     async _checkingExistenceCommentAndOwner(commentId: string, userId: string): Promise<ResultType> {
 
-        const comment: WithId<CommentDbType> | null = await commentRepository
+        const comment: WithId<CommentDbType> | null = await this.commentRepository
             .findComment(commentId);
 
         if (!comment) {
@@ -137,6 +143,6 @@ const commentsService = {
         return SuccessResult
             .create(null);
     }
-};
+}
 
-export {commentsService};
+export {CommentsService};

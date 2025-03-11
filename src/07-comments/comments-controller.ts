@@ -7,11 +7,11 @@ import {
 import {IdType} from "../common/types/input-output-types/id-type";
 import {CommentInputModel, CommentViewModel} from "./types/input-output-types";
 import {ResultType} from "../common/types/result-types/result-type";
-import {commentsService} from "./domain/comments-service";
+import {CommentsService} from "./domain/comments-service";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {SETTINGS} from "../common/settings";
-import {commentQueryRepository} from "./repositoryes/comment-query-repository";
+import {CommentQueryRepository} from "./repositoryes/comment-query-repository";
 import {
     PaginationAndSortFilterType,
     Paginator,
@@ -19,7 +19,12 @@ import {
 } from "../common/types/input-output-types/pagination-sort-types";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 
-const commentsController = {
+class CommentsController {
+
+    constructor(
+        private commentsService: CommentsService = new CommentsService(),
+        private commentQueryRepository: CommentQueryRepository = new CommentQueryRepository()
+    ) {};
 
     async getComments(
         req: RequestWithParamsAndQuery<IdType, SortingAndPaginationParamsType>,
@@ -28,7 +33,7 @@ const commentsController = {
 
         const postId: string = req.params.id;
 
-        const resultCheckPostId: ResultType<string | null> = await commentsService
+        const resultCheckPostId: ResultType<string | null> = await this.commentsService
             ._checkPostId(postId);
 
         if (resultCheckPostId.status !== ResultStatus.Success) {
@@ -49,13 +54,13 @@ const commentsController = {
         const paginationAndSortFilter: PaginationAndSortFilterType =
             createPaginationAndSortFilter(sortingAndPaginationParams)
 
-        const foundComments: CommentViewModel[] = await commentQueryRepository
+        const foundComments: CommentViewModel[] = await this.commentQueryRepository
             .findComments(paginationAndSortFilter, postId);
 
-        const commentsCount: number = await commentQueryRepository
+        const commentsCount: number = await this.commentQueryRepository
             .getCommentsCount(postId);
 
-        const paginationResponse: Paginator<CommentViewModel> = await commentQueryRepository
+        const paginationResponse: Paginator<CommentViewModel> = await this.commentQueryRepository
             ._mapCommentsViewModelToPaginationResponse(
                 foundComments,
                 commentsCount,
@@ -65,14 +70,14 @@ const commentsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(paginationResponse);
-    },
+    }
 
     async getComment(
         req: RequestWithParams<IdType>,
         res: Response<CommentViewModel>
     ) {
 
-        const foundComment: CommentViewModel | null = await commentQueryRepository
+        const foundComment: CommentViewModel | null = await this.commentQueryRepository
             .findComment(req.params.id);
 
         if (!foundComment) {
@@ -86,7 +91,7 @@ const commentsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(foundComment);
-    },
+    }
 
     async createComment(
         req: RequestWithParamsAndBody<IdType, CommentInputModel>,
@@ -100,7 +105,7 @@ const commentsController = {
         const postId: string = req.params.id;
         const commentatorId: string = String(req.user?.id);
 
-        const resultCreateComment: ResultType<string | null> = await commentsService
+        const resultCreateComment: ResultType<string | null> = await this.commentsService
             .createComment(dataForCreatingComment, postId, commentatorId);
 
         if (resultCreateComment.status !== ResultStatus.Success) {
@@ -110,13 +115,13 @@ const commentsController = {
             return;
         }
 
-        const createdComment: CommentViewModel | null = await commentQueryRepository
+        const createdComment: CommentViewModel | null = await this.commentQueryRepository
             .findComment(resultCreateComment.data!);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
             .json(createdComment!);
-    },
+    }
 
     async updateComment(
         req: RequestWithParamsAndBody<IdType, CommentInputModel>,
@@ -131,7 +136,7 @@ const commentsController = {
             content: req.body.content
         };
 
-        const updateResult: ResultType = await commentsService
+        const updateResult: ResultType = await this.commentsService
             .updateComment(commentId, userId, dataForCommentUpdates);
 
         if (updateResult.status !== ResultStatus.Success) {
@@ -144,7 +149,7 @@ const commentsController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    },
+    }
 
     async deleteComment(
         req: RequestWithParams<IdType>,
@@ -155,7 +160,7 @@ const commentsController = {
 
         const userId: string = String(req.user?.id);
 
-        const deleteResult: ResultType = await commentsService
+        const deleteResult: ResultType = await this.commentsService
             .deleteComment(commentId, userId);
 
         if (deleteResult.status !== ResultStatus.Success) {
@@ -169,6 +174,8 @@ const commentsController = {
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     }
-};
+}
+
+const commentsController: CommentsController = new CommentsController();
 
 export {commentsController};

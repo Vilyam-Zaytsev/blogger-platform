@@ -1,7 +1,7 @@
 import {Response} from "express";
 import {RequestWithBody, RequestWithSession, RequestWithUserId} from "../common/types/input-output-types/request-types";
 import {LoginInputModel} from "./types/login-input-model";
-import {authService} from "./domain/auth-service";
+import {AuthService} from "./domain/auth-service";
 import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
@@ -13,28 +13,37 @@ import {LoginSuccessViewModel} from "./types/login-success-view-model";
 import {SETTINGS} from "../common/settings";
 import {RegistrationConfirmationCodeModel} from "./types/registration-confirmation-code-model";
 import {RegistrationEmailResendingType} from "./types/registration-email-resending-type";
-import {usersQueryRepository} from "../04-users/repositoryes/users-query-repository";
+import {UsersQueryRepository} from "../04-users/repositoryes/users-query-repository";
 import {AuthTokens} from "./types/auth-tokens-type";
-import {jwtService} from "./adapters/jwt-service";
+import {JwtService} from "./adapters/jwt-service";
 import {ActiveSessionType} from "../02-sessions/types/active-session-type";
-import {sessionsService} from "../02-sessions/domain/sessions-service";
+import {SessionsService} from "../02-sessions/domain/sessions-service";
 import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
-import {sessionsRepository} from "../02-sessions/repositories/sessions-repository";
+import {SessionsRepository} from "../02-sessions/repositories/sessions-repository";
 import {WithId} from "mongodb";
 
-const authController = {
+const jwtService: JwtService = new JwtService();
 
-    login: async (
+class AuthController {
+
+    constructor(
+        private authService: AuthService = new AuthService(),
+        private sessionsService: SessionsService = new SessionsService(),
+        private sessionsRepository: SessionsRepository = new SessionsRepository(),
+        private usersQueryRepository: UsersQueryRepository = new UsersQueryRepository()
+    ) {};
+
+    async login(
         req: RequestWithBody<LoginInputModel>,
         res: Response<ApiErrorResult | LoginSuccessViewModel>
-    ) => {
+    ) {
 
         const authParams: LoginInputModel = {
             loginOrEmail: req.body.loginOrEmail,
             password: req.body.password,
         };
 
-        const resultLogin: ResultType<AuthTokens | null> = await authService
+        const resultLogin: ResultType<AuthTokens | null> = await this.authService
             .login(authParams);
 
         if (resultLogin.status !== ResultStatus.Success) {
@@ -71,7 +80,7 @@ const authController = {
             exp
         };
 
-        await sessionsService
+        await this.sessionsService
             .createSession(newSession);
 
         const {
@@ -87,12 +96,12 @@ const authController = {
                 {httpOnly: true, secure: true,}
             )
             .json({accessToken});
-    },
+    }
 
-    logout: async (
+    async logout(
         req: RequestWithSession<TokenSessionDataType>,
         res: Response
-    ) => {
+    ){
 
         if (!req.session) {
 
@@ -105,7 +114,7 @@ const authController = {
             deviceId
         } = req.session!;
 
-        const session: WithId<ActiveSessionType> | null = await sessionsRepository
+        const session: WithId<ActiveSessionType> | null = await this.sessionsRepository
             .findSessionByIatAndDeviceId(iat, deviceId);
 
         if (!session) {
@@ -116,17 +125,17 @@ const authController = {
             return;
         }
 
-        await sessionsService
+        await this.sessionsService
             .deleteSession(String(session._id));
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    },
+    }
 
-    refreshToken: async (
+    async refreshToken(
         req: RequestWithSession<TokenSessionDataType>,
         res: Response<ApiErrorResult | LoginSuccessViewModel>
-    ) => {
+    ){
 
         const dataForRefreshToken: TokenSessionDataType = {
             iat: req.session!.iat,
@@ -134,7 +143,7 @@ const authController = {
             deviceId: req.session!.deviceId
         };
 
-        const resultRefreshToken: ResultType<AuthTokens | null> = await authService
+        const resultRefreshToken: ResultType<AuthTokens | null> = await this.authService
             .refreshToken(dataForRefreshToken);
 
         if (resultRefreshToken.status !== ResultStatus.Success) {
@@ -154,12 +163,12 @@ const authController = {
                 {httpOnly: true, secure: true,}
             )
             .json({accessToken: resultRefreshToken.data!.accessToken});
-    },
+    }
 
-    registration: async (
+    async registration(
         req: RequestWithBody<UserInputModel>,
         res: Response
-    ) => {
+    ){
 
         const dataForRegistrationUser: UserInputModel = {
             login: req.body.login,
@@ -167,7 +176,7 @@ const authController = {
             password: req.body.password
         };
 
-        const resultRegistration: ResultType<string | null> = await authService
+        const resultRegistration: ResultType<string | null> = await this.authService
             .registration(dataForRegistrationUser);
 
         if (resultRegistration.status !== ResultStatus.Success) {
@@ -181,16 +190,16 @@ const authController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    },
+    }
 
-    registrationConfirmation: async (
+    async registrationConfirmation(
         req: RequestWithBody<RegistrationConfirmationCodeModel>,
         res: Response
-    ) => {
+    ){
 
         const {code} = req.body
 
-        const resultRegistrationConfirmation: ResultType = await authService
+        const resultRegistrationConfirmation: ResultType = await this.authService
             .registrationConfirmation(code);
 
         if (resultRegistrationConfirmation.status !== ResultStatus.Success) {
@@ -204,16 +213,16 @@ const authController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    },
+    }
 
-    registrationEmailResending: async (
+    async registrationEmailResending(
         req: RequestWithBody<RegistrationEmailResendingType>,
         res: Response
-    ) => {
+    ){
 
         const {email} = req.body;
 
-        const resultEmailResending = await authService
+        const resultEmailResending = await this.authService
             .registrationEmailResending(email);
 
         if (resultEmailResending.status !== ResultStatus.Success) {
@@ -227,12 +236,12 @@ const authController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    },
+    }
 
-    me: async (
+    async me(
         req: RequestWithUserId<IdType>,
         res: Response<UserMeViewModel>
-    ) => {
+    ){
 
         const userId: string = String(req.user?.id);
 
@@ -242,13 +251,15 @@ const authController = {
                 .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
         }
 
-        const me: UserMeViewModel | null = await usersQueryRepository
+        const me: UserMeViewModel | null = await this.usersQueryRepository
             .findUserAndMapToMeViewModel(userId);
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(me!);
-    },
-};
+    }
+}
+
+const authController: AuthController = new AuthController();
 
 export {authController};

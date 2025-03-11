@@ -7,7 +7,7 @@ import {
     RequestWithQuery
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
-import {postsService} from "./domain/posts-service";
+import {PostsService} from "./domain/posts-service";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 import {
     PaginationAndSortFilterType,
@@ -15,14 +15,19 @@ import {
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {postsQueryRepository} from "./repositoryes/posts-query-repository";
+import {PostsQueryRepository} from "./repositoryes/posts-query-repository";
 
-const postsController = {
+class PostsController {
 
-    getPosts: async (
+    constructor(
+        private postsService: PostsService = new PostsService(),
+        private postsQueryRepository: PostsQueryRepository = new PostsQueryRepository()
+    ) {};
+
+    async getPosts(
         req: RequestWithQuery<SortingAndPaginationParamsType>,
         res: Response<Paginator<PostViewModel>>
-    ) => {
+    ){
 
         const sortingAndPaginationParams: SortingAndPaginationParamsType = {
             pageNumber: req.query.pageNumber,
@@ -33,13 +38,13 @@ const postsController = {
 
         const paginationAndSortFilter: PaginationAndSortFilterType = createPaginationAndSortFilter(sortingAndPaginationParams)
 
-        const foundPosts: PostViewModel[] = await postsQueryRepository
+        const foundPosts: PostViewModel[] = await this.postsQueryRepository
             .findPosts(paginationAndSortFilter);
 
-        const postsCount: number = await postsQueryRepository
+        const postsCount: number = await this.postsQueryRepository
             .getPostsCount();
 
-        const paginationResponse: Paginator<PostViewModel> = await postsQueryRepository
+        const paginationResponse: Paginator<PostViewModel> = await this.postsQueryRepository
             ._mapPostsViewModelToPaginationResponse(
                 foundPosts,
                 postsCount,
@@ -49,14 +54,14 @@ const postsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(paginationResponse);
-    },
+    }
 
-    getPost: async (
+    async getPost(
         req: RequestWithParams<IdType>,
         res: Response<PostViewModel>
-    ) => {
+    ){
 
-        const foundPost: PostViewModel | null = await postsQueryRepository
+        const foundPost: PostViewModel | null = await this.postsQueryRepository
             .findPost(req.params.id);
 
         if (!foundPost) {
@@ -69,12 +74,12 @@ const postsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(foundPost);
-    },
+    }
 
-    createPost: async (
+    async createPost(
         req: RequestWithBody<PostInputModel>,
         res: Response<PostViewModel>
-    ) => {
+    ){
 
         const dataForCreatingPost: PostInputModel = {
             title: req.body.title,
@@ -83,21 +88,21 @@ const postsController = {
             blogId: req.body.blogId,
         };
 
-        const idCreatedPost: string | null = await postsService
+        const idCreatedPost: string | null = await this.postsService
             .createPost(dataForCreatingPost);
 
-        const createdPost: PostViewModel | null = await postsQueryRepository
+        const createdPost: PostViewModel | null = await this.postsQueryRepository
             .findPost(idCreatedPost);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
             .json(createdPost!);
-    },
+    }
 
-    updatePost: async (
+    async updatePost(
         req: RequestWithParamsAndBody<IdType, PostInputModel>,
         res: Response<PostViewModel>
-    ) => {
+    ){
 
         const dataForPostUpdates: PostInputModel = {
             title: req.body.title,
@@ -106,7 +111,7 @@ const postsController = {
             blogId: req.body.blogId
         };
 
-        const updatedPost: boolean = await postsService
+        const updatedPost: boolean = await this.postsService
             .updatePost(req.params.id, dataForPostUpdates);
 
         if (!updatedPost) {
@@ -118,14 +123,14 @@ const postsController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
-    },
+    }
 
-    deletePost: async (
+    async deletePost(
         req: RequestWithParams<IdType>,
         res: Response
-    ) => {
+    ){
 
-        const isDeletedPost: boolean = await postsService
+        const isDeletedPost: boolean = await this.postsService
             .deletePost(req.params.id);
 
         if (!isDeletedPost) {
@@ -137,7 +142,9 @@ const postsController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204)
-    },
-};
+    }
+}
+
+const postsController: PostsController = new PostsController();
 
 export {postsController};

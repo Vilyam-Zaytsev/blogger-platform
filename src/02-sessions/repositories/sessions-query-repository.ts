@@ -3,7 +3,7 @@ import {WithId} from "mongodb";
 import {ActiveSessionType} from "../types/active-session-type";
 import {DeviceViewModel} from "../types/input-output-types";
 
-const sessionsQueryRepository = {
+class SessionsQueryRepository {
 
     async findSessionsByUserId(userId: string): Promise<DeviceViewModel[]> {
 
@@ -12,7 +12,7 @@ const sessionsQueryRepository = {
             .toArray();
 
         return sessions.map(s => this._mapSessionDbTypeToDeviceViewModel(s))
-    },
+    }
 
     _mapSessionDbTypeToDeviceViewModel(session: WithId<ActiveSessionType>): DeviceViewModel {
 
@@ -25,4 +25,4 @@ const sessionsQueryRepository = {
     }
 }
 
-export {sessionsQueryRepository};
+export {SessionsQueryRepository};

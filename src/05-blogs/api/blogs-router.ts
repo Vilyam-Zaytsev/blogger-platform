@@ -30,16 +30,18 @@ blogsRouter.get('/',
     sortDirectionInputValidator,
     searchNameTermInputValidator,
     inputCheckErrorsMiddleware,
-    blogsController.getBlogs
+    blogsController.getBlogs.bind(blogsController)
 );
-blogsRouter.get('/:id', blogsController.getBlog);
+blogsRouter.get('/:id',
+    blogsController.getBlog.bind(blogsController)
+);
 blogsRouter.post('/',
     baseAuthGuard,
     blogNameInputValidator,
     blogDescriptionInputValidator,
     blogWebsiteUrlInputValidator,
     inputCheckErrorsMiddleware,
-    blogsController.createBlog
+    blogsController.createBlog.bind(blogsController)
 );
 blogsRouter.put('/:id',
     baseAuthGuard,
@@ -47,11 +49,11 @@ blogsRouter.put('/:id',
     blogDescriptionInputValidator,
     blogWebsiteUrlInputValidator,
     inputCheckErrorsMiddleware,
-    blogsController.updateBlog
+    blogsController.updateBlog.bind(blogsController)
 );
 blogsRouter.delete('/:id',
     baseAuthGuard,
-    blogsController.deleteBlog
+    blogsController.deleteBlog.bind(blogsController)
 );
 blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
     pageNumberInputValidator,
@@ -59,7 +61,7 @@ blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
     sortByInputValidator,
     sortDirectionInputValidator,
     inputCheckErrorsMiddleware,
-    blogsController.getPosts
+    blogsController.getPosts.bind(blogsController)
 );
 blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
     baseAuthGuard,
@@ -67,7 +69,7 @@ blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
     postShortDescriptionInputValidator,
     postContentInputValidator,
     inputCheckErrorsMiddleware,
-    blogsController.createPost
+    blogsController.createPost.bind(blogsController)
 );
 
 export {blogsRouter};

@@ -3,19 +3,19 @@ import {PostInputModel} from "../types/input-output-types";
 import {postsCollection} from "../../db/mongoDb";
 import {InsertOneResult, ObjectId, WithId} from "mongodb";
 
-const postsRepository = {
+class PostsRepository {
 
     async findPost(id: string): Promise<WithId<PostDbType> | null> {
 
         return await postsCollection
             .findOne({_id: new ObjectId(id)});
-    },
+    }
 
     async insertPost(newPost: PostDbType): Promise<InsertOneResult> {
 
             return  await postsCollection
                 .insertOne(newPost);
-    },
+    }
 
     async updatePost(id: string, data: PostInputModel): Promise<boolean> {
 
@@ -23,7 +23,7 @@ const postsRepository = {
                 .updateOne({_id: new ObjectId(id)}, {$set: {...data}});
 
             return result.matchedCount === 1;
-    },
+    }
 
     async deletePost(id: string): Promise<boolean> {
 
@@ -31,7 +31,7 @@ const postsRepository = {
                 .deleteOne({_id: new ObjectId(id)});
 
             return result.deletedCount === 1;
-    },
-};
+    }
+}
 
-export {postsRepository};
+export {PostsRepository};

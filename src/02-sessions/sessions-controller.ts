@@ -3,20 +3,24 @@ import {RequestWithParams, RequestWithSession} from "../common/types/input-outpu
 import {TokenSessionDataType} from "./types/token-session-data-type";
 import {SETTINGS} from "../common/settings";
 import {DeviceViewModel} from "./types/input-output-types";
-import {sessionsQueryRepository} from "./repositories/sessions-query-repository";
+import {SessionsQueryRepository} from "./repositories/sessions-query-repository";
 import {ResultType} from "../common/types/result-types/result-type";
-import {sessionsService} from "./domain/sessions-service";
+import {SessionsService} from "./domain/sessions-service";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 
+class SessionsController {
 
-const sessionsController = {
+    constructor(
+        private sessionsService: SessionsService = new SessionsService(),
+        private sessionsQueryRepository: SessionsQueryRepository = new SessionsQueryRepository(),
+    ) {}
 
-    getDevices: async (
+    async getDevices(
         req: RequestWithSession<TokenSessionDataType>,
         res: Response<DeviceViewModel[]>
-    ) => {
+    ){
 
         const userId: string = req.session!.userId;
 
@@ -28,25 +32,25 @@ const sessionsController = {
             return;
         }
 
-        const devicesActiveSessions: DeviceViewModel[] = await sessionsQueryRepository
+        const devicesActiveSessions: DeviceViewModel[] = await this.sessionsQueryRepository
             .findSessionsByUserId(userId);
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(devicesActiveSessions);
-    },
+    }
 
-    deleteDevices: async (
+    async deleteDevices(
         req: RequestWithSession<TokenSessionDataType>,
         res: Response
-    ) => {
+    ){
 
         const {
             userId,
             iat
         } = req.session!;
 
-        const resultDeleteSessions: boolean = await sessionsService
+        const resultDeleteSessions: boolean = await this.sessionsService
             .deleteAllSessionsExceptCurrent(userId, iat);
 
         if (!resultDeleteSessions) {
@@ -59,19 +63,19 @@ const sessionsController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    },
+    }
 
-    deleteDevice: async (
+    async deleteDevice(
         req: RequestWithParams<IdType>,
         res: Response
-    ) => {
+    ){
 
         const deviceId: string = req.params.id;
         const userId: string = req.session!.userId
 
         const {
             status: sessionDeletionStatus
-        }: ResultType = await sessionsService
+        }: ResultType = await this.sessionsService
             .deleteSessionByDeviceId(userId, deviceId);
 
         if (sessionDeletionStatus !== ResultStatus.Success) {
@@ -85,6 +89,8 @@ const sessionsController = {
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     }
-};
+}
+
+const sessionsController: SessionsController = new SessionsController();
 
 export {sessionsController};

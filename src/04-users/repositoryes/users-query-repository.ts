@@ -9,7 +9,7 @@ import {
 import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
 import {UserMeViewModel, UserViewModel} from "../types/input-output-types";
 
-const usersQueryRepository = {
+class UsersQueryRepository {
 
     async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<UserViewModel[]> {
 
@@ -38,7 +38,7 @@ const usersQueryRepository = {
             .toArray();
 
         return users.map(u => this._mapDbUserToViewModel(u));
-    },
+    }
 
     async findUser(id: string): Promise<UserViewModel | null> {
 
@@ -48,7 +48,7 @@ const usersQueryRepository = {
         if (!user) return null;
 
         return this._mapDbUserToViewModel(user);
-    },
+    }
 
     async findUserAndMapToMeViewModel(id: string): Promise<UserMeViewModel | null> {
 
@@ -58,7 +58,7 @@ const usersQueryRepository = {
         if (!user) return null;
 
         return this._mapDbUserToMeViewModel(user);
-    },
+    }
 
     async getUsersCount(
         searchLoginTerm: string | null,
@@ -75,7 +75,7 @@ const usersQueryRepository = {
 
         return usersCollection
             .countDocuments(filter);
-    },
+    }
 
     _mapDbUserToViewModel(user: WithId<UserDbType>): UserViewModel {
 
@@ -85,7 +85,7 @@ const usersQueryRepository = {
             email: user.email,
             createdAt: user.createdAt
         };
-    },
+    }
 
     _mapDbUserToMeViewModel(user: WithId<UserDbType>): UserMeViewModel {
 
@@ -94,7 +94,7 @@ const usersQueryRepository = {
             login: user.login,
             userId: String(user._id),
         };
-    },
+    }
 
     _mapUsersViewModelToPaginationResponse(
         users: UserViewModel[],
@@ -110,6 +110,6 @@ const usersQueryRepository = {
             items: users
         };
     }
-};
+}
 
-export {usersQueryRepository};
+export {UsersQueryRepository};

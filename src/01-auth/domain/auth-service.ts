@@ -1,15 +1,15 @@
-import {bcryptService} from "../adapters/bcrypt-service";
+import {BcryptService} from "../adapters/bcrypt-service";
 import {LoginInputModel} from "../types/login-input-model";
 import {ConfirmationStatus, UserDbType} from "../../04-users/types/user-db-type";
-import {usersRepository} from "../../04-users/repositoryes/users-repository";
+import {UsersRepository} from "../../04-users/repositoryes/users-repository";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {ResultType} from "../../common/types/result-types/result-type";
-import {jwtService} from "../adapters/jwt-service";
+import {JwtService} from "../adapters/jwt-service";
 import {WithId} from "mongodb";
-import {usersService} from "../../04-users/domain/users-service";
+import {UsersService} from "../../04-users/domain/users-service";
 import {User} from "../../04-users/domain/user.entity";
 import {nodemailerService} from "../adapters/nodemailer-service";
-import {emailTemplates} from "../adapters/email-templates";
+import {EmailTemplates} from "../adapters/email-templates";
 import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
 import {UserInputModel} from "../../04-users/types/input-output-types";
@@ -23,11 +23,20 @@ import {
 import {AuthTokens} from "../types/auth-tokens-type";
 import {ActiveSessionType} from "../../02-sessions/types/active-session-type";
 import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
-import {sessionsRepository} from "../../02-sessions/repositories/sessions-repository";
+import {SessionsRepository} from "../../02-sessions/repositories/sessions-repository";
 import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-type";
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
 
-const authService = {
+class AuthService {
+
+    constructor(
+        private bcryptService: BcryptService = new BcryptService(),
+        private jwtService: JwtService = new JwtService(),
+        private emailTemplates: EmailTemplates = new EmailTemplates(),
+        private sessionsRepository: SessionsRepository = new SessionsRepository(),
+        private usersService: UsersService = new UsersService(),
+        private usersRepository: UsersRepository = new UsersRepository()
+    ) {};
 
     async login(authParamsDto: LoginInputModel): Promise<ResultType<AuthTokens | null>> {
 
@@ -46,12 +55,12 @@ const authService = {
                 );
         }
 
-        const accessToken: string = await jwtService
+        const accessToken: string = await this.jwtService
             .createAccessToken(checkedUserId!);
 
         const deviceId: string = randomUUID();
 
-        const refreshToken: string = await jwtService
+        const refreshToken: string = await this.jwtService
             .createRefreshToken(
                 checkedUserId!,
                 deviceId
@@ -59,7 +68,7 @@ const authService = {
 
         return SuccessResult
             .create<AuthTokens>({accessToken, refreshToken});
-    },
+    }
 
     async refreshToken(tokenData: TokenSessionDataType) {
 
@@ -69,16 +78,16 @@ const authService = {
             deviceId
         } = tokenData;
 
-        const accessToken: string = await jwtService
+        const accessToken: string = await this.jwtService
             .createAccessToken(userId);
 
-        const refreshToken: string = await jwtService
+        const refreshToken: string = await this.jwtService
             .createRefreshToken(userId, deviceId);
 
-        const payloadRefreshToken: PayloadRefreshTokenType = await jwtService
+        const payloadRefreshToken: PayloadRefreshTokenType = await this.jwtService
             .decodeToken(refreshToken);
 
-        const session: WithId<ActiveSessionType> | null = await sessionsRepository
+        const session: WithId<ActiveSessionType> | null = await this.sessionsRepository
             .findSessionByIatAndDeviceId(iat, deviceId);
 
         const timestamps: SessionTimestampsType = {
@@ -86,7 +95,7 @@ const authService = {
             exp: new Date(payloadRefreshToken.exp * 1000).toISOString()
         };
 
-        const resultUpdateSession: boolean = await sessionsRepository
+        const resultUpdateSession: boolean = await this.sessionsRepository
             .updateSessionTimestamps(session!._id, timestamps);
 
         if (!resultUpdateSession) {
@@ -102,14 +111,14 @@ const authService = {
         return SuccessResult
             .create<AuthTokens>({accessToken, refreshToken});
 
-    },
+    }
 
     async registration(registrationUserDto: UserInputModel): Promise<ResultType<string | null>> {
 
         const candidate: UserDbType = await User
             .registrationUser(registrationUserDto);
 
-        const resultCreateUser: ResultType<string | null> = await usersService
+        const resultCreateUser: ResultType<string | null> = await this.usersService
             .createUser(candidate);
 
         if (resultCreateUser.status !== ResultStatus.Success) return resultCreateUser;
@@ -117,18 +126,18 @@ const authService = {
         nodemailerService
             .sendEmail(
                 candidate.email,
-                emailTemplates
+                this.emailTemplates
                     .registrationEmail(candidate.emailConfirmation.confirmationCode!)
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 
         return SuccessResult
             .create(null);
-    },
+    }
 
     async registrationConfirmation(confirmationCode: string): Promise<ResultType> {
 
-        const user: WithId<UserDbType> | null = await usersRepository
+        const user: WithId<UserDbType> | null = await this.usersRepository
             .findByConfirmationCode(confirmationCode);
 
 
@@ -162,16 +171,16 @@ const authService = {
                 );
         }
 
-        await usersRepository
+        await this.usersRepository
             .updateConfirmationStatus(user._id);
 
         return SuccessResult
             .create(null);
-    },
+    }
 
     async registrationEmailResending(email: string): Promise<ResultType> {
 
-        const user: WithId<UserDbType> | null = await usersRepository
+        const user: WithId<UserDbType> | null = await this.usersRepository
             .findByEmail(email);
 
         if (!user) {
@@ -200,7 +209,7 @@ const authService = {
             {hours: 1, minutes: 1}
         );
 
-        await usersRepository
+        await this.usersRepository
             .updateEmailConfirmation(
                 user._id,
                 confirmationCode,
@@ -209,14 +218,14 @@ const authService = {
         nodemailerService
             .sendEmail(
                 user.email,
-                emailTemplates
+                this.emailTemplates
                     .registrationEmail(confirmationCode)
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 
         return SuccessResult
             .create(null);
-    },
+    }
 
     async checkUserCredentials(authParamsDto: LoginInputModel): Promise<ResultType<string | null>> {
         const {
@@ -224,7 +233,7 @@ const authService = {
             password
         } = authParamsDto;
 
-        const user: WithId<UserDbType> | null = await usersRepository
+        const user: WithId<UserDbType> | null = await this.usersRepository
             .findByLoginOrEmail(loginOrEmail);
 
         if (!user) {
@@ -237,7 +246,7 @@ const authService = {
                 );
         }
 
-        const isPasswordCorrect: boolean = await bcryptService
+        const isPasswordCorrect: boolean = await this.bcryptService
             .checkPassword(password, user.passwordHash);
 
         if (!isPasswordCorrect) {
@@ -252,11 +261,11 @@ const authService = {
 
         return SuccessResult
             .create<string>(String(user._id));
-    },
+    }
 
     async checkAccessToken(token: string): Promise<ResultType<string | null>> {
 
-        const payload = await jwtService
+        const payload = await this.jwtService
             .verifyAccessToken(token);
 
         if (!payload) {
@@ -271,7 +280,7 @@ const authService = {
 
         const {userId} = payload;
 
-        const isUser: UserDbType | null = await usersRepository
+        const isUser: UserDbType | null = await this.usersRepository
             .findUser(userId);
 
         if (!isUser) {
@@ -286,11 +295,11 @@ const authService = {
 
         return SuccessResult
             .create<string>(userId);
-    },
+    }
 
     async checkRefreshToken(refreshToken: string): Promise<ResultType<PayloadRefreshTokenType | null>> {
 
-        const payload: PayloadRefreshTokenType | null = await jwtService
+        const payload: PayloadRefreshTokenType | null = await this.jwtService
             .verifyRefreshToken(refreshToken);
 
         if (!payload) {
@@ -309,7 +318,7 @@ const authService = {
             iat
         } = payload;
 
-        const isUser: UserDbType | null = await usersRepository
+        const isUser: UserDbType | null = await this.usersRepository
             .findUser(userId);
 
         if (!isUser) {
@@ -322,7 +331,7 @@ const authService = {
                 );
         }
 
-        const isSessionActive: WithId<ActiveSessionType> | null = await sessionsRepository
+        const isSessionActive: WithId<ActiveSessionType> | null = await this.sessionsRepository
             .findSessionByIatAndDeviceId(new Date(iat * 1000).toISOString(), deviceId);
 
         if (!isSessionActive) {
@@ -337,7 +346,7 @@ const authService = {
 
         return SuccessResult
             .create<PayloadRefreshTokenType>(payload);
-    },
-};
+    }
+}
 
-export {authService};
+export {AuthService};

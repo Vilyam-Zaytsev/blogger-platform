@@ -7,7 +7,7 @@ import {
     RequestWithQuery
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
-import {blogsService} from "./domain/blogs-service";
+import {BlogsService} from "./domain/blogs-service";
 import {BlogDbType} from "./types/blog-db-type";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 import {
@@ -16,20 +16,25 @@ import {
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {blogsQueryRepository} from "./repositoryes/blogs-query-repository";
+import {BlogsQueryRepository} from "./repositoryes/blogs-query-repository";
 import {PostViewModel} from "../06-posts/types/input-output-types";
 import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
-import {postsQueryRepository} from "../06-posts/repositoryes/posts-query-repository";
+import {PostsQueryRepository} from "../06-posts/repositoryes/posts-query-repository";
 
+class BlogsController {
 
-const blogsController = {
+    constructor(
+        private blogsService: BlogsService = new BlogsService(),
+        private blogsQueryRepository: BlogsQueryRepository = new BlogsQueryRepository(),
+        private postsQueryRepository: PostsQueryRepository = new PostsQueryRepository()
+    ) {};
 
-    getBlogs: async (
+    async getBlogs(
         req: RequestWithQuery<SortingAndPaginationParamsType>,
         res: Response<Paginator<BlogDbType>>
-    ) => {
+    ){
 
         const sortingAndPaginationParams: SortingAndPaginationParamsType = {
             pageNumber: req.query.pageNumber,
@@ -42,13 +47,13 @@ const blogsController = {
         const paginationAndSortFilter: PaginationAndSortFilterType =
             createPaginationAndSortFilter(sortingAndPaginationParams);
 
-        const foundBlogs: BlogViewModel[] = await blogsQueryRepository
+        const foundBlogs: BlogViewModel[] = await this.blogsQueryRepository
             .findBlogs(paginationAndSortFilter);
 
-        const blogsCount: number = await blogsQueryRepository
+        const blogsCount: number = await this.blogsQueryRepository
             .getBlogsCount(paginationAndSortFilter.searchNameTerm);
 
-        const paginationResponse: Paginator<BlogViewModel> = await blogsQueryRepository
+        const paginationResponse: Paginator<BlogViewModel> = await this.blogsQueryRepository
             ._mapBlogsViewModelToPaginationResponse(
                 foundBlogs,
                 blogsCount,
@@ -58,14 +63,14 @@ const blogsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(paginationResponse);
-    },
+    }
 
-    getBlog: async (
+    async getBlog(
         req: RequestWithParams<IdType>,
         res: Response<BlogViewModel>
-    ) => {
+    ){
 
-        const foundBlog: BlogViewModel | null = await blogsQueryRepository
+        const foundBlog: BlogViewModel | null = await this.blogsQueryRepository
             .findBlog(req.params.id);
 
         if (!foundBlog) {
@@ -78,12 +83,12 @@ const blogsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(foundBlog);
-    },
+    }
 
-    createBlog: async (
+    async createBlog(
         req: RequestWithBody<BlogInputModel>,
         res: Response<BlogViewModel>
-    ) => {
+    ){
 
         const dataForCreatingBlog: BlogInputModel = {
             name: req.body.name,
@@ -91,21 +96,21 @@ const blogsController = {
             websiteUrl: req.body.websiteUrl
         };
 
-        const idCreatedBlog: string = await blogsService
+        const idCreatedBlog: string = await this.blogsService
             .createBlog(dataForCreatingBlog);
 
-        const createdBlog: BlogViewModel | null = await blogsQueryRepository
+        const createdBlog: BlogViewModel | null = await this.blogsQueryRepository
             .findBlog(idCreatedBlog);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
             .json(createdBlog!);
-    },
+    }
 
-    updateBlog: async (
+    async updateBlog(
         req: RequestWithParamsAndBody<IdType, BlogInputModel>,
         res: Response<BlogViewModel>
-    ) => {
+    ){
 
         const dataForBlogUpdates: BlogInputModel = {
             name: req.body.name,
@@ -113,7 +118,7 @@ const blogsController = {
             websiteUrl: req.body.websiteUrl
         };
 
-        const updatedBlog: boolean = await blogsService
+        const updatedBlog: boolean = await this.blogsService
             .updateBlog(req.params.id, dataForBlogUpdates);
 
         if (!updatedBlog) {
@@ -125,14 +130,14 @@ const blogsController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    },
+    }
 
-    deleteBlog: async (
+    async deleteBlog(
         req: RequestWithParams<IdType>,
         res: Response
-    ) => {
+    ){
 
-        const isDeletedBlog: boolean = await blogsService
+        const isDeletedBlog: boolean = await this.blogsService
             .deleteBlog(req.params.id);
 
         if (!isDeletedBlog) {
@@ -144,16 +149,16 @@ const blogsController = {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    },
+    }
 
-    getPosts: async (
+    async getPosts(
         req: RequestWithParamsAndQuery<IdType, SortingAndPaginationParamsType>,
         res: Response<Paginator<PostViewModel>>
-    ) => {
+    ){
 
         const blogId: string = req.params.id;
 
-        const resultCheckBlogId: ResultType<string | null> = await blogsService
+        const resultCheckBlogId: ResultType<string | null> = await this.blogsService
             .checkBlogId(blogId);
 
         if (resultCheckBlogId.status !== ResultStatus.Success) {
@@ -174,13 +179,13 @@ const blogsController = {
         const paginationAndSortFilter: PaginationAndSortFilterType =
             createPaginationAndSortFilter(sortingAndPaginationParams)
 
-        const foundPosts: PostViewModel[] = await postsQueryRepository
+        const foundPosts: PostViewModel[] = await this.postsQueryRepository
             .findPosts(paginationAndSortFilter, blogId);
 
-        const postsCount: number = await postsQueryRepository
+        const postsCount: number = await this.postsQueryRepository
             .getPostsCount(blogId);
 
-        const paginationResponse: Paginator<PostViewModel> = await postsQueryRepository
+        const paginationResponse: Paginator<PostViewModel> = await this.postsQueryRepository
             ._mapPostsViewModelToPaginationResponse(
                 foundPosts,
                 postsCount,
@@ -190,12 +195,12 @@ const blogsController = {
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .json(paginationResponse);
-    },
+    }
 
-    createPost: async (
+    async createPost(
         req: RequestWithParamsAndBody<IdType, BlogPostInputModel>,
         res: Response<PostViewModel>
-    ) => {
+    ){
 
         const blogId: string = req.params.id;
 
@@ -205,7 +210,7 @@ const blogsController = {
             content: req.body.content,
         };
 
-        const resultCreatedPost: ResultType<string | null> = await blogsService
+        const resultCreatedPost: ResultType<string | null> = await this.blogsService
             .createPost(blogId, dataForCreatingPost);
 
         if (resultCreatedPost.status !== ResultStatus.Success) {
@@ -216,13 +221,15 @@ const blogsController = {
             return;
         }
 
-        const createdPost: PostViewModel | null = await postsQueryRepository
+        const createdPost: PostViewModel | null = await this.postsQueryRepository
             .findPost(resultCreatedPost.data!);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
             .json(createdPost!)
-    },
-};
+    }
+}
+
+const blogsController: BlogsController = new BlogsController();
 
 export {blogsController};

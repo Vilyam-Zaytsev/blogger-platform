@@ -8,7 +8,7 @@ import {
     SortDirection
 } from "../../common/types/input-output-types/pagination-sort-types";
 
-const commentQueryRepository = {
+class CommentQueryRepository {
 
     async findComments(sortQueryDto: PaginationAndSortFilterType, postId: string): Promise<CommentViewModel[]> {
 
@@ -27,7 +27,7 @@ const commentQueryRepository = {
             .toArray()
 
         return comments.map(c => this._mapDBCommentToViewModel(c));
-    },
+    }
 
     async findComment(id: string): Promise<CommentViewModel | null> {
 
@@ -37,13 +37,13 @@ const commentQueryRepository = {
         if (!comment) return null;
 
         return this._mapDBCommentToViewModel(comment);
-    },
+    }
 
     async getCommentsCount(postId: string): Promise<number> {
 
         return await commentsCollection
             .countDocuments({postId})
-    },
+    }
 
     _mapDBCommentToViewModel(comment: WithId<CommentDbType>): CommentViewModel {
 
@@ -56,7 +56,7 @@ const commentQueryRepository = {
             },
             createdAt: comment.createdAt
         };
-    },
+    }
 
     _mapCommentsViewModelToPaginationResponse(
         comments: CommentViewModel[],
@@ -72,6 +72,6 @@ const commentQueryRepository = {
             items: comments
         }
     }
-};
+}
 
-export {commentQueryRepository};
+export {CommentQueryRepository};

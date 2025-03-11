@@ -9,12 +9,14 @@ import {UserDbType} from "../../src/04-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
 import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
-import {usersRepository} from "../../src/04-users/repositoryes/users-repository";
-import {emailTemplates} from "../../src/01-auth/adapters/email-templates";
+import {UsersRepository} from "../../src/04-users/repositoryes/users-repository";
+import {EmailTemplates} from "../../src/01-auth/adapters/email-templates";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {UserInputModel} from "../../src/04-users/types/input-output-types";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
+
+const usersRepository: UsersRepository = new UsersRepository();
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -68,6 +70,8 @@ describe('POST /auth/registration-email-resending', () => {
 
         const foundUser: WithId<UserDbType> | null = await usersRepository
             .findByEmail(user.email);
+
+        const emailTemplates: EmailTemplates = new EmailTemplates();
 
         expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(2);
         expect(await (nodemailerService.sendEmail as jest.Mock).mock.results[1].value)
