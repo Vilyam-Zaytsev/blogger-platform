@@ -21,6 +21,8 @@ import {SessionsService} from "../02-sessions/domain/sessions-service";
 import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
 import {SessionsRepository} from "../02-sessions/repositories/sessions-repository";
 import {WithId} from "mongodb";
+import {PasswordRecoveryInputModel} from "./types/password-recovery-input-model";
+import {NewPasswordRecoveryInputModel} from "./types/new-password-recovery-input-model";
 
 const jwtService: JwtService = new JwtService();
 
@@ -230,6 +232,46 @@ class AuthController {
             res
                 .status(mapResultStatusToHttpStatus(resultEmailResending.status))
                 .json(mapResultExtensionsToErrorMessage(resultEmailResending.extensions));
+
+            return;
+        }
+
+        res
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+    }
+
+    async passwordRecovery(
+        req: RequestWithBody<PasswordRecoveryInputModel>,
+        res: Response
+    ){
+
+        const {email} = req.body;
+
+        const resultPasswordRecovery: ResultType = await this.authService
+            .passwordRecovery(email);
+
+        res
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+    }
+
+    async newPassword(
+        req: RequestWithBody<NewPasswordRecoveryInputModel>,
+        res: Response
+    ){
+
+        const {
+            newPassword,
+            recoveryCode
+        } = req.body;
+
+        const resultNewPassword: ResultType = await this.authService
+            .newPassword(newPassword, recoveryCode);
+
+        if (resultNewPassword.status !== ResultStatus.Success) {
+
+            res
+                .status(mapResultStatusToHttpStatus(resultNewPassword.status))
+                .json(mapResultExtensionsToErrorMessage(resultNewPassword.extensions));
 
             return;
         }

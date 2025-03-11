@@ -97,6 +97,19 @@ class UsersRepository {
         return result.modifiedCount === 1;
     }
 
+    async updatePassword(_id: ObjectId, newPassword: string): Promise<boolean> {
+
+        const result = await usersCollection
+            .updateOne({_id}, {
+                $set: {
+                    passwordHash: newPassword
+                }
+            });
+
+        return result.modifiedCount === 1;
+    }
+
+
     async deleteUser(id: string): Promise<boolean> {
 
         const result = await usersCollection

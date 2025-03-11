@@ -26,6 +26,7 @@ import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
 import {SessionsRepository} from "../../02-sessions/repositories/sessions-repository";
 import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-type";
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
+import {PasswordRecoveryInputModel} from "../types/password-recovery-input-model";
 
 class AuthService {
 
@@ -346,6 +347,87 @@ class AuthService {
 
         return SuccessResult
             .create<PayloadRefreshTokenType>(payload);
+    }
+
+    async passwordRecovery(email: string): Promise<ResultType> {
+
+        const user: WithId<UserDbType> | null = await this.usersRepository
+            .findByEmail(email);
+
+        if (!user) {
+
+            return SuccessResult
+                .create(null);
+        }
+
+        const confirmationCode: string = randomUUID();
+        const expirationDate: Date = add(
+            new Date(),
+            {hours: 1, minutes: 1}
+        )
+
+        await this.usersRepository
+            .updateEmailConfirmation(
+                user._id,
+                confirmationCode,
+                expirationDate);
+
+        nodemailerService
+            .sendEmail(
+                user.email,
+                this.emailTemplates
+                    .passwordRecoveryEmail(confirmationCode)
+            )
+            .catch(error => console.error('ERROR IN SEND EMAIL:', error));
+
+        return SuccessResult
+            .create(null);
+    }
+
+    async newPassword(newPassword: string, recoveryCode: string): Promise<ResultType> {
+
+        const user: WithId<UserDbType> | null = await this.usersRepository
+            .findByConfirmationCode(recoveryCode);
+
+
+        if (!user) {
+
+            return BadRequestResult
+                .create(
+                    'recoveryCode',
+                    'Recovery code incorrect.',
+                    'The password could not be recovered.'
+                );
+        }
+
+        if (user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()) {
+
+            return BadRequestResult
+                .create(
+                    'code',
+                    'The code has expired.',
+                    'The password could not be recovered.'
+                );
+        }
+
+        const passwordHash: string = await this.bcryptService
+            .generateHash(newPassword);
+
+        const resultUpdatePassword: boolean = await this.usersRepository
+            .updatePassword(user._id, passwordHash);
+
+        if (!resultUpdatePassword) {
+
+            return InternalServerErrorResult
+                .create(
+                    'no field',
+                    'Server Error.',
+                    'The password could not be updated.'
+                );
+        }
+
+        return SuccessResult
+            .create(null);
     }
 }
 
