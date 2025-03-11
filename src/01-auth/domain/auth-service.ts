@@ -394,7 +394,7 @@ class AuthService {
 
             return BadRequestResult
                 .create(
-                    'code',
+                    'recoveryCode',
                     'Recovery code incorrect.',
                     'The password could not be recovered.'
                 );
