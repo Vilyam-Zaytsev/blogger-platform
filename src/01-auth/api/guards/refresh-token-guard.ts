@@ -4,6 +4,7 @@ import {ResultType} from "../../../common/types/result-types/result-type";
 import {AuthService} from "../../domain/auth-service";
 import {ResultStatus} from "../../../common/types/result-types/result-status";
 import {PayloadRefreshTokenType} from "../../types/payload.refresh.token.type";
+import {ObjectId} from "mongodb";
 
 const refreshTokenGuard = async (
     req: Request,
@@ -23,10 +24,13 @@ const refreshTokenGuard = async (
 
     const token: string = req.cookies.refreshToken;
 
-    const resultCheckRefreshToken: ResultType<PayloadRefreshTokenType | null> = await authService
+    const {
+        data: payload,
+        status: refreshTokenVerificationStatus
+    }: ResultType<PayloadRefreshTokenType | null> = await authService
         .checkRefreshToken(token);
 
-    if (resultCheckRefreshToken.status !== ResultStatus.Success) {
+    if (refreshTokenVerificationStatus !== ResultStatus.Success) {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
@@ -34,11 +38,9 @@ const refreshTokenGuard = async (
         return;
     }
 
-    //TODO: стоит ли создавать данные сессии в гарде???
     req.session = {
-        iat: new Date(resultCheckRefreshToken.data!.iat * 1000),
-        userId: resultCheckRefreshToken.data!.userId,
-        deviceId: resultCheckRefreshToken.data!.deviceId
+        userId: payload!.userId,
+        deviceId: new ObjectId(payload!.deviceId)
     };
 
     return next();

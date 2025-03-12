@@ -5,7 +5,6 @@ import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, WithId} from "mongodb";
 import {apiTrafficCollection, setApiTrafficCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
-import {UserDbType} from "../../src/04-users/types/confirmation-status";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
 import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
@@ -15,6 +14,7 @@ import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {UserInputModel} from "../../src/04-users/types/input-output-types";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
+import {User} from "../../src/04-users/domain/user.entity";
 
 const usersRepository: UsersRepository = new UsersRepository();
 
@@ -29,7 +29,7 @@ beforeAll(async () => {
     await client.connect();
 
     const db = client.db();
-    setUsersCollection(db.collection<UserDbType>('users'));
+    setUsersCollection(db.collection<User>('users'));
     setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });
 
@@ -68,7 +68,7 @@ describe('POST /auth/registration-email-resending', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
-        const foundUser: WithId<UserDbType> | null = await usersRepository
+        const foundUser: WithId<User> | null = await usersRepository
             .findByEmail(user.email);
 
         const emailTemplates: EmailTemplates = new EmailTemplates();
@@ -98,7 +98,7 @@ describe('POST /auth/registration-email-resending', () => {
                 .registration(user);
         }
 
-        const users: UserDbType[] = await usersRepository
+        const users: User[] = await usersRepository
             .findUsers(createPaginationAndSortFilter({}))
 
         const emails: string[] = users.map(u => u.email);

@@ -48,11 +48,11 @@ class SessionsController {
 
         const {
             userId,
-            iat
+            deviceId
         } = req.session!;
 
         const resultDeleteSessions: boolean = await this.sessionsService
-            .deleteAllSessionsExceptCurrent(userId, iat);
+            .deleteAllSessionsExceptCurrent(userId, deviceId);
 
         if (!resultDeleteSessions) {
 

@@ -73,7 +73,6 @@ class AuthService {
     async refreshToken(tokenData: TokenSessionDataType) {
 
         const {
-            iat,
             userId,
             deviceId
         } = tokenData;
@@ -86,7 +85,7 @@ class AuthService {
         //TODO: что если переделать поиск сессии только по deviceId???
         const [payloadRefreshToken, session] = await Promise.all([
             this.jwtService.decodeToken(refreshToken),
-            this.sessionsRepository.findSessionByIatAndDeviceId(iat, deviceId)
+            this.sessionsRepository.findSessionByDeviceId(deviceId)
         ]);
 
         const timestamps: SessionTimestampsType = {
@@ -94,10 +93,10 @@ class AuthService {
             exp: new Date(payloadRefreshToken.exp * 1000)
         };
 
-        const resultUpdateSession: boolean = await this.sessionsRepository
+        const resultUpdateSessionTimestamps: boolean = await this.sessionsRepository
             .updateSessionTimestamps(session!._id, timestamps);
 
-        if (!resultUpdateSession) {
+        if (!resultUpdateSessionTimestamps) {
 
             return InternalServerErrorResult
                 .create(
@@ -314,7 +313,6 @@ class AuthService {
         const {
             userId,
             deviceId,
-            iat
         } = payload;
 
         const isUser: User | null = await this.usersRepository
@@ -331,7 +329,7 @@ class AuthService {
         }
 
         const isSessionActive: WithId<ActiveSessionType> | null = await this.sessionsRepository
-            .findSessionByIatAndDeviceId(new Date(iat * 1000), deviceId);
+            .findSessionByDeviceId(new ObjectId(deviceId));
 
         if (!isSessionActive) {
 

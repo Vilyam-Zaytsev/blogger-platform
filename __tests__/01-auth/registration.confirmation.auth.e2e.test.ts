@@ -5,7 +5,7 @@ import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId, WithId} from "mongodb";
 import {apiTrafficCollection, setApiTrafficCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
-import {ConfirmationStatus, UserDbType} from "../../src/04-users/types/confirmation-status";
+import {ConfirmationStatus} from "../../src/04-users/types/confirmation-status";
 import {UsersRepository} from "../../src/04-users/repositoryes/users-repository";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
@@ -14,6 +14,7 @@ import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 import {UserInputModel} from "../../src/04-users/types/input-output-types";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
+import {User} from "../../src/04-users/domain/user.entity";
 
 const usersRepository: UsersRepository = new UsersRepository();
 
@@ -28,7 +29,7 @@ beforeAll(async () => {
     await client.connect();
 
     const db = client.db();
-    setUsersCollection(db.collection<UserDbType>('users'));
+    setUsersCollection(db.collection<User>('users'));
     setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });
 
@@ -59,7 +60,7 @@ describe('POST /auth/registration-confirmation', () => {
             .registration(user);
 
 
-        const foundUser_1: WithId<UserDbType> | null = await usersRepository
+        const foundUser_1: WithId<User> | null = await usersRepository
             .findByEmail(user.email);
 
         const resRegistrationConfirmation: Response = await req
@@ -69,7 +70,7 @@ describe('POST /auth/registration-confirmation', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
-        const foundUser_2: WithId<UserDbType> | null = await usersRepository
+        const foundUser_2: WithId<User> | null = await usersRepository
             .findByEmail(user.email);
 
         expect(foundUser_2).toEqual({
@@ -78,6 +79,10 @@ describe('POST /auth/registration-confirmation', () => {
             email: user.email,
             passwordHash: expect.any(String),
             createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+            passwordRecovery: {
+                recoveryCode: null,
+                expirationDate: null
+            },
             emailConfirmation: {
                 confirmationCode: expect.any(String),
                 expirationDate: expect.any(Date),
@@ -102,7 +107,7 @@ describe('POST /auth/registration-confirmation', () => {
                 .registration(user);
         }
 
-        const users: UserDbType[] = await usersRepository
+        const users: User[] = await usersRepository
             .findUsers(createPaginationAndSortFilter({}))
 
         const confirmationCodes: string[] = users.map(u => u.emailConfirmation.confirmationCode!);
@@ -148,7 +153,7 @@ describe('POST /auth/registration-confirmation', () => {
             ]
         });
 
-        const foundUser: WithId<UserDbType> | null = await usersRepository
+        const foundUser: WithId<User> | null = await usersRepository
             .findByEmail(user.email);
 
         expect(foundUser).toEqual({
@@ -157,6 +162,10 @@ describe('POST /auth/registration-confirmation', () => {
             email: user.email,
             passwordHash: expect.any(String),
             createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+            passwordRecovery: {
+                recoveryCode: null,
+                expirationDate: null
+            },
             emailConfirmation: {
                 confirmationCode: expect.any(String),
                 expirationDate: expect.any(Date),
@@ -173,7 +182,7 @@ describe('POST /auth/registration-confirmation', () => {
         await authTestManager
             .registration(user);
 
-        const foundUser_1: WithId<UserDbType> | null = await usersRepository
+        const foundUser_1: WithId<User> | null = await usersRepository
             .findByEmail(user.email);
 
         expect(foundUser_1).toEqual({
@@ -182,6 +191,10 @@ describe('POST /auth/registration-confirmation', () => {
             email: user.email,
             passwordHash: expect.any(String),
             createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+            passwordRecovery: {
+                recoveryCode: null,
+                expirationDate: null
+            },
             emailConfirmation: {
                 confirmationCode: expect.any(String),
                 expirationDate: expect.any(Date),
@@ -212,7 +225,7 @@ describe('POST /auth/registration-confirmation', () => {
             ]
         })
 
-        const foundUser_2: WithId<UserDbType> | null = await usersRepository
+        const foundUser_2: WithId<User> | null = await usersRepository
             .findByEmail(user.email);
 
         expect(foundUser_2).toEqual({
@@ -221,6 +234,10 @@ describe('POST /auth/registration-confirmation', () => {
             email: user.email,
             passwordHash: expect.any(String),
             createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+            passwordRecovery: {
+                recoveryCode: null,
+                expirationDate: null
+            },
             emailConfirmation: {
                 confirmationCode: expect.any(String),
                 expirationDate: expect.any(Date),

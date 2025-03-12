@@ -1,8 +1,6 @@
-import {ObjectId} from "mongodb";
-
 type PayloadRefreshTokenType = {
     userId: string,
-    deviceId: ObjectId,
+    deviceId: string,
     iat: number,
     exp: number
 }

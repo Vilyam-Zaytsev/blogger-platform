@@ -12,11 +12,11 @@ import {
     usersCollection
 } from "../../src/db/mongoDb";
 import {Response} from "supertest";
-import {UserDbType} from "../../src/04-users/types/confirmation-status";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
+import {User} from "../../src/04-users/domain/user.entity";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -33,7 +33,7 @@ beforeAll(async () => {
     // const user = db.collection('user')
     //TODO: replace with runDB func
 
-    setUsersCollection(db.collection<UserDbType>('users'));
+    setUsersCollection(db.collection<User>('users'));
     setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
     setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });
