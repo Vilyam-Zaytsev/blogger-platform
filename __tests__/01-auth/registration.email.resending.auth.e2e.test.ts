@@ -5,7 +5,7 @@ import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, WithId} from "mongodb";
 import {apiTrafficCollection, setApiTrafficCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
-import {UserDbType} from "../../src/04-users/types/user-db-type";
+import {UserDbType} from "../../src/04-users/types/confirmation-status";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
 import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";

@@ -3,8 +3,8 @@ type ActiveSessionType = {
     deviceId: string;
     deviceName: string;
     ip: string;
-    iat: string;
-    exp: string;
+    iat: Date;
+    exp: Date;
 };
 
 export {ActiveSessionType};

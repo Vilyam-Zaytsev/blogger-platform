@@ -78,8 +78,8 @@ class AuthController {
             deviceId,
             deviceName,
             ip,
-            iat: new Date(iat * 1000).toISOString(),
-            exp
+            iat: new Date(iat * 1000),
+            exp: new Date(exp * 1000)
         };
 
         await this.sessionsService

@@ -36,7 +36,7 @@ const refreshTokenGuard = async (
 
     //TODO: стоит ли создавать данные сессии в гарде???
     req.session = {
-        iat: new Date(resultCheckRefreshToken.data!.iat * 1000).toISOString(),
+        iat: new Date(resultCheckRefreshToken.data!.iat * 1000),
         userId: resultCheckRefreshToken.data!.userId,
         deviceId: resultCheckRefreshToken.data!.deviceId
     };

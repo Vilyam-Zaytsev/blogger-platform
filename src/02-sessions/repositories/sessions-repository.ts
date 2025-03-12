@@ -5,7 +5,7 @@ import {SessionTimestampsType} from "../types/session-timestamps-type";
 
 class SessionsRepository {
 
-    async findSessionByIatAndDeviceId(iat: string, deviceId: string): Promise<WithId<ActiveSessionType> | null> {
+    async findSessionByIatAndDeviceId(iat: Date, deviceId: string): Promise<WithId<ActiveSessionType> | null> {
 
         return sessionsCollection
             .findOne({iat, deviceId});
@@ -44,7 +44,7 @@ class SessionsRepository {
         return result.deletedCount === 1;
     }
 
-    async deleteAllSessionsExceptCurrent(userId: string, iat: string) {
+    async deleteAllSessionsExceptCurrent(userId: string, iat: Date) {
 
         const result = await sessionsCollection
             .deleteMany({

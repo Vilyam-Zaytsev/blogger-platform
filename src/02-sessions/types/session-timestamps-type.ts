@@ -1,6 +1,6 @@
 type SessionTimestampsType = {
-    iat: string,
-    exp: string
+    iat: Date,
+    exp: Date
 };
 
 export {SessionTimestampsType};

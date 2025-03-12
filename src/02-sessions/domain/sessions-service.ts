@@ -70,7 +70,7 @@ class SessionsService {
             .create(null);
     }
 
-    async deleteAllSessionsExceptCurrent(userId: string, iat: string): Promise<boolean> {
+    async deleteAllSessionsExceptCurrent(userId: string, iat: Date): Promise<boolean> {
 
         return await this.sessionsRepository
             .deleteAllSessionsExceptCurrent(userId, iat);

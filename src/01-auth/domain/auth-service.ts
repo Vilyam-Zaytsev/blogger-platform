@@ -1,6 +1,6 @@
 import {BcryptService} from "../adapters/bcrypt-service";
 import {LoginInputModel} from "../types/login-input-model";
-import {ConfirmationStatus, UserDbType} from "../../04-users/types/user-db-type";
+import {ConfirmationStatus} from "../../04-users/types/confirmation-status";
 import {UsersRepository} from "../../04-users/repositoryes/users-repository";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {ResultType} from "../../common/types/result-types/result-type";
@@ -26,7 +26,6 @@ import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
 import {SessionsRepository} from "../../02-sessions/repositories/sessions-repository";
 import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-type";
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
-import {PasswordRecoveryInputModel} from "../types/password-recovery-input-model";
 
 class AuthService {
 
@@ -92,8 +91,8 @@ class AuthService {
         ]);
 
         const timestamps: SessionTimestampsType = {
-            iat: new Date(payloadRefreshToken.iat * 1000).toISOString(),
-            exp: new Date(payloadRefreshToken.exp * 1000).toISOString()
+            iat: new Date(payloadRefreshToken.iat * 1000),
+            exp: new Date(payloadRefreshToken.exp * 1000)
         };
 
         const resultUpdateSession: boolean = await this.sessionsRepository
@@ -116,7 +115,7 @@ class AuthService {
 
     async registration(registrationUserDto: UserInputModel): Promise<ResultType<string | null>> {
 
-        const candidate: UserDbType = await User
+        const candidate: User = await User
             .registrationUser(registrationUserDto);
 
         const resultCreateUser: ResultType<string | null> = await this.usersService
@@ -138,7 +137,7 @@ class AuthService {
 
     async registrationConfirmation(confirmationCode: string): Promise<ResultType> {
 
-        const user: WithId<UserDbType> | null = await this.usersRepository
+        const user: WithId<User> | null = await this.usersRepository
             .findByConfirmationCode(confirmationCode);
 
 
@@ -181,7 +180,7 @@ class AuthService {
 
     async registrationEmailResending(email: string): Promise<ResultType> {
 
-        const user: WithId<UserDbType> | null = await this.usersRepository
+        const user: WithId<User> | null = await this.usersRepository
             .findByEmail(email);
 
         if (!user) {
@@ -234,7 +233,7 @@ class AuthService {
             password
         } = authParamsDto;
 
-        const user: WithId<UserDbType> | null = await this.usersRepository
+        const user: WithId<User> | null = await this.usersRepository
             .findByLoginOrEmail(loginOrEmail);
 
         if (!user) {
@@ -281,7 +280,7 @@ class AuthService {
 
         const {userId} = payload;
 
-        const isUser: UserDbType | null = await this.usersRepository
+        const isUser: User | null = await this.usersRepository
             .findUser(userId);
 
         if (!isUser) {
@@ -319,7 +318,7 @@ class AuthService {
             iat
         } = payload;
 
-        const isUser: UserDbType | null = await this.usersRepository
+        const isUser: User | null = await this.usersRepository
             .findUser(userId);
 
         if (!isUser) {
@@ -333,7 +332,7 @@ class AuthService {
         }
 
         const isSessionActive: WithId<ActiveSessionType> | null = await this.sessionsRepository
-            .findSessionByIatAndDeviceId(new Date(iat * 1000).toISOString(), deviceId);
+            .findSessionByIatAndDeviceId(new Date(iat * 1000), deviceId);
 
         if (!isSessionActive) {
 
@@ -351,7 +350,7 @@ class AuthService {
 
     async passwordRecovery(email: string): Promise<ResultType> {
 
-        const user: WithId<UserDbType> | null = await this.usersRepository
+        const user: WithId<User> | null = await this.usersRepository
             .findByEmail(email);
 
         if (!user) {
@@ -360,23 +359,23 @@ class AuthService {
                 .create(null);
         }
 
-        const confirmationCode: string = randomUUID();
+        const recoveryCode: string = randomUUID();
         const expirationDate: Date = add(
             new Date(),
             {hours: 1, minutes: 1}
         )
 
         await this.usersRepository
-            .updateEmailConfirmation(
+            .updatePasswordRecovery(
                 user._id,
-                confirmationCode,
+                recoveryCode,
                 expirationDate);
 
         nodemailerService
             .sendEmail(
                 user.email,
                 this.emailTemplates
-                    .passwordRecoveryEmail(confirmationCode)
+                    .passwordRecoveryEmail(recoveryCode)
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 
@@ -386,8 +385,8 @@ class AuthService {
 
     async newPassword(newPassword: string, recoveryCode: string): Promise<ResultType> {
 
-        const user: WithId<UserDbType> | null = await this.usersRepository
-            .findByConfirmationCode(recoveryCode);
+        const user: WithId<User> | null = await this.usersRepository
+            .findByRecoveryCode(recoveryCode);
 
 
         if (!user) {
@@ -400,7 +399,7 @@ class AuthService {
                 );
         }
 
-        if (user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()) {
+        if (user.passwordRecovery.expirationDate && user.passwordRecovery.expirationDate < new Date()) {
 
             return BadRequestResult
                 .create(

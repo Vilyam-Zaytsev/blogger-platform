@@ -1,15 +1,15 @@
-import {UserDbType} from "../types/user-db-type";
 import {UsersRepository} from "../repositoryes/users-repository";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {WithId} from "mongodb";
 import {BadRequestResult, SuccessResult} from "../../common/helpers/result-object";
+import {User} from "./user.entity";
 
 class UsersService {
 
     constructor(private usersRepository: UsersRepository = new UsersRepository()) {};
 
-    async createUser(user: UserDbType): Promise<ResultType<string | null>> {
+    async createUser(user: User): Promise<ResultType<string | null>> {
 
         const resultCandidateValidation: ResultType = await this.validateCandidateUniqueness(user.login, user.email);
 
@@ -30,7 +30,7 @@ class UsersService {
 
     async validateCandidateUniqueness(login: string, email: string): Promise<ResultType> {
 
-        const findByLogin: WithId<UserDbType> | null = await this.usersRepository
+        const findByLogin: WithId<User> | null = await this.usersRepository
             .findByLoginOrEmail(login);
 
         if (findByLogin) {
@@ -43,7 +43,7 @@ class UsersService {
                 );
         }
 
-        const findByEmail: WithId<UserDbType> | null = await this.usersRepository
+        const findByEmail: WithId<User> | null = await this.usersRepository
             .findByLoginOrEmail(email);
 
         if (findByEmail) {

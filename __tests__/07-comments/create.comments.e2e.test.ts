@@ -23,7 +23,7 @@ import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {CommentDbType} from "../../src/07-comments/types/comment-db-type";
-import {UserDbType} from "../../src/04-users/types/user-db-type";
+import {UserDbType} from "../../src/04-users/types/confirmation-status";
 import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
 import {PostDbType} from "../../src/06-posts/types/post-db-type";
 import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
