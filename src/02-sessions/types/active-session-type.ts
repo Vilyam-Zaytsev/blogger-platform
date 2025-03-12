@@ -1,6 +1,8 @@
+import {ObjectId} from "mongodb";
+
 type ActiveSessionType = {
     userId: string;
-    deviceId: string;
+    deviceId: ObjectId;
     deviceName: string;
     ip: string;
     iat: Date;

@@ -5,7 +5,7 @@ import {UsersRepository} from "../../04-users/repositoryes/users-repository";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {JwtService} from "../adapters/jwt-service";
-import {WithId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import {UsersService} from "../../04-users/domain/users-service";
 import {User} from "../../04-users/domain/user.entity";
 import {nodemailerService} from "../adapters/nodemailer-service";
@@ -58,8 +58,7 @@ class AuthService {
         const accessToken: string = await this.jwtService
             .createAccessToken(checkedUserId!);
 
-        //TODO: генерировать пароль через ObjectId!!!
-        const deviceId: string = randomUUID();
+        const deviceId: ObjectId = new ObjectId();
 
         const refreshToken: string = await this.jwtService
             .createRefreshToken(

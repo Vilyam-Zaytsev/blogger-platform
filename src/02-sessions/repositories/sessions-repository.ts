@@ -5,13 +5,13 @@ import {SessionTimestampsType} from "../types/session-timestamps-type";
 
 class SessionsRepository {
 
-    async findSessionByIatAndDeviceId(iat: Date, deviceId: string): Promise<WithId<ActiveSessionType> | null> {
+    async findSessionByIatAndDeviceId(iat: Date, deviceId: ObjectId): Promise<WithId<ActiveSessionType> | null> {
 
         return sessionsCollection
             .findOne({iat, deviceId});
     }
 
-    async findSessionByDeviceId(deviceId: string): Promise<WithId<ActiveSessionType> | null> {
+    async findSessionByDeviceId(deviceId: ObjectId): Promise<WithId<ActiveSessionType> | null> {
 
         return sessionsCollection
             .findOne({deviceId});

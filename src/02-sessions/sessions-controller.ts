@@ -9,6 +9,7 @@ import {SessionsService} from "./domain/sessions-service";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
+import {ObjectId} from "mongodb";
 
 class SessionsController {
 
@@ -70,7 +71,7 @@ class SessionsController {
         res: Response
     ){
 
-        const deviceId: string = req.params.id;
+        const deviceId: ObjectId = new ObjectId(req.params.id);
         const userId: string = req.session!.userId
 
         const {
