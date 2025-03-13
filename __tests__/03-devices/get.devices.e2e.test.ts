@@ -1,6 +1,6 @@
-import {console_log_e2e, delay, generateRandomString, req} from '../helpers/test-helpers';
+import {console_log_e2e, delay, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {clearPresets, deviceNames, presets, userLogins} from "../helpers/datasets-for-tests";
+import {clearPresets, deviceNames, presets} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {
@@ -12,13 +12,13 @@ import {
     usersCollection
 } from "../../src/db/mongoDb";
 import {Response} from "supertest";
-import {UserDbType} from "../../src/04-users/types/user-db-type";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {DeviceViewModel} from "../../src/02-sessions/types/input-output-types";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
+import {User} from "../../src/04-users/domain/user.entity";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -43,7 +43,7 @@ beforeAll(async () => {
 
     const db = client.db();
 
-    setUsersCollection(db.collection<UserDbType>('users'));
+    setUsersCollection(db.collection<User>('users'));
     setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
     setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });

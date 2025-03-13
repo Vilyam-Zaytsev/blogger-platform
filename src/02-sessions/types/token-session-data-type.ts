@@ -1,7 +1,8 @@
+import {ObjectId} from "mongodb";
+
 type TokenSessionDataType = {
-    iat: string,
     userId: string,
-    deviceId: string
+    deviceId: ObjectId
 };
 
 export {TokenSessionDataType};

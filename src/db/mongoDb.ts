@@ -2,16 +2,16 @@ import {Collection, MongoClient} from "mongodb";
 import {SETTINGS} from "../common/settings";
 import {BlogDbType} from "../05-blogs/types/blog-db-type";
 import {PostDbType} from "../06-posts/types/post-db-type";
-import {UserDbType} from "../04-users/types/user-db-type";
 import {CommentDbType} from "../07-comments/types/comment-db-type";
 import {ActiveSessionType} from "../02-sessions/types/active-session-type";
 import {ApiTrafficType} from "../common/types/api-traffic-type";
+import {User} from "../04-users/domain/user.entity";
 
 let blogsCollection: Collection<BlogDbType>;
 
 let postsCollection: Collection<PostDbType>;
 
-let usersCollection: Collection<UserDbType>;
+let usersCollection: Collection<User>;
 
 let commentsCollection: Collection<CommentDbType>;
 
@@ -27,7 +27,7 @@ const setPostsCollection = (collection: Collection<PostDbType>) => {
     postsCollection = collection;
 };
 
-const setUsersCollection = (collection: Collection<UserDbType>) => {
+const setUsersCollection = (collection: Collection<User>) => {
     usersCollection = collection;
 };
 
@@ -49,7 +49,7 @@ async function runDb(url: string) {
 
     blogsCollection = db.collection<BlogDbType>('blogs');
     postsCollection = db.collection<PostDbType>('posts');
-    usersCollection = db.collection<UserDbType>('users');
+    usersCollection = db.collection<User>('users');
     commentsCollection = db.collection<CommentDbType>('comments');
     sessionsCollection = db.collection<ActiveSessionType>('sessions');
     apiTrafficCollection = db.collection<ApiTrafficType>('ApiTraffic');

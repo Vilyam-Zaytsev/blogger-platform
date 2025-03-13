@@ -6,7 +6,6 @@ import {PostDbType} from "../../06-posts/types/post-db-type";
 import {PostsService} from "../../06-posts/domain/posts-service";
 import {CommentRepository} from "../repositoryes/comment-repository";
 import {CommentDbType} from "../types/comment-db-type";
-import {UserDbType} from "../../04-users/types/user-db-type";
 import {UsersRepository} from "../../04-users/repositoryes/users-repository";
 import {
     BadRequestResult,
@@ -14,6 +13,7 @@ import {
     NotFoundResult,
     SuccessResult
 } from "../../common/helpers/result-object";
+import {User} from "../../04-users/domain/user.entity";
 
 class CommentsService {
 
@@ -37,7 +37,7 @@ class CommentsService {
                 );
         }
 
-        const commentator: WithId<UserDbType> | null = await this.usersRepository
+        const commentator: WithId<User> | null = await this.usersRepository
             .findUser(commentatorId);
 
         const newComment: CommentDbType = {

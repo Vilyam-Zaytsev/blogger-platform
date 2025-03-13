@@ -7,7 +7,8 @@ import {
     SuccessResult
 } from "../../common/helpers/result-object";
 import {ResultType} from "../../common/types/result-types/result-type";
-import {WithId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
+import {sessionsCollection} from "../../db/mongoDb";
 
 class SessionsService {
 
@@ -28,10 +29,10 @@ class SessionsService {
             .deleteSession(id);
     }
 
-    async deleteSessionByDeviceId(userId: string, deviceId: string): Promise<ResultType> {
+    async deleteSessionByDeviceId(userId: string, deviceId: ObjectId): Promise<ResultType> {
 
         const activeSession: WithId<ActiveSessionType> | null = await this.sessionsRepository
-            .findSessionByDeviceId(deviceId);
+            .findSessionByDeviceId(deviceId)
 
         if (!activeSession) {
 
@@ -70,10 +71,10 @@ class SessionsService {
             .create(null);
     }
 
-    async deleteAllSessionsExceptCurrent(userId: string, iat: string): Promise<boolean> {
+    async deleteAllSessionsExceptCurrent(userId: string, deviceId: ObjectId): Promise<boolean> {
 
         return await this.sessionsRepository
-            .deleteAllSessionsExceptCurrent(userId, iat);
+            .deleteAllSessionsExceptCurrent(userId, deviceId);
     }
 }
 

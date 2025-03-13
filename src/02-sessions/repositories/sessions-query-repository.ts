@@ -20,7 +20,7 @@ class SessionsQueryRepository {
             ip: session.ip,
             title: session.deviceName,
             lastActiveDate: session.iat,
-            deviceId: session.deviceId
+            deviceId: String(session.deviceId)
         };
     }
 }

@@ -1,7 +1,7 @@
-import {ConfirmationStatus, UserDbType} from "../types/user-db-type";
+import {ConfirmationStatus} from "../types/confirmation-status";
 import {BcryptService} from "../../01-auth/adapters/bcrypt-service";
 import {randomUUID} from "node:crypto";
-import { add } from "date-fns";
+import {add} from "date-fns";
 import {UserInputModel} from "../types/input-output-types";
 
 const bcryptService: BcryptService = new BcryptService();
@@ -11,13 +11,17 @@ class User {
     email: string;
     passwordHash: string;
     createdAt: string;
+    passwordRecovery: {
+        recoveryCode: string | null,
+        expirationDate: Date | null;
+    };
     emailConfirmation: {
         confirmationCode: string | null;
         expirationDate: Date | null;
         confirmationStatus: ConfirmationStatus;
     };
 
-     private constructor(
+    private constructor(
         login: string,
         email: string,
         passwordHash: string,
@@ -27,6 +31,10 @@ class User {
         this.email = email;
         this.passwordHash = passwordHash;
         this.createdAt = new Date().toISOString();
+        this.passwordRecovery = {
+            recoveryCode: null,
+            expirationDate: null
+        };
         this.emailConfirmation = {
             confirmationCode: null,
             expirationDate: null,
@@ -45,12 +53,12 @@ class User {
         const passwordHash: string = await bcryptService
             .generateHash(password);
 
-        const user: UserDbType = new User(login, email, passwordHash, ConfirmationStatus.NotConfirmed);
+        const user: User = new User(login, email, passwordHash, ConfirmationStatus.NotConfirmed);
 
         user.emailConfirmation.confirmationCode = randomUUID();
         user.emailConfirmation.expirationDate = add(
             new Date(),
-            { hours: 1, minutes: 1 }
+            {hours: 1, minutes: 1}
         );
 
         return user;

@@ -1,11 +1,11 @@
 import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {clearPresets, deviceNames, presets, user, userLogins} from "../helpers/datasets-for-tests";
+import {clearPresets, user, userLogins} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId, WithId} from "mongodb";
 import {apiTrafficCollection, setApiTrafficCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
 import {Response} from "supertest";
-import {ConfirmationStatus, UserDbType} from "../../src/04-users/types/user-db-type";
+import {ConfirmationStatus} from "../../src/04-users/types/confirmation-status";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
 import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
@@ -14,6 +14,7 @@ import {EmailTemplates} from "../../src/01-auth/adapters/email-templates";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {UserViewModel} from "../../src/04-users/types/input-output-types";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
+import {User} from "../../src/04-users/domain/user.entity";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -26,7 +27,7 @@ beforeAll(async () => {
     await client.connect();
 
     const db = client.db();
-    setUsersCollection(db.collection<UserDbType>('users'));
+    setUsersCollection(db.collection<User>('users'));
     setApiTrafficCollection(db.collection<ApiTrafficType>('ApiTraffic'));
 });
 
@@ -66,7 +67,7 @@ describe('POST /auth/registration', () => {
 
         const usersRepository: UsersRepository = new UsersRepository();
 
-        const foundUser: WithId<UserDbType> | null = await usersRepository
+        const foundUser: WithId<User> | null = await usersRepository
             .findByEmail(user.email);
 
         expect(foundUser).toEqual({
@@ -75,6 +76,10 @@ describe('POST /auth/registration', () => {
             email: user.email,
             passwordHash: expect.any(String),
             createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+            passwordRecovery: {
+                recoveryCode: null,
+                expirationDate: null
+            },
             emailConfirmation: {
                 confirmationCode: expect.any(String),
                 expirationDate: expect.any(Date),

@@ -20,7 +20,7 @@ import {ActiveSessionType} from "../02-sessions/types/active-session-type";
 import {SessionsService} from "../02-sessions/domain/sessions-service";
 import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
 import {SessionsRepository} from "../02-sessions/repositories/sessions-repository";
-import {WithId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import {PasswordRecoveryInputModel} from "./types/password-recovery-input-model";
 import {NewPasswordRecoveryInputModel} from "./types/new-password-recovery-input-model";
 
@@ -75,11 +75,11 @@ class AuthController {
 
         const newSession: ActiveSessionType = {
             userId,
-            deviceId,
+            deviceId: new ObjectId(deviceId),
             deviceName,
             ip,
-            iat: new Date(iat * 1000).toISOString(),
-            exp
+            iat: new Date(iat * 1000),
+            exp: new Date(exp * 1000)
         };
 
         await this.sessionsService
@@ -112,12 +112,11 @@ class AuthController {
         }
 
         const {
-            iat,
             deviceId
         } = req.session!;
 
         const session: WithId<ActiveSessionType> | null = await this.sessionsRepository
-            .findSessionByIatAndDeviceId(iat, deviceId);
+            .findSessionByDeviceId(deviceId);
 
         if (!session) {
 
@@ -140,7 +139,6 @@ class AuthController {
     ){
 
         const dataForRefreshToken: TokenSessionDataType = {
-            iat: req.session!.iat,
             userId: req.session!.userId,
             deviceId: req.session!.deviceId
         };

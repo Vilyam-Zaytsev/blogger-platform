@@ -1,5 +1,4 @@
 import {ObjectId, Sort, WithId} from "mongodb";
-import {UserDbType} from "../types/user-db-type";
 import {usersCollection} from "../../db/mongoDb";
 import {
     MatchMode,
@@ -8,6 +7,7 @@ import {
 } from "../../common/types/input-output-types/pagination-sort-types";
 import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
 import {UserMeViewModel, UserViewModel} from "../types/input-output-types";
+import {User} from "../domain/user.entity";
 
 class UsersQueryRepository {
 
@@ -30,7 +30,7 @@ class UsersQueryRepository {
             MatchMode.Partial
         );
 
-        const users: WithId<UserDbType>[] = await usersCollection
+        const users: WithId<User>[] = await usersCollection
             .find(filter)
             .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as Sort)
             .skip((pageNumber - 1) * pageSize)
@@ -42,7 +42,7 @@ class UsersQueryRepository {
 
     async findUser(id: string): Promise<UserViewModel | null> {
 
-        const user: WithId<UserDbType> | null = await usersCollection
+        const user: WithId<User> | null = await usersCollection
             .findOne({_id: new ObjectId(id)});
 
         if (!user) return null;
@@ -52,7 +52,7 @@ class UsersQueryRepository {
 
     async findUserAndMapToMeViewModel(id: string): Promise<UserMeViewModel | null> {
 
-        const user: WithId<UserDbType> | null = await usersCollection
+        const user: WithId<User> | null = await usersCollection
             .findOne({_id: new ObjectId(id)});
 
         if (!user) return null;
@@ -77,7 +77,7 @@ class UsersQueryRepository {
             .countDocuments(filter);
     }
 
-    _mapDbUserToViewModel(user: WithId<UserDbType>): UserViewModel {
+    _mapDbUserToViewModel(user: WithId<User>): UserViewModel {
 
         return {
             id: String(user._id),
@@ -87,7 +87,7 @@ class UsersQueryRepository {
         };
     }
 
-    _mapDbUserToMeViewModel(user: WithId<UserDbType>): UserMeViewModel {
+    _mapDbUserToMeViewModel(user: WithId<User>): UserMeViewModel {
 
         return {
             email: user.email,

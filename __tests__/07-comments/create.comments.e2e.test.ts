@@ -23,7 +23,6 @@ import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {CommentDbType} from "../../src/07-comments/types/comment-db-type";
-import {UserDbType} from "../../src/04-users/types/user-db-type";
 import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
 import {PostDbType} from "../../src/06-posts/types/post-db-type";
 import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
@@ -34,6 +33,7 @@ import {commentsTestManager} from "../helpers/managers/06_comments-test-manager"
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
+import {User} from "../../src/04-users/domain/user.entity";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -46,7 +46,7 @@ beforeAll(async () => {
     await client.connect();
 
     const db = client.db();
-    setUsersCollection(db.collection<UserDbType>('users'));
+    setUsersCollection(db.collection<User>('users'));
     setBlogsCollection(db.collection<BlogDbType>('blogs'));
     setPostsCollection(db.collection<PostDbType>('posts'));
     setCommentsCollection(db.collection<CommentDbType>('comments'));

@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import {SETTINGS} from "../../common/settings";
 import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
+import {ObjectId} from "mongodb";
 
 class JwtService {
 
@@ -15,7 +16,7 @@ class JwtService {
 
     async createRefreshToken(
         userId: string,
-        deviceId: string
+        deviceId: ObjectId
     ): Promise<string> {
 
         return jwt.sign(

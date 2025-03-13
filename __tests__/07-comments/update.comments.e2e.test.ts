@@ -10,7 +10,6 @@ import {
     setPostsCollection,
     setUsersCollection, setSessionsCollection, setApiTrafficCollection, sessionsCollection, apiTrafficCollection,
 } from "../../src/db/mongoDb";
-import {UserDbType} from "../../src/04-users/types/user-db-type";
 import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
 import {PostDbType} from "../../src/06-posts/types/post-db-type";
 import {CommentDbType} from "../../src/07-comments/types/comment-db-type";
@@ -32,6 +31,7 @@ import {ApiErrorResult} from "../../src/common/types/input-output-types/api-erro
 import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
+import {User} from "../../src/04-users/domain/user.entity";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -44,7 +44,7 @@ beforeAll(async () => {
     await client.connect();
 
     const db = client.db();
-    setUsersCollection(db.collection<UserDbType>('users'));
+    setUsersCollection(db.collection<User>('users'));
     setBlogsCollection(db.collection<BlogDbType>('blogs'));
     setPostsCollection(db.collection<PostDbType>('posts'));
     setCommentsCollection(db.collection<CommentDbType>('comments'));

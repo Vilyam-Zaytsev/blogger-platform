@@ -5,13 +5,7 @@ import {SessionTimestampsType} from "../types/session-timestamps-type";
 
 class SessionsRepository {
 
-    async findSessionByIatAndDeviceId(iat: string, deviceId: string): Promise<WithId<ActiveSessionType> | null> {
-
-        return sessionsCollection
-            .findOne({iat, deviceId});
-    }
-
-    async findSessionByDeviceId(deviceId: string): Promise<WithId<ActiveSessionType> | null> {
+    async findSessionByDeviceId(deviceId: ObjectId): Promise<WithId<ActiveSessionType> | null> {
 
         return sessionsCollection
             .findOne({deviceId});
@@ -44,12 +38,12 @@ class SessionsRepository {
         return result.deletedCount === 1;
     }
 
-    async deleteAllSessionsExceptCurrent(userId: string, iat: string) {
+    async deleteAllSessionsExceptCurrent(userId: string, deviceId: ObjectId) {
 
         const result = await sessionsCollection
             .deleteMany({
                 userId,
-                iat: {$ne: iat}
+                deviceId: {$ne: deviceId}
             });
 
         return result.deletedCount > 0;

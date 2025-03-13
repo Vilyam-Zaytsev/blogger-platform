@@ -1,4 +1,4 @@
-import {ConfirmationStatus, UserDbType} from "../types/user-db-type";
+import {ConfirmationStatus} from "../types/confirmation-status";
 import {InsertOneResult, ObjectId, Sort, WithId} from "mongodb";
 import {usersCollection} from "../../db/mongoDb";
 import {
@@ -6,10 +6,11 @@ import {
     PaginationAndSortFilterType,
 } from "../../common/types/input-output-types/pagination-sort-types";
 import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
+import {User} from "../domain/user.entity";
 
 class UsersRepository {
 
-    async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<WithId<UserDbType>[]> {
+    async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<WithId<User>[]> {
 
         const {
             pageNumber,
@@ -36,13 +37,13 @@ class UsersRepository {
             .toArray();
     }
 
-    async findUser(id: string): Promise<WithId<UserDbType> | null> {
+    async findUser(id: string): Promise<WithId<User> | null> {
 
         return usersCollection
             .findOne({_id: new ObjectId(id)});
     }
 
-    async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<UserDbType> | null> {
+    async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<User> | null> {
 
         return usersCollection
             .findOne({
@@ -50,19 +51,25 @@ class UsersRepository {
             });
     }
 
-    async findByEmail(email: string): Promise<WithId<UserDbType> | null> {
+    async findByEmail(email: string): Promise<WithId<User> | null> {
 
         return usersCollection
             .findOne({email});
     }
 
-    async findByConfirmationCode(confirmationCode: string): Promise<WithId<UserDbType> | null> {
+    async findByConfirmationCode(confirmationCode: string): Promise<WithId<User> | null> {
 
         return usersCollection
             .findOne({'emailConfirmation.confirmationCode': confirmationCode});
     }
 
-    async insertUser(newUser: UserDbType): Promise<InsertOneResult> {
+    async findByRecoveryCode(recoveryCode: string): Promise<WithId<User> | null> {
+
+        return usersCollection
+            .findOne({'passwordRecovery.recoveryCode': recoveryCode});
+    }
+
+    async insertUser(newUser: User): Promise<InsertOneResult> {
 
         return await usersCollection
             .insertOne(newUser);
@@ -79,6 +86,23 @@ class UsersRepository {
                 $set: {
                     'emailConfirmation.confirmationCode': confirmationCode,
                     'emailConfirmation.expirationDate': expirationDate,
+                }
+            });
+
+        return result.matchedCount === 1;
+    }
+
+    async updatePasswordRecovery(
+        _id: ObjectId,
+        recoveryCode: string,
+        expirationDate: Date
+    ): Promise<boolean> {
+
+        const result = await usersCollection
+            .updateOne({_id}, {
+                $set: {
+                    'passwordRecovery.recoveryCode': recoveryCode,
+                    'passwordRecovery.expirationDate': expirationDate,
                 }
             });
 
