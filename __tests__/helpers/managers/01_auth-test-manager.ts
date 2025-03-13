@@ -66,6 +66,18 @@ const authTestManager = {
         };
 
         return res;
+    },
+
+    async passwordRecovery(email: string) {
+
+        const res: Response = await req
+            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.PASSWORD_RECOVERY}`)
+            .send({
+                email
+            })
+            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+
+        return res;
     }
 };
 
