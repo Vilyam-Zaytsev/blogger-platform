@@ -14,13 +14,15 @@ import {
     SuccessResult
 } from "../../common/helpers/result-object";
 import {User} from "../../04-users/domain/user.entity";
+import {injectable} from "inversify";
 
+@injectable()
 class CommentsService {
 
     constructor(
-        private usersRepository: UsersRepository = new UsersRepository(),
-        private postsService: PostsService = new PostsService(),
-        private commentRepository: CommentRepository = new CommentRepository()
+        private usersRepository: UsersRepository,
+        private postsService: PostsService,
+        private commentRepository: CommentRepository
     ) {};
 
     async createComment(data: CommentInputModel, postId: string, commentatorId: string): Promise<ResultType<string | null>> {

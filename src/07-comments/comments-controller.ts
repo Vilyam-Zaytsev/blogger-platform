@@ -18,12 +18,14 @@ import {
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
+import {injectable} from "inversify";
 
+@injectable()
 class CommentsController {
 
     constructor(
-        private commentsService: CommentsService = new CommentsService(),
-        private commentQueryRepository: CommentQueryRepository = new CommentQueryRepository()
+        private commentsService: CommentsService,
+        private commentQueryRepository: CommentQueryRepository
     ) {};
 
     async getComments(
@@ -176,6 +178,4 @@ class CommentsController {
     }
 }
 
-const commentsController: CommentsController = new CommentsController();
-
-export {commentsController};
+export {CommentsController};

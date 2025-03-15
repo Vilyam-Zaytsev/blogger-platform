@@ -26,16 +26,18 @@ import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
 import {SessionsRepository} from "../../02-sessions/repositories/sessions-repository";
 import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-type";
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
+import {injectable} from "inversify";
 
+@injectable()
 class AuthService {
 
     constructor(
-        private bcryptService: BcryptService = new BcryptService(),
-        private jwtService: JwtService = new JwtService(),
-        private emailTemplates: EmailTemplates = new EmailTemplates(),
-        private sessionsRepository: SessionsRepository = new SessionsRepository(),
-        private usersService: UsersService = new UsersService(),
-        private usersRepository: UsersRepository = new UsersRepository()
+        private bcryptService: BcryptService,
+        private jwtService: JwtService,
+        private emailTemplates: EmailTemplates,
+        private sessionsRepository: SessionsRepository,
+        private usersService: UsersService,
+        private usersRepository: UsersRepository
     ) {};
 
     async login(authParamsDto: LoginInputModel): Promise<ResultType<AuthTokens | null>> {

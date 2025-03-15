@@ -16,12 +16,14 @@ import {
 } from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {PostsQueryRepository} from "./repositoryes/posts-query-repository";
+import {injectable} from "inversify";
 
+@injectable()
 class PostsController {
 
     constructor(
-        private postsService: PostsService = new PostsService(),
-        private postsQueryRepository: PostsQueryRepository = new PostsQueryRepository()
+        private postsService: PostsService,
+        private postsQueryRepository: PostsQueryRepository
     ) {};
 
     async getPosts(
@@ -145,6 +147,4 @@ class PostsController {
     }
 }
 
-const postsController: PostsController = new PostsController();
-
-export {postsController};
+export {PostsController};

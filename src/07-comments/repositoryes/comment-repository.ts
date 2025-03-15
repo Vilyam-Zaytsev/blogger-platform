@@ -2,7 +2,9 @@ import {CommentDbType} from "../types/comment-db-type";
 import {InsertOneResult, ObjectId, WithId} from "mongodb";
 import {commentsCollection} from "../../db/mongoDb";
 import {CommentInputModel} from "../types/input-output-types";
+import {injectable} from "inversify";
 
+@injectable()
 class CommentRepository {
 
     async findComment(id: string): Promise<WithId<CommentDbType> | null> {

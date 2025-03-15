@@ -3,12 +3,14 @@ import {PostInputModel} from "../types/input-output-types";
 import {WithId} from "mongodb";
 import {PostsRepository} from "../repositoryes/posts-repository";
 import {BlogsRepository} from "../../05-blogs/repositoryes/blogs-repository";
+import {injectable} from "inversify";
 
+@injectable()
 class PostsService {
 
     constructor(
-        private blogsRepository: BlogsRepository = new BlogsRepository(),
-        private postsRepository: PostsRepository = new PostsRepository()
+        private blogsRepository: BlogsRepository,
+        private postsRepository: PostsRepository
     ) {};
 
     async findPost(id: string): Promise<WithId<PostDbType> | null> {

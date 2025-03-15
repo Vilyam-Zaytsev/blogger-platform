@@ -9,10 +9,12 @@ import {
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ObjectId, WithId} from "mongodb";
 import {sessionsCollection} from "../../db/mongoDb";
+import {injectable} from "inversify";
 
+@injectable()
 class SessionsService {
 
-    constructor(private sessionsRepository: SessionsRepository = new SessionsRepository()) {}
+    constructor(private sessionsRepository: SessionsRepository) {}
 
     async createSession(newSession: ActiveSessionType) {
 

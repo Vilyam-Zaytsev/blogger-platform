@@ -6,12 +6,14 @@ import {ObjectId} from "mongodb";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {PostsService} from "../../06-posts/domain/posts-service";
 import {BadRequestResult, NotFoundResult, SuccessResult} from "../../common/helpers/result-object";
+import {injectable} from "inversify";
 
+@injectable()
 class BlogsService {
 
     constructor(
-        private blogsRepository: BlogsRepository = new BlogsRepository(),
-        private postsService: PostsService = new PostsService()
+        private blogsRepository: BlogsRepository,
+        private postsService: PostsService
     ) {};
 
     async createBlog(blogData: BlogInputModel): Promise<string> {

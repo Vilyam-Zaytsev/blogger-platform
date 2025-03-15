@@ -1,5 +1,4 @@
 import {Router} from "express";
-import {authController} from "../auth-controller";
 import {
     userEmailInputValidator,
     userLoginInputValidator,
@@ -13,8 +12,11 @@ import {authConfirmationCodeInputValidator} from "./middlewares/auth-validators"
 import {refreshTokenGuard} from "./guards/refresh-token-guard";
 import {activeSessionGuard} from "./guards/active-session-guard";
 import {rateLimitsGuard} from "../../common/middlewares/rate-limits-guard";
+import {AuthController} from "../auth-controller";
+import {container} from "../../composition-root";
 
 const authRouter = Router();
+const authController: AuthController = container.get(AuthController);
 
 authRouter.post(SETTINGS.PATH.AUTH.LOGIN,
     rateLimitsGuard,
