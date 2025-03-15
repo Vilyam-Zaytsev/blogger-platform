@@ -8,7 +8,9 @@ import {
 import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
 import {UserMeViewModel, UserViewModel} from "../types/input-output-types";
 import {User} from "../domain/user.entity";
+import {injectable} from "inversify";
 
+@injectable()
 class UsersQueryRepository {
 
     async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<UserViewModel[]> {

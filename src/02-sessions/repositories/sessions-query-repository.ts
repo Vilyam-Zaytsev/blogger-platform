@@ -2,7 +2,9 @@ import {sessionsCollection} from "../../db/mongoDb";
 import {WithId} from "mongodb";
 import {ActiveSessionType} from "../types/active-session-type";
 import {DeviceViewModel} from "../types/input-output-types";
+import {injectable} from "inversify";
 
+@injectable()
 class SessionsQueryRepository {
 
     async findSessionsByUserId(userId: string): Promise<DeviceViewModel[]> {

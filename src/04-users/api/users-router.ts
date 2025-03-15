@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {usersController} from "../users-controller";
+import {UsersController} from "../users-controller";
 import {
     userEmailInputValidator,
     userLoginInputValidator,
@@ -7,8 +7,10 @@ import {
 } from "./middlewares/user-validators";
 import {inputCheckErrorsMiddleware} from "../../common/middlewares/input-check-errors-middleware";
 import {baseAuthGuard} from "../../01-auth/api/guards/base-auth-guard";
+import {container} from "../../composition-root";
 
 const usersRouter = Router();
+const usersController: UsersController = container.get(UsersController);
 
 usersRouter.get('/',
     baseAuthGuard,

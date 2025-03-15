@@ -1,5 +1,7 @@
 import {EmailTemplateType} from "../../common/types/input-output-types/email-template-type";
+import {injectable} from "inversify";
 
+@injectable()
 class EmailTemplates {
 
     registrationEmail(code: string): EmailTemplateType {

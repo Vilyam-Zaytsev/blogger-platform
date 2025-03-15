@@ -23,16 +23,18 @@ import {SessionsRepository} from "../02-sessions/repositories/sessions-repositor
 import {ObjectId, WithId} from "mongodb";
 import {PasswordRecoveryInputModel} from "./types/password-recovery-input-model";
 import {NewPasswordRecoveryInputModel} from "./types/new-password-recovery-input-model";
+import {injectable} from "inversify";
 
 const jwtService: JwtService = new JwtService();
 
+@injectable()
 class AuthController {
 
     constructor(
-        private authService: AuthService = new AuthService(),
-        private sessionsService: SessionsService = new SessionsService(),
-        private sessionsRepository: SessionsRepository = new SessionsRepository(),
-        private usersQueryRepository: UsersQueryRepository = new UsersQueryRepository()
+        private authService: AuthService,
+        private sessionsService: SessionsService,
+        private sessionsRepository: SessionsRepository,
+        private usersQueryRepository: UsersQueryRepository
     ) {};
 
     async login(
@@ -300,6 +302,7 @@ class AuthController {
     }
 }
 
-const authController: AuthController = new AuthController();
+// const authController: AuthController = new AuthController();
 
-export {authController};
+export {AuthController};
+// export {authController};

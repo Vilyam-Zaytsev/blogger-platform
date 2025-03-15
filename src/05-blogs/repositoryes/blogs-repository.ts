@@ -2,7 +2,9 @@ import {BlogInputModel} from "../types/input-output-types";
 import {BlogDbType} from "../types/blog-db-type";
 import {blogsCollection} from "../../db/mongoDb";
 import {InsertOneResult, ObjectId} from "mongodb";
+import {injectable} from "inversify";
 
+@injectable()
 class BlogsRepository {
 
     async findBlog(id: string): Promise<BlogDbType | null> {

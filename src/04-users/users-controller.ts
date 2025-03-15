@@ -17,12 +17,14 @@ import {IdType} from "../common/types/input-output-types/id-type";
 import {User} from "./domain/user.entity";
 import {UsersQueryRepository} from "./repositoryes/users-query-repository";
 import {ResultStatus} from "../common/types/result-types/result-status";
+import {injectable} from "inversify";
 
+@injectable()
 class UsersController {
 
     constructor(
-        private usersService: UsersService = new UsersService(),
-        private usersQueryRepository: UsersQueryRepository = new UsersQueryRepository()
+        private usersService: UsersService,
+        private usersQueryRepository: UsersQueryRepository
     ) {};
 
     async getUsers(
@@ -116,9 +118,7 @@ class UsersController {
     }
 }
 
-const usersController: UsersController = new UsersController();
-
-export {usersController};
+export {UsersController};
 
 
 

@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {blogsController} from '../blogs-controller';
+import {BlogsController} from '../blogs-controller';
 import {
     blogDescriptionInputValidator,
     blogNameInputValidator,
@@ -20,8 +20,10 @@ import {
     postShortDescriptionInputValidator,
     postTitleInputValidator
 } from "../../06-posts/api/middlewares/post-validators";
+import {container} from "../../composition-root";
 
 const blogsRouter = Router();
+const blogsController: BlogsController = container.get(BlogsController);
 
 blogsRouter.get('/',
     pageNumberInputValidator,

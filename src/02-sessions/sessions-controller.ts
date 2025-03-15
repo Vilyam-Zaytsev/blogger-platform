@@ -10,12 +10,14 @@ import {ResultStatus} from "../common/types/result-types/result-status";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {ObjectId} from "mongodb";
+import {injectable} from "inversify";
 
+@injectable()
 class SessionsController {
 
     constructor(
-        private sessionsService: SessionsService = new SessionsService(),
-        private sessionsQueryRepository: SessionsQueryRepository = new SessionsQueryRepository(),
+        private sessionsService: SessionsService,
+        private sessionsQueryRepository: SessionsQueryRepository,
     ) {}
 
     async getDevices(
@@ -92,6 +94,4 @@ class SessionsController {
     }
 }
 
-const sessionsController: SessionsController = new SessionsController();
-
-export {sessionsController};
+export {SessionsController};

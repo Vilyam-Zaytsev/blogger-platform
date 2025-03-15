@@ -2,7 +2,9 @@ import jwt from 'jsonwebtoken';
 import {SETTINGS} from "../../common/settings";
 import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
 import {ObjectId} from "mongodb";
+import {injectable} from "inversify";
 
+@injectable()
 class JwtService {
 
     async createAccessToken(userId: string,): Promise<string> {

@@ -9,7 +9,9 @@ import {
 import {createBlogsSearchFilter} from "../helpers/create-blogs-search-filter";
 import {BlogViewModel} from "../types/input-output-types";
 import {CommentViewModel} from "../../07-comments/types/input-output-types";
+import {injectable} from "inversify";
 
+@injectable()
 class BlogsQueryRepository {
 
     async findBlogs(sortQueryDto: PaginationAndSortFilterType): Promise<BlogViewModel[]> {

@@ -2,7 +2,9 @@ import {PostDbType} from "../types/post-db-type";
 import {PostInputModel} from "../types/input-output-types";
 import {postsCollection} from "../../db/mongoDb";
 import {InsertOneResult, ObjectId, WithId} from "mongodb";
+import {injectable} from "inversify";
 
+@injectable()
 class PostsRepository {
 
     async findPost(id: string): Promise<WithId<PostDbType> | null> {

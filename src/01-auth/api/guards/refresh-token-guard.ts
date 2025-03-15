@@ -5,6 +5,7 @@ import {AuthService} from "../../domain/auth-service";
 import {ResultStatus} from "../../../common/types/result-types/result-status";
 import {PayloadRefreshTokenType} from "../../types/payload.refresh.token.type";
 import {ObjectId} from "mongodb";
+import {container} from "../../../composition-root";
 
 const refreshTokenGuard = async (
     req: Request,
@@ -12,7 +13,7 @@ const refreshTokenGuard = async (
     next: NextFunction
 ) => {
 
-    const authService: AuthService = new AuthService();
+    const authService: AuthService = container.get(AuthService);
 
     if (!req.cookies.refreshToken) {
 

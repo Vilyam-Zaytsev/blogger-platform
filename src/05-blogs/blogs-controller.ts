@@ -22,13 +22,15 @@ import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {PostsQueryRepository} from "../06-posts/repositoryes/posts-query-repository";
+import {injectable} from "inversify";
 
+@injectable()
 class BlogsController {
 
     constructor(
-        private blogsService: BlogsService = new BlogsService(),
-        private blogsQueryRepository: BlogsQueryRepository = new BlogsQueryRepository(),
-        private postsQueryRepository: PostsQueryRepository = new PostsQueryRepository()
+        private blogsService: BlogsService,
+        private blogsQueryRepository: BlogsQueryRepository,
+        private postsQueryRepository: PostsQueryRepository
     ) {};
 
     async getBlogs(
@@ -230,6 +232,4 @@ class BlogsController {
     }
 }
 
-const blogsController: BlogsController = new BlogsController();
-
-export {blogsController};
+export {BlogsController};

@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {postsController} from '../posts-controller';
+import {PostsController} from '../posts-controller';
 import {baseAuthGuard} from "../../01-auth/api/guards/base-auth-guard";
 import {
     postBlogIdInputValidator,
@@ -13,11 +13,14 @@ import {
     pageSizeInputValidator, sortByInputValidator, sortDirectionInputValidator
 } from "../../common/middlewares/query-parameters-validator";
 import {SETTINGS} from "../../common/settings";
-import {commentsController} from "../../07-comments/comments-controller";
+import {CommentsController} from "../../07-comments/comments-controller";
 import {accessTokenGuard} from "../../01-auth/api/guards/access-token-guard";
 import {commentContentInputValidator} from "../../07-comments/api/middlewares/comment-validators";
+import {container} from "../../composition-root";
 
 const postsRouter = Router();
+const postsController: PostsController = container.get(PostsController);
+const commentsController: CommentsController = container.get(CommentsController);
 
 postsRouter.get('/',
     pageNumberInputValidator,
