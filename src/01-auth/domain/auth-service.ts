@@ -38,7 +38,8 @@ class AuthService {
         private sessionsRepository: SessionsRepository,
         private usersService: UsersService,
         private usersRepository: UsersRepository
-    ) {};
+    ) {
+    };
 
     async login(authParamsDto: LoginInputModel): Promise<ResultType<AuthTokens | null>> {
 
@@ -79,13 +80,18 @@ class AuthService {
             deviceId
         } = tokenData;
 
-        const [accessToken, refreshToken] = await Promise.all([
+        const [
+            accessToken,
+            refreshToken
+        ] = await Promise.all([
             this.jwtService.createAccessToken(userId),
             this.jwtService.createRefreshToken(userId, deviceId)
         ]);
 
-        //TODO: что если переделать поиск сессии только по deviceId???
-        const [payloadRefreshToken, session] = await Promise.all([
+        const [
+            payloadRefreshToken,
+            session
+        ] = await Promise.all([
             this.jwtService.decodeToken(refreshToken),
             this.sessionsRepository.findSessionByDeviceId(deviceId)
         ]);
