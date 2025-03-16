@@ -79,8 +79,8 @@ class UsersRepository {
 
     async updateEmailConfirmation(
         _id: ObjectId,
-        confirmationCode: string,
-        expirationDate: Date
+        confirmationCode: string | null,
+        expirationDate: Date | null
     ): Promise<boolean> {
 
         const result = await usersCollection
@@ -88,23 +88,6 @@ class UsersRepository {
                 $set: {
                     'emailConfirmation.confirmationCode': confirmationCode,
                     'emailConfirmation.expirationDate': expirationDate,
-                }
-            });
-
-        return result.matchedCount === 1;
-    }
-
-    async updatePasswordRecovery(
-        _id: ObjectId,
-        recoveryCode: string,
-        expirationDate: Date
-    ): Promise<boolean> {
-
-        const result = await usersCollection
-            .updateOne({_id}, {
-                $set: {
-                    'passwordRecovery.recoveryCode': recoveryCode,
-                    'passwordRecovery.expirationDate': expirationDate,
                 }
             });
 
@@ -121,6 +104,23 @@ class UsersRepository {
             });
 
         return result.modifiedCount === 1;
+    }
+
+    async updatePasswordRecovery(
+        _id: ObjectId,
+        recoveryCode: string | null,
+        expirationDate: Date | null
+    ): Promise<boolean> {
+
+        const result = await usersCollection
+            .updateOne({_id}, {
+                $set: {
+                    'passwordRecovery.recoveryCode': recoveryCode,
+                    'passwordRecovery.expirationDate': expirationDate,
+                }
+            });
+
+        return result.matchedCount === 1;
     }
 
     async updatePassword(_id: ObjectId, newPassword: string): Promise<boolean> {

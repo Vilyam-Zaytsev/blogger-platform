@@ -157,15 +157,17 @@ class AuthService {
                 );
         }
 
-        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) {
+        //TODO: УБРАТЬ ЭТУ ПРОВЕРКУ!!!
 
-            return BadRequestResult
-                .create(
-                    'code',
-                    'The confirmation code has already been used. The account has already been verified.',
-                    'Failed to complete user registration.'
-                );
-        }
+        // if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) {
+        //
+        //     return BadRequestResult
+        //         .create(
+        //             'code',
+        //             'The confirmation code has already been used. The account has already been verified.',
+        //             'Failed to complete user registration.'
+        //         );
+        // }
 
         if (user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()) {
 
@@ -179,6 +181,13 @@ class AuthService {
 
         await this.usersRepository
             .updateConfirmationStatus(user._id);
+
+        await this.usersRepository
+            .updateEmailConfirmation(
+                user._id,
+                null,
+                null
+            );
 
         return SuccessResult
             .create(null);
@@ -421,6 +430,23 @@ class AuthService {
             .updatePassword(user._id, passwordHash);
 
         if (!resultUpdatePassword) {
+
+            return InternalServerErrorResult
+                .create(
+                    'no field',
+                    'Server Error.',
+                    'The password could not be updated.'
+                );
+        }
+//TODO: В ЭТОМ СЛУЧАЕ НЕТ НЕОБХОДИМОСТИ В rateLimitsGuard
+        const resultUpdatePasswordRecovery: boolean = await this.usersRepository
+            .updatePasswordRecovery(
+                user._id,
+                null,
+                null
+            )
+
+        if (!resultUpdatePasswordRecovery) {
 
             return InternalServerErrorResult
                 .create(
