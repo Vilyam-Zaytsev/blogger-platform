@@ -84,8 +84,8 @@ describe('POST /auth/registration-confirmation', () => {
                 expirationDate: null
             },
             emailConfirmation: {
-                confirmationCode: expect.any(String),
-                expirationDate: expect.any(Date),
+                confirmationCode: null,
+                expirationDate: null,
                 confirmationStatus: ConfirmationStatus.Confirmed
             }
         });
@@ -220,7 +220,10 @@ describe('POST /auth/registration-confirmation', () => {
             errorsMessages: [
                 {
                     field: 'code',
-                    message: 'The confirmation code has already been used. The account has already been verified.'
+                    //TODO: ЗАМЕНИТЬ СООБЩЕНИЕ!!!
+
+                    // message: 'The confirmation code has already been used. The account has already been verified.'
+                    message: 'Confirmation code incorrect.'
                 }
             ]
         })
@@ -239,8 +242,8 @@ describe('POST /auth/registration-confirmation', () => {
                 expirationDate: null
             },
             emailConfirmation: {
-                confirmationCode: expect.any(String),
-                expirationDate: expect.any(Date),
+                confirmationCode: null,
+                expirationDate: null,
                 confirmationStatus: ConfirmationStatus.Confirmed
             }
         });

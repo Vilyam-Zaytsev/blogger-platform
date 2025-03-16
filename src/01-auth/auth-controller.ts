@@ -47,14 +47,18 @@ class AuthController {
             password: req.body.password,
         };
 
-        const resultLogin: ResultType<AuthTokens | null> = await this.authService
+        const {
+            status: loginResultStatus,
+            extensions: errorDetails,
+            data: authTokens
+        }: ResultType<AuthTokens | null> = await this.authService
             .login(authParams);
 
-        if (resultLogin.status !== ResultStatus.Success) {
+        if (loginResultStatus !== ResultStatus.Success) {
 
             res
-                .status(mapResultStatusToHttpStatus(resultLogin.status))
-                .json(mapResultExtensionsToErrorMessage(resultLogin.extensions));
+                .status(mapResultStatusToHttpStatus(loginResultStatus))
+                .json(mapResultExtensionsToErrorMessage(errorDetails));
 
             return;
         }
@@ -66,7 +70,7 @@ class AuthController {
             || '0.0.0.0';
 
         const payload = await jwtService
-            .decodeToken(resultLogin.data!.refreshToken);
+            .decodeToken(authTokens!.refreshToken);
 
         const {
             userId,
@@ -90,10 +94,10 @@ class AuthController {
         const {
             accessToken,
             refreshToken
-        } = resultLogin.data!;
+        } = authTokens!;
 
         res
-            .status(mapResultStatusToHttpStatus(resultLogin.status))
+            .status(mapResultStatusToHttpStatus(loginResultStatus))
             .cookie(
                 'refreshToken',
                 refreshToken,
@@ -145,26 +149,35 @@ class AuthController {
             deviceId: req.session!.deviceId
         };
 
-        const resultRefreshToken: ResultType<AuthTokens | null> = await this.authService
+        const {
+            status: refreshTokenResultStatus,
+            extensions: errorDetails,
+            data: authTokens
+        }: ResultType<AuthTokens | null> = await this.authService
             .refreshToken(dataForRefreshToken);
 
-        if (resultRefreshToken.status !== ResultStatus.Success) {
+        if (refreshTokenResultStatus !== ResultStatus.Success) {
 
             res
-                .status(mapResultStatusToHttpStatus(resultRefreshToken.status))
-                .json(mapResultExtensionsToErrorMessage(resultRefreshToken.extensions));
+                .status(mapResultStatusToHttpStatus(refreshTokenResultStatus))
+                .json(mapResultExtensionsToErrorMessage(errorDetails));
 
             return;
         }
+
+        const {
+            accessToken,
+            refreshToken
+        } = authTokens!;
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
             .cookie(
                 'refreshToken',
-                resultRefreshToken.data!.refreshToken,
+                refreshToken,
                 {httpOnly: true, secure: true,}
             )
-            .json({accessToken: resultRefreshToken.data!.accessToken});
+            .json({accessToken});
     }
 
     async registration(
