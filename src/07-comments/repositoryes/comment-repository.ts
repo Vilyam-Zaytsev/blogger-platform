@@ -1,6 +1,6 @@
 import {CommentDbType} from "../types/comment-db-type";
 import {InsertOneResult, ObjectId, WithId} from "mongodb";
-import {commentsCollection} from "../../db/mongoDb";
+import {commentsCollection} from "../../db/mongo-db/mongoDb";
 import {CommentInputModel} from "../types/input-output-types";
 import {injectable} from "inversify";
 

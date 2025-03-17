@@ -9,7 +9,7 @@ import {
     setCommentsCollection,
     setPostsCollection,
     setUsersCollection, sessionsCollection, apiTrafficCollection, setSessionsCollection, setApiTrafficCollection,
-} from "../../src/db/mongoDb";
+} from "../../src/db/mongo-db/mongoDb";
 import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
 import {PostDbType} from "../../src/06-posts/types/post-db-type";
 import {CommentDbType} from "../../src/07-comments/types/comment-db-type";

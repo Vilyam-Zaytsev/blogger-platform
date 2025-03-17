@@ -10,7 +10,7 @@ import {
     setSessionsCollection,
     setUsersCollection,
     usersCollection
-} from "../../src/db/mongoDb";
+} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";

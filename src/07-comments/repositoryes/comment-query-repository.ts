@@ -1,6 +1,6 @@
 import {CommentDbType} from "../types/comment-db-type";
 import {ObjectId, Sort, WithId} from "mongodb";
-import {commentsCollection} from "../../db/mongoDb";
+import {commentsCollection} from "../../db/mongo-db/mongoDb";
 import {CommentViewModel} from "../types/input-output-types";
 import {
     PaginationAndSortFilterType,

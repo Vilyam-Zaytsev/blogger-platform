@@ -26,7 +26,7 @@ import {SessionsRepository} from "../../02-sessions/repositories/sessions-reposi
 import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-type";
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
 import {injectable} from "inversify";
-import {Session} from "../../02-sessions/domain/session.entity";
+import {Session} from "../../02-sessions/domain/session-entity";
 
 @injectable()
 class AuthService {

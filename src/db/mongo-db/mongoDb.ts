@@ -1,11 +1,12 @@
 import {Collection, MongoClient} from "mongodb";
-import {SETTINGS} from "../common/settings";
-import {BlogDbType} from "../05-blogs/types/blog-db-type";
-import {PostDbType} from "../06-posts/types/post-db-type";
-import {CommentDbType} from "../07-comments/types/comment-db-type";
-import {ApiTrafficType} from "../common/types/api-traffic-type";
-import {User} from "../04-users/domain/user.entity";
-import {Session} from "../02-sessions/domain/session.entity";
+import {SETTINGS} from "../../common/settings";
+import {BlogDbType} from "../../05-blogs/types/blog-db-type";
+import {PostDbType} from "../../06-posts/types/post-db-type";
+import {CommentDbType} from "../../07-comments/types/comment-db-type";
+import {ApiTrafficType} from "../../common/types/api-traffic-type";
+import {User} from "../../04-users/domain/user.entity";
+import {Session} from "../../02-sessions/domain/session-entity";
+import mongoose from "mongoose";
 
 let blogsCollection: Collection<BlogDbType>;
 
@@ -15,7 +16,7 @@ let usersCollection: Collection<User>;
 
 let commentsCollection: Collection<CommentDbType>;
 
-let sessionsCollection: Collection<Session>;
+// let sessionsCollection: Collection<Session>;
 
 let apiTrafficCollection: Collection<ApiTrafficType>;
 
@@ -35,9 +36,9 @@ const setCommentsCollection = (collection: Collection<CommentDbType>) => {
     commentsCollection = collection;
 };
 
-const setSessionsCollection = (collection: Collection<Session>) => {
-    sessionsCollection = collection;
-};
+// const setSessionsCollection = (collection: Collection<Session>) => {
+//     sessionsCollection = collection;
+// };
 
 const setApiTrafficCollection = (collection: Collection<ApiTrafficType>) => {
     apiTrafficCollection = collection;
@@ -51,11 +52,12 @@ async function runDb(url: string) {
     postsCollection = db.collection<PostDbType>('posts');
     usersCollection = db.collection<User>('users');
     commentsCollection = db.collection<CommentDbType>('comments');
-    sessionsCollection = db.collection<Session>('sessions');
+    // sessionsCollection = db.collection<Session>('sessions');
     apiTrafficCollection = db.collection<ApiTrafficType>('ApiTraffic');
 
     try {
         await client.connect();
+        await mongoose.connect(`${SETTINGS.MONGO_URL}/${SETTINGS.DB_NAME}`);
         await db.command({ping: 1});
 
         console.log('connected to mongodb...');
@@ -65,6 +67,7 @@ async function runDb(url: string) {
         console.log(error);
 
         await client.close();
+        await mongoose.disconnect();
 
         return false;
     }
@@ -75,13 +78,13 @@ export {
     setPostsCollection,
     setUsersCollection,
     setCommentsCollection,
-    setSessionsCollection,
+    // setSessionsCollection,
     setApiTrafficCollection,
     blogsCollection,
     postsCollection,
     usersCollection,
     commentsCollection,
-    sessionsCollection,
+    // sessionsCollection,
     apiTrafficCollection,
     runDb
 };

@@ -23,7 +23,7 @@ import {ObjectId, WithId} from "mongodb";
 import {PasswordRecoveryInputModel} from "./types/password-recovery-input-model";
 import {NewPasswordRecoveryInputModel} from "./types/new-password-recovery-input-model";
 import {injectable} from "inversify";
-import {Session} from "../02-sessions/domain/session.entity";
+import {Session} from "../02-sessions/domain/session-entity";
 
 const jwtService: JwtService = new JwtService();
 
@@ -79,17 +79,17 @@ class AuthController {
             exp
         } = payload;
 
-        const newSession: Session = new Session(
+        const sessionDto: Session = new Session(
             userId,
             new ObjectId(deviceId),
             deviceName,
             ip,
             new Date(iat * 1000),
             new Date(exp * 1000)
-        )
+        );
 
         await this.sessionsService
-            .createSession(newSession);
+            .createSession(sessionDto);
 
         const {
             accessToken,

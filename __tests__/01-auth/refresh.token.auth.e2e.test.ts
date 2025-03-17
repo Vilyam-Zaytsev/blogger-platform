@@ -10,10 +10,10 @@ import {
     setSessionsCollection,
     setUsersCollection,
     usersCollection
-} from "../../src/db/mongoDb";
+} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
-import {Session} from "../../src/02-sessions/domain/session.entity";
+import {Session} from "../../src/02-sessions/domain/session-entity";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 import {User} from "../../src/04-users/domain/user.entity";

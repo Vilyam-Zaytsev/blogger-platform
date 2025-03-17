@@ -4,19 +4,13 @@ import {clearPresets, deviceNames, presets} from "../helpers/datasets-for-tests"
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {
-    apiTrafficCollection,
-    sessionsCollection,
-    setApiTrafficCollection,
-    setSessionsCollection,
-    setUsersCollection,
+    apiTrafficCollection, runDb,
     usersCollection
-} from "../../src/db/mongoDb";
+} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
-import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
-import {User} from "../../src/04-users/domain/user.entity";
-import {Session} from "../../src/02-sessions/domain/session.entity";
+
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -30,12 +24,8 @@ beforeAll(async () => {
 
     const db = client.db();
 
-    // const user = db.collection('user')
-    //TODO: replace with runDB func
+    await runDb(uri);
 
-    setUsersCollection(db.collection<User>('users'));
-    setSessionsCollection(db.collection<Session>('sessions'));
-    setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });
 
 afterAll(async () => {
@@ -45,7 +35,6 @@ afterAll(async () => {
 
 beforeEach(async () => {
     await usersCollection.deleteMany({});
-    await sessionsCollection.deleteMany({});
     await apiTrafficCollection.deleteMany({});
 
     clearPresets();

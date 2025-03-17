@@ -8,7 +8,7 @@ import {
     setApiTrafficCollection,
     setUsersCollection,
     usersCollection
-} from "../../src/db/mongoDb";
+} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";

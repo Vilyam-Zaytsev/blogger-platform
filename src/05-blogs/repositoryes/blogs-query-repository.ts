@@ -1,5 +1,5 @@
 import {BlogDbType} from "../types/blog-db-type";
-import {blogsCollection} from "../../db/mongoDb";
+import {blogsCollection} from "../../db/mongo-db/mongoDb";
 import {ObjectId, Sort, WithId} from "mongodb";
 import {
     MatchMode,

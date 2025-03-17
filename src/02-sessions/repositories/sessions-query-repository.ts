@@ -1,17 +1,16 @@
-import {sessionsCollection} from "../../db/mongoDb";
 import {WithId} from "mongodb";
 import {DeviceViewModel} from "../types/input-output-types";
 import {injectable} from "inversify";
-import {Session} from "../domain/session.entity";
+import {Session} from "../domain/session-entity";
+import {SessionModel} from "../../db/mongo-db/models/session-model";
 
 @injectable()
 class SessionsQueryRepository {
 
     async findSessionsByUserId(userId: string): Promise<DeviceViewModel[]> {
 
-        const sessions: WithId<Session>[] | null = await sessionsCollection
+        const sessions: WithId<Session>[] | null = await SessionModel
             .find({userId})
-            .toArray();
 
         return sessions.map(s => this._mapSessionDbTypeToDeviceViewModel(s))
     }

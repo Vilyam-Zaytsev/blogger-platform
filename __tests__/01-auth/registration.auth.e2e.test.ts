@@ -3,7 +3,7 @@ import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, user, userLogins} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId, WithId} from "mongodb";
-import {apiTrafficCollection, setApiTrafficCollection, setUsersCollection, usersCollection} from "../../src/db/mongoDb";
+import {apiTrafficCollection, setApiTrafficCollection, setUsersCollection, usersCollection} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {ConfirmationStatus} from "../../src/04-users/types/confirmation-status";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";

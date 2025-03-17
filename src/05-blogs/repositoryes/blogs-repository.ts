@@ -1,6 +1,6 @@
 import {BlogInputModel} from "../types/input-output-types";
 import {BlogDbType} from "../types/blog-db-type";
-import {blogsCollection} from "../../db/mongoDb";
+import {blogsCollection} from "../../db/mongo-db/mongoDb";
 import {InsertOneResult, ObjectId} from "mongodb";
 import {injectable} from "inversify";
 
