@@ -3,9 +3,9 @@ import {SETTINGS} from "../common/settings";
 import {BlogDbType} from "../05-blogs/types/blog-db-type";
 import {PostDbType} from "../06-posts/types/post-db-type";
 import {CommentDbType} from "../07-comments/types/comment-db-type";
-import {ActiveSessionType} from "../02-sessions/types/active-session-type";
 import {ApiTrafficType} from "../common/types/api-traffic-type";
 import {User} from "../04-users/domain/user.entity";
+import {Session} from "../02-sessions/domain/session.entity";
 
 let blogsCollection: Collection<BlogDbType>;
 
@@ -15,7 +15,7 @@ let usersCollection: Collection<User>;
 
 let commentsCollection: Collection<CommentDbType>;
 
-let sessionsCollection: Collection<ActiveSessionType>;
+let sessionsCollection: Collection<Session>;
 
 let apiTrafficCollection: Collection<ApiTrafficType>;
 
@@ -35,7 +35,7 @@ const setCommentsCollection = (collection: Collection<CommentDbType>) => {
     commentsCollection = collection;
 };
 
-const setSessionsCollection = (collection: Collection<ActiveSessionType>) => {
+const setSessionsCollection = (collection: Collection<Session>) => {
     sessionsCollection = collection;
 };
 
@@ -51,7 +51,7 @@ async function runDb(url: string) {
     postsCollection = db.collection<PostDbType>('posts');
     usersCollection = db.collection<User>('users');
     commentsCollection = db.collection<CommentDbType>('comments');
-    sessionsCollection = db.collection<ActiveSessionType>('sessions');
+    sessionsCollection = db.collection<Session>('sessions');
     apiTrafficCollection = db.collection<ApiTrafficType>('ApiTraffic');
 
     try {

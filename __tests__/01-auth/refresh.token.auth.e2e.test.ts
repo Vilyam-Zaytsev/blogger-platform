@@ -13,7 +13,7 @@ import {
 } from "../../src/db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
-import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
+import {Session} from "../../src/02-sessions/domain/session.entity";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 import {User} from "../../src/04-users/domain/user.entity";
@@ -41,7 +41,7 @@ beforeAll(async () => {
 
     const db = client.db();
     setUsersCollection(db.collection<User>('users'));
-    setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
+    setSessionsCollection(db.collection<Session>('sessions'));
     setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });
 

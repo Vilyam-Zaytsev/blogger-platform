@@ -1,4 +1,3 @@
-import {ActiveSessionType} from "../types/active-session-type";
 import {SessionsRepository} from "../repositories/sessions-repository";
 import {
     ForbiddenResult,
@@ -10,13 +9,14 @@ import {ResultType} from "../../common/types/result-types/result-type";
 import {ObjectId, WithId} from "mongodb";
 import {sessionsCollection} from "../../db/mongoDb";
 import {injectable} from "inversify";
+import {Session} from "./session.entity";
 
 @injectable()
 class SessionsService {
 
     constructor(private sessionsRepository: SessionsRepository) {}
 
-    async createSession(newSession: ActiveSessionType) {
+    async createSession(newSession: Session) {
 
         const resultInsertSession = await this.sessionsRepository
             .insertSession(newSession);
@@ -33,7 +33,7 @@ class SessionsService {
 
     async deleteSessionByDeviceId(userId: string, deviceId: ObjectId): Promise<ResultType> {
 
-        const activeSession: WithId<ActiveSessionType> | null = await this.sessionsRepository
+        const activeSession: WithId<Session> | null = await this.sessionsRepository
             .findSessionByDeviceId(deviceId)
 
         if (!activeSession) {

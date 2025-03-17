@@ -14,9 +14,9 @@ import {
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
-import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 import {User} from "../../src/04-users/domain/user.entity";
+import {Session} from "../../src/02-sessions/domain/session.entity";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
@@ -34,7 +34,7 @@ beforeAll(async () => {
     //TODO: replace with runDB func
 
     setUsersCollection(db.collection<User>('users'));
-    setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
+    setSessionsCollection(db.collection<Session>('sessions'));
     setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });
 

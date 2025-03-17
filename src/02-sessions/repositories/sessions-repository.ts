@@ -1,19 +1,19 @@
 import {sessionsCollection} from "../../db/mongoDb";
 import {InsertOneResult, ObjectId, WithId} from "mongodb";
-import {ActiveSessionType} from "../types/active-session-type";
 import {SessionTimestampsType} from "../types/session-timestamps-type";
 import {injectable} from "inversify";
+import {Session} from "../domain/session.entity";
 
 @injectable()
 class SessionsRepository {
 
-    async findSessionByDeviceId(deviceId: ObjectId): Promise<WithId<ActiveSessionType> | null> {
+    async findSessionByDeviceId(deviceId: ObjectId): Promise<WithId<Session> | null> {
 
         return sessionsCollection
             .findOne({deviceId});
     }
 
-    async insertSession(newSession: ActiveSessionType): Promise<InsertOneResult> {
+    async insertSession(newSession: Session): Promise<InsertOneResult> {
 
         return await sessionsCollection
             .insertOne(newSession);

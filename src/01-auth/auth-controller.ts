@@ -16,7 +16,6 @@ import {RegistrationEmailResendingType} from "./types/registration-email-resendi
 import {UsersQueryRepository} from "../04-users/repositoryes/users-query-repository";
 import {AuthTokens} from "./types/auth-tokens-type";
 import {JwtService} from "./adapters/jwt-service";
-import {ActiveSessionType} from "../02-sessions/types/active-session-type";
 import {SessionsService} from "../02-sessions/domain/sessions-service";
 import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
 import {SessionsRepository} from "../02-sessions/repositories/sessions-repository";
@@ -24,6 +23,7 @@ import {ObjectId, WithId} from "mongodb";
 import {PasswordRecoveryInputModel} from "./types/password-recovery-input-model";
 import {NewPasswordRecoveryInputModel} from "./types/new-password-recovery-input-model";
 import {injectable} from "inversify";
+import {Session} from "../02-sessions/domain/session.entity";
 
 const jwtService: JwtService = new JwtService();
 
@@ -79,14 +79,14 @@ class AuthController {
             exp
         } = payload;
 
-        const newSession: ActiveSessionType = {
+        const newSession: Session = new Session(
             userId,
-            deviceId: new ObjectId(deviceId),
+            new ObjectId(deviceId),
             deviceName,
             ip,
-            iat: new Date(iat * 1000),
-            exp: new Date(exp * 1000)
-        };
+            new Date(iat * 1000),
+            new Date(exp * 1000)
+        )
 
         await this.sessionsService
             .createSession(newSession);
@@ -121,7 +121,7 @@ class AuthController {
             deviceId
         } = req.session!;
 
-        const session: WithId<ActiveSessionType> | null = await this.sessionsRepository
+        const session: WithId<Session> | null = await this.sessionsRepository
             .findSessionByDeviceId(deviceId);
 
         if (!session) {

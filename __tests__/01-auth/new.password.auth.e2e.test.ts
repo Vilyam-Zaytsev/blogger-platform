@@ -208,7 +208,15 @@ describe('POST /auth/new-password', () => {
         const foundUser_1: WithId<User> | null = await usersRepository
             .findByEmail(presets.users[0].email);
 
-        for (let i = 0; i < 5; i++) {
+        await req
+            .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.NEW_PASSWORD}`)
+            .send({
+                newPassword: generateRandomString(15),
+                recoveryCode: foundUser_1!.passwordRecovery.recoveryCode
+            })
+            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+
+        for (let i = 0; i < 4; i++) {
 
             await req
                 .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.NEW_PASSWORD}`)
@@ -216,7 +224,7 @@ describe('POST /auth/new-password', () => {
                     newPassword: generateRandomString(15),
                     recoveryCode: foundUser_1!.passwordRecovery.recoveryCode
                 })
-                .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+                .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
         }
 
         const resNewPassword: Response = await req
