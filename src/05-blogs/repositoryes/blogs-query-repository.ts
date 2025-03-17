@@ -24,7 +24,6 @@ class BlogsQueryRepository {
             searchNameTerm
         } = sortQueryDto;
 
-        //TODO что если создание фильтра унести в контроллер???
         const filter: any = createBlogsSearchFilter(
             {searchNameTerm},
             MatchMode.Partial
@@ -52,7 +51,6 @@ class BlogsQueryRepository {
 
     async getBlogsCount(searchNameTerm: string | null): Promise<number> {
 
-        //TODO что если создание фильтра унести в контроллер???
         const filter: any = createBlogsSearchFilter(
             {searchNameTerm},
             MatchMode.Partial

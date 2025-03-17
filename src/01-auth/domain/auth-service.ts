@@ -157,18 +157,6 @@ class AuthService {
                 );
         }
 
-        //TODO: УБРАТЬ ЭТУ ПРОВЕРКУ!!!
-
-        // if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) {
-        //
-        //     return BadRequestResult
-        //         .create(
-        //             'code',
-        //             'The confirmation code has already been used. The account has already been verified.',
-        //             'Failed to complete user registration.'
-        //         );
-        // }
-
         if (user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()) {
 
             return BadRequestResult
@@ -438,7 +426,7 @@ class AuthService {
                     'The password could not be updated.'
                 );
         }
-//TODO: В ЭТОМ СЛУЧАЕ НЕТ НЕОБХОДИМОСТИ В rateLimitsGuard
+
         const resultUpdatePasswordRecovery: boolean = await this.usersRepository
             .updatePasswordRecovery(
                 user._id,
