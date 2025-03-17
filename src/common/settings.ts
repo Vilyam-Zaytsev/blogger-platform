@@ -42,12 +42,12 @@ const SETTINGS = {
         TOO_MANY_REQUESTS_429: 429,
         INTERNAL_SERVER_ERROR_500: 500
     },
-    MONGO_URL: process.env.MONGO_URL || 'mongodb://localhost:27017',
-    DB_NAME: process.env.DB_NAME || 'blogger-platform-dev-local',
-    JWT_SECRET_AT: process.env.JWT_SECRET_AT || 'my_secret_AT',
-    JWT_SECRET_RT: process.env.JWT_SECRET_RT || 'my_secret_RT',
-    JWT_EXPIRATION_AT: process.env.JWT_EXPIRATION_AT || '10s',
-    JWT_EXPIRATION_RT: process.env.JWT_EXPIRATION_RT || '20s',
+    MONGO_URL: process.env.MONGO_URL,
+    DB_NAME: process.env.DB_NAME,
+    JWT_SECRET_AT: process.env.JWT_SECRET_AT,
+    JWT_SECRET_RT: process.env.JWT_SECRET_RT,
+    JWT_EXPIRATION_AT: process.env.JWT_EXPIRATION_AT,
+    JWT_EXPIRATION_RT: process.env.JWT_EXPIRATION_RT,
 };
 
 export {SETTINGS};
