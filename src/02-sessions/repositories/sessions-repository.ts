@@ -1,13 +1,12 @@
-import {InsertOneResult, ObjectId, WithId} from "mongodb";
+import {ObjectId, UpdateResult} from "mongodb";
 import {SessionTimestampsType} from "../types/session-timestamps-type";
 import {injectable} from "inversify";
-import {Session} from "../domain/session-entity";
 import {SessionDocument, SessionModel} from "../../db/mongo-db/models/session-model";
 
 @injectable()
 class SessionsRepository {
 
-    async findSessionByDeviceId(deviceId: ObjectId): Promise<WithId<Session> | null> {
+    async findSessionByDeviceId(deviceId: ObjectId): Promise<SessionDocument | null> {
 
         return SessionModel
             .findOne({deviceId});
@@ -27,7 +26,8 @@ class SessionsRepository {
                     'iat': data.iat,
                     'exp': data.exp
                 }
-            });
+            })
+            .exec();
 
         return result.matchedCount === 1;
     }
@@ -35,7 +35,8 @@ class SessionsRepository {
     async deleteSession(id: string): Promise<boolean> {
 
         const result = await SessionModel
-            .deleteOne({_id: new ObjectId(id)});
+            .deleteOne({_id: new ObjectId(id)})
+            .exec();
 
         return result.deletedCount === 1;
     }
@@ -46,7 +47,8 @@ class SessionsRepository {
             .deleteMany({
                 userId,
                 deviceId: {$ne: deviceId}
-            });
+            })
+            .exec();
 
         return result.deletedCount > 0;
     }

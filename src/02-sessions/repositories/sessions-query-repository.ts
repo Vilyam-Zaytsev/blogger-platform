@@ -2,20 +2,21 @@ import {WithId} from "mongodb";
 import {DeviceViewModel} from "../types/input-output-types";
 import {injectable} from "inversify";
 import {Session} from "../domain/session-entity";
-import {SessionModel} from "../../db/mongo-db/models/session-model";
+import {SessionDocument, SessionModel} from "../../db/mongo-db/models/session-model";
 
 @injectable()
 class SessionsQueryRepository {
 
     async findSessionsByUserId(userId: string): Promise<DeviceViewModel[]> {
 
-        const sessions: WithId<Session>[] | null = await SessionModel
+        const sessions: SessionDocument[] = await SessionModel
             .find({userId})
+            .exec();
 
         return sessions.map(s => this._mapSessionDbTypeToDeviceViewModel(s))
     }
 
-    _mapSessionDbTypeToDeviceViewModel(session: WithId<Session>): DeviceViewModel {
+    _mapSessionDbTypeToDeviceViewModel(session: SessionDocument): DeviceViewModel {
 
         return {
             ip: session.ip,
