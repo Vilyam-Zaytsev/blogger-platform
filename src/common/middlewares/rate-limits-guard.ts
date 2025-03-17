@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {apiTrafficCollection} from "../../db/mongoDb";
+import {apiTrafficCollection} from "../../db/mongo-db/mongoDb";
 import {SETTINGS} from "../settings";
 
 const rateLimitsGuard = async (

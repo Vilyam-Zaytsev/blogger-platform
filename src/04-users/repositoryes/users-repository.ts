@@ -1,6 +1,6 @@
 import {ConfirmationStatus} from "../types/confirmation-status";
 import {InsertOneResult, ObjectId, Sort, WithId} from "mongodb";
-import {usersCollection} from "../../db/mongoDb";
+import {usersCollection} from "../../db/mongo-db/mongoDb";
 import {
     MatchMode,
     PaginationAndSortFilterType,

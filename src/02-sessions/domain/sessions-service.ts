@@ -1,4 +1,3 @@
-import {ActiveSessionType} from "../types/active-session-type";
 import {SessionsRepository} from "../repositories/sessions-repository";
 import {
     ForbiddenResult,
@@ -8,22 +7,36 @@ import {
 } from "../../common/helpers/result-object";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ObjectId, WithId} from "mongodb";
-import {sessionsCollection} from "../../db/mongoDb";
 import {injectable} from "inversify";
+import {Session} from "./session-entity";
+import {SessionDocument, SessionModel} from "../../db/mongo-db/models/session-model";
 
 @injectable()
 class SessionsService {
 
     constructor(private sessionsRepository: SessionsRepository) {}
 
-    async createSession(newSession: ActiveSessionType) {
+    async createSession(sessionDto: Session): Promise<ResultType<string | null>> {
 
-        const resultInsertSession = await this.sessionsRepository
-            .insertSession(newSession);
+        const newSession: SessionDocument = new SessionModel(sessionDto);
+
+        const resultSaveSession: SessionDocument = await this.sessionsRepository
+            .saveSession(newSession);
+
+        if (!resultSaveSession) {
+
+            return InternalServerErrorResult
+                .create(
+                    'not field',
+                    'Couldn\'t save the session.',
+                    'Failed to create a session.'
+                )
+        }
 
         return SuccessResult
-            .create<string>(String(resultInsertSession.insertedId));
+            .create<string>(String(resultSaveSession._id));
     }
+
 
     async deleteSession(id: string) {
 
@@ -33,7 +46,7 @@ class SessionsService {
 
     async deleteSessionByDeviceId(userId: string, deviceId: ObjectId): Promise<ResultType> {
 
-        const activeSession: WithId<ActiveSessionType> | null = await this.sessionsRepository
+        const activeSession: WithId<Session> | null = await this.sessionsRepository
             .findSessionByDeviceId(deviceId)
 
         if (!activeSession) {

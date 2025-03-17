@@ -1,5 +1,5 @@
 import {ObjectId, Sort, WithId} from "mongodb";
-import {usersCollection} from "../../db/mongoDb";
+import {usersCollection} from "../../db/mongo-db/mongoDb";
 import {
     MatchMode,
     PaginationAndSortFilterType,

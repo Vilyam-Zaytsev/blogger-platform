@@ -1,5 +1,5 @@
 import {PostDbType} from "../types/post-db-type";
-import {postsCollection} from "../../db/mongoDb";
+import {postsCollection} from "../../db/mongo-db/mongoDb";
 import {ObjectId, Sort, WithId} from "mongodb";
 import {
     MatchMode,

@@ -3,7 +3,7 @@ import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, userLogins} from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
-import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
+import {setUsersCollection, usersCollection} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {UserViewModel} from "../../src/04-users/types/input-output-types";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";

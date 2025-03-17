@@ -11,8 +11,8 @@ class JwtService {
 
         return jwt.sign(
             {userId},
-            SETTINGS.JWT_SECRET_AT,
-            {expiresIn: SETTINGS.JWT_EXPIRATION_AT}
+            SETTINGS.JWT_SECRET_AT!,
+            {expiresIn: SETTINGS.JWT_EXPIRATION_AT!}
         );
     }
 
@@ -26,8 +26,8 @@ class JwtService {
                 userId,
                 deviceId
             },
-            SETTINGS.JWT_SECRET_RT,
-            {expiresIn: SETTINGS.JWT_EXPIRATION_RT}
+            SETTINGS.JWT_SECRET_RT!,
+            {expiresIn: SETTINGS.JWT_EXPIRATION_RT!}
         );
     }
 
@@ -48,19 +48,19 @@ class JwtService {
 
         try {
 
-            return jwt.verify(token, SETTINGS.JWT_SECRET_AT) as { userId: string };
+            return jwt.verify(token, SETTINGS.JWT_SECRET_AT!) as { userId: string };
         } catch (error) {
             console.error(error);
 
             return null;
         }
     }
-//TODO: как убрать простыню из консоли при ошибке???
+
     async verifyRefreshToken(token: string): Promise<PayloadRefreshTokenType | null> {
 
         try {
 
-            return jwt.verify(token, SETTINGS.JWT_SECRET_RT) as PayloadRefreshTokenType;
+            return jwt.verify(token, SETTINGS.JWT_SECRET_RT!) as PayloadRefreshTokenType;
         } catch (error) {
             console.error((error as Error).message);
 

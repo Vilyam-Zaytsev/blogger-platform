@@ -7,7 +7,7 @@ import {
 } from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
-import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
+import {setUsersCollection, usersCollection} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";

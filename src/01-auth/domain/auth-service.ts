@@ -21,12 +21,12 @@ import {
     UnauthorizedResult
 } from "../../common/helpers/result-object";
 import {AuthTokens} from "../types/auth-tokens-type";
-import {ActiveSessionType} from "../../02-sessions/types/active-session-type";
 import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
 import {SessionsRepository} from "../../02-sessions/repositories/sessions-repository";
 import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-type";
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
 import {injectable} from "inversify";
+import {Session} from "../../02-sessions/domain/session-entity";
 
 @injectable()
 class AuthService {
@@ -156,18 +156,6 @@ class AuthService {
                     'Failed to complete user registration.'
                 );
         }
-
-        //TODO: УБРАТЬ ЭТУ ПРОВЕРКУ!!!
-
-        // if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) {
-        //
-        //     return BadRequestResult
-        //         .create(
-        //             'code',
-        //             'The confirmation code has already been used. The account has already been verified.',
-        //             'Failed to complete user registration.'
-        //         );
-        // }
 
         if (user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()) {
 
@@ -345,7 +333,7 @@ class AuthService {
                 );
         }
 
-        const isSessionActive: WithId<ActiveSessionType> | null = await this.sessionsRepository
+        const isSessionActive: WithId<Session> | null = await this.sessionsRepository
             .findSessionByDeviceId(new ObjectId(deviceId));
 
         if (!isSessionActive) {
@@ -438,7 +426,7 @@ class AuthService {
                     'The password could not be updated.'
                 );
         }
-//TODO: В ЭТОМ СЛУЧАЕ НЕТ НЕОБХОДИМОСТИ В rateLimitsGuard
+
         const resultUpdatePasswordRecovery: boolean = await this.usersRepository
             .updatePasswordRecovery(
                 user._id,
