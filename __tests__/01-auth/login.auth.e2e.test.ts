@@ -1,41 +1,45 @@
 import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, deviceNames, presets} from "../helpers/datasets-for-tests";
-import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
-import {
-    apiTrafficCollection, runDb,
-    usersCollection
-} from "../../src/db/mongo-db/mongoDb";
+import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
+import mongoose from "mongoose";
 
-
-let mongoServer: MongoMemoryServer;
 let client: MongoClient;
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
 
-    client = new MongoClient(uri);
-    await client.connect();
+    const uri = SETTINGS.MONGO_URL;
 
-    const db = client.db();
+    if (!uri) {
+
+        throw new Error("MONGO_URL is not defined in SETTINGS");
+    }
 
     await runDb(uri);
 
+    client = new MongoClient(uri);
+    await client.connect();
 });
 
 afterAll(async () => {
+    await mongoose.disconnect();
     await client.close();
-    await mongoServer.stop();
 });
 
 beforeEach(async () => {
-    await usersCollection.deleteMany({});
-    await apiTrafficCollection.deleteMany({});
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
+
+    await client.db(SETTINGS.DB_NAME).dropDatabase();
 
     clearPresets();
 });

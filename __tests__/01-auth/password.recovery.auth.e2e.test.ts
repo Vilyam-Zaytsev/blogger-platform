@@ -1,51 +1,53 @@
 import {console_log_e2e, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, presets, user} from "../helpers/datasets-for-tests";
-import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId, WithId} from "mongodb";
-import {
-    apiTrafficCollection,
-    setApiTrafficCollection,
-    setUsersCollection,
-    usersCollection
-} from "../../src/db/mongo-db/mongoDb";
+import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
-import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 import {User} from "../../src/04-users/domain/user.entity";
 import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
 import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
 import {EmailTemplates} from "../../src/01-auth/adapters/email-templates";
 import {UsersRepository} from "../../src/04-users/repositoryes/users-repository";
 import {ConfirmationStatus} from "../../src/04-users/types/confirmation-status";
+import mongoose from "mongoose";
 
 const usersRepository: UsersRepository = new UsersRepository();
 const emailTemplates: EmailTemplates = new EmailTemplates();
 
-let mongoServer: MongoMemoryServer;
 let client: MongoClient;
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
+
+    const uri = SETTINGS.MONGO_URL;
+
+    if (!uri) {
+
+        throw new Error("MONGO_URL is not defined in SETTINGS");
+    }
+
+    await runDb(uri);
 
     client = new MongoClient(uri);
     await client.connect();
-
-    const db = client.db();
-
-    setUsersCollection(db.collection<User>('users'));
-    setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });
 
 afterAll(async () => {
+    await mongoose.disconnect();
     await client.close();
-    await mongoServer.stop();
 });
 
 beforeEach(async () => {
-    await usersCollection.deleteMany({});
-    await apiTrafficCollection.deleteMany({});
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
+
+    await client.db(SETTINGS.DB_NAME).dropDatabase();
 
     clearPresets();
 
