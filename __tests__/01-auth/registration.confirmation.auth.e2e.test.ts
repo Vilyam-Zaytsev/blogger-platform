@@ -1,21 +1,14 @@
-import {console_log_e2e, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
+import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, user, userLogins} from "../helpers/datasets-for-tests";
 import {MongoClient, ObjectId, WithId} from "mongodb";
-import {
-    apiTrafficCollection,
-    runDb,
-    setApiTrafficCollection,
-    setUsersCollection,
-    usersCollection
-} from "../../src/db/mongo-db/mongoDb";
+import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {ConfirmationStatus} from "../../src/04-users/types/confirmation-status";
 import {UsersRepository} from "../../src/04-users/repositoryes/users-repository";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
 import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
-import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 import {UserInputModel} from "../../src/04-users/types/input-output-types";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
 import {User} from "../../src/04-users/domain/user.entity";

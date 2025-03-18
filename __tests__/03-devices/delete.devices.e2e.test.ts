@@ -1,24 +1,22 @@
 import {console_log_e2e, delay, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, deviceNames, presets} from "../helpers/datasets-for-tests";
-import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
 import {
-    apiTrafficCollection,
-    sessionsCollection,
+    apiTrafficCollection, runDb,
     setApiTrafficCollection,
-    setSessionsCollection,
     setUsersCollection,
     usersCollection
 } from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
-import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 import {User} from "../../src/04-users/domain/user.entity";
+import mongoose from "mongoose";
+import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
+import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
 
-let mongoServer: MongoMemoryServer;
 let client: MongoClient;
 
 jest.mock('../../src/common/settings', () => {
@@ -33,28 +31,35 @@ jest.mock('../../src/common/settings', () => {
 });
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
+
+    const uri = SETTINGS.MONGO_URL;
+
+    if (!uri) {
+
+        throw new Error("MONGO_URL is not defined in SETTINGS");
+    }
+
+    await runDb(uri);
 
     client = new MongoClient(uri);
     await client.connect();
-
-    const db = client.db();
-
-    setUsersCollection(db.collection<User>('users'));
-    setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
-    setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
 });
 
 afterAll(async () => {
+    await mongoose.disconnect();
     await client.close();
-    await mongoServer.stop();
 });
 
 beforeEach(async () => {
-    await usersCollection.deleteMany({});
-    await sessionsCollection.deleteMany({});
-    await apiTrafficCollection.deleteMany({});
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
+
+    await client.db(SETTINGS.DB_NAME).dropDatabase();
 
     clearPresets();
 });
@@ -119,7 +124,7 @@ describe('DELETE /security/devices', () => {
         expect(resGetDevices1.body[0]).toEqual(resGetDevices2.body[0]);
 
         console_log_e2e(resDeleteDevices.body, resDeleteDevices.status, 'Test 1: delete (/security/devices)');
-    });
+    }, 10000);
 
     it('should not delete all active sessions except the current one if the user is not logged in.', async () => {
 

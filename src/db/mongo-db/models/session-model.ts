@@ -5,6 +5,7 @@ type SessionModel = Model<Session>;
 type SessionDocument = HydratedDocument<Session>;
 
 const sessionSchema = new Schema<Session>({
+
     userId: {
         type: String,
         required: true
