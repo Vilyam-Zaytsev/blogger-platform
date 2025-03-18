@@ -8,7 +8,7 @@ import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {UserViewModel} from "../../src/04-users/types/input-output-types";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
-import {User} from "../../src/04-users/domain/user.entity";
+import {User} from "../../src/04-users/domain/user-entity";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;

@@ -12,7 +12,7 @@ import {EmailTemplates} from "../../src/01-auth/adapters/email-templates";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {UserInputModel} from "../../src/04-users/types/input-output-types";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
-import {User} from "../../src/04-users/domain/user.entity";
+import {User} from "../../src/04-users/domain/user-entity";
 import {container} from "../../src/composition-root";
 import mongoose from "mongoose";
 

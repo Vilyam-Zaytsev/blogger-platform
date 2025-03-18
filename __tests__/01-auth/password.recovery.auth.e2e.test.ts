@@ -5,7 +5,7 @@ import {MongoClient, ObjectId, WithId} from "mongodb";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
-import {User} from "../../src/04-users/domain/user.entity";
+import {User} from "../../src/04-users/domain/user-entity";
 import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
 import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
 import {EmailTemplates} from "../../src/01-auth/adapters/email-templates";

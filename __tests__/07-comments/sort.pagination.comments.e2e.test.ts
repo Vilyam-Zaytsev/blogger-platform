@@ -32,7 +32,7 @@ import {commentsTestManager} from "../helpers/managers/06_comments-test-manager"
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
-import {User} from "../../src/04-users/domain/user.entity";
+import {User} from "../../src/04-users/domain/user-entity";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;

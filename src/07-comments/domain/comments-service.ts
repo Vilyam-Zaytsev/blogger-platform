@@ -13,7 +13,7 @@ import {
     NotFoundResult,
     SuccessResult
 } from "../../common/helpers/result-object";
-import {User} from "../../04-users/domain/user.entity";
+import {User} from "../../04-users/domain/user-entity";
 import {injectable} from "inversify";
 
 @injectable()

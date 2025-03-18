@@ -3,7 +3,7 @@ import {SETTINGS} from "../../common/settings";
 import {BlogDbType} from "../../05-blogs/types/blog-db-type";
 import {PostDbType} from "../../06-posts/types/post-db-type";
 import {CommentDbType} from "../../07-comments/types/comment-db-type";
-import {User} from "../../04-users/domain/user.entity";
+import {User} from "../../04-users/domain/user-entity";
 import mongoose from "mongoose";
 
 let blogsCollection: Collection<BlogDbType>;

@@ -12,7 +12,7 @@ import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
-import {User} from "../../src/04-users/domain/user.entity";
+import {User} from "../../src/04-users/domain/user-entity";
 import mongoose from "mongoose";
 import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
 import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";

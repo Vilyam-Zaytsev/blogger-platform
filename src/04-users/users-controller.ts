@@ -14,7 +14,7 @@ import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-t
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
 import {ApiErrorResult} from "../common/types/input-output-types/api-error-result";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {User} from "./domain/user.entity";
+import {User} from "./domain/user-entity";
 import {UsersQueryRepository} from "./repositoryes/users-query-repository";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {injectable} from "inversify";

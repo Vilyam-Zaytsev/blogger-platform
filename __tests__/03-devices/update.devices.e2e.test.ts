@@ -16,7 +16,7 @@ import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
-import {User} from "../../src/04-users/domain/user.entity";
+import {User} from "../../src/04-users/domain/user-entity";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;

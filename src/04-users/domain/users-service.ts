@@ -3,7 +3,7 @@ import {ResultType} from "../../common/types/result-types/result-type";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {WithId} from "mongodb";
 import {BadRequestResult, SuccessResult} from "../../common/helpers/result-object";
-import {User} from "./user.entity";
+import {User} from "./user-entity";
 import {injectable} from "inversify";
 
 @injectable()

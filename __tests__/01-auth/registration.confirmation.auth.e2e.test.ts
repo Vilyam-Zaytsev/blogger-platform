@@ -11,7 +11,7 @@ import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
 import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
 import {UserInputModel} from "../../src/04-users/types/input-output-types";
 import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
-import {User} from "../../src/04-users/domain/user.entity";
+import {User} from "../../src/04-users/domain/user-entity";
 import {container} from "../../src/composition-root";
 import mongoose from "mongoose";
 

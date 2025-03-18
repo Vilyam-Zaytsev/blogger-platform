@@ -18,7 +18,7 @@ import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {DeviceViewModel} from "../../src/02-sessions/types/input-output-types";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
-import {User} from "../../src/04-users/domain/user.entity";
+import {User} from "../../src/04-users/domain/user-entity";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;

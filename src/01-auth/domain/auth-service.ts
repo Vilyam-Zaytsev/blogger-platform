@@ -7,7 +7,7 @@ import {ResultType} from "../../common/types/result-types/result-type";
 import {JwtService} from "../adapters/jwt-service";
 import {ObjectId, WithId} from "mongodb";
 import {UsersService} from "../../04-users/domain/users-service";
-import {User} from "../../04-users/domain/user.entity";
+import {User} from "../../04-users/domain/user-entity";
 import {nodemailerService} from "../adapters/nodemailer-service";
 import {EmailTemplates} from "../adapters/email-templates";
 import {randomUUID} from "node:crypto";
