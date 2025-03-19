@@ -1,9 +1,9 @@
-import {ConfirmationStatus} from "../types/confirmation-status";
 import {BcryptService} from "../../01-auth/adapters/bcrypt-service";
 import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
 import {UserInputModel} from "../types/input-output-types";
 import {EmailConfirmation} from "./email-confirmation-entity";
+import {ObjectId} from "mongodb";
 
 const bcryptService: BcryptService = new BcryptService();
 
@@ -12,8 +12,8 @@ class User {
     email: string;
     passwordHash: string;
     createdAt: string;
-    passwordRecoveryId: string | null;
-    emailConfirmationId: string | null;
+    passwordRecoveryId: ObjectId | null;
+    emailConfirmationId: ObjectId | null;
 
     private constructor(
         login: string,
