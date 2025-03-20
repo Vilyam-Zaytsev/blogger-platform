@@ -4,6 +4,7 @@ import {WithId} from "mongodb";
 import {PostsRepository} from "../repositoryes/posts-repository";
 import {BlogsRepository} from "../../05-blogs/repositoryes/blogs-repository";
 import {injectable} from "inversify";
+import {PostDocument, PostModel} from "../../db/mongo-db/models/post-model";
 
 @injectable()
 class PostsService {
@@ -27,10 +28,12 @@ class PostsService {
             createdAt: new Date().toISOString(),
         };
 
-        const result = await this.postsRepository
-            .insertPost(newPost);
+        const postDocument: PostDocument = new PostModel(newPost);
 
-        return String(result.insertedId);
+        const resultSavePost: PostDocument = await this.postsRepository
+            .savePost(postDocument);
+
+        return String(resultSavePost._id);
     }
 
     async updatePost(id: string, data: PostInputModel): Promise<boolean> {

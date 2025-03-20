@@ -15,6 +15,7 @@ import {
 } from "../../common/helpers/result-object";
 import {User} from "../../04-users/domain/user-entity";
 import {injectable} from "inversify";
+import {CommentDocument, CommentModel} from "../../db/mongo-db/models/comment-model";
 
 @injectable()
 class CommentsService {
@@ -50,13 +51,15 @@ class CommentsService {
                 userLogin: commentator!.login
             },
             createdAt: new Date().toISOString()
-        }
+        };
 
-        const result = await this.commentRepository
-            .insertComment(newComment);
+        const commentDocument: CommentDocument = new CommentModel(newComment);
+
+        const resultSaveComment: CommentDocument = await this.commentRepository
+            .saveComment(commentDocument);
 
         return SuccessResult
-            .create<string>(String(result.insertedId));
+            .create<string>(String(resultSaveComment._id));
     }
 
     async updateComment(commentId: string, userId: string, data: CommentInputModel): Promise<ResultType> {
