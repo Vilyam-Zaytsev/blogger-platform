@@ -20,25 +20,18 @@ class UsersService {
             candidate.email
         );
 
-        if (resultCandidateValidation.status !== ResultStatus.Success) return resultCandidateValidation;
+        if (resultCandidateValidation.status !== ResultStatus.Success) {
+
+            return resultCandidateValidation;
+        }
 
         const user: UserDocument = new UserModel(candidate);
 
-        const resultSaveUser: UserDocument = await this.usersRepository
+        const resultSaveUser: string = await this.usersRepository
                 .saveUser(user);
 
-        if (!resultSaveUser) {
-
-            return InternalServerErrorResult
-                .create(
-                    'not field',
-                    'Couldn\'t save the user.',
-                    'Failed to create a user.'
-                )
-        }
-
         return SuccessResult
-            .create<string>(String(resultSaveUser._id));
+            .create<string>(resultSaveUser);
     }
 
     async deleteUser(id: string): Promise<boolean> {

@@ -46,7 +46,7 @@ class UsersQueryRepository {
     async findUser(id: string): Promise<UserViewModel | null> {
 
         const user: WithId<User> | null = await UserModel
-            .findOne({_id: new ObjectId(id)})
+            .findById(id)
             .exec();
 
         if (!user) return null;

@@ -26,7 +26,7 @@ import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-t
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
 import {injectable} from "inversify";
 import {Session} from "../../02-sessions/domain/session-entity";
-import {ConfirmationStatus} from "../../db/mongo-db/models/user-model";
+import {ConfirmationStatus, UserDocument} from "../../db/mongo-db/models/user-model";
 
 @injectable()
 class AuthService {
@@ -146,11 +146,11 @@ class AuthService {
 
     async registrationConfirmation(confirmationCode: string): Promise<ResultType> {
 
-        const user: WithId<User> | null = await this.usersRepository
+        const userDocument: UserDocument | null = await this.usersRepository
             .findByConfirmationCode(confirmationCode);
 
 
-        if (!user) {
+        if (!userDocument) {
 
             return BadRequestResult
                 .create(
@@ -161,9 +161,9 @@ class AuthService {
         }
 
         if (
-            user.emailConfirmation
-            && user.emailConfirmation.expirationDate
-            && user.emailConfirmation.expirationDate < new Date()
+            userDocument.emailConfirmation
+            && userDocument.emailConfirmation.expirationDate
+            && userDocument.emailConfirmation.expirationDate < new Date()
         ) {
 
             return BadRequestResult
@@ -174,15 +174,12 @@ class AuthService {
                 );
         }
 
-        await this.usersRepository
-            .updateConfirmationStatus(user._id);
+        userDocument.emailConfirmation!.confirmationStatus = ConfirmationStatus.Confirmed;
+        userDocument.emailConfirmation!.confirmationCode = null;
+        userDocument.emailConfirmation!.expirationDate = null;
 
         await this.usersRepository
-            .updateEmailConfirmation(
-                user._id,
-                null,
-                null
-            );
+            .saveUser(userDocument);
 
         return SuccessResult
             .create(null);
@@ -190,10 +187,10 @@ class AuthService {
 
     async registrationEmailResending(email: string): Promise<ResultType> {
 
-        const user: WithId<User> | null = await this.usersRepository
+        const userDocument: UserDocument | null = await this.usersRepository
             .findByEmail(email);
 
-        if (!user) {
+        if (!userDocument) {
 
             return BadRequestResult
                 .create(
@@ -204,8 +201,8 @@ class AuthService {
         }
 
         if (
-            user.emailConfirmation
-            && user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed
+            userDocument.emailConfirmation
+            && userDocument.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed
         ) {
 
             return BadRequestResult
@@ -222,15 +219,15 @@ class AuthService {
             {hours: 1, minutes: 1}
         );
 
+        userDocument.emailConfirmation!.confirmationCode = confirmationCode;
+        userDocument.emailConfirmation!.expirationDate = expirationDate;
+
         await this.usersRepository
-            .updateEmailConfirmation(
-                user._id,
-                confirmationCode,
-                expirationDate);
+            .saveUser(userDocument);
 
         nodemailerService
             .sendEmail(
-                user.email,
+                userDocument.email,
                 this.emailTemplates
                     .registrationEmail(confirmationCode)
             )
@@ -294,7 +291,7 @@ class AuthService {
         const {userId} = payload;
 
         const isUser: User | null = await this.usersRepository
-            .findUser(userId);
+            .findUserById(userId);
 
         if (!isUser) {
 
@@ -331,7 +328,7 @@ class AuthService {
         } = payload;
 
         const isUser: User | null = await this.usersRepository
-            .findUser(userId);
+            .findUserById(userId);
 
         if (!isUser) {
 
@@ -362,10 +359,10 @@ class AuthService {
 
     async passwordRecovery(email: string): Promise<ResultType> {
 
-        const user: WithId<User> | null = await this.usersRepository
+        const userDocument: UserDocument | null = await this.usersRepository
             .findByEmail(email);
 
-        if (!user) {
+        if (!userDocument) {
 
             return SuccessResult
                 .create(null);
@@ -377,15 +374,15 @@ class AuthService {
             {hours: 1, minutes: 1}
         )
 
+        userDocument.passwordRecovery!.recoveryCode = recoveryCode;
+        userDocument.passwordRecovery!.expirationDate = expirationDate;
+
         await this.usersRepository
-            .updatePasswordRecovery(
-                user._id,
-                recoveryCode,
-                expirationDate);
+            .saveUser(userDocument);
 
         nodemailerService
             .sendEmail(
-                user.email,
+                userDocument.email,
                 this.emailTemplates
                     .passwordRecoveryEmail(recoveryCode)
             )
@@ -397,7 +394,7 @@ class AuthService {
 
     async newPassword(newPassword: string, recoveryCode: string): Promise<ResultType> {
 
-        const user: WithId<User> | null = await this.usersRepository
+        const user: WithId<UserDocument> | null = await this.usersRepository
             .findByRecoveryCode(recoveryCode);
 
 
@@ -428,35 +425,39 @@ class AuthService {
         const passwordHash: string = await this.bcryptService
             .generateHash(newPassword);
 
-        const resultUpdatePassword: boolean = await this.usersRepository
-            .updatePassword(user._id, passwordHash);
+        user.passwordHash = passwordHash
+        user.passwordRecovery = null
+        await this.usersRepository.saveUser(user)
 
-        if (!resultUpdatePassword) {
+        // const resultUpdatePassword: boolean = await this.usersRepository
+        //     .updatePassword(user._id, passwordHash);
 
-            return InternalServerErrorResult
-                .create(
-                    'no field',
-                    'Server Error.',
-                    'The password could not be updated.'
-                );
-        }
+        // if (!resultUpdatePassword) {
 
-        const resultUpdatePasswordRecovery: boolean = await this.usersRepository
-            .updatePasswordRecovery(
-                user._id,
-                null,
-                null
-            )
+        //     return InternalServerErrorResult
+        //         .create(
+        //             'no field',
+        //             'Server Error.',
+        //             'The password could not be updated.'
+        //         );
+        // }
 
-        if (!resultUpdatePasswordRecovery) {
+        // const resultUpdatePasswordRecovery: boolean = await this.usersRepository
+        //     .updatePasswordRecovery(
+        //         user._id,
+        //         null,
+        //         null
+        //     )
 
-            return InternalServerErrorResult
-                .create(
-                    'no field',
-                    'Server Error.',
-                    'The password could not be updated.'
-                );
-        }
+        // if (!resultUpdatePasswordRecovery) {
+        //
+        //     return InternalServerErrorResult
+        //         .create(
+        //             'no field',
+        //             'Server Error.',
+        //             'The password could not be updated.'
+        //         );
+        // }
 
         return SuccessResult
             .create(null);

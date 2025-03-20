@@ -41,7 +41,7 @@ class CommentsService {
         }
 
         const commentator: WithId<User> | null = await this.usersRepository
-            .findUser(commentatorId);
+            .findUserById(commentatorId);
 
         const newComment: CommentDbType = {
             postId,

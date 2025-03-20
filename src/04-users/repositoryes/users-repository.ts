@@ -12,7 +12,7 @@ import {SortOptionsType} from "../types/sort-options-type";
 @injectable()
 class UsersRepository {
 
-    async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<WithId<User>[]> {
+    async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<UserDocument[]> {
 
         const {
             pageNumber,
@@ -35,123 +35,57 @@ class UsersRepository {
             .find(filter)
             .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as SortOptionsType)
             .skip((pageNumber - 1) * pageSize)
-            .limit(pageSize)
-            .lean();
+            .limit(pageSize);
     }
 
-    async findUser(id: string): Promise<WithId<User> | null> {
+    async findUserById(id: string): Promise<UserDocument | null> {
 
         return UserModel
-            .findOne({_id: new ObjectId(id)})
-            .lean();
+            .findById(id);
     }
 
-    async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<User> | null> {
+    async findByLoginOrEmail(loginOrEmail: string): Promise<UserDocument | null> {
 
         return UserModel
             .findOne({
                 $or: [{email: loginOrEmail}, {login: loginOrEmail}],
-            })
-            .lean();
+            });
     }
 
-    async findByEmail(email: string): Promise<WithId<User> | null> {
+    async findByEmail(email: string): Promise<UserDocument | null> {
 
         return UserModel
-            .findOne({email})
-            .lean();
+            .findOne({email});
     }
 
-    async findByConfirmationCode(confirmationCode: string): Promise<WithId<User> | null> {
+    async findByConfirmationCode(confirmationCode: string): Promise<UserDocument | null> {
 
         return UserModel
-            .findOne({'emailConfirmation.confirmationCode': confirmationCode})
-            .lean();
+            .findOne({'emailConfirmation.confirmationCode': confirmationCode});
     }
 
-    async findByRecoveryCode(recoveryCode: string): Promise<WithId<User> | null> {
+    async findByRecoveryCode(recoveryCode: string): Promise<UserDocument | null> {
 
         return UserModel
             .findOne({'passwordRecovery.recoveryCode': recoveryCode})
-            .lean();
+
     }
 
-    async saveUser(newUser: UserDocument): Promise<UserDocument> {
+    async saveUser(newUser: UserDocument): Promise<string> {
 
-        return await newUser
+        const result: UserDocument =  await newUser
             .save();
+
+        return String(result._id);
     }
-
-    async updateEmailConfirmation(
-        _id: ObjectId,
-        confirmationCode: string | null,
-        expirationDate: Date | null
-    ): Promise<boolean> {
-
-        const result = await UserModel
-            .updateOne({_id}, {
-                $set: {
-                    'emailConfirmation.confirmationCode': confirmationCode,
-                    'emailConfirmation.expirationDate': expirationDate,
-                }
-            })
-            .exec();
-
-        return result.matchedCount === 1;
-    }
-
-    async updateConfirmationStatus(_id: ObjectId): Promise<boolean> {
-
-        const result = await UserModel
-            .updateOne({_id}, {
-                $set: {
-                    'emailConfirmation.confirmationStatus': ConfirmationStatus.Confirmed
-                }
-            })
-            .exec();
-
-        return result.modifiedCount === 1;
-    }
-
-    async updatePasswordRecovery(
-        _id: ObjectId,
-        recoveryCode: string | null,
-        expirationDate: Date | null
-    ): Promise<boolean> {
-
-        const result = await UserModel
-            .updateOne({_id}, {
-                $set: {
-                    'passwordRecovery.recoveryCode': recoveryCode,
-                    'passwordRecovery.expirationDate': expirationDate,
-                }
-            })
-            .exec();
-
-        return result.matchedCount === 1;
-    }
-
-    async updatePassword(_id: ObjectId, newPassword: string): Promise<boolean> {
-
-        const result = await UserModel
-            .updateOne({_id}, {
-                $set: {
-                    passwordHash: newPassword
-                }
-            })
-            .exec();
-
-        return result.modifiedCount === 1;
-    }
-
 
     async deleteUser(id: string): Promise<boolean> {
 
-        const result = await UserModel
-            .deleteOne({_id: new ObjectId(id)})
+        const result: UserDocument | null = await UserModel
+            .findByIdAndDelete(id)
             .exec();
 
-        return result.deletedCount === 1;
+        return !!result;
     }
 }
 
