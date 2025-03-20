@@ -8,7 +8,7 @@ import {
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ObjectId, WithId} from "mongodb";
 import {injectable} from "inversify";
-import {Session} from "./session-entity";
+import {Session} from "../domain/session-entity";
 import {SessionDocument, SessionModel} from "../../db/mongo-db/models/session-model";
 
 @injectable()

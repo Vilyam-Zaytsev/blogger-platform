@@ -1,7 +1,7 @@
 import {Response} from "express";
 import {RequestWithBody, RequestWithSession, RequestWithUserId} from "../common/types/input-output-types/request-types";
 import {LoginInputModel} from "./types/login-input-model";
-import {AuthService} from "./domain/auth-service";
+import {AuthService} from "./application/auth-service";
 import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
@@ -16,7 +16,7 @@ import {RegistrationEmailResendingType} from "./types/registration-email-resendi
 import {UsersQueryRepository} from "../04-users/repositoryes/users-query-repository";
 import {AuthTokens} from "./types/auth-tokens-type";
 import {JwtService} from "./adapters/jwt-service";
-import {SessionsService} from "../02-sessions/domain/sessions-service";
+import {SessionsService} from "../02-sessions/application/sessions-service";
 import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
 import {SessionsRepository} from "../02-sessions/repositories/sessions-repository";
 import {ObjectId, WithId} from "mongodb";
@@ -25,6 +25,8 @@ import {NewPasswordRecoveryInputModel} from "./types/new-password-recovery-input
 import {injectable} from "inversify";
 import {Session} from "../02-sessions/domain/session-entity";
 import {isSuccessfulResult} from "../common/helpers/type-guards";
+import {SessionDto} from "../02-sessions/domain/session-dto";
+import {UserDto} from "../04-users/domain/user-dto";
 
 const jwtService: JwtService = new JwtService();
 
@@ -36,7 +38,8 @@ class AuthController {
         private sessionsService: SessionsService,
         private sessionsRepository: SessionsRepository,
         private usersQueryRepository: UsersQueryRepository
-    ) {};
+    ) {
+    };
 
     async login(
         req: RequestWithBody<LoginInputModel>,
@@ -70,6 +73,9 @@ class AuthController {
             || req.socket.remoteAddress
             || '0.0.0.0';
 
+        //TODO: как правильно протипизировать payload???
+        //1. разбить на два метода 'decodeRefreshToken' и 'decodeRefreshToken'
+        //2. написать typeGard
         const {
             userId,
             deviceId,
@@ -78,7 +84,7 @@ class AuthController {
         } = await jwtService
             .decodeToken(authTokens.refreshToken);
 
-        const sessionDto: Session = new Session(
+        const sessionDto: SessionDto = new SessionDto(
             userId,
             new ObjectId(deviceId),
             deviceName,
@@ -108,7 +114,7 @@ class AuthController {
     async logout(
         req: RequestWithSession<TokenSessionDataType>,
         res: Response
-    ){
+    ) {
 
         if (!req.session) {
 
@@ -141,7 +147,7 @@ class AuthController {
     async refreshToken(
         req: RequestWithSession<TokenSessionDataType>,
         res: Response<ApiErrorResult | LoginSuccessViewModel>
-    ){
+    ) {
 
         const dataForRefreshToken: TokenSessionDataType = {
             userId: req.session!.userId,
@@ -182,16 +188,16 @@ class AuthController {
     async registration(
         req: RequestWithBody<UserInputModel>,
         res: Response
-    ){
+    ) {
 
-        const dataForRegistrationUser: UserInputModel = {
-            login: req.body.login,
-            email: req.body.email,
-            password: req.body.password
-        };
+        const userDto: UserDto = new UserDto(
+            req.body.login,
+            req.body.email,
+            req.body.password
+        );
 
         const resultRegistration: ResultType<string | null> = await this.authService
-            .registration(dataForRegistrationUser);
+            .registration(userDto);
 
         if (resultRegistration.status !== ResultStatus.Success) {
 
@@ -209,7 +215,7 @@ class AuthController {
     async registrationConfirmation(
         req: RequestWithBody<RegistrationConfirmationCodeModel>,
         res: Response
-    ){
+    ) {
 
         const {code} = req.body
 
@@ -232,7 +238,7 @@ class AuthController {
     async registrationEmailResending(
         req: RequestWithBody<RegistrationEmailResendingType>,
         res: Response
-    ){
+    ) {
 
         const {email} = req.body;
 
@@ -255,7 +261,7 @@ class AuthController {
     async passwordRecovery(
         req: RequestWithBody<PasswordRecoveryInputModel>,
         res: Response
-    ){
+    ) {
 
         const {email} = req.body;
 
@@ -269,7 +275,7 @@ class AuthController {
     async newPassword(
         req: RequestWithBody<NewPasswordRecoveryInputModel>,
         res: Response
-    ){
+    ) {
 
         const {
             newPassword,
@@ -295,7 +301,7 @@ class AuthController {
     async me(
         req: RequestWithUserId<IdType>,
         res: Response<UserMeViewModel>
-    ){
+    ) {
 
         const userId: string = String(req.user?.id);
 

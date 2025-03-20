@@ -6,7 +6,7 @@ import {
     SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {UserInputModel, UserViewModel} from "./types/input-output-types";
-import {UsersService} from "./domain/users-service";
+import {UsersService} from "./application/users-service";
 import {SETTINGS} from "../common/settings";
 import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
 import {ResultType} from "../common/types/result-types/result-type";

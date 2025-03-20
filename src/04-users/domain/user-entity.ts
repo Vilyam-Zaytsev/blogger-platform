@@ -5,6 +5,7 @@ import {UserInputModel} from "../types/input-output-types";
 import {EmailConfirmation} from "./email-confirmation-entity";
 import {PasswordRecovery} from "./password-recovery-entity";
 import {ConfirmationStatus} from "../../db/mongo-db/models/user-model";
+import {UserDto} from "./user-dto";
 
 const bcryptService: BcryptService = new BcryptService();
 
@@ -29,13 +30,13 @@ class User {
         this.emailConfirmation = null;
     };
 
-    static async registrationUser(registrationUserDto: UserInputModel): Promise<User> {
+    static async registrationUser(userDto: UserDto): Promise<User> {
 
         const {
             login,
             email,
             password
-        } = registrationUserDto;
+        } = userDto;
 
         const passwordHash: string = await bcryptService
             .generateHash(password);
@@ -48,13 +49,11 @@ class User {
             {hours: 1, minutes: 1}
         );
 
-        const emailConfirmation: EmailConfirmation = new EmailConfirmation(
+        user.emailConfirmation = new EmailConfirmation(
             confirmationCode,
             expirationDate,
             ConfirmationStatus.NotConfirmed
         );
-
-        user.emailConfirmation = emailConfirmation;
 
         return user;
     };

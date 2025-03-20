@@ -5,7 +5,7 @@ import {ResultStatus} from "../../common/types/result-types/result-status";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {JwtService} from "../adapters/jwt-service";
 import {ObjectId, WithId} from "mongodb";
-import {UsersService} from "../../04-users/domain/users-service";
+import {UsersService} from "../../04-users/application/users-service";
 import {User} from "../../04-users/domain/user-entity";
 import {nodemailerService} from "../adapters/nodemailer-service";
 import {EmailTemplates} from "../adapters/email-templates";
@@ -27,6 +27,8 @@ import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-
 import {injectable} from "inversify";
 import {Session} from "../../02-sessions/domain/session-entity";
 import {ConfirmationStatus, UserDocument} from "../../db/mongo-db/models/user-model";
+import {UserDto} from "../../04-users/domain/user-dto";
+import {isSuccess} from "../../common/helpers/type-guards";
 
 @injectable()
 class AuthService {
@@ -119,15 +121,15 @@ class AuthService {
 
     }
 
-    async registration(registrationUserDto: UserInputModel): Promise<ResultType<string | null>> {
+    async registration(userDto: UserDto): Promise<ResultType<string | null>> {
 
         const candidate: User = await User
-            .registrationUser(registrationUserDto);
+            .registrationUser(userDto);
 
         const resultCreateUser: ResultType<string | null> = await this.usersService
             .createUser(candidate);
 
-        if (resultCreateUser.status !== ResultStatus.Success) {
+        if (!isSuccess(resultCreateUser)) {
 
             return resultCreateUser;
         }

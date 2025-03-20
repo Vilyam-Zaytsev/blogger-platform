@@ -1,7 +1,7 @@
 import {Request, Response, NextFunction} from "express";
 import {SETTINGS} from "../../../common/settings";
 import {ResultType} from "../../../common/types/result-types/result-type";
-import {AuthService} from "../../domain/auth-service";
+import {AuthService} from "../../application/auth-service";
 import {ResultStatus} from "../../../common/types/result-types/result-status";
 import {container} from "../../../composition-root";
 

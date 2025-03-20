@@ -1,4 +1,5 @@
 import {ObjectId} from "mongodb";
+import {SessionDto} from "./session-dto";
 
 class Session {
     userId: string;
@@ -8,7 +9,7 @@ class Session {
     iat: Date;
     exp: Date;
 
-    constructor(
+    private constructor(
         userId: string,
         deviceId: ObjectId,
         deviceName: string,
@@ -23,6 +24,11 @@ class Session {
         this.iat = iat;
         this.exp = exp;
     };
+
+    static createSession(sessionDto: SessionDto) {
+
+        return Object.assign(new this(), sessionDto);
+    }
 }
 
 export {Session};

@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {SETTINGS} from "../../../common/settings";
 import {ResultType} from "../../../common/types/result-types/result-type";
-import {AuthService} from "../../domain/auth-service";
+import {AuthService} from "../../application/auth-service";
 import {ResultStatus} from "../../../common/types/result-types/result-status";
 import {PayloadRefreshTokenType} from "../../types/payload.refresh.token.type";
 import {ObjectId} from "mongodb";

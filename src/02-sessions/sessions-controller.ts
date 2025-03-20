@@ -5,7 +5,7 @@ import {SETTINGS} from "../common/settings";
 import {DeviceViewModel} from "./types/input-output-types";
 import {SessionsQueryRepository} from "./repositories/sessions-query-repository";
 import {ResultType} from "../common/types/result-types/result-type";
-import {SessionsService} from "./domain/sessions-service";
+import {SessionsService} from "./application/sessions-service";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
