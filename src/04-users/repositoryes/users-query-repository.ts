@@ -1,5 +1,4 @@
-import {ObjectId, Sort, WithId} from "mongodb";
-import {usersCollection} from "../../db/mongo-db/mongoDb";
+import {ObjectId, WithId} from "mongodb";
 import {
     MatchMode,
     PaginationAndSortFilterType,
@@ -9,6 +8,8 @@ import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
 import {UserMeViewModel, UserViewModel} from "../types/input-output-types";
 import {User} from "../domain/user-entity";
 import {injectable} from "inversify";
+import {UserModel} from "../../db/mongo-db/models/user-model";
+import {SortOptionsType} from "../types/sort-options-type";
 
 @injectable()
 class UsersQueryRepository {
@@ -32,20 +33,21 @@ class UsersQueryRepository {
             MatchMode.Partial
         );
 
-        const users: WithId<User>[] = await usersCollection
+        const users: WithId<User>[] = await UserModel
             .find(filter)
-            .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as Sort)
+            .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as SortOptionsType)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray();
+            .exec();
 
         return users.map(u => this._mapDbUserToViewModel(u));
     }
 
     async findUser(id: string): Promise<UserViewModel | null> {
 
-        const user: WithId<User> | null = await usersCollection
-            .findOne({_id: new ObjectId(id)});
+        const user: WithId<User> | null = await UserModel
+            .findOne({_id: new ObjectId(id)})
+            .exec();
 
         if (!user) return null;
 
@@ -54,8 +56,9 @@ class UsersQueryRepository {
 
     async findUserAndMapToMeViewModel(id: string): Promise<UserMeViewModel | null> {
 
-        const user: WithId<User> | null = await usersCollection
-            .findOne({_id: new ObjectId(id)});
+        const user: WithId<User> | null = await UserModel
+            .findOne({_id: new ObjectId(id)})
+            .exec();
 
         if (!user) return null;
 
@@ -75,7 +78,7 @@ class UsersQueryRepository {
             MatchMode.Partial
         );
 
-        return usersCollection
+        return UserModel
             .countDocuments(filter);
     }
 

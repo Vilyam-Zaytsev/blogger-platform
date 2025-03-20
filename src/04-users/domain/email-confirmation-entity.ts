@@ -1,12 +1,10 @@
-import {ConfirmationStatus} from "../../db/mongo-db/models/email-confirmation-model";
-import {ObjectId} from "mongodb";
+import {ConfirmationStatus} from "../../db/mongo-db/models/user-model";
 
 class EmailConfirmation {
 
     constructor(
-        public userId: ObjectId,
-        public confirmationCode: string,
-        public expirationDate: Date,
+        public confirmationCode: string | null,
+        public expirationDate: Date | null,
         public confirmationStatus: ConfirmationStatus
     ) {}
 }

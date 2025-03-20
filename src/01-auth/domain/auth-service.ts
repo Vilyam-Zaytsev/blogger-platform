@@ -1,6 +1,5 @@
 import {BcryptService} from "../adapters/bcrypt-service";
 import {LoginInputModel} from "../types/login-input-model";
-import {ConfirmationStatus} from "../../04-users/types/confirmation-status";
 import {UsersRepository} from "../../04-users/repositoryes/users-repository";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {ResultType} from "../../common/types/result-types/result-type";
@@ -27,6 +26,7 @@ import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-t
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
 import {injectable} from "inversify";
 import {Session} from "../../02-sessions/domain/session-entity";
+import {ConfirmationStatus} from "../../db/mongo-db/models/user-model";
 
 @injectable()
 class AuthService {
@@ -127,13 +127,16 @@ class AuthService {
         const resultCreateUser: ResultType<string | null> = await this.usersService
             .createUser(candidate);
 
-        if (resultCreateUser.status !== ResultStatus.Success) return resultCreateUser;
+        if (resultCreateUser.status !== ResultStatus.Success) {
+
+            return resultCreateUser;
+        }
 
         nodemailerService
             .sendEmail(
                 candidate.email,
                 this.emailTemplates
-                    .registrationEmail(candidate.emailConfirmation.confirmationCode!)
+                    .registrationEmail(candidate.emailConfirmation!.confirmationCode!)
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 
@@ -157,7 +160,11 @@ class AuthService {
                 );
         }
 
-        if (user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()) {
+        if (
+            user.emailConfirmation
+            && user.emailConfirmation.expirationDate
+            && user.emailConfirmation.expirationDate < new Date()
+        ) {
 
             return BadRequestResult
                 .create(
@@ -196,7 +203,10 @@ class AuthService {
                 );
         }
 
-        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) {
+        if (
+            user.emailConfirmation
+            && user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed
+        ) {
 
             return BadRequestResult
                 .create(
@@ -401,7 +411,11 @@ class AuthService {
                 );
         }
 
-        if (user.passwordRecovery.expirationDate && user.passwordRecovery.expirationDate < new Date()) {
+        if (
+            user.passwordRecovery
+            && user.passwordRecovery.expirationDate
+            && user.passwordRecovery.expirationDate < new Date()
+        ) {
 
             return BadRequestResult
                 .create(

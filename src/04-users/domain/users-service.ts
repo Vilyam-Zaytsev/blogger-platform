@@ -2,26 +2,43 @@ import {UsersRepository} from "../repositoryes/users-repository";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {WithId} from "mongodb";
-import {BadRequestResult, SuccessResult} from "../../common/helpers/result-object";
+import {BadRequestResult, InternalServerErrorResult, SuccessResult} from "../../common/helpers/result-object";
 import {User} from "./user-entity";
 import {injectable} from "inversify";
+import {UserDocument, UserModel} from "../../db/mongo-db/models/user-model";
 
 @injectable()
 class UsersService {
 
-    constructor(private usersRepository: UsersRepository) {};
+    constructor(private usersRepository: UsersRepository) {
+    };
 
-    async createUser(user: User): Promise<ResultType<string | null>> {
+    async createUser(candidate: User): Promise<ResultType<string | null>> {
 
-        const resultCandidateValidation: ResultType = await this.validateCandidateUniqueness(user.login, user.email);
+        const resultCandidateValidation: ResultType = await this.validateCandidateUniqueness(
+            candidate.login,
+            candidate.email
+        );
 
         if (resultCandidateValidation.status !== ResultStatus.Success) return resultCandidateValidation;
 
-        const result = await this.usersRepository
-            .insertUser(user);
+        const user: UserDocument = new UserModel(candidate);
+
+        const resultSaveUser: UserDocument = await this.usersRepository
+                .saveUser(user);
+
+        if (!resultSaveUser) {
+
+            return InternalServerErrorResult
+                .create(
+                    'not field',
+                    'Couldn\'t save the user.',
+                    'Failed to create a user.'
+                )
+        }
 
         return SuccessResult
-            .create<string>(String(result.insertedId));
+            .create<string>(String(resultSaveUser._id));
     }
 
     async deleteUser(id: string): Promise<boolean> {

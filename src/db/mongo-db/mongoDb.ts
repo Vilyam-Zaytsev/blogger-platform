@@ -10,7 +10,7 @@ let blogsCollection: Collection<BlogDbType>;
 
 let postsCollection: Collection<PostDbType>;
 
-let usersCollection: Collection<User>;
+// let usersCollection: Collection<User>;
 
 let commentsCollection: Collection<CommentDbType>;
 
@@ -26,9 +26,9 @@ const setPostsCollection = (collection: Collection<PostDbType>) => {
     postsCollection = collection;
 };
 
-const setUsersCollection = (collection: Collection<User>) => {
-    usersCollection = collection;
-};
+// const setUsersCollection = (collection: Collection<User>) => {
+//     usersCollection = collection;
+// };
 
 const setCommentsCollection = (collection: Collection<CommentDbType>) => {
     commentsCollection = collection;
@@ -48,7 +48,7 @@ async function runDb(url: string) {
 
     blogsCollection = db.collection<BlogDbType>('blogs');
     postsCollection = db.collection<PostDbType>('posts');
-    usersCollection = db.collection<User>('users');
+    // usersCollection = db.collection<User>('users');
     commentsCollection = db.collection<CommentDbType>('comments');
     // sessionsCollection = db.collection<Session>('sessions');
     // apiTrafficCollection = db.collection<ApiTrafficType>('ApiTraffic');
@@ -74,13 +74,13 @@ async function runDb(url: string) {
 export {
     setBlogsCollection,
     setPostsCollection,
-    setUsersCollection,
+    // setUsersCollection,
     setCommentsCollection,
     // setSessionsCollection,
     // setApiTrafficCollection,
     blogsCollection,
     postsCollection,
-    usersCollection,
+    // usersCollection,
     commentsCollection,
     // sessionsCollection,
     // apiTrafficCollection,

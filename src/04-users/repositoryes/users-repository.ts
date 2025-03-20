@@ -1,6 +1,4 @@
-import {ConfirmationStatus} from "../types/confirmation-status";
-import {InsertOneResult, ObjectId, Sort, WithId} from "mongodb";
-import {usersCollection} from "../../db/mongo-db/mongoDb";
+import {ObjectId, WithId} from "mongodb";
 import {
     MatchMode,
     PaginationAndSortFilterType,
@@ -8,6 +6,8 @@ import {
 import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
 import {User} from "../domain/user-entity";
 import {injectable} from "inversify";
+import {ConfirmationStatus, UserDocument, UserModel} from "../../db/mongo-db/models/user-model";
+import {SortOptionsType} from "../types/sort-options-type";
 
 @injectable()
 class UsersRepository {
@@ -31,50 +31,55 @@ class UsersRepository {
             MatchMode.Partial
         );
 
-        return await usersCollection
+        return UserModel
             .find(filter)
-            .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as Sort)
+            .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as SortOptionsType)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray();
+            .lean();
     }
 
     async findUser(id: string): Promise<WithId<User> | null> {
 
-        return usersCollection
-            .findOne({_id: new ObjectId(id)});
+        return UserModel
+            .findOne({_id: new ObjectId(id)})
+            .lean();
     }
 
     async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<User> | null> {
 
-        return usersCollection
+        return UserModel
             .findOne({
                 $or: [{email: loginOrEmail}, {login: loginOrEmail}],
-            });
+            })
+            .lean();
     }
 
     async findByEmail(email: string): Promise<WithId<User> | null> {
 
-        return usersCollection
-            .findOne({email});
+        return UserModel
+            .findOne({email})
+            .lean();
     }
 
     async findByConfirmationCode(confirmationCode: string): Promise<WithId<User> | null> {
 
-        return usersCollection
-            .findOne({'emailConfirmation.confirmationCode': confirmationCode});
+        return UserModel
+            .findOne({'emailConfirmation.confirmationCode': confirmationCode})
+            .lean();
     }
 
     async findByRecoveryCode(recoveryCode: string): Promise<WithId<User> | null> {
 
-        return usersCollection
-            .findOne({'passwordRecovery.recoveryCode': recoveryCode});
+        return UserModel
+            .findOne({'passwordRecovery.recoveryCode': recoveryCode})
+            .lean();
     }
 
-    async insertUser(newUser: User): Promise<InsertOneResult> {
+    async saveUser(newUser: UserDocument): Promise<UserDocument> {
 
-        return await usersCollection
-            .insertOne(newUser);
+        return await newUser
+            .save();
     }
 
     async updateEmailConfirmation(
@@ -83,25 +88,27 @@ class UsersRepository {
         expirationDate: Date | null
     ): Promise<boolean> {
 
-        const result = await usersCollection
+        const result = await UserModel
             .updateOne({_id}, {
                 $set: {
                     'emailConfirmation.confirmationCode': confirmationCode,
                     'emailConfirmation.expirationDate': expirationDate,
                 }
-            });
+            })
+            .exec();
 
         return result.matchedCount === 1;
     }
 
     async updateConfirmationStatus(_id: ObjectId): Promise<boolean> {
 
-        const result = await usersCollection
+        const result = await UserModel
             .updateOne({_id}, {
                 $set: {
                     'emailConfirmation.confirmationStatus': ConfirmationStatus.Confirmed
                 }
-            });
+            })
+            .exec();
 
         return result.modifiedCount === 1;
     }
@@ -112,25 +119,27 @@ class UsersRepository {
         expirationDate: Date | null
     ): Promise<boolean> {
 
-        const result = await usersCollection
+        const result = await UserModel
             .updateOne({_id}, {
                 $set: {
                     'passwordRecovery.recoveryCode': recoveryCode,
                     'passwordRecovery.expirationDate': expirationDate,
                 }
-            });
+            })
+            .exec();
 
         return result.matchedCount === 1;
     }
 
     async updatePassword(_id: ObjectId, newPassword: string): Promise<boolean> {
 
-        const result = await usersCollection
+        const result = await UserModel
             .updateOne({_id}, {
                 $set: {
                     passwordHash: newPassword
                 }
-            });
+            })
+            .exec();
 
         return result.modifiedCount === 1;
     }
@@ -138,8 +147,9 @@ class UsersRepository {
 
     async deleteUser(id: string): Promise<boolean> {
 
-        const result = await usersCollection
-            .deleteOne({_id: new ObjectId(id)});
+        const result = await UserModel
+            .deleteOne({_id: new ObjectId(id)})
+            .exec();
 
         return result.deletedCount === 1;
     }

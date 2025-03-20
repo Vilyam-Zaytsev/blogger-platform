@@ -3,7 +3,8 @@ import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
 import {UserInputModel} from "../types/input-output-types";
 import {EmailConfirmation} from "./email-confirmation-entity";
-import {ObjectId} from "mongodb";
+import {PasswordRecovery} from "./password-recovery-entity";
+import {ConfirmationStatus} from "../../db/mongo-db/models/user-model";
 
 const bcryptService: BcryptService = new BcryptService();
 
@@ -12,8 +13,8 @@ class User {
     email: string;
     passwordHash: string;
     createdAt: string;
-    passwordRecoveryId: ObjectId | null;
-    emailConfirmationId: ObjectId | null;
+    passwordRecovery: PasswordRecovery | null;
+    emailConfirmation: EmailConfirmation | null;
 
     private constructor(
         login: string,
@@ -24,8 +25,8 @@ class User {
         this.email = email;
         this.passwordHash = passwordHash;
         this.createdAt = new Date().toISOString();
-        this.passwordRecoveryId = null;
-        this.emailConfirmationId = null;
+        this.passwordRecovery = null;
+        this.emailConfirmation = null;
     };
 
     static async registrationUser(registrationUserDto: UserInputModel): Promise<User> {
@@ -39,7 +40,7 @@ class User {
         const passwordHash: string = await bcryptService
             .generateHash(password);
 
-        const user: User = new User(login, email, passwordHash);
+        const user: User = new this(login, email, passwordHash);
 
         const confirmationCode: string = randomUUID();
         const expirationDate: Date = add(
@@ -48,8 +49,12 @@ class User {
         );
 
         const emailConfirmation: EmailConfirmation = new EmailConfirmation(
+            confirmationCode,
+            expirationDate,
+            ConfirmationStatus.NotConfirmed
+        );
 
-        )
+        user.emailConfirmation = emailConfirmation;
 
         return user;
     };
@@ -63,7 +68,17 @@ class User {
         const passwordHash: string = await bcryptService
             .generateHash(password);
 
-        return new User(login, email, passwordHash, ConfirmationStatus.Confirmed);
+        const user: User = new this(login, email, passwordHash);
+
+        const emailConfirmation: EmailConfirmation = new EmailConfirmation(
+            null,
+            null,
+            ConfirmationStatus.Confirmed
+        );
+
+        user.emailConfirmation = emailConfirmation;
+
+        return user;
     }
 }
 
