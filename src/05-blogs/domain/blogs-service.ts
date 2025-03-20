@@ -5,8 +5,14 @@ import {ResultType} from "../../common/types/result-types/result-type";
 import {ObjectId} from "mongodb";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {PostsService} from "../../06-posts/domain/posts-service";
-import {BadRequestResult, NotFoundResult, SuccessResult} from "../../common/helpers/result-object";
+import {
+    BadRequestResult,
+    InternalServerErrorResult,
+    NotFoundResult,
+    SuccessResult
+} from "../../common/helpers/result-object";
 import {injectable} from "inversify";
+import {BlogDocument, BlogModel} from "../../db/mongo-db/models/blog-model";
 
 @injectable()
 class BlogsService {
@@ -24,10 +30,12 @@ class BlogsService {
             isMembership: false,
         };
 
-        const resultInsertBlog =  await this.blogsRepository
-            .insertBlog(newBlog);
+        const blogDocument: BlogDocument = new BlogModel(newBlog);
 
-        return String(resultInsertBlog.insertedId);
+        const resultSaveBlog =  await this.blogsRepository
+            .saveBlog(blogDocument);
+
+        return String(resultSaveBlog._id);
     }
 
     async createPost(

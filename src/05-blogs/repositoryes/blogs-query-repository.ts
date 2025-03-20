@@ -1,5 +1,4 @@
 import {BlogDbType} from "../types/blog-db-type";
-import {blogsCollection} from "../../db/mongo-db/mongoDb";
 import {ObjectId, Sort, WithId} from "mongodb";
 import {
     MatchMode,
@@ -8,8 +7,9 @@ import {
 } from "../../common/types/input-output-types/pagination-sort-types";
 import {createBlogsSearchFilter} from "../helpers/create-blogs-search-filter";
 import {BlogViewModel} from "../types/input-output-types";
-import {CommentViewModel} from "../../07-comments/types/input-output-types";
 import {injectable} from "inversify";
+import {BlogModel} from "../../db/mongo-db/models/blog-model";
+import {SortOptionsType} from "../../04-users/types/sort-options-type";
 
 @injectable()
 class BlogsQueryRepository {
@@ -29,20 +29,21 @@ class BlogsQueryRepository {
             MatchMode.Partial
         );
 
-        const blogs: WithId<BlogDbType>[] = await blogsCollection
+        const blogs: WithId<BlogDbType>[] = await BlogModel
             .find(filter)
-            .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as Sort)
+            .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as SortOptionsType)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray();
+            .exec();
 
         return blogs.map(b => this._mapDbBlogToViewModel(b));
     }
 
     async findBlog(id: string): Promise<BlogViewModel | null> {
 
-        const blog: WithId<BlogDbType> | null = await blogsCollection
-            .findOne({_id: new ObjectId(id)});
+        const blog: WithId<BlogDbType> | null = await BlogModel
+            .findOne({_id: new ObjectId(id)})
+            .exec();
 
         if (!blog) return null;
 
@@ -56,7 +57,7 @@ class BlogsQueryRepository {
             MatchMode.Partial
         );
 
-        return blogsCollection
+        return BlogModel
             .countDocuments(filter);
     }
 

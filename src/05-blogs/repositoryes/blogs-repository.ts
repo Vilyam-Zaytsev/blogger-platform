@@ -1,35 +1,38 @@
 import {BlogInputModel} from "../types/input-output-types";
 import {BlogDbType} from "../types/blog-db-type";
-import {blogsCollection} from "../../db/mongo-db/mongoDb";
 import {InsertOneResult, ObjectId} from "mongodb";
 import {injectable} from "inversify";
+import {BlogDocument, BlogModel} from "../../db/mongo-db/models/blog-model";
 
 @injectable()
 class BlogsRepository {
 
     async findBlog(id: string): Promise<BlogDbType | null> {
-      return await blogsCollection
-          .findOne({_id: new ObjectId(id)});
+      return BlogModel
+          .findOne({_id: new ObjectId(id)})
+          .lean();
     }
 
-    async insertBlog(newBlog: BlogDbType): Promise<InsertOneResult> {
+    async saveBlog(blogDocument: BlogDocument): Promise<BlogDocument> {
 
-        return await blogsCollection
-            .insertOne(newBlog);
+        return await blogDocument
+            .save();
     }
 
     async updateBlog(id: string, data: BlogInputModel): Promise<boolean> {
 
-        const result = await blogsCollection
-            .updateOne({_id: new ObjectId(id)}, {$set: {...data}});
+        const result = await BlogModel
+            .updateOne({_id: new ObjectId(id)}, {$set: {...data}})
+            .exec();
 
         return result.matchedCount === 1;
     }
 
     async deleteBlog(id: string): Promise<boolean> {
 
-        const result = await blogsCollection
-            .deleteOne({_id: new ObjectId(id)});
+        const result = await BlogModel
+            .deleteOne({_id: new ObjectId(id)})
+            .exec();
 
         return result.deletedCount === 1;
     }
