@@ -24,6 +24,7 @@ import {PasswordRecoveryInputModel} from "./types/password-recovery-input-model"
 import {NewPasswordRecoveryInputModel} from "./types/new-password-recovery-input-model";
 import {injectable} from "inversify";
 import {Session} from "../02-sessions/domain/session-entity";
+import {isSuccessfulResult} from "../common/helpers/type-guards";
 
 const jwtService: JwtService = new JwtService();
 
@@ -54,7 +55,7 @@ class AuthController {
         }: ResultType<AuthTokens | null> = await this.authService
             .login(authParams);
 
-        if (loginResultStatus !== ResultStatus.Success) {
+        if (!isSuccessfulResult(loginResultStatus, authTokens)) {
 
             res
                 .status(mapResultStatusToHttpStatus(loginResultStatus))
@@ -69,15 +70,13 @@ class AuthController {
             || req.socket.remoteAddress
             || '0.0.0.0';
 
-        const payload = await jwtService
-            .decodeToken(authTokens!.refreshToken);
-
         const {
             userId,
             deviceId,
             iat,
             exp
-        } = payload;
+        } = await jwtService
+            .decodeToken(authTokens.refreshToken);
 
         const sessionDto: Session = new Session(
             userId,
@@ -94,7 +93,7 @@ class AuthController {
         const {
             accessToken,
             refreshToken
-        } = authTokens!;
+        } = authTokens;
 
         res
             .status(mapResultStatusToHttpStatus(loginResultStatus))
