@@ -423,36 +423,6 @@ class AuthService {
         user.passwordRecovery = null
         await this.usersRepository.saveUser(user)
 
-        // const resultUpdatePassword: boolean = await this.usersRepository
-        //     .updatePassword(user._id, passwordHash);
-
-        // if (!resultUpdatePassword) {
-
-        //     return InternalServerErrorResult
-        //         .create(
-        //             'no field',
-        //             'Server Error.',
-        //             'The password could not be updated.'
-        //         );
-        // }
-
-        // const resultUpdatePasswordRecovery: boolean = await this.usersRepository
-        //     .updatePasswordRecovery(
-        //         user._id,
-        //         null,
-        //         null
-        //     )
-
-        // if (!resultUpdatePasswordRecovery) {
-        //
-        //     return InternalServerErrorResult
-        //         .create(
-        //             'no field',
-        //             'Server Error.',
-        //             'The password could not be updated.'
-        //         );
-        // }
-
         return SuccessResult
             .create(null);
     }
