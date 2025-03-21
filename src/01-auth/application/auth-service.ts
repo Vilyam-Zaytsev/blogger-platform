@@ -27,7 +27,7 @@ import {injectable} from "inversify";
 import {SessionDocument} from "../../02-sessions/domain/session-entity";
 import {ConfirmationStatus, UserDocument} from "../../archive/models/user-model";
 import {UserDto} from "../../04-users/domain/user-dto";
-import {isSuccess} from "../../common/helpers/type-guards";
+import {isSuccess, isSuccessfulResult} from "../../common/helpers/type-guards";
 
 @injectable()
 class AuthService {
@@ -45,11 +45,11 @@ class AuthService {
     async login(authParamsDto: LoginInputModel): Promise<ResultType<AuthTokens | null>> {
 
         const {
-            data: checkedUserId,
-            status: userVerificationStatus
+            status: userVerificationStatus,
+            data: checkedUserId
         }: ResultType<string | null> = await this.checkUserCredentials(authParamsDto);
 
-        if (userVerificationStatus !== ResultStatus.Success) {
+        if (!isSuccessfulResult(userVerificationStatus, checkedUserId)) {
 
             return UnauthorizedResult
                 .create(
@@ -60,13 +60,13 @@ class AuthService {
         }
 
         const accessToken: string = await this.jwtService
-            .createAccessToken(checkedUserId!);
+            .createAccessToken(checkedUserId);
 
         const deviceId: ObjectId = new ObjectId();
 
         const refreshToken: string = await this.jwtService
             .createRefreshToken(
-                checkedUserId!,
+                checkedUserId,
                 deviceId
             );
 
