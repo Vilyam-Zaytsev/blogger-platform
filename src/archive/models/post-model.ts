@@ -1,5 +1,5 @@
 import mongoose, {HydratedDocument, Model, Schema} from "mongoose";
-import {PostDbType} from "../../../06-posts/types/post-db-type";
+import {PostDbType} from "../../06-posts/types/post-db-type";
 
 type PostModel = Model<PostDbType>;
 type PostDocument = HydratedDocument<PostDbType>;

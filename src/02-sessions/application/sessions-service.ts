@@ -8,33 +8,23 @@ import {
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ObjectId, WithId} from "mongodb";
 import {injectable} from "inversify";
-import {Session} from "../domain/session-entity";
-import {SessionDocument, SessionModel} from "../../db/mongo-db/models/session-model";
+import {SessionDto} from "../domain/session-dto";
+import {SessionDocument, SessionModel} from "../domain/session-entity";
 
 @injectable()
 class SessionsService {
 
     constructor(private sessionsRepository: SessionsRepository) {}
 
-    async createSession(sessionDto: Session): Promise<ResultType<string | null>> {
+    async createSession(dto: SessionDto): Promise<ResultType<string | null>> {
 
-        const newSession: SessionDocument = new SessionModel(sessionDto);
+        const newSession: SessionDocument = SessionModel.createSession(dto);
 
-        const resultSaveSession: SessionDocument = await this.sessionsRepository
+        const resultSaveSession: string = await this.sessionsRepository
             .saveSession(newSession);
 
-        if (!resultSaveSession) {
-
-            return InternalServerErrorResult
-                .create(
-                    'not field',
-                    'Couldn\'t save the session.',
-                    'Failed to create a session.'
-                )
-        }
-
         return SuccessResult
-            .create<string>(String(resultSaveSession._id));
+            .create<string>(resultSaveSession);
     }
 
 

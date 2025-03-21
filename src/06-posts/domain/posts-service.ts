@@ -4,7 +4,7 @@ import {WithId} from "mongodb";
 import {PostsRepository} from "../repositoryes/posts-repository";
 import {BlogsRepository} from "../../05-blogs/repositoryes/blogs-repository";
 import {injectable} from "inversify";
-import {PostDocument, PostModel} from "../../db/mongo-db/models/post-model";
+import {PostDocument, PostModel} from "../../archive/models/post-model";
 
 @injectable()
 class PostsService {

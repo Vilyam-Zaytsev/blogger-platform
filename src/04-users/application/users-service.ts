@@ -5,7 +5,7 @@ import {WithId} from "mongodb";
 import {BadRequestResult, InternalServerErrorResult, SuccessResult} from "../../common/helpers/result-object";
 import {User} from "../domain/user-entity";
 import {injectable} from "inversify";
-import {UserDocument, UserModel} from "../../db/mongo-db/models/user-model";
+import {UserDocument, UserModel} from "../../archive/models/user-model";
 
 @injectable()
 class UsersService {

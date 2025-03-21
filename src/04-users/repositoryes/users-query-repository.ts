@@ -8,7 +8,7 @@ import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
 import {UserMeViewModel, UserViewModel} from "../types/input-output-types";
 import {User} from "../domain/user-entity";
 import {injectable} from "inversify";
-import {UserModel} from "../../db/mongo-db/models/user-model";
+import {UserModel} from "../../archive/models/user-model";
 import {SortOptionsType} from "../types/sort-options-type";
 
 @injectable()

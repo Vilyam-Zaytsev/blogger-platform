@@ -2,7 +2,7 @@ import {CommentDbType} from "../types/comment-db-type";
 import {InsertOneResult, ObjectId, WithId} from "mongodb";
 import {CommentInputModel} from "../types/input-output-types";
 import {injectable} from "inversify";
-import {CommentDocument, CommentModel} from "../../db/mongo-db/models/comment-model";
+import {CommentDocument, CommentModel} from "../../archive/models/comment-model";
 
 @injectable()
 class CommentRepository {

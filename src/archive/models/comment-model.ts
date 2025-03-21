@@ -1,5 +1,5 @@
 import mongoose, {HydratedDocument, Model, Schema} from "mongoose";
-import {CommentDbType} from "../../../07-comments/types/comment-db-type";
+import {CommentDbType} from "../../07-comments/types/comment-db-type";
 
 type CommentatorInfo = {
     userId: string,

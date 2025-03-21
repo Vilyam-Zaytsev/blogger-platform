@@ -1,7 +1,7 @@
 import {ObjectId, UpdateResult} from "mongodb";
 import {SessionTimestampsType} from "../types/session-timestamps-type";
 import {injectable} from "inversify";
-import {SessionDocument, SessionModel} from "../../db/mongo-db/models/session-model";
+import {SessionDocument, SessionModel} from "../../archive/models/session-model";
 
 @injectable()
 class SessionsRepository {
@@ -12,10 +12,12 @@ class SessionsRepository {
             .findOne({deviceId});
     }
 
-    async saveSession(newSession: SessionDocument): Promise<SessionDocument> {
+    async saveSession(newSession: SessionDocument): Promise<string> {
 
-        return await newSession
+        const result = await newSession
             .save();
+
+        return String(result._id);
     }
 
     async updateSessionTimestamps(_id: ObjectId, data: SessionTimestampsType): Promise<boolean> {

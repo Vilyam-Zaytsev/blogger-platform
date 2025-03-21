@@ -2,7 +2,7 @@ import {PostDbType} from "../types/post-db-type";
 import {PostInputModel} from "../types/input-output-types";
 import {InsertOneResult, ObjectId, WithId} from "mongodb";
 import {injectable} from "inversify";
-import {PostDocument, PostModel} from "../../db/mongo-db/models/post-model";
+import {PostDocument, PostModel} from "../../archive/models/post-model";
 
 @injectable()
 class PostsRepository {

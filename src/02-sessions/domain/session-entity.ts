@@ -1,34 +1,68 @@
 import {ObjectId} from "mongodb";
+import {HydratedDocument, model, Model, Schema} from "mongoose";
 import {SessionDto} from "./session-dto";
 
-class Session {
+type Session = {
     userId: string;
     deviceId: ObjectId;
     deviceName: string;
     ip: string;
     iat: Date;
     exp: Date;
+};
 
-    private constructor(
-        userId: string,
-        deviceId: ObjectId,
-        deviceName: string,
-        ip: string,
-        iat: Date,
-        exp: Date
-    ) {
-        this.userId = userId;
-        this.deviceId = deviceId;
-        this.deviceName = deviceName;
-        this.ip = ip;
-        this.iat = iat;
-        this.exp = exp;
-    };
+type SessionMethods = typeof sessionMethods;
+type SessionStatics = typeof sessionStatics;
 
-    static createSession(sessionDto: SessionDto) {
+type SessionModel = Model<Session, {}, SessionMethods> & SessionStatics;
+type SessionDocument = HydratedDocument<Session, SessionStatics>;
 
-        return Object.assign(new this(), sessionDto);
+const sessionSchema = new Schema<Session, SessionModel, SessionMethods>({
+
+    userId: {
+        type: String,
+        required: true
+    },
+    deviceId: {
+        type: Schema.Types.ObjectId,
+        required: true
+    },
+    deviceName: {
+        type: String,
+        required: true
+    },
+    ip: {
+        type: String,
+        required: true
+    },
+    iat: {
+        type: Date,
+        required: true
+    },
+    exp: {
+        type: Date,
+        required: true
+    },
+});
+
+const sessionMethods = {
+
+};
+
+const sessionStatics = {
+
+    createSession(dto: SessionDto): SessionDocument {
+
+        return new SessionModel(dto) as SessionDocument;
     }
-}
+};
 
-export {Session};
+sessionSchema.methods = sessionMethods;
+sessionSchema.statics = sessionStatics;
+
+const SessionModel: SessionModel = model<Session, SessionModel>('Session', sessionSchema);
+
+export {
+    SessionModel,
+    SessionDocument
+};

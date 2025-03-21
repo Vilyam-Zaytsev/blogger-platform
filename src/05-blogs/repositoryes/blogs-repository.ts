@@ -2,7 +2,7 @@ import {BlogInputModel} from "../types/input-output-types";
 import {BlogDbType} from "../types/blog-db-type";
 import {InsertOneResult, ObjectId} from "mongodb";
 import {injectable} from "inversify";
-import {BlogDocument, BlogModel} from "../../db/mongo-db/models/blog-model";
+import {BlogDocument, BlogModel} from "../../archive/models/blog-model";
 
 @injectable()
 class BlogsRepository {

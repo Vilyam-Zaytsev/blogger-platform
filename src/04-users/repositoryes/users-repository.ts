@@ -6,7 +6,7 @@ import {
 import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
 import {User} from "../domain/user-entity";
 import {injectable} from "inversify";
-import {ConfirmationStatus, UserDocument, UserModel} from "../../db/mongo-db/models/user-model";
+import {ConfirmationStatus, UserDocument, UserModel} from "../../archive/models/user-model";
 import {SortOptionsType} from "../types/sort-options-type";
 
 @injectable()

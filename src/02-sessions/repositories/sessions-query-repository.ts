@@ -2,7 +2,7 @@ import {WithId} from "mongodb";
 import {DeviceViewModel} from "../types/input-output-types";
 import {injectable} from "inversify";
 import {Session} from "../domain/session-entity";
-import {SessionDocument, SessionModel} from "../../db/mongo-db/models/session-model";
+import {SessionDocument, SessionModel} from "../../archive/models/session-model";
 
 @injectable()
 class SessionsQueryRepository {

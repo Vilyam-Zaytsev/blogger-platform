@@ -1,4 +1,4 @@
-import {ConfirmationStatus} from "../../db/mongo-db/models/user-model";
+import {ConfirmationStatus} from "../../archive/models/user-model";
 
 class EmailConfirmation {
 

@@ -8,7 +8,7 @@ import {
 import {createBlogsSearchFilter} from "../helpers/create-blogs-search-filter";
 import {BlogViewModel} from "../types/input-output-types";
 import {injectable} from "inversify";
-import {BlogModel} from "../../db/mongo-db/models/blog-model";
+import {BlogModel} from "../../archive/models/blog-model";
 import {SortOptionsType} from "../../04-users/types/sort-options-type";
 
 @injectable()

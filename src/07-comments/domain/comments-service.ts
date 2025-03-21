@@ -15,7 +15,7 @@ import {
 } from "../../common/helpers/result-object";
 import {User} from "../../04-users/domain/user-entity";
 import {injectable} from "inversify";
-import {CommentDocument, CommentModel} from "../../db/mongo-db/models/comment-model";
+import {CommentDocument, CommentModel} from "../../archive/models/comment-model";
 
 @injectable()
 class CommentsService {

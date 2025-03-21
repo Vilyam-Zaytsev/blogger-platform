@@ -1,4 +1,4 @@
-import {BlogDbType} from "../../../05-blogs/types/blog-db-type";
+import {BlogDbType} from "../../05-blogs/types/blog-db-type";
 import mongoose, {HydratedDocument, Model, Schema} from "mongoose";
 
 type BlogModel = Model<BlogDbType>;

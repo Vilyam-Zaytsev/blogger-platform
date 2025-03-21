@@ -12,7 +12,7 @@ import {
     SuccessResult
 } from "../../common/helpers/result-object";
 import {injectable} from "inversify";
-import {BlogDocument, BlogModel} from "../../db/mongo-db/models/blog-model";
+import {BlogDocument, BlogModel} from "../../archive/models/blog-model";
 
 @injectable()
 class BlogsService {

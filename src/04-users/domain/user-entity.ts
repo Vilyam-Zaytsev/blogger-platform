@@ -4,7 +4,7 @@ import {add} from "date-fns";
 import {UserInputModel} from "../types/input-output-types";
 import {EmailConfirmation} from "./email-confirmation-entity";
 import {PasswordRecovery} from "./password-recovery-entity";
-import {ConfirmationStatus} from "../../db/mongo-db/models/user-model";
+import {ConfirmationStatus} from "../../archive/models/user-model";
 import {UserDto} from "./user-dto";
 
 const bcryptService: BcryptService = new BcryptService();

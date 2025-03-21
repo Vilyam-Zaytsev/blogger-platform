@@ -1,4 +1,4 @@
-import {CommentatorInfo} from "../../db/mongo-db/models/comment-model";
+import {CommentatorInfo} from "../../archive/models/comment-model";
 
 type CommentDbType = {
     postId: string,

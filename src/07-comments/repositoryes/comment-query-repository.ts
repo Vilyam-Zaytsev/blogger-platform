@@ -6,7 +6,7 @@ import {
     Paginator,
     SortDirection
 } from "../../common/types/input-output-types/pagination-sort-types";
-import {CommentModel} from "../../db/mongo-db/models/comment-model";
+import {CommentModel} from "../../archive/models/comment-model";
 import {SortOptionsType} from "../../04-users/types/sort-options-type";
 
 class CommentQueryRepository {

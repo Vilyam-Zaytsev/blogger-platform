@@ -26,7 +26,7 @@ import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-t
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
 import {injectable} from "inversify";
 import {Session} from "../../02-sessions/domain/session-entity";
-import {ConfirmationStatus, UserDocument} from "../../db/mongo-db/models/user-model";
+import {ConfirmationStatus, UserDocument} from "../../archive/models/user-model";
 import {UserDto} from "../../04-users/domain/user-dto";
 import {isSuccess} from "../../common/helpers/type-guards";
 

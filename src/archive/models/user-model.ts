@@ -1,7 +1,7 @@
-import {User} from "../../../04-users/domain/user-entity";
+import {User} from "../../04-users/domain/user-entity";
 import mongoose, {HydratedDocument, Model, Schema} from "mongoose";
-import {PasswordRecovery} from "../../../04-users/domain/password-recovery-entity";
-import {EmailConfirmation} from "../../../04-users/domain/email-confirmation-entity";
+import {PasswordRecovery} from "../../04-users/domain/password-recovery-entity";
+import {EmailConfirmation} from "../../04-users/domain/email-confirmation-entity";
 
 enum ConfirmationStatus {
     Confirmed = 'Confirmed',

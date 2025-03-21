@@ -1,5 +1,5 @@
 import mongoose, {HydratedDocument, Model, Schema} from "mongoose";
-import {Session} from "../../../02-sessions/domain/session-entity";
+import {Session} from "../../02-sessions/domain/session-entity";
 
 type SessionModel = Model<Session>;
 type SessionDocument = HydratedDocument<Session>;
