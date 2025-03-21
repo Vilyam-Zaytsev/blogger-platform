@@ -23,10 +23,10 @@ import {ObjectId, WithId} from "mongodb";
 import {PasswordRecoveryInputModel} from "./types/password-recovery-input-model";
 import {NewPasswordRecoveryInputModel} from "./types/new-password-recovery-input-model";
 import {injectable} from "inversify";
-import {Session} from "../02-sessions/domain/session-entity";
 import {isSuccessfulResult} from "../common/helpers/type-guards";
 import {SessionDto} from "../02-sessions/domain/session-dto";
 import {UserDto} from "../04-users/domain/user-dto";
+import {SessionDocument} from "../02-sessions/domain/session-entity";
 
 const jwtService: JwtService = new JwtService();
 
@@ -126,7 +126,7 @@ class AuthController {
             deviceId
         } = req.session!;
 
-        const session: WithId<Session> | null = await this.sessionsRepository
+        const session: SessionDocument | null = await this.sessionsRepository
             .findSessionByDeviceId(deviceId);
 
         if (!session) {
@@ -161,7 +161,7 @@ class AuthController {
         }: ResultType<AuthTokens | null> = await this.authService
             .refreshToken(dataForRefreshToken);
 
-        if (refreshTokenResultStatus !== ResultStatus.Success) {
+        if (!isSuccessfulResult(refreshTokenResultStatus, authTokens)) {
 
             res
                 .status(mapResultStatusToHttpStatus(refreshTokenResultStatus))
@@ -173,7 +173,7 @@ class AuthController {
         const {
             accessToken,
             refreshToken
-        } = authTokens!;
+        } = authTokens;
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)

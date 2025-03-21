@@ -11,7 +11,6 @@ import {nodemailerService} from "../adapters/nodemailer-service";
 import {EmailTemplates} from "../adapters/email-templates";
 import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
-import {UserInputModel} from "../../04-users/types/input-output-types";
 import {
     BadRequestResult,
     InternalServerErrorResult,
@@ -25,7 +24,7 @@ import {SessionsRepository} from "../../02-sessions/repositories/sessions-reposi
 import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-type";
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
 import {injectable} from "inversify";
-import {Session} from "../../02-sessions/domain/session-entity";
+import {SessionDocument} from "../../02-sessions/domain/session-entity";
 import {ConfirmationStatus, UserDocument} from "../../archive/models/user-model";
 import {UserDto} from "../../04-users/domain/user-dto";
 import {isSuccess} from "../../common/helpers/type-guards";
@@ -90,10 +89,11 @@ class AuthService {
             this.jwtService.createRefreshToken(userId, deviceId)
         ]);
 
+        //TODO: как правильно написать типизацию???
         const [
             payloadRefreshToken,
             session
-        ] = await Promise.all([
+        ]: [PayloadRefreshTokenType, SessionDocument] = await Promise.all([
             this.jwtService.decodeToken(refreshToken),
             this.sessionsRepository.findSessionByDeviceId(deviceId)
         ]);
@@ -103,18 +103,10 @@ class AuthService {
             exp: new Date(payloadRefreshToken.exp * 1000)
         };
 
-        const resultUpdateSessionTimestamps: boolean = await this.sessionsRepository
-            .updateSessionTimestamps(session!._id, timestamps);
+        session.updateTimestamps(timestamps);
 
-        if (!resultUpdateSessionTimestamps) {
-
-            return InternalServerErrorResult
-                .create(
-                    'iat, exp',
-                    'Failed to update session timestamps.',
-                    'Failed to refresh the token pair.'
-                );
-        }
+        await this.sessionsRepository
+            .saveSession(session);
 
         return SuccessResult
             .create<AuthTokens>({accessToken, refreshToken});
@@ -342,7 +334,7 @@ class AuthService {
                 );
         }
 
-        const isSessionActive: WithId<Session> | null = await this.sessionsRepository
+        const isSessionActive: SessionDocument | null = await this.sessionsRepository
             .findSessionByDeviceId(new ObjectId(deviceId));
 
         if (!isSessionActive) {

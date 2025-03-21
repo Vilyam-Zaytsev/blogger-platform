@@ -6,7 +6,7 @@ import {
     SuccessResult
 } from "../../common/helpers/result-object";
 import {ResultType} from "../../common/types/result-types/result-type";
-import {ObjectId, WithId} from "mongodb";
+import {ObjectId} from "mongodb";
 import {injectable} from "inversify";
 import {SessionDto} from "../domain/session-dto";
 import {SessionDocument, SessionModel} from "../domain/session-entity";
@@ -36,7 +36,7 @@ class SessionsService {
 
     async deleteSessionByDeviceId(userId: string, deviceId: ObjectId): Promise<ResultType> {
 
-        const activeSession: WithId<Session> | null = await this.sessionsRepository
+        const activeSession: SessionDocument | null = await this.sessionsRepository
             .findSessionByDeviceId(deviceId)
 
         if (!activeSession) {

@@ -1,7 +1,6 @@
-import {ObjectId, UpdateResult} from "mongodb";
-import {SessionTimestampsType} from "../types/session-timestamps-type";
+import {ObjectId} from "mongodb";
 import {injectable} from "inversify";
-import {SessionDocument, SessionModel} from "../../archive/models/session-model";
+import {SessionDocument, SessionModel} from "../domain/session-entity";
 
 @injectable()
 class SessionsRepository {
@@ -20,24 +19,10 @@ class SessionsRepository {
         return String(result._id);
     }
 
-    async updateSessionTimestamps(_id: ObjectId, data: SessionTimestampsType): Promise<boolean> {
-
-        const result = await SessionModel
-            .updateOne({_id}, {
-                $set: {
-                    'iat': data.iat,
-                    'exp': data.exp
-                }
-            })
-            .exec();
-
-        return result.matchedCount === 1;
-    }
-
     async deleteSession(id: string): Promise<boolean> {
 
         const result = await SessionModel
-            .deleteOne({_id: new ObjectId(id)})
+            .deleteOne(id)
             .exec();
 
         return result.deletedCount === 1;

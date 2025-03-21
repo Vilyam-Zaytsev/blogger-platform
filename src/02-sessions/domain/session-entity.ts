@@ -1,6 +1,7 @@
 import {ObjectId} from "mongodb";
-import {HydratedDocument, model, Model, Schema} from "mongoose";
+import mongoose, {HydratedDocument, Model, Schema} from "mongoose";
 import {SessionDto} from "./session-dto";
+import {SessionTimestampsType} from "../types/session-timestamps-type";
 
 type Session = {
     userId: string;
@@ -15,7 +16,7 @@ type SessionMethods = typeof sessionMethods;
 type SessionStatics = typeof sessionStatics;
 
 type SessionModel = Model<Session, {}, SessionMethods> & SessionStatics;
-type SessionDocument = HydratedDocument<Session, SessionStatics>;
+type SessionDocument = HydratedDocument<Session, SessionMethods>;
 
 const sessionSchema = new Schema<Session, SessionModel, SessionMethods>({
 
@@ -47,9 +48,20 @@ const sessionSchema = new Schema<Session, SessionModel, SessionMethods>({
 
 const sessionMethods = {
 
+    updateTimestamps(timestamps: SessionTimestampsType) {
+
+        const {
+            iat,
+            exp
+        } = timestamps;
+
+        (this as SessionDocument).iat = iat;
+        (this as SessionDocument).exp = exp;
+    }
+
 };
 
-const sessionStatics = {
+const sessionStatics: any = {
 
     createSession(dto: SessionDto): SessionDocument {
 
@@ -60,7 +72,7 @@ const sessionStatics = {
 sessionSchema.methods = sessionMethods;
 sessionSchema.statics = sessionStatics;
 
-const SessionModel: SessionModel = model<Session, SessionModel>('Session', sessionSchema);
+const SessionModel: SessionModel = mongoose.model<Session, SessionModel>('Session', sessionSchema);
 
 export {
     SessionModel,
