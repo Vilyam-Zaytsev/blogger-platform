@@ -1,11 +1,9 @@
 import {UsersRepository} from "../repositoryes/users-repository";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ResultStatus} from "../../common/types/result-types/result-status";
-import {WithId} from "mongodb";
-import {BadRequestResult, InternalServerErrorResult, SuccessResult} from "../../common/helpers/result-object";
-import {User} from "../domain/user-entity";
+import {BadRequestResult, SuccessResult} from "../../common/helpers/result-object";
 import {injectable} from "inversify";
-import {UserDocument, UserModel} from "../../archive/models/user-model";
+import {UserDocument, UserModel} from "../domain/user-entity";
 
 @injectable()
 class UsersService {
@@ -13,7 +11,7 @@ class UsersService {
     constructor(private usersRepository: UsersRepository) {
     };
 
-    async createUser(candidate: User): Promise<ResultType<string | null>> {
+    async createUser(candidate: UserDocument): Promise<ResultType<string | null>> {
 
         const resultCandidateValidation: ResultType = await this.validateCandidateUniqueness(
             candidate.login,
@@ -25,10 +23,8 @@ class UsersService {
             return resultCandidateValidation;
         }
 
-        const user: UserDocument = new UserModel(candidate);
-
         const resultSaveUser: string = await this.usersRepository
-                .saveUser(user);
+                .saveUser(candidate);
 
         return SuccessResult
             .create<string>(resultSaveUser);
@@ -42,7 +38,7 @@ class UsersService {
 
     async validateCandidateUniqueness(login: string, email: string): Promise<ResultType> {
 
-        const findByLogin: WithId<User> | null = await this.usersRepository
+        const findByLogin: UserDocument | null = await this.usersRepository
             .findByLoginOrEmail(login);
 
         if (findByLogin) {
@@ -55,7 +51,7 @@ class UsersService {
                 );
         }
 
-        const findByEmail: WithId<User> | null = await this.usersRepository
+        const findByEmail: UserDocument | null = await this.usersRepository
             .findByLoginOrEmail(email);
 
         if (findByEmail) {

@@ -1,6 +1,6 @@
-import {ConfirmationStatus} from "../../archive/models/user-model";
+import {ConfirmationStatus} from "./user-entity";
 
-class EmailConfirmation {
+class EmailConfirmationDto {
 
     constructor(
         public confirmationCode: string | null,
@@ -9,4 +9,4 @@ class EmailConfirmation {
     ) {}
 }
 
-export {EmailConfirmation};
+export {EmailConfirmationDto};

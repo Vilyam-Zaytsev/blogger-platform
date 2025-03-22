@@ -13,9 +13,9 @@ import {
     NotFoundResult,
     SuccessResult
 } from "../../common/helpers/result-object";
-import {User} from "../../04-users/domain/user-entity";
 import {injectable} from "inversify";
 import {CommentDocument, CommentModel} from "../../archive/models/comment-model";
+import {UserDocument} from "../../04-users/domain/user-entity";
 
 @injectable()
 class CommentsService {
@@ -28,7 +28,7 @@ class CommentsService {
 
     async createComment(data: CommentInputModel, postId: string, commentatorId: string): Promise<ResultType<string | null>> {
 
-        const resultCheckPostId: ResultType<string | null> = await this._checkPostId(postId);
+        const resultCheckPostId: ResultType = await this._checkPostId(postId);
 
         if (resultCheckPostId.status !== ResultStatus.Success) {
 
@@ -40,7 +40,9 @@ class CommentsService {
                 );
         }
 
-        const commentator: WithId<User> | null = await this.usersRepository
+        //TODO: нужно ли делать явную проверку что нашелся комментатор???
+        //или ! нормально?
+        const commentator: UserDocument | null = await this.usersRepository
             .findUserById(commentatorId);
 
         const newComment: CommentDbType = {
@@ -91,7 +93,7 @@ class CommentsService {
             .create(null);
     }
 
-    async _checkPostId(postId: string): Promise<ResultType<string | null>> {
+    async _checkPostId(postId: string): Promise<ResultType> {
 
         if (!ObjectId.isValid(postId)) {
 
@@ -117,7 +119,7 @@ class CommentsService {
         }
 
         return SuccessResult
-            .create<string>(String(isExistPost._id));
+            .create(null);
     }
 
     async _checkingExistenceCommentAndOwner(commentId: string, userId: string): Promise<ResultType> {

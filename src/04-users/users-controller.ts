@@ -14,10 +14,12 @@ import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-t
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
 import {ApiErrorResult} from "../common/types/input-output-types/api-error-result";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {User} from "./domain/user-entity";
 import {UsersQueryRepository} from "./repositoryes/users-query-repository";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {injectable} from "inversify";
+import {UserDocument, UserModel} from "./domain/user-entity";
+import {UserDto} from "./domain/user-dto";
+import {isSuccessfulResult} from "../common/helpers/type-guards";
 
 @injectable()
 class UsersController {
@@ -76,22 +78,28 @@ class UsersController {
             password
         } = req.body;
 
-        const candidate: User = await User
-            .createByAdmin(login, email, password);
+        const userDto: UserDto = new UserDto(login, email, password);
 
-        const result: ResultType<string | null> = await this.usersService
+        const candidate: UserDocument = UserModel
+            .createByAdmin(userDto);
+
+        const {
+            status: userCreationStatus,
+            extensions: errorDetails,
+            data: createdUserId
+        }: ResultType<string | null> = await this.usersService
             .createUser(candidate);
 
-        if (result.status !== ResultStatus.Success) {
+        if (!isSuccessfulResult(userCreationStatus, createdUserId)) {
             res
-                .status(mapResultStatusToHttpStatus(result.status))
-                .json(mapResultExtensionsToErrorMessage(result.extensions));
+                .status(mapResultStatusToHttpStatus(userCreationStatus))
+                .json(mapResultExtensionsToErrorMessage(errorDetails));
 
             return;
         }
 
         const createdUser: UserViewModel | null = await this.usersQueryRepository
-            .findUser(result.data!);
+            .findUser(createdUserId);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)

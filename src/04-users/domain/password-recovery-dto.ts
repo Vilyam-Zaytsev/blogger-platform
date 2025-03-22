@@ -1,6 +1,6 @@
 import {ObjectId} from "mongodb";
 
-class PasswordRecovery {
+class PasswordRecoveryDto {
 
     constructor(
         public recoveryCode: string,
@@ -8,4 +8,4 @@ class PasswordRecovery {
     ) {}
 }
 
-export {PasswordRecovery};
+export {PasswordRecoveryDto};

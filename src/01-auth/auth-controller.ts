@@ -19,7 +19,7 @@ import {JwtService} from "./adapters/jwt-service";
 import {SessionsService} from "../02-sessions/application/sessions-service";
 import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
 import {SessionsRepository} from "../02-sessions/repositories/sessions-repository";
-import {ObjectId, WithId} from "mongodb";
+import {ObjectId} from "mongodb";
 import {PasswordRecoveryInputModel} from "./types/password-recovery-input-model";
 import {NewPasswordRecoveryInputModel} from "./types/new-password-recovery-input-model";
 import {injectable} from "inversify";

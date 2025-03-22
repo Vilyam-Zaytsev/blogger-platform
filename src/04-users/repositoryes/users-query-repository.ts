@@ -6,10 +6,9 @@ import {
 } from "../../common/types/input-output-types/pagination-sort-types";
 import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
 import {UserMeViewModel, UserViewModel} from "../types/input-output-types";
-import {User} from "../domain/user-entity";
 import {injectable} from "inversify";
-import {UserModel} from "../../archive/models/user-model";
 import {SortOptionsType} from "../types/sort-options-type";
+import {User, UserModel} from "../domain/user-entity";
 
 @injectable()
 class UsersQueryRepository {

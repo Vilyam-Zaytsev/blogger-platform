@@ -1,23 +1,16 @@
 import {BcryptService} from "../adapters/bcrypt-service";
 import {LoginInputModel} from "../types/login-input-model";
 import {UsersRepository} from "../../04-users/repositoryes/users-repository";
-import {ResultStatus} from "../../common/types/result-types/result-status";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {JwtService} from "../adapters/jwt-service";
 import {ObjectId, WithId} from "mongodb";
 import {UsersService} from "../../04-users/application/users-service";
-import {User} from "../../04-users/domain/user-entity";
+import {ConfirmationStatus, UserDocument, UserModel} from "../../04-users/domain/user-entity";
 import {nodemailerService} from "../adapters/nodemailer-service";
 import {EmailTemplates} from "../adapters/email-templates";
 import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
-import {
-    BadRequestResult,
-    InternalServerErrorResult,
-    NotFoundResult,
-    SuccessResult,
-    UnauthorizedResult
-} from "../../common/helpers/result-object";
+import {BadRequestResult, NotFoundResult, SuccessResult, UnauthorizedResult} from "../../common/helpers/result-object";
 import {AuthTokens} from "../types/auth-tokens-type";
 import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
 import {SessionsRepository} from "../../02-sessions/repositories/sessions-repository";
@@ -25,7 +18,6 @@ import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-t
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
 import {injectable} from "inversify";
 import {SessionDocument} from "../../02-sessions/domain/session-entity";
-import {ConfirmationStatus, UserDocument} from "../../archive/models/user-model";
 import {UserDto} from "../../04-users/domain/user-dto";
 import {isSuccess, isSuccessfulResult} from "../../common/helpers/type-guards";
 
@@ -93,20 +85,20 @@ class AuthService {
         const [
             payloadRefreshToken,
             session
-        ]: [PayloadRefreshTokenType, SessionDocument] = await Promise.all([
+        ] = await Promise.all([
             this.jwtService.decodeToken(refreshToken),
             this.sessionsRepository.findSessionByDeviceId(deviceId)
         ]);
 
         const timestamps: SessionTimestampsType = {
-            iat: new Date(payloadRefreshToken.iat * 1000),
-            exp: new Date(payloadRefreshToken.exp * 1000)
+            iat: new Date(payloadRefreshToken!.iat * 1000),
+            exp: new Date(payloadRefreshToken!.exp * 1000)
         };
 
-        session.updateTimestamps(timestamps);
+        session!.updateTimestamps(timestamps);
 
         await this.sessionsRepository
-            .saveSession(session);
+            .saveSession(session!);
 
         return SuccessResult
             .create<AuthTokens>({accessToken, refreshToken});
@@ -115,8 +107,8 @@ class AuthService {
 
     async registration(userDto: UserDto): Promise<ResultType<string | null>> {
 
-        const candidate: User = await User
-            .registrationUser(userDto);
+        const candidate: UserDocument = UserModel
+            .userCreationDuringRegistration(userDto);
 
         const resultCreateUser: ResultType<string | null> = await this.usersService
             .createUser(candidate);
@@ -237,7 +229,7 @@ class AuthService {
             password
         } = authParamsDto;
 
-        const user: WithId<User> | null = await this.usersRepository
+        const user: UserDocument | null = await this.usersRepository
             .findByLoginOrEmail(loginOrEmail);
 
         if (!user) {
@@ -284,7 +276,7 @@ class AuthService {
 
         const {userId} = payload;
 
-        const isUser: User | null = await this.usersRepository
+        const isUser: UserDocument | null = await this.usersRepository
             .findUserById(userId);
 
         if (!isUser) {
@@ -321,7 +313,7 @@ class AuthService {
             deviceId,
         } = payload;
 
-        const isUser: User | null = await this.usersRepository
+        const isUser: UserDocument | null = await this.usersRepository
             .findUserById(userId);
 
         if (!isUser) {

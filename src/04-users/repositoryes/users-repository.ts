@@ -1,13 +1,11 @@
-import {ObjectId, WithId} from "mongodb";
 import {
     MatchMode,
     PaginationAndSortFilterType,
 } from "../../common/types/input-output-types/pagination-sort-types";
 import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
-import {User} from "../domain/user-entity";
 import {injectable} from "inversify";
-import {ConfirmationStatus, UserDocument, UserModel} from "../../archive/models/user-model";
 import {SortOptionsType} from "../types/sort-options-type";
+import {UserDocument, UserModel} from "../domain/user-entity";
 
 @injectable()
 class UsersRepository {
