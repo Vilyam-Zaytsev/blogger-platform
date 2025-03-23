@@ -4,6 +4,7 @@ import {ResultStatus} from "../../common/types/result-types/result-status";
 import {BadRequestResult, SuccessResult} from "../../common/helpers/result-object";
 import {injectable} from "inversify";
 import {UserDocument, UserModel} from "../domain/user-entity";
+import {isSuccess} from "../../common/helpers/type-guards";
 
 @injectable()
 class UsersService {
@@ -18,7 +19,7 @@ class UsersService {
             candidate.email
         );
 
-        if (resultCandidateValidation.status !== ResultStatus.Success) {
+        if (!isSuccess(resultCandidateValidation)) {
 
             return resultCandidateValidation;
         }

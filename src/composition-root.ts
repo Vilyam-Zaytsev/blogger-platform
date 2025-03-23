@@ -24,6 +24,7 @@ import {CommentsController} from "./07-comments/comments-controller";
 import {CommentsService} from "./07-comments/domain/comments-service";
 import {CommentRepository} from "./07-comments/repositoryes/comment-repository";
 import {CommentQueryRepository} from "./07-comments/repositoryes/comment-query-repository";
+import {NodemailerService} from "./01-auth/adapters/nodemailer-service";
 
 const container: Container = new Container();
 
@@ -58,6 +59,7 @@ container.bind(CommentQueryRepository).to(CommentQueryRepository);
 
 container.bind(BcryptService).to(BcryptService);
 container.bind(JwtService).to(JwtService);
+container.bind(NodemailerService).to(NodemailerService);
 container.bind(EmailTemplates).to(EmailTemplates);
 
 

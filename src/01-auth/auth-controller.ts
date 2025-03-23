@@ -23,7 +23,7 @@ import {ObjectId} from "mongodb";
 import {PasswordRecoveryInputModel} from "./types/password-recovery-input-model";
 import {NewPasswordRecoveryInputModel} from "./types/new-password-recovery-input-model";
 import {injectable} from "inversify";
-import {isSuccessfulResult} from "../common/helpers/type-guards";
+import {isSuccess, isSuccessfulResult} from "../common/helpers/type-guards";
 import {SessionDto} from "../02-sessions/domain/session-dto";
 import {UserDto} from "../04-users/domain/user-dto";
 import {SessionDocument} from "../02-sessions/domain/session-entity";
@@ -199,7 +199,7 @@ class AuthController {
         const resultRegistration: ResultType<string | null> = await this.authService
             .registration(userDto);
 
-        if (resultRegistration.status !== ResultStatus.Success) {
+        if (!isSuccess(resultRegistration)) {
 
             res
                 .status(mapResultStatusToHttpStatus(resultRegistration.status))
@@ -265,7 +265,7 @@ class AuthController {
 
         const {email} = req.body;
 
-        const resultPasswordRecovery: ResultType = await this.authService
+        await this.authService
             .passwordRecovery(email);
 
         res
@@ -320,7 +320,4 @@ class AuthController {
     }
 }
 
-// const authController: AuthController = new AuthController();
-
 export {AuthController};
-// export {authController};

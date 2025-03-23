@@ -5,8 +5,8 @@ import {ResultType} from "../../common/types/result-types/result-type";
 import {JwtService} from "../adapters/jwt-service";
 import {ObjectId, WithId} from "mongodb";
 import {UsersService} from "../../04-users/application/users-service";
-import {ConfirmationStatus, UserDocument, UserModel} from "../../04-users/domain/user-entity";
-import {nodemailerService} from "../adapters/nodemailer-service";
+import {ConfirmationStatus, PasswordRecovery, UserDocument, UserModel} from "../../04-users/domain/user-entity";
+import {NodemailerService} from "../adapters/nodemailer-service";
 import {EmailTemplates} from "../adapters/email-templates";
 import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
@@ -30,7 +30,8 @@ class AuthService {
         private emailTemplates: EmailTemplates,
         private sessionsRepository: SessionsRepository,
         private usersService: UsersService,
-        private usersRepository: UsersRepository
+        private usersRepository: UsersRepository,
+        private nodemailerService: NodemailerService
     ) {
     };
 
@@ -118,7 +119,7 @@ class AuthService {
             return resultCreateUser;
         }
 
-        nodemailerService
+        this.nodemailerService
             .sendEmail(
                 candidate.email,
                 this.emailTemplates
@@ -160,9 +161,9 @@ class AuthService {
                 );
         }
 
-        userDocument.emailConfirmation!.confirmationStatus = ConfirmationStatus.Confirmed;
-        userDocument.emailConfirmation!.confirmationCode = null;
-        userDocument.emailConfirmation!.expirationDate = null;
+        userDocument.emailConfirmation.confirmationStatus = ConfirmationStatus.Confirmed;
+        userDocument.emailConfirmation.confirmationCode = null;
+        userDocument.emailConfirmation.expirationDate = null;
 
         await this.usersRepository
             .saveUser(userDocument);
@@ -205,13 +206,13 @@ class AuthService {
             {hours: 1, minutes: 1}
         );
 
-        userDocument.emailConfirmation!.confirmationCode = confirmationCode;
-        userDocument.emailConfirmation!.expirationDate = expirationDate;
+        userDocument.emailConfirmation.confirmationCode = confirmationCode;
+        userDocument.emailConfirmation.expirationDate = expirationDate;
 
         await this.usersRepository
             .saveUser(userDocument);
 
-        nodemailerService
+        this.nodemailerService
             .sendEmail(
                 userDocument.email,
                 this.emailTemplates
@@ -354,23 +355,24 @@ class AuthService {
                 .create(null);
         }
 
-        const recoveryCode: string = randomUUID();
-        const expirationDate: Date = add(
-            new Date(),
-            {hours: 1, minutes: 1}
-        )
+        const passwordRecovery: PasswordRecovery = {
+            recoveryCode: randomUUID(),
+            expirationDate: add(
+                new Date(),
+                {hours: 1, minutes: 1}
+            )
+        }
 
-        userDocument.passwordRecovery!.recoveryCode = recoveryCode;
-        userDocument.passwordRecovery!.expirationDate = expirationDate;
+        userDocument.passwordRecovery = passwordRecovery;
 
         await this.usersRepository
             .saveUser(userDocument);
 
-        nodemailerService
+        this.nodemailerService
             .sendEmail(
                 userDocument.email,
                 this.emailTemplates
-                    .passwordRecoveryEmail(recoveryCode)
+                    .passwordRecoveryEmail(passwordRecovery.recoveryCode)
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 
@@ -380,11 +382,11 @@ class AuthService {
 
     async newPassword(newPassword: string, recoveryCode: string): Promise<ResultType> {
 
-        const user: WithId<UserDocument> | null = await this.usersRepository
+        const userDocument: UserDocument | null = await this.usersRepository
             .findByRecoveryCode(recoveryCode);
 
 
-        if (!user) {
+        if (!userDocument) {
 
             return BadRequestResult
                 .create(
@@ -395,9 +397,9 @@ class AuthService {
         }
 
         if (
-            user.passwordRecovery
-            && user.passwordRecovery.expirationDate
-            && user.passwordRecovery.expirationDate < new Date()
+            userDocument.passwordRecovery
+            && userDocument.passwordRecovery.expirationDate
+            && userDocument.passwordRecovery.expirationDate < new Date()
         ) {
 
             return BadRequestResult
@@ -408,12 +410,13 @@ class AuthService {
                 );
         }
 
-        const passwordHash: string = await this.bcryptService
+        userDocument.passwordHash = await this.bcryptService
             .generateHash(newPassword);
 
-        user.passwordHash = passwordHash
-        user.passwordRecovery = null
-        await this.usersRepository.saveUser(user)
+        userDocument.passwordRecovery = null;
+
+        await this.usersRepository
+            .saveUser(userDocument);
 
         return SuccessResult
             .create(null);
