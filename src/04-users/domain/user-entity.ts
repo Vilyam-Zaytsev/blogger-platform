@@ -94,7 +94,21 @@ const userSchema = new Schema<User, UserModel, UserMethods>({
     }
 });
 
-const userMethods = {};
+const userMethods = {
+
+    confirmRegistration() {
+
+        (this as UserDocument).emailConfirmation.confirmationStatus = ConfirmationStatus.Confirmed;
+        (this as UserDocument).emailConfirmation.expirationDate = null;
+        (this as UserDocument).emailConfirmation.confirmationCode = null;
+    },
+
+    refreshConfirmationCode(confirmationCode: string, expirationDate: Date) {
+
+        (this as UserDocument).emailConfirmation.confirmationCode = confirmationCode;
+        (this as UserDocument).emailConfirmation.expirationDate = expirationDate;
+    }
+};
 
 const userStatics: any = {
 

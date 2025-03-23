@@ -1,10 +1,5 @@
 import {SessionsRepository} from "../repositories/sessions-repository";
-import {
-    ForbiddenResult,
-    InternalServerErrorResult,
-    NotFoundResult,
-    SuccessResult
-} from "../../common/helpers/result-object";
+import {InternalServerErrorResult, NotFoundResult, SuccessResult} from "../../common/helpers/result-object";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ObjectId} from "mongodb";
 import {injectable} from "inversify";
@@ -34,7 +29,7 @@ class SessionsService {
             .deleteSession(id);
     }
 
-    async deleteSessionByDeviceId(userId: string, deviceId: ObjectId): Promise<ResultType> {
+    async deleteSessionByDeviceId(deviceId: ObjectId): Promise<ResultType> {
 
         const activeSession: SessionDocument | null = await this.sessionsRepository
             .findSessionByDeviceId(deviceId)
@@ -45,16 +40,6 @@ class SessionsService {
                 .create(
                     'deviceId',
                     'No active session found with this deviceId.',
-                    'Failed to delete the session.'
-                );
-        }
-
-        if (activeSession.userId !== userId) {
-
-            return ForbiddenResult
-                .create(
-                    'userId',
-                    'The user does not have permission to delete this session.',
                     'Failed to delete the session.'
                 );
         }

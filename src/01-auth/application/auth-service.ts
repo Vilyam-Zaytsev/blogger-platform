@@ -3,7 +3,7 @@ import {LoginInputModel} from "../types/login-input-model";
 import {UsersRepository} from "../../04-users/repositoryes/users-repository";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {JwtService} from "../adapters/jwt-service";
-import {ObjectId, WithId} from "mongodb";
+import {ObjectId} from "mongodb";
 import {UsersService} from "../../04-users/application/users-service";
 import {ConfirmationStatus, PasswordRecovery, UserDocument, UserModel} from "../../04-users/domain/user-entity";
 import {NodemailerService} from "../adapters/nodemailer-service";
@@ -123,7 +123,7 @@ class AuthService {
             .sendEmail(
                 candidate.email,
                 this.emailTemplates
-                    .registrationEmail(candidate.emailConfirmation!.confirmationCode!)
+                    .registrationEmail(candidate.emailConfirmation.confirmationCode!)
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 
@@ -161,9 +161,8 @@ class AuthService {
                 );
         }
 
-        userDocument.emailConfirmation.confirmationStatus = ConfirmationStatus.Confirmed;
-        userDocument.emailConfirmation.confirmationCode = null;
-        userDocument.emailConfirmation.expirationDate = null;
+        userDocument
+            .confirmRegistration();
 
         await this.usersRepository
             .saveUser(userDocument);
@@ -206,8 +205,8 @@ class AuthService {
             {hours: 1, minutes: 1}
         );
 
-        userDocument.emailConfirmation.confirmationCode = confirmationCode;
-        userDocument.emailConfirmation.expirationDate = expirationDate;
+        userDocument
+            .refreshConfirmationCode(confirmationCode, expirationDate);
 
         await this.usersRepository
             .saveUser(userDocument);

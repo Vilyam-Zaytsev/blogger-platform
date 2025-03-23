@@ -74,12 +74,11 @@ class SessionsController {
     ){
 
         const deviceId: ObjectId = new ObjectId(req.params.id);
-        const userId: string = req.session!.userId
 
         const {
             status: sessionDeletionStatus
         }: ResultType = await this.sessionsService
-            .deleteSessionByDeviceId(userId, deviceId);
+            .deleteSessionByDeviceId(deviceId);
 
         if (sessionDeletionStatus !== ResultStatus.Success) {
 

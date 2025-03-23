@@ -15,7 +15,6 @@ import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-ex
 import {ApiErrorResult} from "../common/types/input-output-types/api-error-result";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {UsersQueryRepository} from "./repositoryes/users-query-repository";
-import {ResultStatus} from "../common/types/result-types/result-status";
 import {injectable} from "inversify";
 import {UserDocument, UserModel} from "./domain/user-entity";
 import {UserDto} from "./domain/user-dto";

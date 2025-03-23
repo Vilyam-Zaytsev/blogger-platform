@@ -1,9 +1,8 @@
 import {UsersRepository} from "../repositoryes/users-repository";
 import {ResultType} from "../../common/types/result-types/result-type";
-import {ResultStatus} from "../../common/types/result-types/result-status";
 import {BadRequestResult, SuccessResult} from "../../common/helpers/result-object";
 import {injectable} from "inversify";
-import {UserDocument, UserModel} from "../domain/user-entity";
+import {UserDocument} from "../domain/user-entity";
 import {isSuccess} from "../../common/helpers/type-guards";
 
 @injectable()
