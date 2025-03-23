@@ -1,7 +1,6 @@
 import {ObjectId, WithId} from "mongodb";
 import {
     MatchMode,
-    PaginationAndSortFilterType,
     Paginator
 } from "../../common/types/input-output-types/pagination-sort-types";
 import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
@@ -9,11 +8,12 @@ import {UserMeViewModel, UserViewModel} from "../types/input-output-types";
 import {injectable} from "inversify";
 import {SortOptionsType} from "../types/sort-options-type";
 import {User, UserModel} from "../domain/user-entity";
+import {SortQueryDto} from "../../common/helpers/sort-query-dto";
 
 @injectable()
 class UsersQueryRepository {
 
-    async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<UserViewModel[]> {
+    async findUsers(sortQueryDto: SortQueryDto): Promise<UserViewModel[]> {
 
         const {
             pageNumber,
@@ -103,13 +103,13 @@ class UsersQueryRepository {
     _mapUsersViewModelToPaginationResponse(
         users: UserViewModel[],
         usersCount: number,
-        paginationAndSortFilter: PaginationAndSortFilterType
+        sortQueryDto: SortQueryDto
     ): Paginator<UserViewModel> {
 
         return {
-            pagesCount: Math.ceil(usersCount / paginationAndSortFilter.pageSize),
-            page: paginationAndSortFilter.pageNumber,
-            pageSize: paginationAndSortFilter.pageSize,
+            pagesCount: Math.ceil(usersCount / sortQueryDto.pageSize),
+            page: sortQueryDto.pageNumber,
+            pageSize: sortQueryDto.pageSize,
             totalCount: usersCount,
             items: users
         };

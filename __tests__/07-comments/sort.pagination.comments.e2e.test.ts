@@ -29,7 +29,7 @@ import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/07-comments/types/input-output-types";
 import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
-import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
+import {createPaginationAndSortFilter} from "../../src/common/helpers/sort-query-dto";
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 import {User} from "../../src/04-users/domain/user-entity";

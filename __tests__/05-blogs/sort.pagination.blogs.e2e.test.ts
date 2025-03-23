@@ -11,7 +11,7 @@ import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
 import {blogsCollection, setBlogsCollection} from "../../src/db/mongo-db/mongoDb";
 import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
-import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
+import {createPaginationAndSortFilter} from "../../src/common/helpers/sort-query-dto";
 import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
 
 let mongoServer: MongoMemoryServer;

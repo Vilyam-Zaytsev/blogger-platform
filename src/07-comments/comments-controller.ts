@@ -12,13 +12,9 @@ import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {SETTINGS} from "../common/settings";
 import {CommentQueryRepository} from "./repositoryes/comment-query-repository";
-import {
-    PaginationAndSortFilterType,
-    Paginator,
-    SortingAndPaginationParamsType
-} from "../common/types/input-output-types/pagination-sort-types";
-import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
+import {Paginator,} from "../common/types/input-output-types/pagination-sort-types";
 import {injectable} from "inversify";
+import {SortingAndPaginationParamsType, SortQueryDto} from "../common/helpers/sort-query-dto";
 
 @injectable()
 class CommentsController {
@@ -53,8 +49,7 @@ class CommentsController {
             sortDirection: req.query.sortDirection,
         };
 
-        const paginationAndSortFilter: PaginationAndSortFilterType =
-            createPaginationAndSortFilter(sortingAndPaginationParams)
+        const paginationAndSortFilter: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
 
         const foundComments: CommentViewModel[] = await this.commentQueryRepository
             .findComments(paginationAndSortFilter, postId);

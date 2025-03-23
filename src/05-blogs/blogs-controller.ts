@@ -3,18 +3,14 @@ import {BlogInputModel, BlogPostInputModel, BlogViewModel} from "./types/input-o
 import {
     RequestWithBody,
     RequestWithParams,
-    RequestWithParamsAndBody, RequestWithParamsAndQuery,
+    RequestWithParamsAndBody,
+    RequestWithParamsAndQuery,
     RequestWithQuery
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
 import {BlogsService} from "./domain/blogs-service";
 import {BlogDbType} from "./types/blog-db-type";
-import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
-import {
-    PaginationAndSortFilterType,
-    Paginator,
-    SortingAndPaginationParamsType
-} from "../common/types/input-output-types/pagination-sort-types";
+import {Paginator,} from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {BlogsQueryRepository} from "./repositoryes/blogs-query-repository";
 import {PostViewModel} from "../06-posts/types/input-output-types";
@@ -23,6 +19,7 @@ import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {PostsQueryRepository} from "../06-posts/repositoryes/posts-query-repository";
 import {injectable} from "inversify";
+import {SortingAndPaginationParamsType, SortQueryDto} from "../common/helpers/sort-query-dto";
 
 @injectable()
 class BlogsController {
@@ -46,8 +43,7 @@ class BlogsController {
             searchNameTerm: req.query.searchNameTerm
         };
 
-        const paginationAndSortFilter: PaginationAndSortFilterType =
-            createPaginationAndSortFilter(sortingAndPaginationParams);
+        const paginationAndSortFilter: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
 
         const foundBlogs: BlogViewModel[] = await this.blogsQueryRepository
             .findBlogs(paginationAndSortFilter);
@@ -178,8 +174,7 @@ class BlogsController {
             sortDirection: req.query.sortDirection,
         };
 
-        const paginationAndSortFilter: PaginationAndSortFilterType =
-            createPaginationAndSortFilter(sortingAndPaginationParams)
+        const paginationAndSortFilter: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
 
         const foundPosts: PostViewModel[] = await this.postsQueryRepository
             .findPosts(paginationAndSortFilter, blogId);

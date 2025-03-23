@@ -8,15 +8,11 @@ import {
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
 import {PostsService} from "./domain/posts-service";
-import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
-import {
-    PaginationAndSortFilterType,
-    Paginator,
-    SortingAndPaginationParamsType
-} from "../common/types/input-output-types/pagination-sort-types";
+import {Paginator,} from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {PostsQueryRepository} from "./repositoryes/posts-query-repository";
 import {injectable} from "inversify";
+import {SortingAndPaginationParamsType, SortQueryDto} from "../common/helpers/sort-query-dto";
 
 @injectable()
 class PostsController {
@@ -38,7 +34,7 @@ class PostsController {
             sortDirection: req.query.sortDirection,
         };
 
-        const paginationAndSortFilter: PaginationAndSortFilterType = createPaginationAndSortFilter(sortingAndPaginationParams)
+        const paginationAndSortFilter: SortQueryDto = new SortQueryDto(sortingAndPaginationParams)
 
         const foundPosts: PostViewModel[] = await this.postsQueryRepository
             .findPosts(paginationAndSortFilter);

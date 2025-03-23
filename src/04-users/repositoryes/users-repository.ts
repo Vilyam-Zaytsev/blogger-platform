@@ -1,16 +1,14 @@
-import {
-    MatchMode,
-    PaginationAndSortFilterType,
-} from "../../common/types/input-output-types/pagination-sort-types";
+import {MatchMode,} from "../../common/types/input-output-types/pagination-sort-types";
 import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
 import {injectable} from "inversify";
 import {SortOptionsType} from "../types/sort-options-type";
 import {UserDocument, UserModel} from "../domain/user-entity";
+import {SortQueryDto} from "../../common/helpers/sort-query-dto";
 
 @injectable()
 class UsersRepository {
 
-    async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<UserDocument[]> {
+    async findUsers(sortQueryDto: SortQueryDto): Promise<UserDocument[]> {
 
         const {
             pageNumber,

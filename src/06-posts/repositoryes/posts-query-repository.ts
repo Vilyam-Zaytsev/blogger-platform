@@ -1,20 +1,17 @@
 import {PostDbType} from "../types/post-db-type";
-import {ObjectId, Sort, WithId} from "mongodb";
-import {
-    MatchMode,
-    PaginationAndSortFilterType,
-    Paginator
-} from "../../common/types/input-output-types/pagination-sort-types";
+import {ObjectId, WithId} from "mongodb";
+import {MatchMode, Paginator} from "../../common/types/input-output-types/pagination-sort-types";
 import {createPostsSearchFilter} from "../helpers/create-posts-search-filter";
 import {PostViewModel} from "../types/input-output-types";
 import {injectable} from "inversify";
 import {PostModel} from "../../archive/models/post-model";
 import {SortOptionsType} from "../../04-users/types/sort-options-type";
+import {SortQueryDto} from "../../common/helpers/sort-query-dto";
 
 @injectable()
 class PostsQueryRepository {
 
-    async findPosts(sortQueryDto: PaginationAndSortFilterType, blogId?: string): Promise<PostViewModel[]> {
+    async findPosts(sortQueryDto: SortQueryDto, blogId?: string): Promise<PostViewModel[]> {
 
         const {
             pageNumber,
@@ -75,13 +72,13 @@ class PostsQueryRepository {
     _mapPostsViewModelToPaginationResponse(
         posts: PostViewModel[],
         blogsCount: number,
-        paginationAndSortFilter: PaginationAndSortFilterType
+        sortQueryDto: SortQueryDto
     ): Paginator<PostViewModel> {
 
         return {
-            pagesCount: Math.ceil(blogsCount / paginationAndSortFilter.pageSize),
-            page: paginationAndSortFilter.pageNumber,
-            pageSize: paginationAndSortFilter.pageSize,
+            pagesCount: Math.ceil(blogsCount / sortQueryDto.pageSize),
+            page: sortQueryDto.pageNumber,
+            pageSize: sortQueryDto.pageSize,
             totalCount: blogsCount,
             items: posts
         };

@@ -14,7 +14,7 @@ import {PostDbType} from "../../src/06-posts/types/post-db-type";
 import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {Response} from "supertest";
 import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
-import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
+import {createPaginationAndSortFilter} from "../../src/common/helpers/sort-query-dto";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;

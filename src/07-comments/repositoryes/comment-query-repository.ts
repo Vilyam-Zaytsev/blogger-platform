@@ -1,17 +1,14 @@
 import {CommentDbType} from "../types/comment-db-type";
-import {ObjectId, Sort, WithId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import {CommentViewModel} from "../types/input-output-types";
-import {
-    PaginationAndSortFilterType,
-    Paginator,
-    SortDirection
-} from "../../common/types/input-output-types/pagination-sort-types";
+import {Paginator} from "../../common/types/input-output-types/pagination-sort-types";
 import {CommentModel} from "../../archive/models/comment-model";
 import {SortOptionsType} from "../../04-users/types/sort-options-type";
+import {SortDirection, SortQueryDto} from "../../common/helpers/sort-query-dto";
 
 class CommentQueryRepository {
 
-    async findComments(sortQueryDto: PaginationAndSortFilterType, postId: string): Promise<CommentViewModel[]> {
+    async findComments(sortQueryDto: SortQueryDto, postId: string): Promise<CommentViewModel[]> {
 
         const {
             pageNumber,
@@ -63,13 +60,13 @@ class CommentQueryRepository {
     _mapCommentsViewModelToPaginationResponse(
         comments: CommentViewModel[],
         commentsCount: number,
-        paginationAndSortFilter: PaginationAndSortFilterType
+        sortQueryDto: SortQueryDto
     ): Paginator<CommentViewModel> {
 
         return {
-            pagesCount: Math.ceil(commentsCount / paginationAndSortFilter.pageSize),
-            page: paginationAndSortFilter.pageNumber,
-            pageSize: paginationAndSortFilter.pageSize,
+            pagesCount: Math.ceil(commentsCount / sortQueryDto.pageSize),
+            page: sortQueryDto.pageNumber,
+            pageSize: sortQueryDto.pageSize,
             totalCount: commentsCount,
             items: comments
         }

@@ -1,14 +1,14 @@
 import {Response} from "express";
 import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../common/types/input-output-types/request-types";
 import {
-    PaginationAndSortFilterType,
     Paginator,
-    SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {UserInputModel, UserViewModel} from "./types/input-output-types";
 import {UsersService} from "./application/users-service";
 import {SETTINGS} from "../common/settings";
-import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
+import {
+    SortingAndPaginationParamsType, SortQueryDto
+} from "../common/helpers/sort-query-dto";
 import {ResultType} from "../common/types/result-types/result-type";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
@@ -42,8 +42,7 @@ class UsersController {
             searchEmailTerm: req.query.searchEmailTerm,
         };
 
-        const paginationAndSortFilter: PaginationAndSortFilterType =
-            createPaginationAndSortFilter(sortingAndPaginationParams);
+        const paginationAndSortFilter: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
 
         const foundUsers: UserViewModel[] = await this.usersQueryRepository
             .findUsers(paginationAndSortFilter);

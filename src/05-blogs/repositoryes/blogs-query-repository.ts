@@ -1,20 +1,17 @@
 import {BlogDbType} from "../types/blog-db-type";
-import {ObjectId, Sort, WithId} from "mongodb";
-import {
-    MatchMode,
-    PaginationAndSortFilterType,
-    Paginator
-} from "../../common/types/input-output-types/pagination-sort-types";
+import {ObjectId, WithId} from "mongodb";
+import {MatchMode, Paginator} from "../../common/types/input-output-types/pagination-sort-types";
 import {createBlogsSearchFilter} from "../helpers/create-blogs-search-filter";
 import {BlogViewModel} from "../types/input-output-types";
 import {injectable} from "inversify";
 import {BlogModel} from "../../archive/models/blog-model";
 import {SortOptionsType} from "../../04-users/types/sort-options-type";
+import {SortQueryDto} from "../../common/helpers/sort-query-dto";
 
 @injectable()
 class BlogsQueryRepository {
 
-    async findBlogs(sortQueryDto: PaginationAndSortFilterType): Promise<BlogViewModel[]> {
+    async findBlogs(sortQueryDto: SortQueryDto): Promise<BlogViewModel[]> {
 
         const {
             pageNumber,
@@ -76,13 +73,13 @@ class BlogsQueryRepository {
     _mapBlogsViewModelToPaginationResponse(
         blogs: BlogViewModel[],
         blogsCount: number,
-        paginationAndSortFilter: PaginationAndSortFilterType
+        sortQueryDto: SortQueryDto
     ): Paginator<BlogViewModel> {
 
         return {
-            pagesCount: Math.ceil(blogsCount / paginationAndSortFilter.pageSize),
-            page: paginationAndSortFilter.pageNumber,
-            pageSize: paginationAndSortFilter.pageSize,
+            pagesCount: Math.ceil(blogsCount / sortQueryDto.pageSize),
+            page: sortQueryDto.pageNumber,
+            pageSize: sortQueryDto.pageSize,
             totalCount: blogsCount,
             items: blogs
         };

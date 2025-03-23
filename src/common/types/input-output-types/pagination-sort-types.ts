@@ -1,8 +1,3 @@
-enum SortDirection {
-    Ascending = 'asc',
-    Descending = 'desc'
-}
-
 enum MatchMode {
     Exact = 'exact',
     Partial = 'partial',
@@ -14,26 +9,6 @@ type FilterCondition =
     |{ name?: string | { $regex: string; $options: string } }
     |{ blogId?: string | { $regex: string; $options: string } };
 
-type SortingAndPaginationParamsType = {
-    pageNumber?: string,
-    pageSize?: string,
-    sortBy?: string,
-    sortDirection?: string,
-    searchNameTerm?: string,
-    searchLoginTerm?: string,
-    searchEmailTerm?: string,
-};
-
-type PaginationAndSortFilterType = {
-    pageNumber: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: SortDirection,
-    searchNameTerm: string | null,
-    searchLoginTerm: string | null,
-    searchEmailTerm: string | null,
-};
-
 type Paginator<T> = {
     pagesCount: number,
     page: number,
@@ -44,10 +19,7 @@ type Paginator<T> = {
 
 
 export {
-    SortDirection,
     MatchMode,
     FilterCondition,
-    SortingAndPaginationParamsType,
-    PaginationAndSortFilterType,
     Paginator,
 };

@@ -16,7 +16,7 @@ import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {UserViewModel} from "../../src/04-users/types/input-output-types";
-import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
+import {createPaginationAndSortFilter} from "../../src/common/helpers/sort-query-dto";
 import {User} from "../../src/04-users/domain/user-entity";
 
 let mongoServer: MongoMemoryServer;
