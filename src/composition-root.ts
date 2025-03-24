@@ -15,7 +15,7 @@ import {UsersController} from "./04-users/users-controller";
 import {BlogsController} from "./05-blogs/blogs-controller";
 import {BlogsService} from "./05-blogs/application/blogs-service";
 import {BlogsRepository} from "./05-blogs/repositoryes/blogs-repository";
-import {PostsService} from "./06-posts/domain/posts-service";
+import {PostsService} from "./06-posts/application/posts-service";
 import {PostsRepository} from "./06-posts/repositoryes/posts-repository";
 import {PostsQueryRepository} from "./06-posts/repositoryes/posts-query-repository";
 import {BlogsQueryRepository} from "./05-blogs/repositoryes/blogs-query-repository";

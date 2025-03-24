@@ -21,6 +21,8 @@ import {injectable} from "inversify";
 import {SortingAndPaginationParamsType, SortQueryDto} from "../common/helpers/sort-query-dto";
 import {BlogDto} from "./domain/blog-dto";
 import {Blog} from "./domain/blog-entity";
+import {PostDto} from "../06-posts/domain/post-dto";
+import {isSuccess, isSuccessfulResult} from "../common/helpers/type-guards";
 
 @injectable()
 class BlogsController {
@@ -163,9 +165,9 @@ class BlogsController {
         res: Response<Paginator<PostViewModel>>
     ){
 
-        const blogId: string = req.params.id;
+        const { id: blogId } = req.params;
 
-        const resultCheckBlogId: ResultType<string | null> = await this.blogsService
+        const resultCheckBlogId: ResultType = await this.blogsService
             .checkBlogId(blogId);
 
         if (resultCheckBlogId.status !== ResultStatus.Success) {
@@ -183,10 +185,10 @@ class BlogsController {
             sortDirection: req.query.sortDirection,
         };
 
-        const paginationAndSortFilter: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
+        const sortQueryDto: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
 
         const foundPosts: PostViewModel[] = await this.postsQueryRepository
-            .findPosts(paginationAndSortFilter, blogId);
+            .findPosts(sortQueryDto, blogId);
 
         const postsCount: number = await this.postsQueryRepository
             .getPostsCount(blogId);
@@ -195,7 +197,7 @@ class BlogsController {
             ._mapPostsViewModelToPaginationResponse(
                 foundPosts,
                 postsCount,
-                paginationAndSortFilter
+                sortQueryDto
             );
 
         res
@@ -210,25 +212,35 @@ class BlogsController {
 
         const blogId: string = req.params.id;
 
-        const dataForCreatingPost: BlogPostInputModel = {
-            title: req.body.title,
-            shortDescription: req.body.shortDescription,
-            content: req.body.content,
-        };
+        const {
+            title,
+            shortDescription,
+            content
+        } = req.body;
 
-        const resultCreatedPost: ResultType<string | null> = await this.blogsService
-            .createPost(blogId, dataForCreatingPost);
+        const postDto: PostDto = new PostDto(
+            title,
+            shortDescription,
+            content,
+            blogId
+        );
 
-        if (resultCreatedPost.status !== ResultStatus.Success) {
+        const {
+            status: postCreationStatus,
+            data: idCreatedPost
+        }: ResultType<string | null> = await this.blogsService
+            .createPost(postDto);
+
+        if (!isSuccessfulResult(postCreationStatus, idCreatedPost)) {
 
             res
-                .sendStatus(mapResultStatusToHttpStatus(resultCreatedPost.status));
+                .sendStatus(mapResultStatusToHttpStatus(postCreationStatus));
 
             return;
         }
 
         const createdPost: PostViewModel | null = await this.postsQueryRepository
-            .findPost(resultCreatedPost.data!);
+            .findPost(idCreatedPost);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)

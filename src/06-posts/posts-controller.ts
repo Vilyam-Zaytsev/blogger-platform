@@ -7,12 +7,13 @@ import {
     RequestWithQuery
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
-import {PostsService} from "./domain/posts-service";
+import {PostsService} from "./application/posts-service";
 import {Paginator,} from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {PostsQueryRepository} from "./repositoryes/posts-query-repository";
 import {injectable} from "inversify";
 import {SortingAndPaginationParamsType, SortQueryDto} from "../common/helpers/sort-query-dto";
+import {PostDto} from "./domain/post-dto";
 
 @injectable()
 class PostsController {
@@ -34,10 +35,10 @@ class PostsController {
             sortDirection: req.query.sortDirection,
         };
 
-        const paginationAndSortFilter: SortQueryDto = new SortQueryDto(sortingAndPaginationParams)
+        const sortQueryDto: SortQueryDto = new SortQueryDto(sortingAndPaginationParams)
 
         const foundPosts: PostViewModel[] = await this.postsQueryRepository
-            .findPosts(paginationAndSortFilter);
+            .findPosts(sortQueryDto);
 
         const postsCount: number = await this.postsQueryRepository
             .getPostsCount();
@@ -46,7 +47,7 @@ class PostsController {
             ._mapPostsViewModelToPaginationResponse(
                 foundPosts,
                 postsCount,
-                paginationAndSortFilter
+                sortQueryDto
             );
 
         res
@@ -79,18 +80,25 @@ class PostsController {
         res: Response<PostViewModel>
     ){
 
-        const dataForCreatingPost: PostInputModel = {
-            title: req.body.title,
-            shortDescription: req.body.shortDescription,
-            content: req.body.content,
-            blogId: req.body.blogId,
-        };
+        const {
+            title,
+            shortDescription,
+            content,
+            blogId,
+        } = req.body;
 
-        const idCreatedPost: string | null = await this.postsService
-            .createPost(dataForCreatingPost);
+        const postDto: PostDto = new PostDto(
+            title,
+            shortDescription,
+            content,
+            blogId
+        );
+
+        const postCreationResult: string = await this.postsService
+            .createPost(postDto);
 
         const createdPost: PostViewModel | null = await this.postsQueryRepository
-            .findPost(idCreatedPost);
+            .findPost(postCreationResult);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
@@ -102,15 +110,22 @@ class PostsController {
         res: Response<PostViewModel>
     ){
 
-        const dataForPostUpdates: PostInputModel = {
-            title: req.body.title,
-            shortDescription: req.body.shortDescription,
-            content: req.body.content,
-            blogId: req.body.blogId
-        };
+        const {
+            title,
+            shortDescription,
+            content,
+            blogId,
+        } = req.body;
+
+        const postDto: PostDto = new PostDto(
+            title,
+            shortDescription,
+            content,
+            blogId
+        );
 
         const updatedPost: boolean = await this.postsService
-            .updatePost(req.params.id, dataForPostUpdates);
+            .updatePost(req.params.id, postDto);
 
         if (!updatedPost) {
             res

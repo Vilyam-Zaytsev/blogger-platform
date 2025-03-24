@@ -2,8 +2,7 @@ import {CommentInputModel} from "../types/input-output-types";
 import {ObjectId, WithId} from "mongodb";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ResultStatus} from "../../common/types/result-types/result-status";
-import {PostDbType} from "../../06-posts/types/post-db-type";
-import {PostsService} from "../../06-posts/domain/posts-service";
+import {PostsService} from "../../06-posts/application/posts-service";
 import {CommentRepository} from "../repositoryes/comment-repository";
 import {CommentDbType} from "../types/comment-db-type";
 import {UsersRepository} from "../../04-users/repositoryes/users-repository";
@@ -16,6 +15,7 @@ import {
 import {injectable} from "inversify";
 import {CommentDocument, CommentModel} from "../../archive/models/comment-model";
 import {UserDocument} from "../../04-users/domain/user-entity";
+import {Post} from "../../06-posts/domain/post-entity";
 
 @injectable()
 class CommentsService {
@@ -105,7 +105,7 @@ class CommentsService {
                 );
         }
 
-        const isExistPost: WithId<PostDbType> | null = await this.postsService
+        const isExistPost: WithId<Post> | null = await this.postsService
             .findPost(postId);
 
         if (!isExistPost) {

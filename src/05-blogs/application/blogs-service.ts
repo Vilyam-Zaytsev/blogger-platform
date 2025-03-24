@@ -3,11 +3,12 @@ import {BlogPostInputModel} from "../types/input-output-types";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ObjectId} from "mongodb";
 import {ResultStatus} from "../../common/types/result-types/result-status";
-import {PostsService} from "../../06-posts/domain/posts-service";
+import {PostsService} from "../../06-posts/application/posts-service";
 import {BadRequestResult, NotFoundResult, SuccessResult} from "../../common/helpers/result-object";
 import {injectable} from "inversify";
 import {BlogDto} from "../domain/blog-dto";
 import {Blog, BlogDocument, BlogModel} from "../domain/blog-entity";
+import {PostDto} from "../../06-posts/domain/post-dto";
 
 @injectable()
 class BlogsService {
@@ -25,12 +26,11 @@ class BlogsService {
             .saveBlog(blogDocument);
     }
 
-    async createPost(
-        blogId: string,
-        dataForCreatingPost: BlogPostInputModel
-    ): Promise<ResultType<string | null>> {
+    async createPost(postDto: PostDto): Promise<ResultType<string | null>> {
 
-        const resultCheckBlogId: ResultType<string | null> = await this.checkBlogId(blogId);
+        const {blogId} = postDto;
+
+        const resultCheckBlogId: ResultType = await this.checkBlogId(blogId);
 
         if (resultCheckBlogId.status !== ResultStatus.Success) {
 
@@ -42,11 +42,11 @@ class BlogsService {
                 )
         }
 
-        const resultCreatedPost: string = await this.postsService
-            .createPost({...dataForCreatingPost, blogId});
+        const postCreationResult: string = await this.postsService
+            .createPost(postDto);
 
         return SuccessResult
-            .create<string>(resultCreatedPost);
+            .create<string>(postCreationResult);
     }
 
     async updateBlog(id: string, blogDto: BlogDto): Promise<boolean> {
@@ -61,7 +61,7 @@ class BlogsService {
             .deleteBlog(id);
     }
 
-    async checkBlogId(blogId: string): Promise<ResultType<string | null>> {
+    async checkBlogId(blogId: string): Promise<ResultType> {
 
         if (!ObjectId.isValid(blogId)) {
 
@@ -73,7 +73,7 @@ class BlogsService {
                 );
         }
 
-        const isExistBlog: Blog | null = await this.blogsRepository
+        const isExistBlog: BlogDocument | null = await this.blogsRepository
             .findBlog(blogId);
 
         if (!isExistBlog) {
@@ -87,7 +87,7 @@ class BlogsService {
         }
 
         return SuccessResult
-            .create<string>(blogId);
+            .create(null);
     }
 }
 

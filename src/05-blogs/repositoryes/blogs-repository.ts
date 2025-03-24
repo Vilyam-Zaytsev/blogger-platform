@@ -31,9 +31,8 @@ class BlogsRepository {
 
     async deleteBlog(id: string): Promise<boolean> {
 
-        const result = await BlogModel
-            .findByIdAndDelete(id)
-            .exec();
+        const result: BlogDocument | null = await BlogModel
+            .findByIdAndDelete(id);
 
         return !!result;
     }

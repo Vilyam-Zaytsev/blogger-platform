@@ -84,11 +84,11 @@ class UsersController {
         const {
             status: userCreationStatus,
             extensions: errorDetails,
-            data: createdUserId
+            data: IdCreatedUser
         }: ResultType<string | null> = await this.usersService
             .createUser(candidate);
 
-        if (!isSuccessfulResult(userCreationStatus, createdUserId)) {
+        if (!isSuccessfulResult(userCreationStatus, IdCreatedUser)) {
             res
                 .status(mapResultStatusToHttpStatus(userCreationStatus))
                 .json(mapResultExtensionsToErrorMessage(errorDetails));
@@ -97,7 +97,7 @@ class UsersController {
         }
 
         const createdUser: UserViewModel | null = await this.usersQueryRepository
-            .findUser(createdUserId);
+            .findUser(IdCreatedUser);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
