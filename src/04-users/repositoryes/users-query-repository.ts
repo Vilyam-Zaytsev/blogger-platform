@@ -3,7 +3,6 @@ import {
     MatchMode,
     Paginator
 } from "../../common/types/input-output-types/pagination-sort-types";
-import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
 import {UserMeViewModel, UserViewModel} from "../types/input-output-types";
 import {injectable} from "inversify";
 import {SortOptionsType} from "../types/sort-options-type";
@@ -24,16 +23,18 @@ class UsersQueryRepository {
             searchEmailTerm
         } = sortQueryDto;
 
-        const filter: any = createUsersSearchFilter(
-            {
-                searchLoginTerm,
-                searchEmailTerm
-            },
-            MatchMode.Partial
-        );
+        let filter: any = {$or: []};
+
+        searchLoginTerm
+            ? filter.$or.push({login: {$regex: searchLoginTerm, $options: 'i'}})
+            : null;
+
+        searchEmailTerm
+            ? filter.$or.push({email: {$regex: searchEmailTerm, $options: 'i'}})
+            : null;
 
         const users: WithId<User>[] = await UserModel
-            .find(filter)
+            .find(filter.$or.length > 0 ? filter : {})
             .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as SortOptionsType)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
@@ -69,16 +70,18 @@ class UsersQueryRepository {
         searchEmailTerm: string | null
     ): Promise<number> {
 
-        const filter: any = createUsersSearchFilter(
-            {
-                searchLoginTerm,
-                searchEmailTerm
-            },
-            MatchMode.Partial
-        );
+        let filter: any = {$or: []};
+
+        searchLoginTerm
+            ? filter.$or.push({login: {$regex: searchLoginTerm, $options: 'i'}})
+            : null;
+
+        searchEmailTerm
+            ? filter.$or.push({email: {$regex: searchEmailTerm, $options: 'i'}})
+            : null;
 
         return UserModel
-            .countDocuments(filter);
+            .countDocuments(filter.$or.length > 0 ? filter : {});
     }
 
     _mapDbUserToViewModel(user: WithId<User>): UserViewModel {

@@ -1,5 +1,4 @@
 import {MatchMode,} from "../../common/types/input-output-types/pagination-sort-types";
-import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
 import {injectable} from "inversify";
 import {SortOptionsType} from "../types/sort-options-type";
 import {UserDocument, UserModel} from "../domain/user-entity";
@@ -9,7 +8,7 @@ import {SortQueryDto} from "../../common/helpers/sort-query-dto";
 class UsersRepository {
 
     async findUsers(sortQueryDto: SortQueryDto): Promise<UserDocument[]> {
-
+//TODO: зачем мне здесь сортировка, погинация и фильтр???
         const {
             pageNumber,
             pageSize,
@@ -19,16 +18,18 @@ class UsersRepository {
             searchEmailTerm
         } = sortQueryDto;
 
-        const filter: any = createUsersSearchFilter(
-            {
-                searchLoginTerm,
-                searchEmailTerm
-            },
-            MatchMode.Partial
-        );
+        let filter: any = {$or: []};
+
+        searchLoginTerm
+            ? filter.$or.push({login: {$regex: searchLoginTerm, $options: 'i'}})
+            : null;
+
+        searchEmailTerm
+            ? filter.$or.push({email: {$regex: searchEmailTerm, $options: 'i'}})
+            : null;
 
         return UserModel
-            .find(filter)
+            .find(filter.$or.length > 0 ? filter : {})
             .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as SortOptionsType)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize);

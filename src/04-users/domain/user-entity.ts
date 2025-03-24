@@ -89,6 +89,7 @@ const userSchema = new Schema<User, UserModel, UserMethods>({
     passwordRecovery: passwordRecoverySchema,
 
     emailConfirmation: {
+        _id:false,
         type: emailConfirmationSchema,
         required: true
     }
@@ -109,6 +110,7 @@ const userMethods = {
         (this as UserDocument).emailConfirmation.expirationDate = expirationDate;
     }
 };
+
 
 const userStatics: any = {
 
