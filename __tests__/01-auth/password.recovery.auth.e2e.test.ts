@@ -6,11 +6,9 @@ import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {User} from "../../src/04-users/domain/user-entity";
-import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
 import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
 import {EmailTemplates} from "../../src/01-auth/adapters/email-templates";
 import {UsersRepository} from "../../src/04-users/repositoryes/users-repository";
-import {ConfirmationStatus} from "../../src/04-users/types/confirmation-status";
 import mongoose from "mongoose";
 
 const usersRepository: UsersRepository = new UsersRepository();
