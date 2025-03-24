@@ -42,22 +42,22 @@ class UsersController {
             searchEmailTerm: req.query.searchEmailTerm,
         };
 
-        const paginationAndSortFilter: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
+        const sortQueryDto: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
 
         const foundUsers: UserViewModel[] = await this.usersQueryRepository
-            .findUsers(paginationAndSortFilter);
+            .findUsers(sortQueryDto);
 
         const usersCount: number = await this.usersQueryRepository
             .getUsersCount(
-                paginationAndSortFilter.searchLoginTerm,
-                paginationAndSortFilter.searchEmailTerm
+                sortQueryDto.searchLoginTerm,
+                sortQueryDto.searchEmailTerm
                 );
 
         const paginationResponse: Paginator<UserViewModel> = await this.usersQueryRepository
             ._mapUsersViewModelToPaginationResponse(
                 foundUsers,
                 usersCount,
-                paginationAndSortFilter
+                sortQueryDto
             );
 
         res
