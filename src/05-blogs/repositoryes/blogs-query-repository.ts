@@ -1,4 +1,4 @@
-import {ObjectId, WithId} from "mongodb";
+import {WithId} from "mongodb";
 import {Paginator} from "../../common/types/input-output-types/pagination-sort-types";
 import {BlogViewModel} from "../types/input-output-types";
 import {injectable} from "inversify";

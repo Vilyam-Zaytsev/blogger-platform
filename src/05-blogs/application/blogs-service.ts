@@ -1,5 +1,5 @@
 import {BlogsRepository} from "../repositoryes/blogs-repository";
-import {BlogInputModel, BlogPostInputModel} from "../types/input-output-types";
+import {BlogPostInputModel} from "../types/input-output-types";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ObjectId} from "mongodb";
 import {ResultStatus} from "../../common/types/result-types/result-status";
