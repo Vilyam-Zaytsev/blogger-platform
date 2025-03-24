@@ -79,8 +79,7 @@ class UsersRepository {
     async deleteUser(id: string): Promise<boolean> {
 
         const result: UserDocument | null = await UserModel
-            .findByIdAndDelete(id)
-            .exec();
+            .findByIdAndDelete(id);
 
         return !!result;
     }

@@ -109,10 +109,11 @@ class UsersController {
         res: Response
     ){
 
-        const isDeletedUser: boolean = await this.usersService
+        const userDeletionResult: boolean = await this.usersService
             .deleteUser(req.params.id);
 
-        if (!isDeletedUser) {
+        if (!userDeletionResult) {
+
             res
                 .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
