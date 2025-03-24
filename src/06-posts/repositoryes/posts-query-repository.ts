@@ -5,7 +5,7 @@ import {createPostsSearchFilter} from "../helpers/create-posts-search-filter";
 import {PostViewModel} from "../types/input-output-types";
 import {injectable} from "inversify";
 import {PostModel} from "../../archive/models/post-model";
-import {SortOptionsType} from "../../04-users/types/sort-options-type";
+import {SortOptionsType} from "../../common/types/sort-options-type";
 import {SortQueryDto} from "../../common/helpers/sort-query-dto";
 
 @injectable()

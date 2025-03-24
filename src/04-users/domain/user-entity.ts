@@ -2,10 +2,10 @@ import {BcryptService} from "../../01-auth/adapters/bcrypt-service";
 import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
 import {UserDto} from "./user-dto";
-
-const bcryptService: BcryptService = new BcryptService();
-
 import mongoose, {HydratedDocument, Model, Schema} from "mongoose";
+
+//TODO: BcryptService внедрить при помощи inversify
+const bcryptService: BcryptService = new BcryptService();
 
 enum ConfirmationStatus {
     Confirmed = 'Confirmed',

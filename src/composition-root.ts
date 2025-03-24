@@ -13,7 +13,7 @@ import {SessionsController} from "./02-sessions/sessions-controller";
 import {SessionsQueryRepository} from "./02-sessions/repositories/sessions-query-repository";
 import {UsersController} from "./04-users/users-controller";
 import {BlogsController} from "./05-blogs/blogs-controller";
-import {BlogsService} from "./05-blogs/domain/blogs-service";
+import {BlogsService} from "./05-blogs/application/blogs-service";
 import {BlogsRepository} from "./05-blogs/repositoryes/blogs-repository";
 import {PostsService} from "./06-posts/domain/posts-service";
 import {PostsRepository} from "./06-posts/repositoryes/posts-repository";

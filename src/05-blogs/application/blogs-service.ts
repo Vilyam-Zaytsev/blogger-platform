@@ -1,18 +1,13 @@
 import {BlogsRepository} from "../repositoryes/blogs-repository";
 import {BlogInputModel, BlogPostInputModel} from "../types/input-output-types";
-import {BlogDbType} from "../types/blog-db-type";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ObjectId} from "mongodb";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {PostsService} from "../../06-posts/domain/posts-service";
-import {
-    BadRequestResult,
-    InternalServerErrorResult,
-    NotFoundResult,
-    SuccessResult
-} from "../../common/helpers/result-object";
+import {BadRequestResult, NotFoundResult, SuccessResult} from "../../common/helpers/result-object";
 import {injectable} from "inversify";
-import {BlogDocument, BlogModel} from "../../archive/models/blog-model";
+import {BlogDto} from "../domain/blog-dto";
+import {Blog, BlogDocument, BlogModel} from "../domain/blog-entity";
 
 @injectable()
 class BlogsService {
@@ -22,20 +17,12 @@ class BlogsService {
         private postsService: PostsService
     ) {};
 
-    async createBlog(blogData: BlogInputModel): Promise<string> {
+    async createBlog(blogDto: BlogDto): Promise<string> {
 
-        const newBlog: BlogDbType = {
-            ...blogData,
-            createdAt: new Date().toISOString(),
-            isMembership: false,
-        };
+        const blogDocument: BlogDocument = BlogModel.createBlog(blogDto);
 
-        const blogDocument: BlogDocument = new BlogModel(newBlog);
-
-        const resultSaveBlog =  await this.blogsRepository
+        return await this.blogsRepository
             .saveBlog(blogDocument);
-
-        return String(resultSaveBlog._id);
     }
 
     async createPost(
@@ -62,10 +49,10 @@ class BlogsService {
             .create<string>(resultCreatedPost);
     }
 
-    async updateBlog(id: string, data: BlogInputModel): Promise<boolean> {
+    async updateBlog(id: string, blogDto: BlogDto): Promise<boolean> {
 
         return await this.blogsRepository
-            .updateBlog(id, data);
+            .updateBlog(id, blogDto);
     }
 
     async deleteBlog(id: string): Promise<boolean> {
@@ -86,7 +73,7 @@ class BlogsService {
                 );
         }
 
-        const isExistBlog: BlogDbType | null = await this.blogsRepository
+        const isExistBlog: Blog | null = await this.blogsRepository
             .findBlog(blogId);
 
         if (!isExistBlog) {

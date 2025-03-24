@@ -1,22 +1,23 @@
 import {BlogInputModel} from "../types/input-output-types";
-import {BlogDbType} from "../types/blog-db-type";
-import {InsertOneResult, ObjectId} from "mongodb";
+import {ObjectId} from "mongodb";
 import {injectable} from "inversify";
-import {BlogDocument, BlogModel} from "../../archive/models/blog-model";
+import {BlogDocument, BlogModel} from "../domain/blog-entity";
 
 @injectable()
 class BlogsRepository {
 
-    async findBlog(id: string): Promise<BlogDbType | null> {
+    async findBlog(id: string): Promise<BlogDocument | null> {
+
       return BlogModel
-          .findOne({_id: new ObjectId(id)})
-          .lean();
+          .findById(id);
     }
 
-    async saveBlog(blogDocument: BlogDocument): Promise<BlogDocument> {
+    async saveBlog(blogDocument: BlogDocument): Promise<string> {
 
-        return await blogDocument
+        const result =  await blogDocument
             .save();
+
+        return String(result._id);
     }
 
     async updateBlog(id: string, data: BlogInputModel): Promise<boolean> {
@@ -31,10 +32,10 @@ class BlogsRepository {
     async deleteBlog(id: string): Promise<boolean> {
 
         const result = await BlogModel
-            .deleteOne({_id: new ObjectId(id)})
+            .findByIdAndDelete(id)
             .exec();
 
-        return result.deletedCount === 1;
+        return !!result;
     }
 }
 

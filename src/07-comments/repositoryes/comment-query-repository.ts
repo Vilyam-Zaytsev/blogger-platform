@@ -3,7 +3,7 @@ import {ObjectId, WithId} from "mongodb";
 import {CommentViewModel} from "../types/input-output-types";
 import {Paginator} from "../../common/types/input-output-types/pagination-sort-types";
 import {CommentModel} from "../../archive/models/comment-model";
-import {SortOptionsType} from "../../04-users/types/sort-options-type";
+import {SortOptionsType} from "../../common/types/sort-options-type";
 import {SortDirection, SortQueryDto} from "../../common/helpers/sort-query-dto";
 
 class CommentQueryRepository {

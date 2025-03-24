@@ -1,18 +1,16 @@
-import {BlogDbType} from "../types/blog-db-type";
 import {ObjectId, WithId} from "mongodb";
-import {MatchMode, Paginator} from "../../common/types/input-output-types/pagination-sort-types";
-import {createBlogsSearchFilter} from "../helpers/create-blogs-search-filter";
+import {Paginator} from "../../common/types/input-output-types/pagination-sort-types";
 import {BlogViewModel} from "../types/input-output-types";
 import {injectable} from "inversify";
-import {BlogModel} from "../../archive/models/blog-model";
-import {SortOptionsType} from "../../04-users/types/sort-options-type";
+import {SortOptionsType} from "../../common/types/sort-options-type";
 import {SortQueryDto} from "../../common/helpers/sort-query-dto";
+import {Blog, BlogModel} from "../domain/blog-entity";
 
 @injectable()
 class BlogsQueryRepository {
 
     async findBlogs(sortQueryDto: SortQueryDto): Promise<BlogViewModel[]> {
-
+//TODO: зачем мне здесь фильтр???
         const {
             pageNumber,
             pageSize,
@@ -21,12 +19,13 @@ class BlogsQueryRepository {
             searchNameTerm
         } = sortQueryDto;
 
-        const filter: any = createBlogsSearchFilter(
-            {searchNameTerm},
-            MatchMode.Partial
-        );
+        let filter: any = {};
 
-        const blogs: WithId<BlogDbType>[] = await BlogModel
+        searchNameTerm
+            ? filter = {name: {$regex: searchNameTerm, $options: 'i'}}
+            : {};
+
+        const blogs: WithId<Blog>[] = await BlogModel
             .find(filter)
             .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as SortOptionsType)
             .skip((pageNumber - 1) * pageSize)
@@ -38,8 +37,8 @@ class BlogsQueryRepository {
 
     async findBlog(id: string): Promise<BlogViewModel | null> {
 
-        const blog: WithId<BlogDbType> | null = await BlogModel
-            .findOne({_id: new ObjectId(id)})
+        const blog: WithId<Blog> | null = await BlogModel
+            .findById(id)
             .exec();
 
         if (!blog) return null;
@@ -49,16 +48,17 @@ class BlogsQueryRepository {
 
     async getBlogsCount(searchNameTerm: string | null): Promise<number> {
 
-        const filter: any = createBlogsSearchFilter(
-            {searchNameTerm},
-            MatchMode.Partial
-        );
+        let filter: any = {};
+
+        searchNameTerm
+            ? filter = {name: {$regex: searchNameTerm, $options: 'i'}}
+            : {};
 
         return BlogModel
             .countDocuments(filter);
     }
 
-    _mapDbBlogToViewModel(blog: WithId<BlogDbType>): BlogViewModel {
+    _mapDbBlogToViewModel(blog: WithId<Blog>): BlogViewModel {
 
         return {
             id: String(blog._id),

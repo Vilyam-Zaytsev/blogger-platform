@@ -8,8 +8,7 @@ import {
     RequestWithQuery
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
-import {BlogsService} from "./domain/blogs-service";
-import {BlogDbType} from "./types/blog-db-type";
+import {BlogsService} from "./application/blogs-service";
 import {Paginator,} from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {BlogsQueryRepository} from "./repositoryes/blogs-query-repository";
@@ -20,6 +19,8 @@ import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-t
 import {PostsQueryRepository} from "../06-posts/repositoryes/posts-query-repository";
 import {injectable} from "inversify";
 import {SortingAndPaginationParamsType, SortQueryDto} from "../common/helpers/sort-query-dto";
+import {BlogDto} from "./domain/blog-dto";
+import {Blog} from "./domain/blog-entity";
 
 @injectable()
 class BlogsController {
@@ -32,7 +33,7 @@ class BlogsController {
 
     async getBlogs(
         req: RequestWithQuery<SortingAndPaginationParamsType>,
-        res: Response<Paginator<BlogDbType>>
+        res: Response<Paginator<Blog>>
     ){
 
         const sortingAndPaginationParams: SortingAndPaginationParamsType = {
@@ -43,19 +44,19 @@ class BlogsController {
             searchNameTerm: req.query.searchNameTerm
         };
 
-        const paginationAndSortFilter: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
+        const sortQueryDto: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
 
         const foundBlogs: BlogViewModel[] = await this.blogsQueryRepository
-            .findBlogs(paginationAndSortFilter);
+            .findBlogs(sortQueryDto);
 
         const blogsCount: number = await this.blogsQueryRepository
-            .getBlogsCount(paginationAndSortFilter.searchNameTerm);
+            .getBlogsCount(sortQueryDto.searchNameTerm);
 
         const paginationResponse: Paginator<BlogViewModel> = await this.blogsQueryRepository
             ._mapBlogsViewModelToPaginationResponse(
                 foundBlogs,
                 blogsCount,
-                paginationAndSortFilter
+                sortQueryDto
             );
 
         res
@@ -72,6 +73,7 @@ class BlogsController {
             .findBlog(req.params.id);
 
         if (!foundBlog) {
+
             res
                 .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
 
@@ -88,17 +90,20 @@ class BlogsController {
         res: Response<BlogViewModel>
     ){
 
-        const dataForCreatingBlog: BlogInputModel = {
-            name: req.body.name,
-            description: req.body.description,
-            websiteUrl: req.body.websiteUrl
-        };
+        const {
+            name,
+            description,
+            websiteUrl
+        } = req.body;
 
-        const idCreatedBlog: string = await this.blogsService
-            .createBlog(dataForCreatingBlog);
+        const blogDto: BlogDto = new BlogDto(name, description, websiteUrl);
+
+        //TODO: стоит ли както проверять создание блога!!!???
+        const blogCreationResult: string = await this.blogsService
+            .createBlog(blogDto);
 
         const createdBlog: BlogViewModel | null = await this.blogsQueryRepository
-            .findBlog(idCreatedBlog);
+            .findBlog(blogCreationResult);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
@@ -110,16 +115,19 @@ class BlogsController {
         res: Response<BlogViewModel>
     ){
 
-        const dataForBlogUpdates: BlogInputModel = {
-            name: req.body.name,
-            description: req.body.description,
-            websiteUrl: req.body.websiteUrl
-        };
+        const {
+            name,
+            description,
+            websiteUrl
+        } = req.body;
 
-        const updatedBlog: boolean = await this.blogsService
-            .updateBlog(req.params.id, dataForBlogUpdates);
+        const blogDto: BlogDto = new BlogDto(name, description, websiteUrl);
 
-        if (!updatedBlog) {
+        const blogUpdateResult: boolean = await this.blogsService
+            .updateBlog(req.params.id, blogDto);
+
+        if (!blogUpdateResult) {
+
             res
                 .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
@@ -135,10 +143,11 @@ class BlogsController {
         res: Response
     ){
 
-        const isDeletedBlog: boolean = await this.blogsService
+        const blogDeletionResult: boolean = await this.blogsService
             .deleteBlog(req.params.id);
 
-        if (!isDeletedBlog) {
+        if (!blogDeletionResult) {
+
             res
                 .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
