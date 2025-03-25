@@ -69,6 +69,8 @@ const postStatics: any = {
     }
 }
 
+postSchema.statics = postStatics;
+
 const PostModel: PostModel = mongoose.model<Post, PostModel>('Post', postSchema);
 
 export {

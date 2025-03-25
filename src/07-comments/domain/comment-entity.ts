@@ -73,7 +73,9 @@ const commentStatics: any = {
 
         return new CommentModel(content) as CommentDocument;
     }
-}
+};
+
+commentSchema.statics = commentStatics;
 
 const CommentModel: CommentModel = mongoose.model<Comment, CommentModel>('Comment', commentSchema);
 

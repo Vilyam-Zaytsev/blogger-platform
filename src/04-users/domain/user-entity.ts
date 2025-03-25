@@ -179,6 +179,9 @@ const userStatics: any = {
     }
 };
 
+userSchema.methods = userMethods;
+userStatics.statics = userStatics;
+
 const UserModel: UserModel = mongoose.model<User, UserModel>('User', userSchema);
 
 export {
