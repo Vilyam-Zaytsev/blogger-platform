@@ -1,4 +1,4 @@
-import {CommentatorInfo} from "../../archive/models/comment-model";
+import {CommentatorInfo} from "../domain/comment-entity";
 
 type CommentInputModel = {
     content: string

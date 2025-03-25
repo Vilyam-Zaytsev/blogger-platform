@@ -1,10 +1,9 @@
-import {CommentDbType} from "../types/comment-db-type";
-import {ObjectId, WithId} from "mongodb";
+import {WithId} from "mongodb";
 import {CommentViewModel} from "../types/input-output-types";
 import {Paginator} from "../../common/types/input-output-types/pagination-sort-types";
-import {CommentModel} from "../../archive/models/comment-model";
 import {SortOptionsType} from "../../common/types/sort-options-type";
 import {SortDirection, SortQueryDto} from "../../common/helpers/sort-query-dto";
+import {Comment, CommentModel} from "../domain/comment-entity";
 
 class CommentQueryRepository {
 
@@ -17,7 +16,7 @@ class CommentQueryRepository {
             sortDirection,
         } = sortQueryDto;
 
-        const comments: WithId<CommentDbType>[] | null = await CommentModel
+        const comments: WithId<Comment>[] = await CommentModel
             .find({postId})
             .sort({[sortBy]: sortDirection === SortDirection.Ascending ? 1 : -1} as SortOptionsType)
             .skip((pageNumber - 1) * pageSize)
@@ -29,8 +28,8 @@ class CommentQueryRepository {
 
     async findComment(id: string): Promise<CommentViewModel | null> {
 
-        const comment: WithId<CommentDbType> | null = await CommentModel
-            .findOne({_id: new ObjectId(id)})
+        const comment: WithId<Comment> | null = await CommentModel
+            .findById(id)
             .exec();
 
         if (!comment) return null;
@@ -44,7 +43,7 @@ class CommentQueryRepository {
             .countDocuments({postId})
     }
 
-    _mapDBCommentToViewModel(comment: WithId<CommentDbType>): CommentViewModel {
+    _mapDBCommentToViewModel(comment: WithId<Comment>): CommentViewModel {
 
         return {
             id: String(comment._id),

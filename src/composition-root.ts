@@ -21,7 +21,7 @@ import {PostsQueryRepository} from "./06-posts/repositoryes/posts-query-reposito
 import {BlogsQueryRepository} from "./05-blogs/repositoryes/blogs-query-repository";
 import {PostsController} from "./06-posts/posts-controller";
 import {CommentsController} from "./07-comments/comments-controller";
-import {CommentsService} from "./07-comments/domain/comments-service";
+import {CommentsService} from "./07-comments/application/comments-service";
 import {CommentRepository} from "./07-comments/repositoryes/comment-repository";
 import {CommentQueryRepository} from "./07-comments/repositoryes/comment-query-repository";
 import {NodemailerService} from "./01-auth/adapters/nodemailer-service";

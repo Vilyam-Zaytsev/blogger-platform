@@ -49,7 +49,7 @@ const passwordRecoverySchema = new Schema<PasswordRecovery>({
         type: Date,
         required: true
     }
-});
+}, { _id: false });
 
 const emailConfirmationSchema = new Schema<EmailConfirmation>({
 
@@ -66,7 +66,7 @@ const emailConfirmationSchema = new Schema<EmailConfirmation>({
         enum: Object.values(ConfirmationStatus),
         required: true
     }
-});
+}, { _id: false });
 
 const userSchema = new Schema<User, UserModel, UserMethods>({
 
@@ -89,7 +89,6 @@ const userSchema = new Schema<User, UserModel, UserMethods>({
     passwordRecovery: passwordRecoverySchema,
 
     emailConfirmation: {
-        _id:false,
         type: emailConfirmationSchema,
         required: true
     }

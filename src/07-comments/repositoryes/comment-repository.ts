@@ -1,23 +1,23 @@
-import {CommentDbType} from "../types/comment-db-type";
-import {InsertOneResult, ObjectId, WithId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import {CommentInputModel} from "../types/input-output-types";
 import {injectable} from "inversify";
-import {CommentDocument, CommentModel} from "../../archive/models/comment-model";
+import {CommentDocument, CommentModel} from "../domain/comment-entity";
 
 @injectable()
 class CommentRepository {
 
-    async findComment(id: string): Promise<WithId<CommentDbType> | null> {
+    async findComment(id: string): Promise<CommentDocument | null> {
 
         return CommentModel
-            .findOne({_id: new ObjectId(id)})
-            .lean();
+            .findById(id);
     }
 
-    async saveComment(commentDocument: CommentDocument): Promise<CommentDocument> {
+    async saveComment(commentDocument: CommentDocument): Promise<string> {
 
-        return await commentDocument
+        const result =  await commentDocument
             .save();
+
+        return String(result._id);
     }
 
     async updateComment(id: string, data: CommentInputModel): Promise<boolean> {
@@ -31,11 +31,10 @@ class CommentRepository {
 
     async deleteComment(id: string): Promise<boolean> {
 
-        const result = await CommentModel
-            .deleteOne({_id: new ObjectId(id)})
-            .exec();
+        const result: CommentDocument | null = await CommentModel
+            .findByIdAndDelete(id)
 
-        return result.deletedCount === 1;
+        return !!result;
     }
 }
 

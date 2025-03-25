@@ -6,11 +6,10 @@ import {Post, PostDocument, PostModel} from "../domain/post-entity";
 @injectable()
 class PostsRepository {
 
-    async findPost(id: string): Promise<WithId<Post> | null> {
+    async findPost(id: string): Promise<PostDocument | null> {
 
         return PostModel
-            .findOne({_id: new ObjectId(id)})
-            .lean();
+            .findById(id);
     }
 
     async savePost(postDocument: PostDocument): Promise<string> {
