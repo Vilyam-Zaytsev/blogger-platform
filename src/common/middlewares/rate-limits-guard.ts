@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {SETTINGS} from "../settings";
-import {ApiTrafficModel} from "../../archive/models/api-traffic-model";
+import {ApiTrafficModel} from "../../04-users/domain/api-traffic-entity";
 
 const rateLimitsGuard = async (
     req: Request,
