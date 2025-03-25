@@ -1,29 +1,27 @@
-import {ActiveSessionType} from "../types/active-session-type";
 import {SessionsRepository} from "../repositories/sessions-repository";
-import {
-    ForbiddenResult,
-    InternalServerErrorResult,
-    NotFoundResult,
-    SuccessResult
-} from "../../common/helpers/result-object";
+import {InternalServerErrorResult, NotFoundResult, SuccessResult} from "../../common/helpers/result-object";
 import {ResultType} from "../../common/types/result-types/result-type";
-import {ObjectId, WithId} from "mongodb";
-import {sessionsCollection} from "../../db/mongoDb";
+import {ObjectId} from "mongodb";
 import {injectable} from "inversify";
+import {SessionDto} from "../domain/session-dto";
+import {SessionDocument, SessionModel} from "../domain/session-entity";
 
 @injectable()
 class SessionsService {
 
     constructor(private sessionsRepository: SessionsRepository) {}
 
-    async createSession(newSession: ActiveSessionType) {
+    async createSession(dto: SessionDto): Promise<ResultType<string | null>> {
 
-        const resultInsertSession = await this.sessionsRepository
-            .insertSession(newSession);
+        const newSession: SessionDocument = SessionModel.createSession(dto);
+
+        const resultSaveSession: string = await this.sessionsRepository
+            .saveSession(newSession);
 
         return SuccessResult
-            .create<string>(String(resultInsertSession.insertedId));
+            .create<string>(resultSaveSession);
     }
+
 
     async deleteSession(id: string) {
 
@@ -31,9 +29,9 @@ class SessionsService {
             .deleteSession(id);
     }
 
-    async deleteSessionByDeviceId(userId: string, deviceId: ObjectId): Promise<ResultType> {
+    async deleteSessionByDeviceId(deviceId: ObjectId): Promise<ResultType> {
 
-        const activeSession: WithId<ActiveSessionType> | null = await this.sessionsRepository
+        const activeSession: SessionDocument | null = await this.sessionsRepository
             .findSessionByDeviceId(deviceId)
 
         if (!activeSession) {
@@ -42,16 +40,6 @@ class SessionsService {
                 .create(
                     'deviceId',
                     'No active session found with this deviceId.',
-                    'Failed to delete the session.'
-                );
-        }
-
-        if (activeSession.userId !== userId) {
-
-            return ForbiddenResult
-                .create(
-                    'userId',
-                    'The user does not have permission to delete this session.',
                     'Failed to delete the session.'
                 );
         }

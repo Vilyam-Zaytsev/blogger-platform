@@ -3,18 +3,13 @@ import {BlogInputModel, BlogPostInputModel, BlogViewModel} from "./types/input-o
 import {
     RequestWithBody,
     RequestWithParams,
-    RequestWithParamsAndBody, RequestWithParamsAndQuery,
+    RequestWithParamsAndBody,
+    RequestWithParamsAndQuery,
     RequestWithQuery
 } from "../common/types/input-output-types/request-types";
 import {SETTINGS} from "../common/settings";
-import {BlogsService} from "./domain/blogs-service";
-import {BlogDbType} from "./types/blog-db-type";
-import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
-import {
-    PaginationAndSortFilterType,
-    Paginator,
-    SortingAndPaginationParamsType
-} from "../common/types/input-output-types/pagination-sort-types";
+import {BlogsService} from "./application/blogs-service";
+import {Paginator,} from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {BlogsQueryRepository} from "./repositoryes/blogs-query-repository";
 import {PostViewModel} from "../06-posts/types/input-output-types";
@@ -23,6 +18,11 @@ import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {PostsQueryRepository} from "../06-posts/repositoryes/posts-query-repository";
 import {injectable} from "inversify";
+import {SortingAndPaginationParamsType, SortQueryDto} from "../common/helpers/sort-query-dto";
+import {BlogDto} from "./domain/blog-dto";
+import {Blog} from "./domain/blog-entity";
+import {PostDto} from "../06-posts/domain/post-dto";
+import {isSuccess, isSuccessfulResult} from "../common/helpers/type-guards";
 
 @injectable()
 class BlogsController {
@@ -35,7 +35,7 @@ class BlogsController {
 
     async getBlogs(
         req: RequestWithQuery<SortingAndPaginationParamsType>,
-        res: Response<Paginator<BlogDbType>>
+        res: Response<Paginator<Blog>>
     ){
 
         const sortingAndPaginationParams: SortingAndPaginationParamsType = {
@@ -46,20 +46,19 @@ class BlogsController {
             searchNameTerm: req.query.searchNameTerm
         };
 
-        const paginationAndSortFilter: PaginationAndSortFilterType =
-            createPaginationAndSortFilter(sortingAndPaginationParams);
+        const sortQueryDto: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
 
         const foundBlogs: BlogViewModel[] = await this.blogsQueryRepository
-            .findBlogs(paginationAndSortFilter);
+            .findBlogs(sortQueryDto);
 
         const blogsCount: number = await this.blogsQueryRepository
-            .getBlogsCount(paginationAndSortFilter.searchNameTerm);
+            .getBlogsCount(sortQueryDto.searchNameTerm);
 
         const paginationResponse: Paginator<BlogViewModel> = await this.blogsQueryRepository
             ._mapBlogsViewModelToPaginationResponse(
                 foundBlogs,
                 blogsCount,
-                paginationAndSortFilter
+                sortQueryDto
             );
 
         res
@@ -76,6 +75,7 @@ class BlogsController {
             .findBlog(req.params.id);
 
         if (!foundBlog) {
+
             res
                 .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
 
@@ -92,17 +92,20 @@ class BlogsController {
         res: Response<BlogViewModel>
     ){
 
-        const dataForCreatingBlog: BlogInputModel = {
-            name: req.body.name,
-            description: req.body.description,
-            websiteUrl: req.body.websiteUrl
-        };
+        const {
+            name,
+            description,
+            websiteUrl
+        } = req.body;
 
-        const idCreatedBlog: string = await this.blogsService
-            .createBlog(dataForCreatingBlog);
+        const blogDto: BlogDto = new BlogDto(name, description, websiteUrl);
+
+        //TODO: стоит ли както проверять создание блога!!!???
+        const blogCreationResult: string = await this.blogsService
+            .createBlog(blogDto);
 
         const createdBlog: BlogViewModel | null = await this.blogsQueryRepository
-            .findBlog(idCreatedBlog);
+            .findBlog(blogCreationResult);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
@@ -114,16 +117,19 @@ class BlogsController {
         res: Response<BlogViewModel>
     ){
 
-        const dataForBlogUpdates: BlogInputModel = {
-            name: req.body.name,
-            description: req.body.description,
-            websiteUrl: req.body.websiteUrl
-        };
+        const {
+            name,
+            description,
+            websiteUrl
+        } = req.body;
 
-        const updatedBlog: boolean = await this.blogsService
-            .updateBlog(req.params.id, dataForBlogUpdates);
+        const blogDto: BlogDto = new BlogDto(name, description, websiteUrl);
 
-        if (!updatedBlog) {
+        const blogUpdateResult: boolean = await this.blogsService
+            .updateBlog(req.params.id, blogDto);
+
+        if (!blogUpdateResult) {
+
             res
                 .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
@@ -139,10 +145,11 @@ class BlogsController {
         res: Response
     ){
 
-        const isDeletedBlog: boolean = await this.blogsService
+        const blogDeletionResult: boolean = await this.blogsService
             .deleteBlog(req.params.id);
 
-        if (!isDeletedBlog) {
+        if (!blogDeletionResult) {
+
             res
                 .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
@@ -158,9 +165,9 @@ class BlogsController {
         res: Response<Paginator<PostViewModel>>
     ){
 
-        const blogId: string = req.params.id;
+        const { id: blogId } = req.params;
 
-        const resultCheckBlogId: ResultType<string | null> = await this.blogsService
+        const resultCheckBlogId: ResultType = await this.blogsService
             .checkBlogId(blogId);
 
         if (resultCheckBlogId.status !== ResultStatus.Success) {
@@ -178,11 +185,10 @@ class BlogsController {
             sortDirection: req.query.sortDirection,
         };
 
-        const paginationAndSortFilter: PaginationAndSortFilterType =
-            createPaginationAndSortFilter(sortingAndPaginationParams)
+        const sortQueryDto: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
 
         const foundPosts: PostViewModel[] = await this.postsQueryRepository
-            .findPosts(paginationAndSortFilter, blogId);
+            .findPosts(sortQueryDto, blogId);
 
         const postsCount: number = await this.postsQueryRepository
             .getPostsCount(blogId);
@@ -191,7 +197,7 @@ class BlogsController {
             ._mapPostsViewModelToPaginationResponse(
                 foundPosts,
                 postsCount,
-                paginationAndSortFilter
+                sortQueryDto
             );
 
         res
@@ -206,25 +212,35 @@ class BlogsController {
 
         const blogId: string = req.params.id;
 
-        const dataForCreatingPost: BlogPostInputModel = {
-            title: req.body.title,
-            shortDescription: req.body.shortDescription,
-            content: req.body.content,
-        };
+        const {
+            title,
+            shortDescription,
+            content
+        } = req.body;
 
-        const resultCreatedPost: ResultType<string | null> = await this.blogsService
-            .createPost(blogId, dataForCreatingPost);
+        const postDto: PostDto = new PostDto(
+            title,
+            shortDescription,
+            content,
+            blogId
+        );
 
-        if (resultCreatedPost.status !== ResultStatus.Success) {
+        const {
+            status: postCreationStatus,
+            data: idCreatedPost
+        }: ResultType<string | null> = await this.blogsService
+            .createPost(postDto);
+
+        if (!isSuccessfulResult(postCreationStatus, idCreatedPost)) {
 
             res
-                .sendStatus(mapResultStatusToHttpStatus(resultCreatedPost.status));
+                .sendStatus(mapResultStatusToHttpStatus(postCreationStatus));
 
             return;
         }
 
         const createdPost: PostViewModel | null = await this.postsQueryRepository
-            .findPost(resultCreatedPost.data!);
+            .findPost(idCreatedPost);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)

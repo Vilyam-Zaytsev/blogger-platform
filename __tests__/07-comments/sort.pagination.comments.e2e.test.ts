@@ -9,7 +9,7 @@ import {
     setCommentsCollection,
     setPostsCollection,
     setUsersCollection, sessionsCollection, apiTrafficCollection, setSessionsCollection, setApiTrafficCollection,
-} from "../../src/db/mongoDb";
+} from "../../src/db/mongo-db/mongoDb";
 import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
 import {PostDbType} from "../../src/06-posts/types/post-db-type";
 import {CommentDbType} from "../../src/07-comments/types/comment-db-type";
@@ -29,10 +29,10 @@ import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/07-comments/types/input-output-types";
 import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
-import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
+import {createPaginationAndSortFilter} from "../../src/common/helpers/sort-query-dto";
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
-import {User} from "../../src/04-users/domain/user.entity";
+import {User} from "../../src/04-users/domain/user-entity";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;

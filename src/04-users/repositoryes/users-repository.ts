@@ -1,19 +1,14 @@
-import {ConfirmationStatus} from "../types/confirmation-status";
-import {InsertOneResult, ObjectId, Sort, WithId} from "mongodb";
-import {usersCollection} from "../../db/mongoDb";
-import {
-    MatchMode,
-    PaginationAndSortFilterType,
-} from "../../common/types/input-output-types/pagination-sort-types";
-import {createUsersSearchFilter} from "../helpers/create-users-search-filter";
-import {User} from "../domain/user.entity";
+import {MatchMode,} from "../../common/types/input-output-types/pagination-sort-types";
 import {injectable} from "inversify";
+import {SortOptionsType} from "../../common/types/sort-options-type";
+import {UserDocument, UserModel} from "../domain/user-entity";
+import {SortQueryDto} from "../../common/helpers/sort-query-dto";
 
 @injectable()
 class UsersRepository {
 
-    async findUsers(sortQueryDto: PaginationAndSortFilterType): Promise<WithId<User>[]> {
-
+    async findUsers(sortQueryDto: SortQueryDto): Promise<UserDocument[]> {
+//TODO: зачем мне здесь сортировка, погинация и фильтр???
         const {
             pageNumber,
             pageSize,
@@ -23,125 +18,70 @@ class UsersRepository {
             searchEmailTerm
         } = sortQueryDto;
 
-        const filter: any = createUsersSearchFilter(
-            {
-                searchLoginTerm,
-                searchEmailTerm
-            },
-            MatchMode.Partial
-        );
+        let filter: any = {$or: []};
 
-        return await usersCollection
-            .find(filter)
-            .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as Sort)
+        searchLoginTerm
+            ? filter.$or.push({login: {$regex: searchLoginTerm, $options: 'i'}})
+            : null;
+
+        searchEmailTerm
+            ? filter.$or.push({email: {$regex: searchEmailTerm, $options: 'i'}})
+            : null;
+
+        return UserModel
+            .find(filter.$or.length > 0 ? filter : {})
+            .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as SortOptionsType)
             .skip((pageNumber - 1) * pageSize)
-            .limit(pageSize)
-            .toArray();
+            .limit(pageSize);
     }
 
-    async findUser(id: string): Promise<WithId<User> | null> {
+    async findUserById(id: string): Promise<UserDocument | null> {
 
-        return usersCollection
-            .findOne({_id: new ObjectId(id)});
+        return UserModel
+            .findById(id);
     }
 
-    async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<User> | null> {
+    async findByLoginOrEmail(loginOrEmail: string): Promise<UserDocument | null> {
 
-        return usersCollection
+        return UserModel
             .findOne({
                 $or: [{email: loginOrEmail}, {login: loginOrEmail}],
             });
     }
 
-    async findByEmail(email: string): Promise<WithId<User> | null> {
+    async findByEmail(email: string): Promise<UserDocument | null> {
 
-        return usersCollection
+        return UserModel
             .findOne({email});
     }
 
-    async findByConfirmationCode(confirmationCode: string): Promise<WithId<User> | null> {
+    async findByConfirmationCode(confirmationCode: string): Promise<UserDocument | null> {
 
-        return usersCollection
+        return UserModel
             .findOne({'emailConfirmation.confirmationCode': confirmationCode});
     }
 
-    async findByRecoveryCode(recoveryCode: string): Promise<WithId<User> | null> {
+    async findByRecoveryCode(recoveryCode: string): Promise<UserDocument | null> {
 
-        return usersCollection
-            .findOne({'passwordRecovery.recoveryCode': recoveryCode});
+        return UserModel
+            .findOne({'passwordRecovery.recoveryCode': recoveryCode})
+
     }
 
-    async insertUser(newUser: User): Promise<InsertOneResult> {
+    async saveUser(newUser: UserDocument): Promise<string> {
 
-        return await usersCollection
-            .insertOne(newUser);
+        const result: UserDocument =  await newUser
+            .save();
+
+        return String(result._id);
     }
-
-    async updateEmailConfirmation(
-        _id: ObjectId,
-        confirmationCode: string | null,
-        expirationDate: Date | null
-    ): Promise<boolean> {
-
-        const result = await usersCollection
-            .updateOne({_id}, {
-                $set: {
-                    'emailConfirmation.confirmationCode': confirmationCode,
-                    'emailConfirmation.expirationDate': expirationDate,
-                }
-            });
-
-        return result.matchedCount === 1;
-    }
-
-    async updateConfirmationStatus(_id: ObjectId): Promise<boolean> {
-
-        const result = await usersCollection
-            .updateOne({_id}, {
-                $set: {
-                    'emailConfirmation.confirmationStatus': ConfirmationStatus.Confirmed
-                }
-            });
-
-        return result.modifiedCount === 1;
-    }
-
-    async updatePasswordRecovery(
-        _id: ObjectId,
-        recoveryCode: string | null,
-        expirationDate: Date | null
-    ): Promise<boolean> {
-
-        const result = await usersCollection
-            .updateOne({_id}, {
-                $set: {
-                    'passwordRecovery.recoveryCode': recoveryCode,
-                    'passwordRecovery.expirationDate': expirationDate,
-                }
-            });
-
-        return result.matchedCount === 1;
-    }
-
-    async updatePassword(_id: ObjectId, newPassword: string): Promise<boolean> {
-
-        const result = await usersCollection
-            .updateOne({_id}, {
-                $set: {
-                    passwordHash: newPassword
-                }
-            });
-
-        return result.modifiedCount === 1;
-    }
-
 
     async deleteUser(id: string): Promise<boolean> {
 
-        const result = await usersCollection
-            .deleteOne({_id: new ObjectId(id)});
+        const result: UserDocument | null = await UserModel
+            .findByIdAndDelete(id);
 
-        return result.deletedCount === 1;
+        return !!result;
     }
 }
 

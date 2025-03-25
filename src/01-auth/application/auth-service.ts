@@ -1,32 +1,25 @@
 import {BcryptService} from "../adapters/bcrypt-service";
 import {LoginInputModel} from "../types/login-input-model";
-import {ConfirmationStatus} from "../../04-users/types/confirmation-status";
 import {UsersRepository} from "../../04-users/repositoryes/users-repository";
-import {ResultStatus} from "../../common/types/result-types/result-status";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {JwtService} from "../adapters/jwt-service";
-import {ObjectId, WithId} from "mongodb";
-import {UsersService} from "../../04-users/domain/users-service";
-import {User} from "../../04-users/domain/user.entity";
-import {nodemailerService} from "../adapters/nodemailer-service";
+import {ObjectId} from "mongodb";
+import {UsersService} from "../../04-users/application/users-service";
+import {ConfirmationStatus, PasswordRecovery, UserDocument, UserModel} from "../../04-users/domain/user-entity";
+import {NodemailerService} from "../adapters/nodemailer-service";
 import {EmailTemplates} from "../adapters/email-templates";
 import {randomUUID} from "node:crypto";
 import {add} from "date-fns";
-import {UserInputModel} from "../../04-users/types/input-output-types";
-import {
-    BadRequestResult,
-    InternalServerErrorResult,
-    NotFoundResult,
-    SuccessResult,
-    UnauthorizedResult
-} from "../../common/helpers/result-object";
+import {BadRequestResult, NotFoundResult, SuccessResult, UnauthorizedResult} from "../../common/helpers/result-object";
 import {AuthTokens} from "../types/auth-tokens-type";
-import {ActiveSessionType} from "../../02-sessions/types/active-session-type";
 import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
 import {SessionsRepository} from "../../02-sessions/repositories/sessions-repository";
 import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-type";
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
 import {injectable} from "inversify";
+import {SessionDocument} from "../../02-sessions/domain/session-entity";
+import {UserDto} from "../../04-users/domain/user-dto";
+import {isSuccess, isSuccessfulResult} from "../../common/helpers/type-guards";
 
 @injectable()
 class AuthService {
@@ -37,18 +30,19 @@ class AuthService {
         private emailTemplates: EmailTemplates,
         private sessionsRepository: SessionsRepository,
         private usersService: UsersService,
-        private usersRepository: UsersRepository
+        private usersRepository: UsersRepository,
+        private nodemailerService: NodemailerService
     ) {
     };
 
     async login(authParamsDto: LoginInputModel): Promise<ResultType<AuthTokens | null>> {
 
         const {
-            data: checkedUserId,
-            status: userVerificationStatus
+            status: userVerificationStatus,
+            data: checkedUserId
         }: ResultType<string | null> = await this.checkUserCredentials(authParamsDto);
 
-        if (userVerificationStatus !== ResultStatus.Success) {
+        if (!isSuccessfulResult(userVerificationStatus, checkedUserId)) {
 
             return UnauthorizedResult
                 .create(
@@ -59,13 +53,13 @@ class AuthService {
         }
 
         const accessToken: string = await this.jwtService
-            .createAccessToken(checkedUserId!);
+            .createAccessToken(checkedUserId);
 
         const deviceId: ObjectId = new ObjectId();
 
         const refreshToken: string = await this.jwtService
             .createRefreshToken(
-                checkedUserId!,
+                checkedUserId,
                 deviceId
             );
 
@@ -88,6 +82,7 @@ class AuthService {
             this.jwtService.createRefreshToken(userId, deviceId)
         ]);
 
+        //TODO: как правильно написать типизацию???
         const [
             payloadRefreshToken,
             session
@@ -97,39 +92,34 @@ class AuthService {
         ]);
 
         const timestamps: SessionTimestampsType = {
-            iat: new Date(payloadRefreshToken.iat * 1000),
-            exp: new Date(payloadRefreshToken.exp * 1000)
+            iat: new Date(payloadRefreshToken!.iat * 1000),
+            exp: new Date(payloadRefreshToken!.exp * 1000)
         };
 
-        const resultUpdateSessionTimestamps: boolean = await this.sessionsRepository
-            .updateSessionTimestamps(session!._id, timestamps);
+        session!.updateTimestamps(timestamps);
 
-        if (!resultUpdateSessionTimestamps) {
-
-            return InternalServerErrorResult
-                .create(
-                    'iat, exp',
-                    'Failed to update session timestamps.',
-                    'Failed to refresh the token pair.'
-                );
-        }
+        await this.sessionsRepository
+            .saveSession(session!);
 
         return SuccessResult
             .create<AuthTokens>({accessToken, refreshToken});
 
     }
 
-    async registration(registrationUserDto: UserInputModel): Promise<ResultType<string | null>> {
+    async registration(userDto: UserDto): Promise<ResultType<string | null>> {
 
-        const candidate: User = await User
-            .registrationUser(registrationUserDto);
+        const candidate: UserDocument = UserModel
+            .userCreationDuringRegistration(userDto);
 
         const resultCreateUser: ResultType<string | null> = await this.usersService
             .createUser(candidate);
 
-        if (resultCreateUser.status !== ResultStatus.Success) return resultCreateUser;
+        if (!isSuccess(resultCreateUser)) {
 
-        nodemailerService
+            return resultCreateUser;
+        }
+
+        this.nodemailerService
             .sendEmail(
                 candidate.email,
                 this.emailTemplates
@@ -143,11 +133,11 @@ class AuthService {
 
     async registrationConfirmation(confirmationCode: string): Promise<ResultType> {
 
-        const user: WithId<User> | null = await this.usersRepository
+        const userDocument: UserDocument | null = await this.usersRepository
             .findByConfirmationCode(confirmationCode);
 
 
-        if (!user) {
+        if (!userDocument) {
 
             return BadRequestResult
                 .create(
@@ -157,19 +147,11 @@ class AuthService {
                 );
         }
 
-        //TODO: УБРАТЬ ЭТУ ПРОВЕРКУ!!!
-
-        // if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) {
-        //
-        //     return BadRequestResult
-        //         .create(
-        //             'code',
-        //             'The confirmation code has already been used. The account has already been verified.',
-        //             'Failed to complete user registration.'
-        //         );
-        // }
-
-        if (user.emailConfirmation.expirationDate && user.emailConfirmation.expirationDate < new Date()) {
+        if (
+            userDocument.emailConfirmation
+            && userDocument.emailConfirmation.expirationDate
+            && userDocument.emailConfirmation.expirationDate < new Date()
+        ) {
 
             return BadRequestResult
                 .create(
@@ -179,15 +161,11 @@ class AuthService {
                 );
         }
 
-        await this.usersRepository
-            .updateConfirmationStatus(user._id);
+        userDocument
+            .confirmRegistration();
 
         await this.usersRepository
-            .updateEmailConfirmation(
-                user._id,
-                null,
-                null
-            );
+            .saveUser(userDocument);
 
         return SuccessResult
             .create(null);
@@ -195,10 +173,10 @@ class AuthService {
 
     async registrationEmailResending(email: string): Promise<ResultType> {
 
-        const user: WithId<User> | null = await this.usersRepository
+        const userDocument: UserDocument | null = await this.usersRepository
             .findByEmail(email);
 
-        if (!user) {
+        if (!userDocument) {
 
             return BadRequestResult
                 .create(
@@ -208,7 +186,10 @@ class AuthService {
                 );
         }
 
-        if (user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed) {
+        if (
+            userDocument.emailConfirmation
+            && userDocument.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed
+        ) {
 
             return BadRequestResult
                 .create(
@@ -224,15 +205,15 @@ class AuthService {
             {hours: 1, minutes: 1}
         );
 
-        await this.usersRepository
-            .updateEmailConfirmation(
-                user._id,
-                confirmationCode,
-                expirationDate);
+        userDocument
+            .refreshConfirmationCode(confirmationCode, expirationDate);
 
-        nodemailerService
+        await this.usersRepository
+            .saveUser(userDocument);
+
+        this.nodemailerService
             .sendEmail(
-                user.email,
+                userDocument.email,
                 this.emailTemplates
                     .registrationEmail(confirmationCode)
             )
@@ -248,7 +229,7 @@ class AuthService {
             password
         } = authParamsDto;
 
-        const user: WithId<User> | null = await this.usersRepository
+        const user: UserDocument | null = await this.usersRepository
             .findByLoginOrEmail(loginOrEmail);
 
         if (!user) {
@@ -295,8 +276,8 @@ class AuthService {
 
         const {userId} = payload;
 
-        const isUser: User | null = await this.usersRepository
-            .findUser(userId);
+        const isUser: UserDocument | null = await this.usersRepository
+            .findUserById(userId);
 
         if (!isUser) {
 
@@ -332,8 +313,8 @@ class AuthService {
             deviceId,
         } = payload;
 
-        const isUser: User | null = await this.usersRepository
-            .findUser(userId);
+        const isUser: UserDocument | null = await this.usersRepository
+            .findUserById(userId);
 
         if (!isUser) {
 
@@ -345,7 +326,7 @@ class AuthService {
                 );
         }
 
-        const isSessionActive: WithId<ActiveSessionType> | null = await this.sessionsRepository
+        const isSessionActive: SessionDocument | null = await this.sessionsRepository
             .findSessionByDeviceId(new ObjectId(deviceId));
 
         if (!isSessionActive) {
@@ -364,32 +345,33 @@ class AuthService {
 
     async passwordRecovery(email: string): Promise<ResultType> {
 
-        const user: WithId<User> | null = await this.usersRepository
+        const userDocument: UserDocument | null = await this.usersRepository
             .findByEmail(email);
 
-        if (!user) {
+        if (!userDocument) {
 
             return SuccessResult
                 .create(null);
         }
 
-        const recoveryCode: string = randomUUID();
-        const expirationDate: Date = add(
-            new Date(),
-            {hours: 1, minutes: 1}
-        )
+        const passwordRecovery: PasswordRecovery = {
+            recoveryCode: randomUUID(),
+            expirationDate: add(
+                new Date(),
+                {hours: 1, minutes: 1}
+            )
+        }
+
+        userDocument.passwordRecovery = passwordRecovery;
 
         await this.usersRepository
-            .updatePasswordRecovery(
-                user._id,
-                recoveryCode,
-                expirationDate);
+            .saveUser(userDocument);
 
-        nodemailerService
+        this.nodemailerService
             .sendEmail(
-                user.email,
+                userDocument.email,
                 this.emailTemplates
-                    .passwordRecoveryEmail(recoveryCode)
+                    .passwordRecoveryEmail(passwordRecovery.recoveryCode)
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 
@@ -399,11 +381,11 @@ class AuthService {
 
     async newPassword(newPassword: string, recoveryCode: string): Promise<ResultType> {
 
-        const user: WithId<User> | null = await this.usersRepository
+        const userDocument: UserDocument | null = await this.usersRepository
             .findByRecoveryCode(recoveryCode);
 
 
-        if (!user) {
+        if (!userDocument) {
 
             return BadRequestResult
                 .create(
@@ -413,7 +395,11 @@ class AuthService {
                 );
         }
 
-        if (user.passwordRecovery.expirationDate && user.passwordRecovery.expirationDate < new Date()) {
+        if (
+            userDocument.passwordRecovery
+            && userDocument.passwordRecovery.expirationDate
+            && userDocument.passwordRecovery.expirationDate < new Date()
+        ) {
 
             return BadRequestResult
                 .create(
@@ -423,38 +409,13 @@ class AuthService {
                 );
         }
 
-        const passwordHash: string = await this.bcryptService
+        userDocument.passwordHash = await this.bcryptService
             .generateHash(newPassword);
 
-        const resultUpdatePassword: boolean = await this.usersRepository
-            .updatePassword(user._id, passwordHash);
+        userDocument.passwordRecovery = null;
 
-        if (!resultUpdatePassword) {
-
-            return InternalServerErrorResult
-                .create(
-                    'no field',
-                    'Server Error.',
-                    'The password could not be updated.'
-                );
-        }
-//TODO: В ЭТОМ СЛУЧАЕ НЕТ НЕОБХОДИМОСТИ В rateLimitsGuard
-        const resultUpdatePasswordRecovery: boolean = await this.usersRepository
-            .updatePasswordRecovery(
-                user._id,
-                null,
-                null
-            )
-
-        if (!resultUpdatePasswordRecovery) {
-
-            return InternalServerErrorResult
-                .create(
-                    'no field',
-                    'Server Error.',
-                    'The password could not be updated.'
-                );
-        }
+        await this.usersRepository
+            .saveUser(userDocument);
 
         return SuccessResult
             .create(null);

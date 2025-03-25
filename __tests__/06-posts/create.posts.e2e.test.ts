@@ -10,8 +10,7 @@ import {
 import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
-import {blogsCollection, postsCollection, setBlogsCollection, setPostsCollection} from "../../src/db/mongoDb";
-import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
+import {blogsCollection, postsCollection, setBlogsCollection, setPostsCollection} from "../../src/db/mongo-db/mongoDb";
 import {PostDbType} from "../../src/06-posts/types/post-db-type";
 import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {Response} from "supertest";

@@ -1,27 +1,33 @@
 import {UsersRepository} from "../repositoryes/users-repository";
 import {ResultType} from "../../common/types/result-types/result-type";
-import {ResultStatus} from "../../common/types/result-types/result-status";
-import {WithId} from "mongodb";
 import {BadRequestResult, SuccessResult} from "../../common/helpers/result-object";
-import {User} from "./user.entity";
 import {injectable} from "inversify";
+import {UserDocument} from "../domain/user-entity";
+import {isSuccess} from "../../common/helpers/type-guards";
 
 @injectable()
 class UsersService {
 
-    constructor(private usersRepository: UsersRepository) {};
+    constructor(private usersRepository: UsersRepository) {
+    };
 
-    async createUser(user: User): Promise<ResultType<string | null>> {
+    async createUser(candidate: UserDocument): Promise<ResultType<string | null>> {
 
-        const resultCandidateValidation: ResultType = await this.validateCandidateUniqueness(user.login, user.email);
+        const resultCandidateValidation: ResultType = await this.validateCandidateUniqueness(
+            candidate.login,
+            candidate.email
+        );
 
-        if (resultCandidateValidation.status !== ResultStatus.Success) return resultCandidateValidation;
+        if (!isSuccess(resultCandidateValidation)) {
 
-        const result = await this.usersRepository
-            .insertUser(user);
+            return resultCandidateValidation;
+        }
+
+        const resultSaveUser: string = await this.usersRepository
+                .saveUser(candidate);
 
         return SuccessResult
-            .create<string>(String(result.insertedId));
+            .create<string>(resultSaveUser);
     }
 
     async deleteUser(id: string): Promise<boolean> {
@@ -32,7 +38,7 @@ class UsersService {
 
     async validateCandidateUniqueness(login: string, email: string): Promise<ResultType> {
 
-        const findByLogin: WithId<User> | null = await this.usersRepository
+        const findByLogin: UserDocument | null = await this.usersRepository
             .findByLoginOrEmail(login);
 
         if (findByLogin) {
@@ -45,7 +51,7 @@ class UsersService {
                 );
         }
 
-        const findByEmail: WithId<User> | null = await this.usersRepository
+        const findByEmail: UserDocument | null = await this.usersRepository
             .findByLoginOrEmail(email);
 
         if (findByEmail) {

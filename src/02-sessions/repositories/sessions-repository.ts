@@ -1,52 +1,41 @@
-import {sessionsCollection} from "../../db/mongoDb";
-import {InsertOneResult, ObjectId, WithId} from "mongodb";
-import {ActiveSessionType} from "../types/active-session-type";
-import {SessionTimestampsType} from "../types/session-timestamps-type";
+import {ObjectId} from "mongodb";
 import {injectable} from "inversify";
+import {SessionDocument, SessionModel} from "../domain/session-entity";
 
 @injectable()
 class SessionsRepository {
 
-    async findSessionByDeviceId(deviceId: ObjectId): Promise<WithId<ActiveSessionType> | null> {
+    async findSessionByDeviceId(deviceId: ObjectId): Promise<SessionDocument | null> {
 
-        return sessionsCollection
+        return SessionModel
             .findOne({deviceId});
     }
 
-    async insertSession(newSession: ActiveSessionType): Promise<InsertOneResult> {
+    async saveSession(newSession: SessionDocument): Promise<string> {
 
-        return await sessionsCollection
-            .insertOne(newSession);
-    }
+        const result = await newSession
+            .save();
 
-    async updateSessionTimestamps(_id: ObjectId, data: SessionTimestampsType): Promise<boolean> {
-
-        const result = await sessionsCollection
-            .updateOne({_id}, {
-                $set: {
-                    'iat': data.iat,
-                    'exp': data.exp
-                }
-            });
-
-        return result.matchedCount === 1;
+        return String(result._id);
     }
 
     async deleteSession(id: string): Promise<boolean> {
 
-        const result = await sessionsCollection
-            .deleteOne({_id: new ObjectId(id)});
+        const result = await SessionModel
+            .deleteOne(id)
+            .exec();
 
         return result.deletedCount === 1;
     }
 
     async deleteAllSessionsExceptCurrent(userId: string, deviceId: ObjectId) {
 
-        const result = await sessionsCollection
+        const result = await SessionModel
             .deleteMany({
                 userId,
                 deviceId: {$ne: deviceId}
-            });
+            })
+            .exec();
 
         return result.deletedCount > 0;
     }

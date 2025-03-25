@@ -1,38 +1,40 @@
-import {PostDbType} from "../types/post-db-type";
 import {PostInputModel} from "../types/input-output-types";
-import {postsCollection} from "../../db/mongoDb";
-import {InsertOneResult, ObjectId, WithId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import {injectable} from "inversify";
+import {Post, PostDocument, PostModel} from "../domain/post-entity";
 
 @injectable()
 class PostsRepository {
 
-    async findPost(id: string): Promise<WithId<PostDbType> | null> {
+    async findPost(id: string): Promise<PostDocument | null> {
 
-        return await postsCollection
-            .findOne({_id: new ObjectId(id)});
+        return PostModel
+            .findById(id);
     }
 
-    async insertPost(newPost: PostDbType): Promise<InsertOneResult> {
+    async savePost(postDocument: PostDocument): Promise<string> {
 
-            return  await postsCollection
-                .insertOne(newPost);
+            const result = await postDocument
+                .save();
+
+            return String(result._id);
     }
 
-    async updatePost(id: string, data: PostInputModel): Promise<boolean> {
+    async updatePost(id: string, postDto: PostInputModel): Promise<boolean> {
 
-            const result = await postsCollection
-                .updateOne({_id: new ObjectId(id)}, {$set: {...data}});
+            const result = await PostModel
+                .updateOne({_id: new ObjectId(id)}, {$set: {...postDto}})
+                .exec();
 
             return result.matchedCount === 1;
     }
 
     async deletePost(id: string): Promise<boolean> {
 
-            const result = await postsCollection
-                .deleteOne({_id: new ObjectId(id)});
+            const result: PostDocument | null = await PostModel
+                .findByIdAndDelete(id);
 
-            return result.deletedCount === 1;
+            return !!result;
     }
 }
 

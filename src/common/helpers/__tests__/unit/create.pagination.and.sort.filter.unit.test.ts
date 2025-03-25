@@ -1,5 +1,5 @@
 import {PaginationAndSortFilterType, SortDirection} from "../../../types/input-output-types/pagination-sort-types";
-import {createPaginationAndSortFilter} from "../../create-pagination-and-sort-filter";
+import {createPaginationAndSortFilter} from "../../sort-query-dto";
 import {console_log_e2e, console_log_unit} from "../../../../../__tests__/helpers/test-helpers";
 
 describe('CREATE PAGINATION AND SORT FILTER', () => {

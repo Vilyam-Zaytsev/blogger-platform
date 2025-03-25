@@ -16,7 +16,7 @@ import {
 import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
-import {blogsCollection, postsCollection, setBlogsCollection, setPostsCollection} from "../../src/db/mongoDb";
+import {blogsCollection, postsCollection, setBlogsCollection, setPostsCollection} from "../../src/db/mongo-db/mongoDb";
 import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {postsTestManager} from "../helpers/managers/05_posts-test-manager";

@@ -1,20 +1,15 @@
-import {PostDbType} from "../types/post-db-type";
-import {postsCollection} from "../../db/mongoDb";
-import {ObjectId, Sort, WithId} from "mongodb";
-import {
-    MatchMode,
-    PaginationAndSortFilterType,
-    Paginator
-} from "../../common/types/input-output-types/pagination-sort-types";
-import {createPostsSearchFilter} from "../helpers/create-posts-search-filter";
+import {ObjectId, WithId} from "mongodb";
+import {Paginator} from "../../common/types/input-output-types/pagination-sort-types";
 import {PostViewModel} from "../types/input-output-types";
-import {BlogViewModel} from "../../05-blogs/types/input-output-types";
 import {injectable} from "inversify";
+import {SortOptionsType} from "../../common/types/sort-options-type";
+import {SortQueryDto} from "../../common/helpers/sort-query-dto";
+import {Post, PostModel} from "../domain/post-entity";
 
 @injectable()
 class PostsQueryRepository {
 
-    async findPosts(sortQueryDto: PaginationAndSortFilterType, blogId?: string): Promise<PostViewModel[]> {
+    async findPosts(sortQueryDto: SortQueryDto, blogId?: string): Promise<PostViewModel[]> {
 
         const {
             pageNumber,
@@ -23,42 +18,47 @@ class PostsQueryRepository {
             sortDirection,
         } = sortQueryDto;
 
-        const filter: any = createPostsSearchFilter(
-            {blogId},
-            MatchMode.Exact
-        );
+        let filter: any = {};
 
-        const posts: WithId<PostDbType>[] = await postsCollection
+        blogId
+            ? filter = {blogId}
+            : {};
+
+        const posts: WithId<Post>[] = await PostModel
             .find(filter)
-            .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as Sort)
+            .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as SortOptionsType)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray();
+            .exec();
 
         return posts.map(p => this._mapDbPostToViewModel(p));
     }
 
-    async getPostsCount(blogId?: string ): Promise<number> {
+    async getPostsCount(blogId?: string): Promise<number> {
 
-        const filter: any = createPostsSearchFilter(
-            {blogId},
-            MatchMode.Exact
-        );
+        let filter: any = {};
 
-        return await postsCollection
-            .countDocuments(filter);
+        blogId
+            ? filter = {blogId}
+            : {};
+
+        return PostModel
+            .countDocuments(filter)
+            .lean();
     }
 
     async findPost(id: string): Promise<PostViewModel | null> {
-            const post: WithId<PostDbType> | null = await postsCollection
-                .findOne({_id: new ObjectId(id)});
 
-            if (!post) return null;
+        const post: WithId<Post> | null = await PostModel
+            .findById(id)
+            .exec();
 
-            return this._mapDbPostToViewModel(post);
+        if (!post) return null;
+
+        return this._mapDbPostToViewModel(post);
     }
 
-    _mapDbPostToViewModel(post: WithId<PostDbType>): PostViewModel {
+    _mapDbPostToViewModel(post: WithId<Post>): PostViewModel {
         return {
             id: String(post._id),
             title: post.title,
@@ -73,13 +73,13 @@ class PostsQueryRepository {
     _mapPostsViewModelToPaginationResponse(
         posts: PostViewModel[],
         blogsCount: number,
-        paginationAndSortFilter: PaginationAndSortFilterType
+        sortQueryDto: SortQueryDto
     ): Paginator<PostViewModel> {
 
         return {
-            pagesCount: Math.ceil(blogsCount / paginationAndSortFilter.pageSize),
-            page: paginationAndSortFilter.pageNumber,
-            pageSize: paginationAndSortFilter.pageSize,
+            pagesCount: Math.ceil(blogsCount / sortQueryDto.pageSize),
+            page: sortQueryDto.pageNumber,
+            pageSize: sortQueryDto.pageSize,
             totalCount: blogsCount,
             items: posts
         };

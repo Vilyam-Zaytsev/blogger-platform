@@ -18,7 +18,7 @@ import {
     setPostsCollection, setSessionsCollection,
     setUsersCollection,
     usersCollection
-} from "../../src/db/mongoDb";
+} from "../../src/db/mongo-db/mongoDb";
 import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
@@ -33,7 +33,7 @@ import {commentsTestManager} from "../helpers/managers/06_comments-test-manager"
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
-import {User} from "../../src/04-users/domain/user.entity";
+import {User} from "../../src/04-users/domain/user-entity";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;

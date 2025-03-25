@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
-import {apiTrafficCollection} from "../../db/mongoDb";
 import {SETTINGS} from "../settings";
+import {ApiTrafficModel} from "../../04-users/domain/api-traffic-entity";
 
 const rateLimitsGuard = async (
     req: Request,
@@ -22,23 +22,26 @@ const rateLimitsGuard = async (
         date: {$gte: new Date(date.getTime() - 10 * 1000).toISOString()}
     };
 
-    const recentRequestCount: number = await apiTrafficCollection
-        .countDocuments(filter);
+    await ApiTrafficModel
+        .create({
+            ip,
+            url,
+            date
+        });
 
-    if (recentRequestCount >= 5) {
+    const recentRequestCount: number = await ApiTrafficModel
+        .countDocuments(filter)
+        .exec();
+
+    console.log(recentRequestCount)
+
+    if (recentRequestCount > 5) {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.TOO_MANY_REQUESTS_429);
 
         return;
     }
-
-    await apiTrafficCollection
-        .insertOne({
-            ip,
-            url,
-            date: date.toISOString()
-        });
 
     next();
 };

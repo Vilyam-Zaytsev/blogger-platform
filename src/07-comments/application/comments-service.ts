@@ -2,10 +2,8 @@ import {CommentInputModel} from "../types/input-output-types";
 import {ObjectId, WithId} from "mongodb";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ResultStatus} from "../../common/types/result-types/result-status";
-import {PostDbType} from "../../06-posts/types/post-db-type";
-import {PostsService} from "../../06-posts/domain/posts-service";
+import {PostsService} from "../../06-posts/application/posts-service";
 import {CommentRepository} from "../repositoryes/comment-repository";
-import {CommentDbType} from "../types/comment-db-type";
 import {UsersRepository} from "../../04-users/repositoryes/users-repository";
 import {
     BadRequestResult,
@@ -13,8 +11,10 @@ import {
     NotFoundResult,
     SuccessResult
 } from "../../common/helpers/result-object";
-import {User} from "../../04-users/domain/user.entity";
 import {injectable} from "inversify";
+import {UserDocument} from "../../04-users/domain/user-entity";
+import {Post} from "../../06-posts/domain/post-entity";
+import {CommentDocument, CommentModel} from "../domain/comment-entity";
 
 @injectable()
 class CommentsService {
@@ -23,11 +23,16 @@ class CommentsService {
         private usersRepository: UsersRepository,
         private postsService: PostsService,
         private commentRepository: CommentRepository
-    ) {};
+    ) {
+    };
 
-    async createComment(data: CommentInputModel, postId: string, commentatorId: string): Promise<ResultType<string | null>> {
+    async createComment(
+        content: string,
+        postId: string,
+        commentatorId: string
+    ): Promise<ResultType<string | null>> {
 
-        const resultCheckPostId: ResultType<string | null> = await this._checkPostId(postId);
+        const resultCheckPostId: ResultType = await this._checkPostId(postId);
 
         if (resultCheckPostId.status !== ResultStatus.Success) {
 
@@ -39,24 +44,24 @@ class CommentsService {
                 );
         }
 
-        const commentator: WithId<User> | null = await this.usersRepository
-            .findUser(commentatorId);
+        //TODO: нужно ли делать явную проверку что нашелся комментатор???
+        //или ! нормально?
+        const commentator: UserDocument | null = await this.usersRepository
+            .findUserById(commentatorId);
 
-        const newComment: CommentDbType = {
-            postId,
-            ...data,
-            commentatorInfo: {
-                userId: String(commentator!._id),
-                userLogin: commentator!.login
-            },
-            createdAt: new Date().toISOString()
-        }
+        const commentDocument: CommentDocument = CommentModel
+            .createComment(
+            content,
+                postId,
+                commentatorId,
+                commentator!.login
+        );
 
-        const result = await this.commentRepository
-            .insertComment(newComment);
+        const resultSaveComment: string = await this.commentRepository
+            .saveComment(commentDocument);
 
         return SuccessResult
-            .create<string>(String(result.insertedId));
+            .create<string>(resultSaveComment);
     }
 
     async updateComment(commentId: string, userId: string, data: CommentInputModel): Promise<ResultType> {
@@ -79,7 +84,10 @@ class CommentsService {
 
         const resultCheckingExistenceCommentAndOwner: ResultType = await this._checkingExistenceCommentAndOwner(commentId, userId);
 
-        if (resultCheckingExistenceCommentAndOwner.status !== ResultStatus.Success) return resultCheckingExistenceCommentAndOwner;
+        if (resultCheckingExistenceCommentAndOwner.status !== ResultStatus.Success) {
+
+            return resultCheckingExistenceCommentAndOwner;
+        }
 
         await this.commentRepository
             .deleteComment(commentId);
@@ -88,7 +96,7 @@ class CommentsService {
             .create(null);
     }
 
-    async _checkPostId(postId: string): Promise<ResultType<string | null>> {
+    async _checkPostId(postId: string): Promise<ResultType> {
 
         if (!ObjectId.isValid(postId)) {
 
@@ -100,7 +108,7 @@ class CommentsService {
                 );
         }
 
-        const isExistPost: WithId<PostDbType> | null = await this.postsService
+        const isExistPost: WithId<Post> | null = await this.postsService
             .findPost(postId);
 
         if (!isExistPost) {
@@ -114,12 +122,12 @@ class CommentsService {
         }
 
         return SuccessResult
-            .create<string>(String(isExistPost._id));
+            .create(null);
     }
 
     async _checkingExistenceCommentAndOwner(commentId: string, userId: string): Promise<ResultType> {
 
-        const comment: WithId<CommentDbType> | null = await this.commentRepository
+        const comment: CommentDocument | null = await this.commentRepository
             .findComment(commentId);
 
         if (!comment) {

@@ -1,23 +1,24 @@
 import {Response} from "express";
 import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../common/types/input-output-types/request-types";
 import {
-    PaginationAndSortFilterType,
     Paginator,
-    SortingAndPaginationParamsType
 } from "../common/types/input-output-types/pagination-sort-types";
 import {UserInputModel, UserViewModel} from "./types/input-output-types";
-import {UsersService} from "./domain/users-service";
+import {UsersService} from "./application/users-service";
 import {SETTINGS} from "../common/settings";
-import {createPaginationAndSortFilter} from "../common/helpers/create-pagination-and-sort-filter";
+import {
+    SortingAndPaginationParamsType, SortQueryDto
+} from "../common/helpers/sort-query-dto";
 import {ResultType} from "../common/types/result-types/result-type";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 import {mapResultExtensionsToErrorMessage} from "../common/helpers/map-result-extensions-to-error-message";
 import {ApiErrorResult} from "../common/types/input-output-types/api-error-result";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {User} from "./domain/user.entity";
 import {UsersQueryRepository} from "./repositoryes/users-query-repository";
-import {ResultStatus} from "../common/types/result-types/result-status";
 import {injectable} from "inversify";
+import {UserDocument, UserModel} from "./domain/user-entity";
+import {UserDto} from "./domain/user-dto";
+import {isSuccessfulResult} from "../common/helpers/type-guards";
 
 @injectable()
 class UsersController {
@@ -41,23 +42,22 @@ class UsersController {
             searchEmailTerm: req.query.searchEmailTerm,
         };
 
-        const paginationAndSortFilter: PaginationAndSortFilterType =
-            createPaginationAndSortFilter(sortingAndPaginationParams);
+        const sortQueryDto: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
 
         const foundUsers: UserViewModel[] = await this.usersQueryRepository
-            .findUsers(paginationAndSortFilter);
+            .findUsers(sortQueryDto);
 
         const usersCount: number = await this.usersQueryRepository
             .getUsersCount(
-                paginationAndSortFilter.searchLoginTerm,
-                paginationAndSortFilter.searchEmailTerm
+                sortQueryDto.searchLoginTerm,
+                sortQueryDto.searchEmailTerm
                 );
 
         const paginationResponse: Paginator<UserViewModel> = await this.usersQueryRepository
             ._mapUsersViewModelToPaginationResponse(
                 foundUsers,
                 usersCount,
-                paginationAndSortFilter
+                sortQueryDto
             );
 
         res
@@ -76,22 +76,28 @@ class UsersController {
             password
         } = req.body;
 
-        const candidate: User = await User
-            .createByAdmin(login, email, password);
+        const userDto: UserDto = new UserDto(login, email, password);
 
-        const result: ResultType<string | null> = await this.usersService
+        const candidate: UserDocument = UserModel
+            .createByAdmin(userDto);
+
+        const {
+            status: userCreationStatus,
+            extensions: errorDetails,
+            data: idCreatedUser
+        }: ResultType<string | null> = await this.usersService
             .createUser(candidate);
 
-        if (result.status !== ResultStatus.Success) {
+        if (!isSuccessfulResult(userCreationStatus, idCreatedUser)) {
             res
-                .status(mapResultStatusToHttpStatus(result.status))
-                .json(mapResultExtensionsToErrorMessage(result.extensions));
+                .status(mapResultStatusToHttpStatus(userCreationStatus))
+                .json(mapResultExtensionsToErrorMessage(errorDetails));
 
             return;
         }
 
         const createdUser: UserViewModel | null = await this.usersQueryRepository
-            .findUser(result.data!);
+            .findUser(idCreatedUser);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)
@@ -103,10 +109,11 @@ class UsersController {
         res: Response
     ){
 
-        const isDeletedUser: boolean = await this.usersService
+        const userDeletionResult: boolean = await this.usersService
             .deleteUser(req.params.id);
 
-        if (!isDeletedUser) {
+        if (!userDeletionResult) {
+
             res
                 .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 

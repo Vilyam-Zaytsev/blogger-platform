@@ -7,13 +7,13 @@ import {
 } from "../helpers/datasets-for-tests";
 import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient} from "mongodb";
-import {setUsersCollection, usersCollection} from "../../src/db/mongoDb";
+import {setUsersCollection, usersCollection} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {UserViewModel} from "../../src/04-users/types/input-output-types";
-import {createPaginationAndSortFilter} from "../../src/common/helpers/create-pagination-and-sort-filter";
-import {User} from "../../src/04-users/domain/user.entity";
+import {createPaginationAndSortFilter} from "../../src/common/helpers/sort-query-dto";
+import {User} from "../../src/04-users/domain/user-entity";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;

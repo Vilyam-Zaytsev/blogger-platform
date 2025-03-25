@@ -1,37 +1,40 @@
 import {BlogInputModel} from "../types/input-output-types";
-import {BlogDbType} from "../types/blog-db-type";
-import {blogsCollection} from "../../db/mongoDb";
-import {InsertOneResult, ObjectId} from "mongodb";
+import {ObjectId} from "mongodb";
 import {injectable} from "inversify";
+import {BlogDocument, BlogModel} from "../domain/blog-entity";
 
 @injectable()
 class BlogsRepository {
 
-    async findBlog(id: string): Promise<BlogDbType | null> {
-      return await blogsCollection
-          .findOne({_id: new ObjectId(id)});
+    async findBlog(id: string): Promise<BlogDocument | null> {
+
+      return BlogModel
+          .findById(id);
     }
 
-    async insertBlog(newBlog: BlogDbType): Promise<InsertOneResult> {
+    async saveBlog(blogDocument: BlogDocument): Promise<string> {
 
-        return await blogsCollection
-            .insertOne(newBlog);
+        const result =  await blogDocument
+            .save();
+
+        return String(result._id);
     }
 
     async updateBlog(id: string, data: BlogInputModel): Promise<boolean> {
 
-        const result = await blogsCollection
-            .updateOne({_id: new ObjectId(id)}, {$set: {...data}});
+        const result = await BlogModel
+            .updateOne({_id: new ObjectId(id)}, {$set: {...data}})
+            .exec();
 
         return result.matchedCount === 1;
     }
 
     async deleteBlog(id: string): Promise<boolean> {
 
-        const result = await blogsCollection
-            .deleteOne({_id: new ObjectId(id)});
+        const result: BlogDocument | null = await BlogModel
+            .findByIdAndDelete(id);
 
-        return result.deletedCount === 1;
+        return !!result;
     }
 }
 

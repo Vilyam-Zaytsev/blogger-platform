@@ -1,9 +1,10 @@
-import {PostDbType} from "../types/post-db-type";
 import {PostInputModel} from "../types/input-output-types";
 import {WithId} from "mongodb";
 import {PostsRepository} from "../repositoryes/posts-repository";
 import {BlogsRepository} from "../../05-blogs/repositoryes/blogs-repository";
 import {injectable} from "inversify";
+import {PostDto} from "../domain/post-dto";
+import {Post, PostDocument, PostModel} from "../domain/post-entity";
 
 @injectable()
 class PostsService {
@@ -13,24 +14,22 @@ class PostsService {
         private postsRepository: PostsRepository
     ) {};
 
-    async findPost(id: string): Promise<WithId<PostDbType> | null> {
+    async findPost(id: string): Promise<WithId<Post> | null> {
 
         return await this.postsRepository
             .findPost(id);
     }
 
-    async createPost(data: PostInputModel): Promise<string> {
+    async createPost(postDto: PostDto): Promise<string> {
 
-        const newPost: PostDbType = {
-            ...data,
-            blogName: (await this.blogsRepository.findBlog(data.blogId))!.name,
-            createdAt: new Date().toISOString(),
-        };
+        const {blogId} = postDto;
 
-        const result = await this.postsRepository
-            .insertPost(newPost);
+        const blogName: string = (await this.blogsRepository.findBlog(blogId))!.name
 
-        return String(result.insertedId);
+        const postDocument: PostDocument = PostModel.createPost(postDto, blogName);
+
+        return await this.postsRepository
+            .savePost(postDocument);
     }
 
     async updatePost(id: string, data: PostInputModel): Promise<boolean> {

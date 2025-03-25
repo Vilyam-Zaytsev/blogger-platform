@@ -10,7 +10,7 @@ import {
     setSessionsCollection,
     setUsersCollection,
     usersCollection
-} from "../../src/db/mongoDb";
+} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
@@ -18,7 +18,7 @@ import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {DeviceViewModel} from "../../src/02-sessions/types/input-output-types";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
-import {User} from "../../src/04-users/domain/user.entity";
+import {User} from "../../src/04-users/domain/user-entity";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;

@@ -1,35 +1,40 @@
-import {CommentDbType} from "../types/comment-db-type";
-import {InsertOneResult, ObjectId, WithId} from "mongodb";
-import {commentsCollection} from "../../db/mongoDb";
+import {ObjectId, WithId} from "mongodb";
 import {CommentInputModel} from "../types/input-output-types";
 import {injectable} from "inversify";
+import {CommentDocument, CommentModel} from "../domain/comment-entity";
 
 @injectable()
 class CommentRepository {
 
-    async findComment(id: string): Promise<WithId<CommentDbType> | null> {
+    async findComment(id: string): Promise<CommentDocument | null> {
 
-        return  await commentsCollection
-            .findOne({_id: new ObjectId(id)});
+        return CommentModel
+            .findById(id);
     }
 
-    async insertComment(newComment: CommentDbType): Promise<InsertOneResult> {
-        return await commentsCollection
-            .insertOne(newComment);
+    async saveComment(commentDocument: CommentDocument): Promise<string> {
+
+        const result =  await commentDocument
+            .save();
+
+        return String(result._id);
     }
 
     async updateComment(id: string, data: CommentInputModel): Promise<boolean> {
-        const result = await commentsCollection
-            .updateOne({_id: new ObjectId(id)}, {$set: {...data}});
+
+        const result = await CommentModel
+            .updateOne({_id: new ObjectId(id)}, {$set: {...data}})
+            .exec();
 
         return result.matchedCount === 1;
     }
 
     async deleteComment(id: string): Promise<boolean> {
-        const result = await commentsCollection
-            .deleteOne({_id: new ObjectId(id)});
 
-        return result.deletedCount === 1;
+        const result: CommentDocument | null = await CommentModel
+            .findByIdAndDelete(id)
+
+        return !!result;
     }
 }
 

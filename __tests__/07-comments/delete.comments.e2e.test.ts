@@ -10,7 +10,7 @@ import {
     setPostsCollection, setSessionsCollection,
     setUsersCollection,
     usersCollection
-} from "../../src/db/mongoDb";
+} from "../../src/db/mongo-db/mongoDb";
 import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
 import {PostDbType} from "../../src/06-posts/types/post-db-type";
 import {CommentDbType} from "../../src/07-comments/types/comment-db-type";
@@ -32,7 +32,7 @@ import {commentsTestManager} from "../helpers/managers/06_comments-test-manager"
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
-import {User} from "../../src/04-users/domain/user.entity";
+import {User} from "../../src/04-users/domain/user-entity";
 
 let mongoServer: MongoMemoryServer;
 let client: MongoClient;
