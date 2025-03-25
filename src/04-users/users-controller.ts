@@ -78,7 +78,7 @@ class UsersController {
 
         const userDto: UserDto = new UserDto(login, email, password);
 
-        const candidate: UserDocument = UserModel
+        const candidate: UserDocument = await UserModel
             .createByAdmin(userDto);
 
         const {
