@@ -6,18 +6,21 @@ import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {User} from "../../src/04-users/domain/user-entity";
-import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
 import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
 import {UsersRepository} from "../../src/04-users/repositoryes/users-repository";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import mongoose from "mongoose";
 import {container} from "../../src/composition-root";
+import {NodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
 
 const usersRepository: UsersRepository = container.get(UsersRepository);
+const nodemailerService: NodemailerService = container.get(NodemailerService);
 
 let client: MongoClient;
 
 beforeAll(async () => {
+
+
 
     const uri = SETTINGS.MONGO_URL;
 
@@ -27,17 +30,26 @@ beforeAll(async () => {
     }
 
     await runDb(uri);
-
-    client = new MongoClient(uri);
-    await client.connect();
 });
 
 afterAll(async () => {
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
     await mongoose.disconnect();
-    await client.close();
+
+    clearPresets();
 });
 
 beforeEach(async () => {
+
+    container.rebind(NodemailerService).toConstantValue({
+        sendEmail: jest.fn().mockResolvedValue(true),
+    } as NodemailerService);
 
     if (!mongoose.connection.db) {
 
@@ -46,18 +58,7 @@ beforeEach(async () => {
 
     await mongoose.connection.db.dropDatabase();
 
-    await client.db(SETTINGS.DB_NAME).dropDatabase();
-
     clearPresets();
-
-    nodemailerService.sendEmail = jest
-        .fn()
-        .mockImplementation((email: string, template: EmailTemplateType) => {
-            return Promise.resolve({
-                email,
-                template
-            });
-        });
 });
 
 describe('POST /auth/new-password', () => {
@@ -77,7 +78,7 @@ describe('POST /auth/new-password', () => {
             .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.NEW_PASSWORD}`)
             .send({
                 newPassword: generateRandomString(10),
-                recoveryCode: foundUser_1!.passwordRecovery.recoveryCode
+                recoveryCode: foundUser_1!.passwordRecovery!.recoveryCode
             })
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
@@ -87,6 +88,13 @@ describe('POST /auth/new-password', () => {
         expect(foundUser_1!.passwordHash).not.toBe(foundUser_2!.passwordHash);
 
         console_log_e2e(resNewPassword.body, resNewPassword.status, 'Test 1: post(/auth/new-password)');
+
+        console.log(
+            'xxxxxxxxxxx',
+            (nodemailerService.sendEmail as jest.Mock).mock.calls.length,
+            (nodemailerService.sendEmail as jest.Mock).mock.results
+        )
+
     });
 
     it('should not update the password if the user has sent incorrect data: (newPassword: less than 6 characters).', async () => {
@@ -104,7 +112,7 @@ describe('POST /auth/new-password', () => {
             .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.NEW_PASSWORD}`)
             .send({
                 newPassword: generateRandomString(5),
-                recoveryCode: foundUser_1!.passwordRecovery.recoveryCode
+                recoveryCode: foundUser_1!.passwordRecovery!.recoveryCode
             })
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
@@ -140,7 +148,7 @@ describe('POST /auth/new-password', () => {
             .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.NEW_PASSWORD}`)
             .send({
                 newPassword: generateRandomString(21),
-                recoveryCode: foundUser_1!.passwordRecovery.recoveryCode
+                recoveryCode: foundUser_1!.passwordRecovery!.recoveryCode
             })
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
@@ -212,7 +220,7 @@ describe('POST /auth/new-password', () => {
             .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.NEW_PASSWORD}`)
             .send({
                 newPassword: generateRandomString(15),
-                recoveryCode: foundUser_1!.passwordRecovery.recoveryCode
+                recoveryCode: foundUser_1!.passwordRecovery!.recoveryCode
             })
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
@@ -222,7 +230,7 @@ describe('POST /auth/new-password', () => {
                 .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.NEW_PASSWORD}`)
                 .send({
                     newPassword: generateRandomString(15),
-                    recoveryCode: foundUser_1!.passwordRecovery.recoveryCode
+                    recoveryCode: foundUser_1!.passwordRecovery!.recoveryCode
                 })
                 .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
         }
@@ -231,7 +239,7 @@ describe('POST /auth/new-password', () => {
             .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.NEW_PASSWORD}`)
             .send({
                 newPassword: generateRandomString(15),
-                recoveryCode: foundUser_1!.passwordRecovery.recoveryCode
+                recoveryCode: foundUser_1!.passwordRecovery!.recoveryCode
             })
             .expect(SETTINGS.HTTP_STATUSES.TOO_MANY_REQUESTS_429);
 
