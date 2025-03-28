@@ -1,7 +1,6 @@
 import {console_log_e2e, delay, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, presets} from "../helpers/datasets-for-tests";
-import {MongoClient} from "mongodb";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
@@ -19,8 +18,6 @@ jest.mock('../../src/common/settings', () => {
     };
 });
 
-let client: MongoClient;
-
 beforeAll(async () => {
 
     const uri = SETTINGS.MONGO_URL;
@@ -31,16 +28,19 @@ beforeAll(async () => {
     }
 
     await runDb(uri);
-
-    client = new MongoClient(uri);
-    await client.connect();
-
-
 });
 
 afterAll(async () => {
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
     await mongoose.disconnect();
-    await client.close();
+
+    clearPresets();
 });
 
 beforeEach(async () => {
@@ -51,8 +51,6 @@ beforeEach(async () => {
     }
 
     await mongoose.connection.db.dropDatabase();
-
-    await client.db(SETTINGS.DB_NAME).dropDatabase();
 
     clearPresets();
 });

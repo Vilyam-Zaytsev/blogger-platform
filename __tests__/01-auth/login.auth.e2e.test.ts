@@ -1,14 +1,11 @@
 import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, deviceNames, presets} from "../helpers/datasets-for-tests";
-import {MongoClient} from "mongodb";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
 import mongoose from "mongoose";
-
-let client: MongoClient;
 
 beforeAll(async () => {
 
@@ -20,14 +17,19 @@ beforeAll(async () => {
     }
 
     await runDb(uri);
-
-    client = new MongoClient(uri);
-    await client.connect();
 });
 
 afterAll(async () => {
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
     await mongoose.disconnect();
-    await client.close();
+
+    clearPresets();
 });
 
 beforeEach(async () => {
@@ -38,8 +40,6 @@ beforeEach(async () => {
     }
 
     await mongoose.connection.db.dropDatabase();
-
-    await client.db(SETTINGS.DB_NAME).dropDatabase();
 
     clearPresets();
 });

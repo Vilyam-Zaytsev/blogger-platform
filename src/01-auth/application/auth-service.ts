@@ -108,7 +108,7 @@ class AuthService {
 
     async registration(userDto: UserDto): Promise<ResultType<string | null>> {
 
-        const candidate: UserDocument = UserModel
+        const candidate: UserDocument = await UserModel
             .userCreationDuringRegistration(userDto);
 
         const resultCreateUser: ResultType<string | null> = await this.usersService

@@ -143,7 +143,7 @@ const userStatics: any = {
         };
 
 
-        return new UserModel(user) as UserDocument;
+        return new UserModel(user);
     },
 
     async createByAdmin(userDto: UserDto): Promise<UserDocument> {

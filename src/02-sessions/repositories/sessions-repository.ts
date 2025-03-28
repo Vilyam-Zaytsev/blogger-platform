@@ -21,11 +21,11 @@ class SessionsRepository {
 
     async deleteSession(id: string): Promise<boolean> {
 
-        const result = await SessionModel
-            .deleteOne(id)
+        const result: SessionDocument = await SessionModel
+            .findByIdAndDelete(id)
             .exec();
 
-        return result.deletedCount === 1;
+        return !!result;
     }
 
     async deleteAllSessionsExceptCurrent(userId: string, deviceId: ObjectId) {
