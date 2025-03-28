@@ -1,26 +1,66 @@
 import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, presets} from "../helpers/datasets-for-tests";
-import {MongoClient, WithId} from "mongodb";
+import {WithId} from "mongodb";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {User} from "../../src/04-users/domain/user-entity";
-import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
 import {UsersRepository} from "../../src/04-users/repositoryes/users-repository";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import mongoose from "mongoose";
 import {container} from "../../src/composition-root";
-import {NodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
+import {INodeMailerService, NodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
+import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
+import {EmailTemplates, IEmailTemplates} from "../../src/01-auth/adapters/email-templates";
+import {Container, injectable} from "inversify";
 
 const usersRepository: UsersRepository = container.get(UsersRepository);
 const nodemailerService: NodemailerService = container.get(NodemailerService);
 
-let client: MongoClient;
+@injectable()
+class MockEmailTemplates implements IEmailTemplates {
+    registrationEmail (code: string) {
+        console.log(' mock registrationEmail called')
+        return {} as unknown as EmailTemplateType
+    }
+    passwordRecoveryEmail (code: string) {
+        console.log(' mock passwordRecoveryEmail called')
+
+        return {} as unknown as EmailTemplateType
+    }
+}
+
+@injectable()
+class MockNodemailerService implements INodeMailerService {
+    async sendEmail (email: string, template: EmailTemplateType): Promise<boolean> {
+        console.log(' mock sendEmail called')
+
+        return new Promise(resolve => {
+            resolve(true)
+        }) as Promise<true>
+    }
+}
+
+// const x = async () => {
+//     await (container as Container).unbind(NodemailerService );
+//     container.bind<NodemailerService>(NodemailerService).to(MockNodemailerService);
+//
+//     await  (container as Container).unbind(EmailTemplates );
+//     container.bind<EmailTemplates>(EmailTemplates).to(MockEmailTemplates);
+//
+//     console.log(
+//         container.getAll(NodemailerService),
+//         container.getAll(EmailTemplates)
+//     )
+// }
+//
+// x();
+
+
+
 
 beforeAll(async () => {
-
-
 
     const uri = SETTINGS.MONGO_URL;
 
@@ -30,6 +70,17 @@ beforeAll(async () => {
     }
 
     await runDb(uri);
+
+    await (container as Container).unbind(NodemailerService );
+    container.bind<NodemailerService>(NodemailerService).to(MockNodemailerService);
+
+    await  (container as Container).unbind(EmailTemplates );
+    container.bind<EmailTemplates>(EmailTemplates).to(MockEmailTemplates);
+
+    console.log(
+        container.getAll(NodemailerService),
+        container.getAll(EmailTemplates)
+    )
 });
 
 afterAll(async () => {
@@ -47,9 +98,11 @@ afterAll(async () => {
 
 beforeEach(async () => {
 
-    container.rebind(NodemailerService).toConstantValue({
-        sendEmail: jest.fn().mockResolvedValue(true),
-    } as NodemailerService);
+    // jest.spyOn(nodemailerService, 'sendEmail')
+    //     .mockImplementation((
+    //         email: string,
+    //         template: EmailTemplateType
+    //     ) => Promise.resolve(true));
 
     if (!mongoose.connection.db) {
 
@@ -89,12 +142,13 @@ describe('POST /auth/new-password', () => {
 
         console_log_e2e(resNewPassword.body, resNewPassword.status, 'Test 1: post(/auth/new-password)');
 
-        console.log(
-            'xxxxxxxxxxx',
-            (nodemailerService.sendEmail as jest.Mock).mock.calls.length,
-            (nodemailerService.sendEmail as jest.Mock).mock.results
-        )
-
+        // const mockNodemailerService = container.get(NodemailerService);
+        //
+        // console.log(
+        //     'xxxxxxxxxxx',
+        //     (mockNodemailerService.sendEmail as jest.Mock).mock.calls.length,
+        //     (mockNodemailerService.sendEmail as jest.Mock).mock.results
+        // )
     });
 
     it('should not update the password if the user has sent incorrect data: (newPassword: less than 6 characters).', async () => {
