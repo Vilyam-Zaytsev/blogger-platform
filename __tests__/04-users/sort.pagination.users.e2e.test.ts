@@ -1,45 +1,46 @@
-import {
-    console_log_e2e,
-    encodingAdminDataInBase64,
-    req
-} from '../helpers/test-helpers';
+import {console_log_e2e, encodingAdminDataInBase64, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {
-    clearPresets,
-    presets,
-    userPropertyMap
-} from "../helpers/datasets-for-tests";
-import {MongoMemoryServer} from "mongodb-memory-server";
-import {MongoClient} from "mongodb";
-import {setUsersCollection, usersCollection} from "../../src/db/mongo-db/mongoDb";
+import {clearPresets, presets, userPropertyMap} from "../helpers/datasets-for-tests";
+import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
-import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {UserViewModel} from "../../src/04-users/types/input-output-types";
-import {createPaginationAndSortFilter} from "../../src/common/helpers/sort-query-dto";
-import {User} from "../../src/04-users/domain/user-entity";
-
-let mongoServer: MongoMemoryServer;
-let client: MongoClient;
+import mongoose from "mongoose";
+import {SortDirection} from "../../src/common/helpers/sort-query-dto";
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
 
-    client = new MongoClient(uri);
-    await client.connect();
+    const uri = SETTINGS.MONGO_URL;
 
-    const db = client.db();
-    setUsersCollection(db.collection<User>('users'));
+    if (!uri) {
+
+        throw new Error("MONGO_URL is not defined in SETTINGS");
+    }
+
+    await runDb(uri);
 });
 
 afterAll(async () => {
-    await client.close();
-    await mongoServer.stop();
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.disconnect();
+
+    clearPresets();
 });
 
 beforeEach(async () => {
-    await usersCollection.deleteMany({});
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
 
     clearPresets();
 });
@@ -62,6 +63,13 @@ describe('pagination, sort, search in term /users', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
+        const filter = {
+            pageNumber: 1,
+            pageSize: 10,
+            sortBy: 'createdAt',
+            sortDirection: SortDirection.Descending
+        };
+
         expect(resGetUsers.body).toEqual({
             pagesCount: 2,
             page: 1,
@@ -69,12 +77,7 @@ describe('pagination, sort, search in term /users', () => {
             totalCount: 11,
             items: usersTestManager.filterAndSort<UserViewModel>(
                 [...presets.users],
-                createPaginationAndSortFilter({
-                    pageNumber: '1',
-                    pageSize: '10',
-                    sortBy: 'createdAt',
-                    sortDirection: SortDirection.Descending
-                }),
+                filter,
                 userPropertyMap
             )
         });
@@ -106,6 +109,13 @@ describe('pagination, sort, search in term /users', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
+        const filter = {
+            pageNumber: 2,
+            pageSize: 3,
+            sortBy: 'login',
+            sortDirection: SortDirection.Ascending
+        };
+
         expect(resGetUsers.body).toEqual({
             pagesCount: 4,
             page: 2,
@@ -113,12 +123,7 @@ describe('pagination, sort, search in term /users', () => {
             totalCount: 11,
             items: usersTestManager.filterAndSort<UserViewModel>(
                 [...presets.users],
-                createPaginationAndSortFilter({
-                    pageNumber: '2',
-                    pageSize: '3',
-                    sortBy: 'login',
-                    sortDirection: SortDirection.Ascending
-                }),
+                filter,
                 userPropertyMap
             )
         });
@@ -150,6 +155,13 @@ describe('pagination, sort, search in term /users', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
+        const filter = {
+            pageNumber: 6,
+            pageSize: 2,
+            sortBy: 'createdAt',
+            sortDirection: SortDirection.Ascending
+        };
+
         expect(resGetUsers.body).toEqual({
             pagesCount: 6,
             page: 6,
@@ -157,12 +169,7 @@ describe('pagination, sort, search in term /users', () => {
             totalCount: 11,
             items: usersTestManager.filterAndSort<UserViewModel>(
                 [...presets.users],
-                createPaginationAndSortFilter({
-                    pageNumber: '6',
-                    pageSize: '2',
-                    sortBy: 'createdAt',
-                    sortDirection: SortDirection.Ascending
-                }),
+                filter,
                 userPropertyMap
             )
         });
@@ -191,6 +198,14 @@ describe('pagination, sort, search in term /users', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
+        const filter = {
+            pageNumber: 1,
+            pageSize: 10,
+            sortBy: 'createdAt',
+            sortDirection: SortDirection.Descending,
+            searchLoginTerm: 'ro'
+        };
+
         expect(resGetUsers.body).toEqual({
             pagesCount: 1,
             page: 1,
@@ -198,9 +213,7 @@ describe('pagination, sort, search in term /users', () => {
             totalCount: 2,
             items: usersTestManager.filterAndSort<UserViewModel>(
                 [...presets.users],
-                createPaginationAndSortFilter({
-                    searchLoginTerm: 'ro',
-                }),
+                filter,
                 userPropertyMap
             )
         });
@@ -229,6 +242,14 @@ describe('pagination, sort, search in term /users', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
+        const filter = {
+            pageNumber: 1,
+            pageSize: 10,
+            sortBy: 'createdAt',
+            sortDirection: SortDirection.Descending,
+            searchEmailTerm: 'ro'
+        };
+
         expect(resGetUsers.body).toEqual({
             pagesCount: 1,
             page: 1,
@@ -236,9 +257,7 @@ describe('pagination, sort, search in term /users', () => {
             totalCount: 2,
             items: usersTestManager.filterAndSort<UserViewModel>(
                 [...presets.users],
-                createPaginationAndSortFilter({
-                    searchEmailTerm: 'ro',
-                }),
+                filter,
                 userPropertyMap
             )
         });
@@ -268,6 +287,15 @@ describe('pagination, sort, search in term /users', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
+        const filter = {
+            pageNumber: 1,
+            pageSize: 10,
+            sortBy: 'createdAt',
+            sortDirection: SortDirection.Descending,
+            searchLoginTerm: 'ro',
+            searchEmailTerm: 'la'
+        };
+
         expect(resGetUsers.body).toEqual({
             pagesCount: 1,
             page: 1,
@@ -275,10 +303,7 @@ describe('pagination, sort, search in term /users', () => {
             totalCount: 4,
             items: usersTestManager.filterAndSort<UserViewModel>(
                 [...presets.users],
-                createPaginationAndSortFilter({
-                    searchLoginTerm: 'ro',
-                    searchEmailTerm: 'la'
-                }),
+                filter,
                 userPropertyMap
             )
         })

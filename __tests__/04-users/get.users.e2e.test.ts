@@ -1,41 +1,46 @@
 import {console_log_e2e, encodingAdminDataInBase64, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {
-    clearPresets,
-    presets,
-    userPropertyMap
-} from "../helpers/datasets-for-tests";
-import {MongoMemoryServer} from "mongodb-memory-server";
-import {MongoClient} from "mongodb";
-import {setUsersCollection, usersCollection} from "../../src/db/mongo-db/mongoDb";
+import {clearPresets, presets, userPropertyMap} from "../helpers/datasets-for-tests";
+import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
-import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {UserViewModel} from "../../src/04-users/types/input-output-types";
-import {createPaginationAndSortFilter} from "../../src/common/helpers/sort-query-dto";
-import {User} from "../../src/04-users/domain/user-entity";
-
-let mongoServer: MongoMemoryServer;
-let client: MongoClient;
+import mongoose from "mongoose";
+import {SortDirection} from "../../src/common/helpers/sort-query-dto";
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
 
-    client = new MongoClient(uri);
-    await client.connect();
+    const uri = SETTINGS.MONGO_URL;
 
-    const db = client.db();
-    setUsersCollection(db.collection<User>('users'));
+    if (!uri) {
+
+        throw new Error("MONGO_URL is not defined in SETTINGS");
+    }
+
+    await runDb(uri);
 });
 
 afterAll(async () => {
-    await client.close();
-    await mongoServer.stop();
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.disconnect();
+
+    clearPresets();
 });
 
 beforeEach(async () => {
-    await usersCollection.deleteMany({});
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
 
     clearPresets();
 });
@@ -120,15 +125,17 @@ describe('GET /users', () => {
             )
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
+        const filter = {
+            pageNumber: '1',
+            pageSize: '10',
+            sortBy: 'createdAt',
+            sortDirection: SortDirection.Descending
+        };
+
             expect(resGetUsers.body.items).toEqual(
                 usersTestManager.filterAndSort<UserViewModel>(
                     [...presets.users],
-                    createPaginationAndSortFilter({
-                        pageNumber: '1',
-                        pageSize: '10',
-                        sortBy: 'createdAt',
-                        sortDirection: SortDirection.Descending
-                    }),
+                    filter,
                     userPropertyMap
                 )
             );
