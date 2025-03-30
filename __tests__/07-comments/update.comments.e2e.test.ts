@@ -1,18 +1,4 @@
-import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
-import {
-    blogsCollection,
-    commentsCollection,
-    postsCollection,
-    usersCollection,
-    setBlogsCollection,
-    setCommentsCollection,
-    setPostsCollection,
-    setUsersCollection, setSessionsCollection, setApiTrafficCollection, sessionsCollection, apiTrafficCollection,
-} from "../../src/db/mongo-db/mongoDb";
-import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
-import {PostDbType} from "../../src/06-posts/types/post-db-type";
-import {CommentDbType} from "../../src/07-comments/types/comment-db-type";
 import {
     clearPresets,
     comments,
@@ -29,41 +15,43 @@ import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/07-comments/types/input-output-types";
 import {ApiErrorResult} from "../../src/common/types/input-output-types/api-error-result";
 import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
-import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
-import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
 import {User} from "../../src/04-users/domain/user-entity";
-
-let mongoServer: MongoMemoryServer;
-let client: MongoClient;
+import {runDb} from "../../src/db/mongo-db/mongoDb";
+import mongoose from "mongoose";
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
 
-    client = new MongoClient(uri);
-    await client.connect();
+    const uri = SETTINGS.MONGO_URL;
 
-    const db = client.db();
-    setUsersCollection(db.collection<User>('users'));
-    setBlogsCollection(db.collection<BlogDbType>('blogs'));
-    setPostsCollection(db.collection<PostDbType>('posts'));
-    setCommentsCollection(db.collection<CommentDbType>('comments'));
-    setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
-    setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
+    if (!uri) {
+
+        throw new Error("MONGO_URL is not defined in SETTINGS");
+    }
+
+    await runDb(uri);
 });
 
 afterAll(async () => {
-    await client.close();
-    await mongoServer.stop();
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.disconnect();
+
+    clearPresets();
 });
 
 beforeEach(async () => {
-    await usersCollection.deleteMany({});
-    await blogsCollection.deleteMany({});
-    await postsCollection.deleteMany({});
-    await commentsCollection.deleteMany({});
-    await sessionsCollection.deleteMany({});
-    await apiTrafficCollection.deleteMany({});
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
 
     clearPresets();
 });

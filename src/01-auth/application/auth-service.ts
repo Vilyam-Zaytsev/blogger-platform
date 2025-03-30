@@ -417,14 +417,6 @@ class AuthService {
         await this.usersRepository
             .saveUser(userDocument);
 
-        this.nodemailerService
-            .sendEmail(
-                userDocument.email,
-                this.emailTemplates
-                    .passwordRecoveryEmail('sss')
-            )
-            .catch(error => console.error('ERROR IN SEND EMAIL:', error));
-
         return SuccessResult
             .create(null);
     }

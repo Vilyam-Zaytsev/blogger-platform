@@ -71,7 +71,7 @@ const commentStatics: any = {
             createdAt: new Date().toISOString()
         };
 
-        return new CommentModel(content) as CommentDocument;
+        return new CommentModel(comment) as CommentDocument;
     }
 };
 

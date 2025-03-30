@@ -3,10 +3,8 @@ import {comments, presets} from "../datasets-for-tests";
 import {req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";
 import {CommentInputModel, CommentViewModel} from "../../../src/07-comments/types/input-output-types";
-import {
-    PaginationAndSortFilterType, Paginator,
-    SortDirection
-} from "../../../src/common/types/input-output-types/pagination-sort-types";
+import {Paginator,} from "../../../src/common/types/input-output-types/pagination-sort-types";
+import {SortDirection} from "../../../src/common/helpers/sort-query-dto";
 
 const commentsTestManager = {
 
@@ -65,10 +63,9 @@ const commentsTestManager = {
         return res.body;
     },
 
-//TODO вынести в отдельную функцию и протипизировать <>
     filterAndSort<T>(
         items: T[],
-        sortAndPaginationFilter: PaginationAndSortFilterType,
+        sortAndPaginationFilter: any,
         propertyMap: Record<string, string>
     ) {
 
