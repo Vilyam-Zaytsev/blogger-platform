@@ -1,10 +1,5 @@
-import {MongoClient, ObjectId} from "mongodb";
-import {
-    clearPresets,
-    comments,
-    incorrectAccessToken,
-    presets
-} from "../helpers/datasets-for-tests";
+import {ObjectId} from "mongodb";
+import {clearPresets, comments, incorrectAccessToken, presets} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
 import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
@@ -15,7 +10,6 @@ import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/07-comments/types/input-output-types";
 import {ApiErrorResult} from "../../src/common/types/input-output-types/api-error-result";
 import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
-import {User} from "../../src/04-users/domain/user-entity";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import mongoose from "mongoose";
 
