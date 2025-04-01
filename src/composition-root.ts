@@ -59,9 +59,9 @@ container.bind(CommentQueryRepository).to(CommentQueryRepository);
 
 container.bind(BcryptService).to(BcryptService);
 container.bind(JwtService).to(JwtService);
-const nodemailerServiceIdentifier = container.bind(NodemailerService).to(NodemailerService);
+container.bind(NodemailerService).to(NodemailerService);
 container.bind(EmailTemplates).to(EmailTemplates);
 
 
 
-export {container };
+export {container};

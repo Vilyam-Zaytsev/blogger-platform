@@ -2,39 +2,46 @@ import {console_log_e2e, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, postPropertyMap, presets} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
-import {MongoMemoryServer} from "mongodb-memory-server";
 import {MongoClient, ObjectId} from "mongodb";
-import {blogsCollection, postsCollection, setBlogsCollection, setPostsCollection} from "../../src/db/mongo-db/mongoDb";
-import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
-import {PostDbType} from "../../src/06-posts/types/post-db-type";
 import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {Response} from "supertest";
-import {createPaginationAndSortFilter} from "../../src/common/helpers/sort-query-dto";
-import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
-
-let mongoServer: MongoMemoryServer;
-let client: MongoClient;
+import {runDb} from "../../src/db/mongo-db/mongoDb";
+import mongoose from "mongoose";
+import {SortDirection} from "../../src/common/helpers/sort-query-dto";
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
 
-    client = new MongoClient(uri);
-    await client.connect();
+    const uri = SETTINGS.MONGO_URL;
 
-    const db = client.db();
-    setBlogsCollection(db.collection<BlogDbType>('blogs'));
-    setPostsCollection(db.collection<PostDbType>('posts'));
+    if (!uri) {
+
+        throw new Error("MONGO_URL is not defined in SETTINGS");
+    }
+
+    await runDb(uri);
 });
 
 afterAll(async () => {
-    await client.close();
-    await mongoServer.stop();
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.disconnect();
+
+    clearPresets();
 });
 
 beforeEach(async () => {
-    await blogsCollection.deleteMany({});
-    await postsCollection.deleteMany({});
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
 
     clearPresets();
 });
@@ -88,6 +95,13 @@ beforeEach(async () => {
                 .get(SETTINGS.PATH.POSTS)
                 .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
+            const filter = {
+                pageNumber: 1,
+                pageSize: 10,
+                sortBy: 'createdAt',
+                sortDirection: SortDirection.Descending,
+            }
+
             expect(resGetPosts.body).toEqual({
                 pagesCount: 1,
                 page: 1,
@@ -95,12 +109,7 @@ beforeEach(async () => {
                 totalCount: 3,
                 items: postsTestManager.filterAndSort(
                     [...presets.posts],
-                    createPaginationAndSortFilter({
-                        pageNumber: '1',
-                        pageSize: '10',
-                        sortBy: 'createdAt',
-                        sortDirection: SortDirection.Descending,
-                    }),
+                    filter,
                     postPropertyMap
                 )
             })

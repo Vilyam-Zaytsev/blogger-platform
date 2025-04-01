@@ -2,12 +2,12 @@ import {EmailTemplateType} from "../../common/types/input-output-types/email-tem
 import {injectable} from "inversify";
 
 
-export interface IEmailTemplates {
-    registrationEmail: (code: string) => EmailTemplateType,
-    passwordRecoveryEmail: (code: string) => EmailTemplateType
-}
+// export interface IEmailTemplates {
+//     registrationEmail: (code: string) => EmailTemplateType,
+//     passwordRecoveryEmail: (code: string) => EmailTemplateType
+// }
 @injectable()
-class EmailTemplates implements IEmailTemplates {
+class EmailTemplates {
 
     registrationEmail(code: string): EmailTemplateType {
 

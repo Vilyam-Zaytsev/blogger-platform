@@ -4,11 +4,11 @@ import {injectable} from "inversify";
 
 
 
-export interface INodeMailerService {
-    sendEmail: (email: string, template: EmailTemplateType) => Promise<boolean>
-}
+// export interface INodeMailerService {
+//     sendEmail: (email: string, template: EmailTemplateType) => Promise<boolean>
+// }
 @injectable()
-class NodemailerService implements INodeMailerService {
+class NodemailerService {
 
     async sendEmail(
         email: string,

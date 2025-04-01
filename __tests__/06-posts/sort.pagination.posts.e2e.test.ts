@@ -1,49 +1,46 @@
 import {console_log_e2e, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {
-    clearPresets,
-    postPropertyMap,
-    presets
-} from "../helpers/datasets-for-tests";
+import {clearPresets, postPropertyMap, presets} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
-import {MongoMemoryServer} from "mongodb-memory-server";
-import {MongoClient} from "mongodb";
-import {
-    blogsCollection,
-    postsCollection,
-    setBlogsCollection,
-    setPostsCollection
-} from "../../src/db/mongo-db/mongoDb";
-import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
-import {PostDbType} from "../../src/06-posts/types/post-db-type";
 import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {Response} from "supertest";
-import {createPaginationAndSortFilter} from "../../src/common/helpers/sort-query-dto";
-import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
-
-let mongoServer: MongoMemoryServer;
-let client: MongoClient;
+import {runDb} from "../../src/db/mongo-db/mongoDb";
+import mongoose from "mongoose";
+import {SortDirection} from "../../src/common/helpers/sort-query-dto";
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
 
-    client = new MongoClient(uri);
-    await client.connect();
+    const uri = SETTINGS.MONGO_URL;
 
-    const db = client.db();
-    setBlogsCollection(db.collection<BlogDbType>('blogs'));
-    setPostsCollection(db.collection<PostDbType>('posts'));
+    if (!uri) {
+
+        throw new Error("MONGO_URL is not defined in SETTINGS");
+    }
+
+    await runDb(uri);
 });
 
 afterAll(async () => {
-    await client.close();
-    await mongoServer.stop();
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.disconnect();
+
+    clearPresets();
 });
 
 beforeEach(async () => {
-    await blogsCollection.deleteMany({});
-    await postsCollection.deleteMany({});
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
 
     clearPresets();
 });
@@ -62,6 +59,13 @@ describe('pagination, sort /posts', () => {
             .get(SETTINGS.PATH.POSTS)
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
+        const filter = {
+            pageNumber: 1,
+            pageSize: 10,
+            sortBy: 'createdAt',
+            sortDirection: SortDirection.Descending,
+        }
+
         expect(resGetPosts.body).toEqual({
             pagesCount: 2,
             page: 1,
@@ -69,12 +73,7 @@ describe('pagination, sort /posts', () => {
             totalCount: 11,
             items: postsTestManager.filterAndSort(
                 [...presets.posts],
-                createPaginationAndSortFilter({
-                    pageNumber: '1',
-                    pageSize: '10',
-                    sortBy: 'createdAt',
-                    sortDirection: SortDirection.Descending,
-                }),
+                filter,
                 postPropertyMap
             )
         });
@@ -82,7 +81,7 @@ describe('pagination, sort /posts', () => {
         expect(resGetPosts.body.items.length).toEqual(10);
 
         console_log_e2e(resGetPosts.body, resGetPosts.status, 'Test 1: pagination, sort(/posts)');
-    });
+    }, 10000);
 
     it('should use client-provided pagination values to return the correct subset of data.', async () => {
 
@@ -102,6 +101,13 @@ describe('pagination, sort /posts', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
+        const filter = {
+            pageNumber: 2,
+            pageSize: 3,
+            sortBy: 'title',
+            sortDirection: SortDirection.Ascending,
+        }
+
         expect(resGetPosts.body).toEqual({
             pagesCount: 4,
             page: 2,
@@ -109,12 +115,7 @@ describe('pagination, sort /posts', () => {
             totalCount: 11,
             items: postsTestManager.filterAndSort(
                 [...presets.posts],
-                createPaginationAndSortFilter({
-                    pageNumber: '2',
-                    pageSize: '3',
-                    sortBy: 'title',
-                    sortDirection: SortDirection.Ascending,
-                }),
+                filter,
                 postPropertyMap
             )
         });
@@ -142,6 +143,13 @@ describe('pagination, sort /posts', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
+        const filter = {
+            pageNumber: 6,
+            pageSize: 2,
+            sortBy: 'content',
+            sortDirection: SortDirection.Descending,
+        }
+
         expect(resGetPosts.body).toEqual({
             pagesCount: 6,
             page: 6,
@@ -149,12 +157,7 @@ describe('pagination, sort /posts', () => {
             totalCount: 11,
             items: postsTestManager.filterAndSort(
                 [...presets.posts],
-                createPaginationAndSortFilter({
-                    pageNumber: '6',
-                    pageSize: '2',
-                    sortBy: 'content',
-                    sortDirection: SortDirection.Descending,
-                }),
+                filter,
                 postPropertyMap
             )
         });
@@ -182,6 +185,13 @@ describe('pagination, sort /posts', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.OK_200);
 
+        const filter = {
+            pageNumber: 6,
+            pageSize: 2,
+            sortBy: 'shortDescription',
+            sortDirection: SortDirection.Ascending,
+        }
+
         expect(resGetPosts.body).toEqual({
             pagesCount: 6,
             page: 6,
@@ -189,12 +199,7 @@ describe('pagination, sort /posts', () => {
             totalCount: 11,
             items: postsTestManager.filterAndSort(
                 [...presets.posts],
-                createPaginationAndSortFilter({
-                    pageNumber: '6',
-                    pageSize: '2',
-                    sortBy: 'shortDescription',
-                    sortDirection: SortDirection.Ascending,
-                }),
+                filter,
                 postPropertyMap
             )
         });

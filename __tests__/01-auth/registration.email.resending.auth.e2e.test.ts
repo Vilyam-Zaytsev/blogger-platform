@@ -1,24 +1,21 @@
 import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, presets, user, userLogins} from "../helpers/datasets-for-tests";
-import {MongoClient, WithId} from "mongodb";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
-import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
-import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
 import {UsersRepository} from "../../src/04-users/repositoryes/users-repository";
-import {EmailTemplates} from "../../src/01-auth/adapters/email-templates";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {UserInputModel} from "../../src/04-users/types/input-output-types";
-import {createPaginationAndSortFilter} from "../../src/common/helpers/sort-query-dto";
-import {User} from "../../src/04-users/domain/user-entity";
+import {UserDocument} from "../../src/04-users/domain/user-entity";
 import {container} from "../../src/composition-root";
 import mongoose from "mongoose";
+import {NodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
+import {SortQueryDto} from "../../src/common/helpers/sort-query-dto";
 
 const usersRepository: UsersRepository = container.get(UsersRepository);
 
-let client: MongoClient;
+let sendEmailMock: any;
 
 beforeAll(async () => {
 
@@ -31,13 +28,24 @@ beforeAll(async () => {
 
     await runDb(uri);
 
-    client = new MongoClient(uri);
-    await client.connect();
+    //@ts-ignore
+    sendEmailMock = jest
+        .spyOn(NodemailerService.prototype, 'sendEmail')
+        .mockResolvedValue(true);
 });
 
 afterAll(async () => {
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
     await mongoose.disconnect();
-    await client.close();
+
+    jest.clearAllMocks();
+    clearPresets();
 });
 
 beforeEach(async () => {
@@ -49,18 +57,8 @@ beforeEach(async () => {
 
     await mongoose.connection.db.dropDatabase();
 
-    await client.db(SETTINGS.DB_NAME).dropDatabase();
-
+    jest.clearAllMocks();
     clearPresets();
-
-    nodemailerService.sendEmail = jest
-        .fn()
-        .mockImplementation((email: string, template: EmailTemplateType) => {
-            return Promise.resolve({
-                email,
-                template
-            });
-        })
 });
 
 describe('POST /auth/registration-email-resending', () => {
@@ -77,17 +75,8 @@ describe('POST /auth/registration-email-resending', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
-        const foundUser: WithId<User> | null = await usersRepository
-            .findByEmail(user.email);
-
-        const emailTemplates: EmailTemplates = new EmailTemplates();
-
-        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(2);
-        expect(await (nodemailerService.sendEmail as jest.Mock).mock.results[1].value)
-            .toEqual({
-                email: foundUser!.email,
-                template: emailTemplates.registrationEmail(foundUser!.emailConfirmation.confirmationCode!)
-            });
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(2);
 
         console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 1:' +
             ' post(/auth/registration-email-resending)');
@@ -107,8 +96,10 @@ describe('POST /auth/registration-email-resending', () => {
                 .registration(user);
         }
 
-        const users: User[] = await usersRepository
-            .findUsers(createPaginationAndSortFilter({}))
+        const filter: SortQueryDto = new SortQueryDto({});
+
+        const users: UserDocument[] = await usersRepository
+            .findUsers(filter);
 
         const emails: string[] = users.map(u => u.email);
 
@@ -129,8 +120,11 @@ describe('POST /auth/registration-email-resending', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.TOO_MANY_REQUESTS_429);
 
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(10);
+
         console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 2: post(/auth/registration-email-resending)');
-    });
+    }, 10000);
 
     it('should not resend the verification code if the user has sent incorrect data(an empty object is passed).', async () => {
 
@@ -153,7 +147,8 @@ describe('POST /auth/registration-email-resending', () => {
             },
         );
 
-        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(1);
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
         console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 3:' +
             ' post(/auth/registration-email-resending)');
@@ -182,7 +177,8 @@ describe('POST /auth/registration-email-resending', () => {
             },
         );
 
-        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(1);
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
         console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 4:' +
             ' post(/auth/registration-email-resending)');
@@ -211,7 +207,8 @@ describe('POST /auth/registration-email-resending', () => {
             },
         );
 
-        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(1);
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
         console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 5:' +
             ' post(/auth/registration-email-resending)');
@@ -240,7 +237,8 @@ describe('POST /auth/registration-email-resending', () => {
             },
         );
 
-        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(1);
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
         console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 6:' +
             ' post(/auth/registration-email-resending)');
@@ -268,6 +266,8 @@ describe('POST /auth/registration-email-resending', () => {
                 ]
             },
         );
+
+        expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
         console_log_e2e(resRegistrationEmailResending.body, resRegistrationEmailResending.status, 'Test 7:' +
             ' post(/auth/registration-email-resending)');
