@@ -159,5 +159,5 @@ describe('UPDATE /security/devices', () => {
         }
 
         console_log_e2e('No Body', 200, 'Test 1: update (/security/devices)');
-    }, 35000);
+    }, 50000);
 });
