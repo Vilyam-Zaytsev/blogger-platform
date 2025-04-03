@@ -113,6 +113,31 @@ const userMethods = {
         (this as UserDocument).emailConfirmation.expirationDate = expirationDate;
 
         return confirmationCode;
+    },
+
+    recoverPassword() {
+
+        const recoveryCode: string = randomUUID();
+
+        const expirationDate: Date = add(
+            new Date(),
+            {hours: 1, minutes: 1}
+        );
+
+        (this as UserDocument).passwordRecovery = {
+            recoveryCode,
+            expirationDate
+        };
+
+        return recoveryCode;
+    },
+
+    async updatePassword(newPassword: string) {
+
+        (this as UserDocument).passwordHash = await bcryptService
+            .generateHash(newPassword);
+
+        (this as UserDocument).passwordRecovery = null;
     }
 };
 

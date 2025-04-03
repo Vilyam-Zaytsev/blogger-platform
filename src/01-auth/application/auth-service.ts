@@ -348,15 +348,8 @@ class AuthService {
                 .create(null);
         }
 
-        const passwordRecovery: PasswordRecovery = {
-            recoveryCode: randomUUID(),
-            expirationDate: add(
-                new Date(),
-                {hours: 1, minutes: 1}
-            )
-        }
-
-        userDocument.passwordRecovery = passwordRecovery;
+        const recoveryCode: string = userDocument
+            .recoverPassword();
 
         await this.usersRepository
             .saveUser(userDocument);
@@ -365,7 +358,7 @@ class AuthService {
             .sendEmail(
                 userDocument.email,
                 this.emailTemplates
-                    .passwordRecoveryEmail(passwordRecovery.recoveryCode)
+                    .passwordRecoveryEmail(recoveryCode)
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 
@@ -403,10 +396,8 @@ class AuthService {
                 );
         }
 
-        userDocument.passwordHash = await this.bcryptService
-            .generateHash(newPassword);
-
-        userDocument.passwordRecovery = null;
+        await userDocument
+            .updatePassword(newPassword);
 
         await this.usersRepository
             .saveUser(userDocument);
