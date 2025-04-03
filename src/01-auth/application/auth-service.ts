@@ -199,14 +199,8 @@ class AuthService {
                 );
         }
 
-        const confirmationCode: string = randomUUID();
-        const expirationDate: Date = add(
-            new Date(),
-            {hours: 1, minutes: 1}
-        );
-
-        userDocument
-            .refreshConfirmationCode(confirmationCode, expirationDate);
+        const newConfirmationCode: string = userDocument
+            .refreshConfirmationCode();
 
         await this.usersRepository
             .saveUser(userDocument);
@@ -215,7 +209,7 @@ class AuthService {
             .sendEmail(
                 userDocument.email,
                 this.emailTemplates
-                    .registrationEmail(confirmationCode)
+                    .registrationEmail(newConfirmationCode)
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 

@@ -101,10 +101,18 @@ const userMethods = {
         (this as UserDocument).emailConfirmation.confirmationCode = null;
     },
 
-    refreshConfirmationCode(confirmationCode: string, expirationDate: Date) {
+    refreshConfirmationCode(): string {
+
+        const confirmationCode: string = randomUUID();
+        const expirationDate: Date = add(
+            new Date(),
+            {hours: 1, minutes: 1}
+        );
 
         (this as UserDocument).emailConfirmation.confirmationCode = confirmationCode;
         (this as UserDocument).emailConfirmation.expirationDate = expirationDate;
+
+        return confirmationCode;
     }
 };
 
