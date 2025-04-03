@@ -1,25 +1,11 @@
 import {console_log_e2e, delay, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, deviceNames, presets} from "../helpers/datasets-for-tests";
-import {MongoMemoryServer} from "mongodb-memory-server";
-import {MongoClient} from "mongodb";
-import {
-    apiTrafficCollection,
-    sessionsCollection,
-    setApiTrafficCollection,
-    setSessionsCollection,
-    setUsersCollection,
-    usersCollection
-} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
-import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
-import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
-import {User} from "../../src/04-users/domain/user-entity";
-
-let mongoServer: MongoMemoryServer;
-let client: MongoClient;
+import mongoose from "mongoose";
+import {runDb} from "../../src/db/mongo-db/mongoDb";
 
 jest.mock('../../src/common/settings', () => {
     const actualSettings = jest.requireActual('../../src/common/settings').SETTINGS;
@@ -33,28 +19,38 @@ jest.mock('../../src/common/settings', () => {
 });
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
 
-    client = new MongoClient(uri);
-    await client.connect();
+    const uri = SETTINGS.MONGO_URL;
 
-    const db = client.db();
+    if (!uri) {
 
-    setUsersCollection(db.collection<User>('users'));
-    setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
-    setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
+        throw new Error("MONGO_URL is not defined in SETTINGS");
+    }
+
+    await runDb(uri);
 });
 
 afterAll(async () => {
-    await client.close();
-    await mongoServer.stop();
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.disconnect();
+
+    clearPresets();
 });
 
 beforeEach(async () => {
-    await usersCollection.deleteMany({});
-    await sessionsCollection.deleteMany({});
-    await apiTrafficCollection.deleteMany({});
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
 
     clearPresets();
 });
@@ -163,5 +159,5 @@ describe('UPDATE /security/devices', () => {
         }
 
         console_log_e2e('No Body', 200, 'Test 1: update (/security/devices)');
-    }, 30000);
+    }, 50000);
 });

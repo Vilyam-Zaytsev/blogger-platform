@@ -1,36 +1,47 @@
-import {console_log_e2e, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
+import {console_log_e2e, encodingAdminDataInBase64, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, presets} from "../helpers/datasets-for-tests";
-import {MongoMemoryServer} from "mongodb-memory-server";
-import {MongoClient, ObjectId} from "mongodb";
-import {setUsersCollection, usersCollection} from "../../src/db/mongo-db/mongoDb";
+import {ObjectId} from "mongodb";
+import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {UserViewModel} from "../../src/04-users/types/input-output-types";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
-import {User} from "../../src/04-users/domain/user-entity";
-
-let mongoServer: MongoMemoryServer;
-let client: MongoClient;
+import mongoose from "mongoose";
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
 
-    client = new MongoClient(uri);
-    await client.connect();
+    const uri = SETTINGS.MONGO_URL;
 
-    const db = client.db();
-    setUsersCollection(db.collection<User>('users'));
+    if (!uri) {
+
+        throw new Error("MONGO_URL is not defined in SETTINGS");
+    }
+
+    await runDb(uri);
 });
 
 afterAll(async () => {
-    await client.close();
-    await mongoServer.stop();
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.disconnect();
+
+    clearPresets();
 });
 
 beforeEach(async () => {
-    await usersCollection.deleteMany({});
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
 
     clearPresets();
 });

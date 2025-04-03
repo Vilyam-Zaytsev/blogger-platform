@@ -55,11 +55,9 @@ const emailConfirmationSchema = new Schema<EmailConfirmation>({
 
     confirmationCode: {
         type: String,
-        required: true
     },
     expirationDate: {
         type: Date,
-        required: true
     },
     confirmationStatus: {
         type: String,
@@ -145,7 +143,7 @@ const userStatics: any = {
         };
 
 
-        return new UserModel(user) as UserDocument;
+        return new UserModel(user);
     },
 
     async createByAdmin(userDto: UserDto): Promise<UserDocument> {
@@ -178,6 +176,9 @@ const userStatics: any = {
         return new UserModel(user) as UserDocument;
     }
 };
+
+userSchema.methods = userMethods;
+userSchema.statics = userStatics;
 
 const UserModel: UserModel = mongoose.model<User, UserModel>('User', userSchema);
 

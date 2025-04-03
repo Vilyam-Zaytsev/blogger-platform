@@ -33,8 +33,6 @@ const rateLimitsGuard = async (
         .countDocuments(filter)
         .exec();
 
-    console.log(recentRequestCount)
-
     if (recentRequestCount > 5) {
 
         res

@@ -5,7 +5,7 @@ async function runDb(url: string) {
 
     try {
 
-        await mongoose.connect(`${url}/${SETTINGS.DB_NAME}`);
+        await mongoose.connect(`${url}/${SETTINGS.DB_NAME}?${SETTINGS.MONGO_QUERY}`);
 
         console.log('connected to mongodb...');
 

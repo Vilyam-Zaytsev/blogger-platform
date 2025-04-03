@@ -1,25 +1,6 @@
-import {MongoMemoryServer} from "mongodb-memory-server";
-import {MongoClient, ObjectId} from "mongodb";
-import {
-    apiTrafficCollection,
-    blogsCollection,
-    commentsCollection,
-    postsCollection, sessionsCollection, setApiTrafficCollection,
-    setBlogsCollection,
-    setCommentsCollection,
-    setPostsCollection, setSessionsCollection,
-    setUsersCollection,
-    usersCollection
-} from "../../src/db/mongo-db/mongoDb";
-import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
-import {PostDbType} from "../../src/06-posts/types/post-db-type";
-import {CommentDbType} from "../../src/07-comments/types/comment-db-type";
-import {
-    clearPresets,
-    comments,
-    incorrectAccessToken,
-    presets
-} from "../helpers/datasets-for-tests";
+import {ObjectId} from "mongodb";
+
+import {clearPresets, incorrectAccessToken, presets} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
 import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
@@ -30,41 +11,42 @@ import {SETTINGS} from "../../src/common/settings";
 import {CommentViewModel} from "../../src/07-comments/types/input-output-types";
 import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
-import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
-import {ActiveSessionType} from "../../src/02-sessions/types/active-session-type";
-import {User} from "../../src/04-users/domain/user-entity";
-
-let mongoServer: MongoMemoryServer;
-let client: MongoClient;
+import {runDb} from "../../src/db/mongo-db/mongoDb";
+import mongoose from "mongoose";
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
 
-    client = new MongoClient(uri);
-    await client.connect();
+    const uri = SETTINGS.MONGO_URL;
 
-    const db = client.db();
-    setUsersCollection(db.collection<User>('users'));
-    setBlogsCollection(db.collection<BlogDbType>('blogs'));
-    setPostsCollection(db.collection<PostDbType>('posts'));
-    setCommentsCollection(db.collection<CommentDbType>('comments'));
-    setSessionsCollection(db.collection<ActiveSessionType>('sessions'));
-    setApiTrafficCollection(db.collection<ApiTrafficType>('api-traffic'));
+    if (!uri) {
+
+        throw new Error("MONGO_URL is not defined in SETTINGS");
+    }
+
+    await runDb(uri);
 });
 
 afterAll(async () => {
-    await client.close();
-    await mongoServer.stop();
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.disconnect();
+
+    clearPresets();
 });
 
 beforeEach(async () => {
-    await usersCollection.deleteMany({});
-    await blogsCollection.deleteMany({});
-    await postsCollection.deleteMany({});
-    await commentsCollection.deleteMany({});
-    await sessionsCollection.deleteMany({});
-    await apiTrafficCollection.deleteMany({});
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
 
     clearPresets();
 });
@@ -84,24 +66,24 @@ describe('DELETE /comments', () => {
 
         await authTestManager
             .login(presets.users.map(u => u.login));
-        //
-        // await commentsTestManager
-        //     .createComments(1);
 
-        // const resDeleteComment: Response = await req
-        //     .delete(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
-        //     .set(
-        //         'Authorization',
-        //         `Bearer ${presets.authTokens[0].accessToken}`
-        //     )
-        //     .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+        await commentsTestManager
+            .createComments(1);
 
-        // const foundComments: Paginator<CommentViewModel> = await commentsTestManager
-        //     .getComments(presets.posts[0].id);
-        //
-        // expect(foundComments.items.length).toEqual(0);
-        //
-        // console_log_e2e(resDeleteComment.body, resDeleteComment.status, 'Test 1: delete(/comments/:id)');
+        const resDeleteComment: Response = await req
+            .delete(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
+            .set(
+                'Authorization',
+                `Bearer ${presets.authTokens[0].accessToken}`
+            )
+            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+
+        const foundComments: Paginator<CommentViewModel> = await commentsTestManager
+            .getComments(presets.posts[0].id);
+
+        expect(foundComments.items.length).toEqual(0);
+
+        console_log_e2e(resDeleteComment.body, resDeleteComment.status, 'Test 1: delete(/comments/:id)');
     });
 
     it('should not delete the comment if the user is not logged in.', async () => {

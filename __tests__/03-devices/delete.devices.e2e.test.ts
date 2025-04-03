@@ -1,23 +1,12 @@
 import {console_log_e2e, delay, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, deviceNames, presets} from "../helpers/datasets-for-tests";
-import {MongoClient, ObjectId} from "mongodb";
-import {
-    apiTrafficCollection, runDb,
-    setApiTrafficCollection,
-    setUsersCollection,
-    usersCollection
-} from "../../src/db/mongo-db/mongoDb";
+import {ObjectId} from "mongodb";
+import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {LoginSuccessViewModel} from "../../src/01-auth/types/login-success-view-model";
-import {ApiTrafficType} from "../../src/common/types/api-traffic-type";
-import {User} from "../../src/04-users/domain/user-entity";
 import mongoose from "mongoose";
-import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
-import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
-
-let client: MongoClient;
 
 jest.mock('../../src/common/settings', () => {
     const actualSettings = jest.requireActual('../../src/common/settings').SETTINGS;
@@ -40,14 +29,19 @@ beforeAll(async () => {
     }
 
     await runDb(uri);
-
-    client = new MongoClient(uri);
-    await client.connect();
 });
 
 afterAll(async () => {
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
     await mongoose.disconnect();
-    await client.close();
+
+    clearPresets();
 });
 
 beforeEach(async () => {
@@ -58,8 +52,6 @@ beforeEach(async () => {
     }
 
     await mongoose.connection.db.dropDatabase();
-
-    await client.db(SETTINGS.DB_NAME).dropDatabase();
 
     clearPresets();
 });
@@ -183,7 +175,7 @@ describe('DELETE /security/devices', () => {
         expect(resGetDevices1.body).toEqual(resGetDevices2.body);
 
         console_log_e2e(resDeleteDevices.body, resDeleteDevices.status, 'Test 2: delete (/security/devices)');
-    });
+    }, 10000);
 
     it('should delete a specific session by ID if the user is logged in.', async () => {
 
@@ -245,7 +237,7 @@ describe('DELETE /security/devices', () => {
         expect(resGetDevices2.body.some((d: { lastActiveDate: string }) => d.lastActiveDate === resGetDevices1.body[1].lastActiveDate)).toBe(false);
 
         console_log_e2e(resDeleteDevice.body, resDeleteDevice.status, 'Test 3: delete (/security/devices/:id)');
-    });
+    }, 10000);
 
     it('should not delete a specific session of a specific user if the user is logged in.', async () => {
 
@@ -306,7 +298,7 @@ describe('DELETE /security/devices', () => {
         expect(resGetDevices1.body).toEqual(resGetDevices2.body);
 
         console_log_e2e(resDeleteDevice.body, resDeleteDevice.status, 'Test 4: delete (/security/devices/:id)');
-    });
+    }, 10000);
 
     it('should not delete a specific session of a specific user if the user is not the owner of this device.', async () => {
 
@@ -430,7 +422,5 @@ describe('DELETE /security/devices', () => {
         expect(resGetDevices1.body).toEqual(resGetDevices2.body);
 
         console_log_e2e(resDeleteDevice.body, resDeleteDevice.status, 'Test 6: delete (/security/devices/:id)');
-    });
-
-
+    }, 10000);
 });

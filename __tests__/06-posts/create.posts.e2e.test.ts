@@ -1,45 +1,47 @@
 import {console_log_e2e, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {
-    clearPresets,
-    postContents,
-    postShortDescriptions,
-    postTitles,
-    presets
-} from "../helpers/datasets-for-tests";
+import {clearPresets, postContents, postShortDescriptions, postTitles, presets} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
-import {MongoMemoryServer} from "mongodb-memory-server";
-import {MongoClient} from "mongodb";
-import {blogsCollection, postsCollection, setBlogsCollection, setPostsCollection} from "../../src/db/mongo-db/mongoDb";
-import {PostDbType} from "../../src/06-posts/types/post-db-type";
 import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {Response} from "supertest";
 import {PostViewModel} from "../../src/06-posts/types/input-output-types";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
-
-let mongoServer: MongoMemoryServer;
-let client: MongoClient;
+import {runDb} from "../../src/db/mongo-db/mongoDb";
+import mongoose from "mongoose";
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
 
-    client = new MongoClient(uri);
-    await client.connect();
+    const uri = SETTINGS.MONGO_URL;
 
-    const db = client.db();
-    setBlogsCollection(db.collection<BlogDbType>('blogs'));
-    setPostsCollection(db.collection<PostDbType>('posts'));
+    if (!uri) {
+
+        throw new Error("MONGO_URL is not defined in SETTINGS");
+    }
+
+    await runDb(uri);
 });
 
 afterAll(async () => {
-    await client.close();
-    await mongoServer.stop();
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.disconnect();
+
+    clearPresets();
 });
 
 beforeEach(async () => {
-    await blogsCollection.deleteMany({});
-    await postsCollection.deleteMany({});
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
 
     clearPresets();
 });

@@ -1,22 +1,20 @@
 import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, presets} from "../helpers/datasets-for-tests";
-import {MongoClient, WithId} from "mongodb";
+import {WithId} from "mongodb";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {User} from "../../src/04-users/domain/user-entity";
-import {nodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
-import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
 import {UsersRepository} from "../../src/04-users/repositoryes/users-repository";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import mongoose from "mongoose";
 import {container} from "../../src/composition-root";
+import {NodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
 
 const usersRepository: UsersRepository = container.get(UsersRepository);
 
-let client: MongoClient;
-
+let sendEmailMock: any;
 beforeAll(async () => {
 
     const uri = SETTINGS.MONGO_URL;
@@ -28,13 +26,8 @@ beforeAll(async () => {
 
     await runDb(uri);
 
-    client = new MongoClient(uri);
-    await client.connect();
-});
-
-afterAll(async () => {
-    await mongoose.disconnect();
-    await client.close();
+    //@ts-ignore
+    sendEmailMock = jest.spyOn(NodemailerService.prototype, 'sendEmail').mockResolvedValue(true)
 });
 
 beforeEach(async () => {
@@ -46,18 +39,22 @@ beforeEach(async () => {
 
     await mongoose.connection.db.dropDatabase();
 
-    await client.db(SETTINGS.DB_NAME).dropDatabase();
-
+    jest.clearAllMocks();
     clearPresets();
+});
 
-    nodemailerService.sendEmail = jest
-        .fn()
-        .mockImplementation((email: string, template: EmailTemplateType) => {
-            return Promise.resolve({
-                email,
-                template
-            });
-        });
+afterAll(async () => {
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.disconnect();
+
+    jest.clearAllMocks();
+    clearPresets();
 });
 
 describe('POST /auth/new-password', () => {
@@ -77,7 +74,7 @@ describe('POST /auth/new-password', () => {
             .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.NEW_PASSWORD}`)
             .send({
                 newPassword: generateRandomString(10),
-                recoveryCode: foundUser_1!.passwordRecovery.recoveryCode
+                recoveryCode: foundUser_1!.passwordRecovery!.recoveryCode
             })
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
@@ -86,7 +83,11 @@ describe('POST /auth/new-password', () => {
 
         expect(foundUser_1!.passwordHash).not.toBe(foundUser_2!.passwordHash);
 
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(1);
+
         console_log_e2e(resNewPassword.body, resNewPassword.status, 'Test 1: post(/auth/new-password)');
+
     });
 
     it('should not update the password if the user has sent incorrect data: (newPassword: less than 6 characters).', async () => {
@@ -104,7 +105,7 @@ describe('POST /auth/new-password', () => {
             .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.NEW_PASSWORD}`)
             .send({
                 newPassword: generateRandomString(5),
-                recoveryCode: foundUser_1!.passwordRecovery.recoveryCode
+                recoveryCode: foundUser_1!.passwordRecovery!.recoveryCode
             })
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
@@ -122,7 +123,10 @@ describe('POST /auth/new-password', () => {
 
         expect(foundUser_1!.passwordHash).toEqual(foundUser_2!.passwordHash);
 
-        console_log_e2e(resNewPassword.body, resNewPassword.status, 'Test 1: post(/auth/new-password)');
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(1);
+
+        console_log_e2e(resNewPassword.body, resNewPassword.status, 'Test 2: post(/auth/new-password)');
     });
 
     it('should not update the password if the user has sent incorrect data: (newPassword: more than 20 characters).', async () => {
@@ -140,7 +144,7 @@ describe('POST /auth/new-password', () => {
             .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.NEW_PASSWORD}`)
             .send({
                 newPassword: generateRandomString(21),
-                recoveryCode: foundUser_1!.passwordRecovery.recoveryCode
+                recoveryCode: foundUser_1!.passwordRecovery!.recoveryCode
             })
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
@@ -158,7 +162,10 @@ describe('POST /auth/new-password', () => {
 
         expect(foundUser_1!.passwordHash).toEqual(foundUser_2!.passwordHash);
 
-        console_log_e2e(resNewPassword.body, resNewPassword.status, 'Test 2: post(/auth/new-password)');
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(1);
+
+        console_log_e2e(resNewPassword.body, resNewPassword.status, 'Test 3: post(/auth/new-password)');
     });
 
     it('should not update the password if the user has sent incorrect data: (recoveryCode).', async () => {
@@ -194,7 +201,10 @@ describe('POST /auth/new-password', () => {
 
         expect(foundUser_1!.passwordHash).toEqual(foundUser_2!.passwordHash);
 
-        console_log_e2e(resNewPassword.body, resNewPassword.status, 'Test 3: post(/auth/new-password)');
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(1);
+
+        console_log_e2e(resNewPassword.body, resNewPassword.status, 'Test 4: post(/auth/new-password)');
     });
 
     it('should abort the request with error 429 if the user has sent more than 5 requests in the last 10 seconds.', async () => {
@@ -212,7 +222,7 @@ describe('POST /auth/new-password', () => {
             .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.NEW_PASSWORD}`)
             .send({
                 newPassword: generateRandomString(15),
-                recoveryCode: foundUser_1!.passwordRecovery.recoveryCode
+                recoveryCode: foundUser_1!.passwordRecovery!.recoveryCode
             })
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
@@ -222,7 +232,7 @@ describe('POST /auth/new-password', () => {
                 .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.NEW_PASSWORD}`)
                 .send({
                     newPassword: generateRandomString(15),
-                    recoveryCode: foundUser_1!.passwordRecovery.recoveryCode
+                    recoveryCode: foundUser_1!.passwordRecovery!.recoveryCode
                 })
                 .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
         }
@@ -231,10 +241,13 @@ describe('POST /auth/new-password', () => {
             .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.NEW_PASSWORD}`)
             .send({
                 newPassword: generateRandomString(15),
-                recoveryCode: foundUser_1!.passwordRecovery.recoveryCode
+                recoveryCode: foundUser_1!.passwordRecovery!.recoveryCode
             })
             .expect(SETTINGS.HTTP_STATUSES.TOO_MANY_REQUESTS_429);
 
-        console_log_e2e(resNewPassword.body, resNewPassword.status, 'Test 4: post(/auth/new-password)');
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(1);
+
+        console_log_e2e(resNewPassword.body, resNewPassword.status, 'Test 5: post(/auth/new-password)');
     });
 });

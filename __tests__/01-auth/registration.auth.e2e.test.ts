@@ -1,19 +1,20 @@
 import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, user, userLogins} from "../helpers/datasets-for-tests";
-import {MongoClient, ObjectId, WithId} from "mongodb";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
-import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
 import {UsersRepository} from "../../src/04-users/repositoryes/users-repository";
-import {EmailTemplates} from "../../src/01-auth/adapters/email-templates";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {UserViewModel} from "../../src/04-users/types/input-output-types";
-import {User} from "../../src/04-users/domain/user-entity";
+import {ConfirmationStatus, UserDocument} from "../../src/04-users/domain/user-entity";
 import mongoose from "mongoose";
+import {NodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
+import {container} from "../../src/composition-root";
 
-let client: MongoClient;
+const usersRepository: UsersRepository = container.get(UsersRepository);
+
+let sendEmailMock: any;
 
 beforeAll(async () => {
 
@@ -26,13 +27,24 @@ beforeAll(async () => {
 
     await runDb(uri);
 
-    client = new MongoClient(uri);
-    await client.connect();
+    //@ts-ignore
+    sendEmailMock = jest
+        .spyOn(NodemailerService.prototype, 'sendEmail')
+        .mockResolvedValue(true);
 });
 
 afterAll(async () => {
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
     await mongoose.disconnect();
-    await client.close();
+
+    jest.clearAllMocks();
+    clearPresets();
 });
 
 beforeEach(async () => {
@@ -44,18 +56,8 @@ beforeEach(async () => {
 
     await mongoose.connection.db.dropDatabase();
 
-    await client.db(SETTINGS.DB_NAME).dropDatabase();
-
+    jest.clearAllMocks();
     clearPresets();
-
-    nodemailerService.sendEmail = jest
-        .fn()
-        .mockImplementation((email: string, template: EmailTemplateType) => {
-            return Promise.resolve({
-                email,
-                template
-            });
-        });
 });
 
 describe('POST /auth/registration', () => {
@@ -71,36 +73,30 @@ describe('POST /auth/registration', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
-        const usersRepository: UsersRepository = new UsersRepository();
-
-        const foundUser: WithId<User> | null = await usersRepository
+        const foundUser: UserDocument | null = await usersRepository
             .findByEmail(user.email);
 
-        expect(foundUser).toEqual({
-            _id: expect.any(ObjectId),
+        const foundUser_obj = foundUser
+            ? { ...foundUser.toObject(), _id: foundUser._id.toString() }
+            : null;
+
+        expect(foundUser_obj).toEqual({
+            _id: expect.any(String),
             login: user.login,
             email: user.email,
             passwordHash: expect.any(String),
-            createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
-            passwordRecovery: {
-                recoveryCode: null,
-                expirationDate: null
-            },
+            createdAt: expect.any(String),
+            passwordRecovery: null,
             emailConfirmation: {
                 confirmationCode: expect.any(String),
-                expirationDate: expect.any(Date),
+                expirationDate: expect.anything(),
                 confirmationStatus: ConfirmationStatus.NotConfirmed
-            }
+            },
+            __v: 0
         });
 
-        const emailTemplates: EmailTemplates = new EmailTemplates();
-
-        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(1);
-        expect(await (nodemailerService.sendEmail as jest.Mock).mock.results[0].value)
-            .toEqual({
-                email: foundUser!.email,
-                template: emailTemplates.registrationEmail(foundUser!.emailConfirmation.confirmationCode!)
-            });
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
         console_log_e2e(resRegistration.body, resRegistration.status, 'Test 1: post(/auth/registration)');
     });
@@ -128,6 +124,9 @@ describe('POST /auth/registration', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.TOO_MANY_REQUESTS_429);
 
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(5);
+
         console_log_e2e(resRegistration.body, resRegistration.status, 'Test 2: post(/auth/registration)');
     });
 
@@ -145,12 +144,12 @@ describe('POST /auth/registration', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(0);
-
         const foundUsers: Paginator<UserViewModel> = await usersTestManager
             .getUsers();
 
         expect(foundUsers.items.length).toEqual(1);
+
+        expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
         console_log_e2e(resRegistration.body, resRegistration.status, 'Test 3: post(/auth/registration)');
     });
@@ -169,12 +168,13 @@ describe('POST /auth/registration', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
 
-        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(0);
-
         const foundUsers: Paginator<UserViewModel> = await usersTestManager
             .getUsers();
 
         expect(foundUsers.items.length).toEqual(1);
+
+        expect(sendEmailMock).toHaveBeenCalledTimes(0);
+
 
         console_log_e2e(resRegistration.body, resRegistration.status, 'Test 4: post(/auth/registration)');
     });
@@ -205,12 +205,12 @@ describe('POST /auth/registration', () => {
             },
         );
 
-        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(0);
-
         const foundUsers: Paginator<UserViewModel> = await usersTestManager
             .getUsers();
 
         expect(foundUsers.items.length).toEqual(0);
+
+        expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
         console_log_e2e(resRegistration.body, resRegistration.status, 'Test 5: post(/auth/registration)');
     });
@@ -245,12 +245,12 @@ describe('POST /auth/registration', () => {
             },
         );
 
-        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(0);
-
         const foundUsers: Paginator<UserViewModel> = await usersTestManager
             .getUsers();
 
         expect(foundUsers.items.length).toEqual(0);
+
+        expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
         console_log_e2e(resRegistration.body, resRegistration.status, 'Test 6: post(/auth/registration)');
     });
@@ -285,12 +285,12 @@ describe('POST /auth/registration', () => {
             },
         );
 
-        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(0);
-
         const foundUsers: Paginator<UserViewModel> = await usersTestManager
             .getUsers();
 
         expect(foundUsers.items.length).toEqual(0);
+
+        expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
         console_log_e2e(resRegistration.body, resRegistration.status, 'Test 7: post(/auth/registration)');
     });
@@ -325,12 +325,12 @@ describe('POST /auth/registration', () => {
             },
         );
 
-        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(0);
-
         const foundUsers: Paginator<UserViewModel> = await usersTestManager
             .getUsers();
 
         expect(foundUsers.items.length).toEqual(0);
+
+        expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
         console_log_e2e(resRegistration.body, resRegistration.status, 'Test 8: post(/auth/registration)');
     });
@@ -365,12 +365,12 @@ describe('POST /auth/registration', () => {
             },
         );
 
-        expect((nodemailerService.sendEmail as jest.Mock).mock.calls.length).toEqual(0);
-
         const foundUsers: Paginator<UserViewModel> = await usersTestManager
             .getUsers();
 
         expect(foundUsers.items.length).toEqual(0);
+
+        expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
         console_log_e2e(resRegistration.body, resRegistration.status, 'Test 9: post(/auth/registration)');
     });

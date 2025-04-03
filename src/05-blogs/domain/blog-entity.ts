@@ -62,6 +62,8 @@ const blogStatics: any = {
     }
 };
 
+blogSchema.statics = blogStatics;
+
 const BlogModel: BlogModel = mongoose.model<Blog, BlogModel>('Blog', blogSchema);
 
 export {

@@ -2,11 +2,9 @@ import {encodingAdminDataInBase64, req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";
 import {Response} from "supertest";
 import {UserInputModel, UserViewModel} from "../../../src/04-users/types/input-output-types";
-import {
-    PaginationAndSortFilterType, Paginator,
-    SortDirection
-} from "../../../src/common/types/input-output-types/pagination-sort-types";
+import {Paginator,} from "../../../src/common/types/input-output-types/pagination-sort-types";
 import {presets, userLogins} from "../datasets-for-tests";
+import {SortDirection} from "../../../src/common/helpers/sort-query-dto";
 
 
 const usersTestManager = {
@@ -68,7 +66,7 @@ const usersTestManager = {
 
     filterAndSort<T extends { login: string; email: string }>(
         items: T[],
-        sortAndPaginationFilter: PaginationAndSortFilterType,
+        sortAndPaginationFilter: any,
         propertyMap: Record<string, string>
     ) {
 

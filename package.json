@@ -10,8 +10,8 @@
     "jest:coverage": "jest -i --coverage"
   },
   "dependencies": {
-    "@types/jest": "^29.5.14",
-    "@types/supertest": "^6.0.2",
+    "@types/jest": "29.5.8",
+    "@types/supertest": "^6.0.3",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
     "date-fns": "^4.1.0",

@@ -1,4 +1,3 @@
-import {MatchMode,} from "../../common/types/input-output-types/pagination-sort-types";
 import {injectable} from "inversify";
 import {SortOptionsType} from "../../common/types/sort-options-type";
 import {UserDocument, UserModel} from "../domain/user-entity";

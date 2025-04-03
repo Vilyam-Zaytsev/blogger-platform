@@ -1,12 +1,21 @@
 import nodemailer from 'nodemailer';
 import {EmailTemplateType} from "../../common/types/input-output-types/email-template-type";
+import {injectable} from "inversify";
 
+
+
+// export interface INodeMailerService {
+//     sendEmail: (email: string, template: EmailTemplateType) => Promise<boolean>
+// }
+@injectable()
 class NodemailerService {
 
     async sendEmail(
         email: string,
         template: EmailTemplateType
     ): Promise<boolean> {
+
+        console.log('sendEmail invoked')
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',

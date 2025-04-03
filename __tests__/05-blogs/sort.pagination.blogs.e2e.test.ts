@@ -7,182 +7,199 @@ import {
     presets
 } from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
-import {MongoMemoryServer} from "mongodb-memory-server";
-import {MongoClient} from "mongodb";
-import {blogsCollection, setBlogsCollection} from "../../src/db/mongo-db/mongoDb";
-import {BlogDbType} from "../../src/05-blogs/types/blog-db-type";
-import {createPaginationAndSortFilter} from "../../src/common/helpers/sort-query-dto";
-import {SortDirection} from "../../src/common/types/input-output-types/pagination-sort-types";
-
-let mongoServer: MongoMemoryServer;
-let client: MongoClient;
+import mongoose from "mongoose";
+import {runDb} from "../../src/db/mongo-db/mongoDb";
+import {SortDirection} from "../../src/common/helpers/sort-query-dto";
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
 
-    client = new MongoClient(uri);
-    await client.connect();
+    const uri = SETTINGS.MONGO_URL;
 
-    const db = client.db();
-    setBlogsCollection(db.collection<BlogDbType>('blogs'));
+    if (!uri) {
+
+        throw new Error("MONGO_URL is not defined in SETTINGS");
+    }
+
+    await runDb(uri);
 });
 
 afterAll(async () => {
-    await client.close();
-    await mongoServer.stop();
-});
 
-beforeEach(async () => {
-    await blogsCollection.deleteMany({});
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.disconnect();
 
     clearPresets();
 });
 
-    describe('pagination, sort, search in term /blogs', () => {
+beforeEach(async () => {
 
-        it('should use default pagination values when none are provided by the client.', async () => {
+    if (!mongoose.connection.db) {
 
-            await blogsTestManager
-                .createBlog(11);
+        throw new Error("mongoose.connection.db is undefined");
+    }
 
-            const resGetBlogs: Response = await req
-                .get(SETTINGS.PATH.BLOGS)
-                .expect(SETTINGS.HTTP_STATUSES.OK_200);
+    await mongoose.connection.db.dropDatabase();
 
-            expect(resGetBlogs.body).toEqual({
-                "pagesCount": 2,
-                "page": 1,
-                "pageSize": 10,
-                "totalCount": 11,
-                "items": blogsTestManager.filterAndSort(
-                    [...presets.blogs],
-                    createPaginationAndSortFilter({
-                        pageNumber: '1',
-                        pageSize: '10',
-                        sortBy: 'createdAt',
-                        sortDirection: SortDirection.Descending
-                    }),
-                    blogPropertyMap
-                )
-            });
+    clearPresets();
+});
 
-            expect(resGetBlogs.body.items.length).toEqual(10);
+describe('pagination, sort, search in term /blogs', () => {
 
-            console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 1: pagination(/blogs)');
+    it('should use default pagination values when none are provided by the client.', async () => {
+
+        await blogsTestManager
+            .createBlog(11);
+
+        const resGetBlogs: Response = await req
+            .get(SETTINGS.PATH.BLOGS)
+            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        const filter = {
+            pageNumber: 1,
+            pageSize: 10,
+            sortBy: 'createdAt',
+            sortDirection: SortDirection.Descending
+        }
+
+        expect(resGetBlogs.body).toEqual({
+            "pagesCount": 2,
+            "page": 1,
+            "pageSize": 10,
+            "totalCount": 11,
+            "items": blogsTestManager.filterAndSort(
+                [...presets.blogs],
+                filter,
+                blogPropertyMap
+            )
         });
 
-        it('should use client-provided pagination values to return the correct subset of data.', async () => {
+        expect(resGetBlogs.body.items.length).toEqual(10);
 
-            await blogsTestManager
-                .createBlog(11);
-
-            const resGetBlogs: Response = await req
-                .get(SETTINGS.PATH.BLOGS)
-                .query({
-                    sortBy: 'name',
-                    sortDirection: 'asc',
-                    pageNumber: 2,
-                    pageSize: 3
-                })
-                .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
-            expect(resGetBlogs.body).toEqual({
-                pagesCount: 4,
-                page: 2,
-                pageSize: 3,
-                totalCount: 11,
-                items: blogsTestManager.filterAndSort(
-                    [...presets.blogs],
-                    createPaginationAndSortFilter({
-                        pageNumber: '2',
-                        pageSize: '3',
-                        sortBy: 'name',
-                        sortDirection: SortDirection.Ascending
-                    }),
-                    blogPropertyMap
-                )
-            });
-
-            expect(resGetBlogs.body.items.length).toEqual(3);
-
-            console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 2: pagination(/blogs)');
-        });
-
-        it('should use client-provided pagination values to return the correct subset of data.', async () => {
-
-            await blogsTestManager
-                .createBlog(11);
-
-            const resGetBlogs: Response = await req
-                .get(SETTINGS.PATH.BLOGS)
-                .query({
-                    sortBy: 'description',
-                    sortDirection: 'desc',
-                    pageNumber: 6,
-                    pageSize: 2
-                })
-                .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
-            expect(resGetBlogs.body).toEqual({
-                pagesCount: 6,
-                page: 6,
-                pageSize: 2,
-                totalCount: 11,
-                items: blogsTestManager.filterAndSort(
-                    [...presets.blogs],
-                    createPaginationAndSortFilter({
-                        pageNumber: '6',
-                        pageSize: '2',
-                        sortBy: 'description',
-                        sortDirection: SortDirection.Descending
-                    }),
-                    blogPropertyMap
-                )
-            });
-
-
-            expect(resGetBlogs.body.items.length).toEqual(1);
-
-            console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 3: pagination(/blogs)');
-        });
-
-        it('should use client-provided pagination values to return the correct subset of data.', async () => {
-
-            await blogsTestManager
-                .createBlog(11);
-
-            const resGetBlogs = await req
-                .get(SETTINGS.PATH.BLOGS)
-                .query({
-                    searchNameTerm: 'co',
-                    sortBy: 'name',
-                    sortDirection: 'asc',
-                    pageNumber: 1,
-                    pageSize: 1
-                })
-                .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
-            expect(resGetBlogs.body).toEqual({
-                pagesCount: 2,
-                page: 1,
-                pageSize: 1,
-                totalCount: 2,
-                items: blogsTestManager.filterAndSort(
-                    [...presets.blogs],
-                    createPaginationAndSortFilter({
-                        pageNumber: '1',
-                        pageSize: '1',
-                        sortBy: 'name',
-                        sortDirection: SortDirection.Ascending,
-                        searchNameTerm: 'co'
-                    }),
-                    blogPropertyMap
-                )
-            });
-
-            expect(resGetBlogs.body.items.length).toEqual(1);
-
-            console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 4: pagination(/blogs)');
-        });
+        console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 1: pagination(/blogs)');
     });
+
+    it('should use client-provided pagination values to return the correct subset of data.', async () => {
+
+        await blogsTestManager
+            .createBlog(11);
+
+        const resGetBlogs: Response = await req
+            .get(SETTINGS.PATH.BLOGS)
+            .query({
+                sortBy: 'name',
+                sortDirection: 'asc',
+                pageNumber: 2,
+                pageSize: 3
+            })
+            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        const filter = {
+            pageNumber: 2,
+            pageSize: 3,
+            sortBy: 'name',
+            sortDirection: SortDirection.Ascending
+        }
+
+        expect(resGetBlogs.body).toEqual({
+            pagesCount: 4,
+            page: 2,
+            pageSize: 3,
+            totalCount: 11,
+            items: blogsTestManager.filterAndSort(
+                [...presets.blogs],
+                filter,
+                blogPropertyMap
+            )
+        });
+
+        expect(resGetBlogs.body.items.length).toEqual(3);
+
+        console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 2: pagination(/blogs)');
+    });
+
+    it('should use client-provided pagination values to return the correct subset of data.', async () => {
+
+        await blogsTestManager
+            .createBlog(11);
+
+        const resGetBlogs: Response = await req
+            .get(SETTINGS.PATH.BLOGS)
+            .query({
+                sortBy: 'description',
+                sortDirection: 'desc',
+                pageNumber: 6,
+                pageSize: 2
+            })
+            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        const filter = {
+            pageNumber: 6,
+            pageSize: 2,
+            sortBy: 'description',
+            sortDirection: SortDirection.Descending
+        }
+
+        expect(resGetBlogs.body).toEqual({
+            pagesCount: 6,
+            page: 6,
+            pageSize: 2,
+            totalCount: 11,
+            items: blogsTestManager.filterAndSort(
+                [...presets.blogs],
+                filter,
+                blogPropertyMap
+            )
+        });
+
+
+        expect(resGetBlogs.body.items.length).toEqual(1);
+
+        console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 3: pagination(/blogs)');
+    });
+
+    it('should use client-provided pagination values to return the correct subset of data.', async () => {
+
+        await blogsTestManager
+            .createBlog(11);
+
+        const resGetBlogs = await req
+            .get(SETTINGS.PATH.BLOGS)
+            .query({
+                searchNameTerm: 'co',
+                sortBy: 'name',
+                sortDirection: 'asc',
+                pageNumber: 1,
+                pageSize: 1
+            })
+            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        const filter = {
+            pageNumber: 1,
+            pageSize: 1,
+            sortBy: 'name',
+            sortDirection: SortDirection.Ascending,
+            searchNameTerm: 'co'
+        }
+
+        expect(resGetBlogs.body).toEqual({
+            pagesCount: 2,
+            page: 1,
+            pageSize: 1,
+            totalCount: 2,
+            items: blogsTestManager.filterAndSort(
+                [...presets.blogs],
+                filter,
+                blogPropertyMap
+            )
+        });
+
+        expect(resGetBlogs.body.items.length).toEqual(1);
+
+        console_log_e2e(resGetBlogs.body, resGetBlogs.status, 'Test 4: pagination(/blogs)');
+    });
+});

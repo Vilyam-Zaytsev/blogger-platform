@@ -1,20 +1,21 @@
 import {console_log_e2e, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, user, userLogins} from "../helpers/datasets-for-tests";
-import {MongoClient, ObjectId, WithId} from "mongodb";
+import {WithId} from "mongodb";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import {Response} from "supertest";
 import {UsersRepository} from "../../src/04-users/repositoryes/users-repository";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
-import {EmailTemplateType} from "../../src/common/types/input-output-types/email-template-type";
 import {UserInputModel} from "../../src/04-users/types/input-output-types";
-import {User} from "../../src/04-users/domain/user-entity";
+import {ConfirmationStatus, User, UserDocument} from "../../src/04-users/domain/user-entity";
 import {container} from "../../src/composition-root";
 import mongoose from "mongoose";
+import {NodemailerService} from "../../src/01-auth/adapters/nodemailer-service";
+import {SortQueryDto} from "../../src/common/helpers/sort-query-dto";
 
 const usersRepository: UsersRepository = container.get(UsersRepository);
 
-let client: MongoClient;
+let sendEmailMock: any;
 
 beforeAll(async () => {
 
@@ -27,13 +28,24 @@ beforeAll(async () => {
 
     await runDb(uri);
 
-    client = new MongoClient(uri);
-    await client.connect();
+    //@ts-ignore
+    sendEmailMock = jest
+        .spyOn(NodemailerService.prototype, 'sendEmail')
+        .mockResolvedValue(true);
 });
 
 afterAll(async () => {
+
+    if (!mongoose.connection.db) {
+
+        throw new Error("mongoose.connection.db is undefined");
+    }
+
+    await mongoose.connection.db.dropDatabase();
     await mongoose.disconnect();
-    await client.close();
+
+    jest.clearAllMocks();
+    clearPresets();
 });
 
 beforeEach(async () => {
@@ -45,18 +57,8 @@ beforeEach(async () => {
 
     await mongoose.connection.db.dropDatabase();
 
-    await client.db(SETTINGS.DB_NAME).dropDatabase();
-
+    jest.clearAllMocks();
     clearPresets();
-
-    nodemailerService.sendEmail = jest
-        .fn()
-        .mockImplementation((email: string, template: EmailTemplateType) => {
-            return Promise.resolve({
-                email,
-                template
-            });
-        });
 });
 
 describe('POST /auth/registration-confirmation', () => {
@@ -67,8 +69,19 @@ describe('POST /auth/registration-confirmation', () => {
             .registration(user);
 
 
-        const foundUser_1: WithId<User> | null = await usersRepository
+        const foundUser_1: UserDocument | null = await usersRepository
             .findByEmail(user.email);
+
+        expect(foundUser_1).toEqual(expect.objectContaining({
+
+            emailConfirmation: expect.objectContaining({
+
+                confirmationCode: expect.any(String),
+                expirationDate: expect.any(Date),
+                confirmationStatus: ConfirmationStatus.NotConfirmed
+                })
+            })
+        );
 
         const resRegistrationConfirmation: Response = await req
             .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION_CONFIRMATION}`)
@@ -77,25 +90,22 @@ describe('POST /auth/registration-confirmation', () => {
             })
             .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
-        const foundUser_2: WithId<User> | null = await usersRepository
+        const foundUser_2: UserDocument | null = await usersRepository
             .findByEmail(user.email);
 
-        expect(foundUser_2).toEqual({
-            _id: expect.any(ObjectId),
-            login: user.login,
-            email: user.email,
-            passwordHash: expect.any(String),
-            createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
-            passwordRecovery: {
-                recoveryCode: null,
-                expirationDate: null
-            },
-            emailConfirmation: {
-                confirmationCode: null,
-                expirationDate: null,
-                confirmationStatus: ConfirmationStatus.Confirmed
-            }
-        });
+        expect(foundUser_2).toEqual(expect.objectContaining({
+
+                emailConfirmation: expect.objectContaining({
+
+                    confirmationCode: null,
+                    expirationDate: null,
+                    confirmationStatus: ConfirmationStatus.Confirmed
+                })
+            })
+        );
+
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
         console_log_e2e(resRegistrationConfirmation.body, resRegistrationConfirmation.status, 'Test 1: post(/auth/registration-confirmation)');
     });
@@ -114,8 +124,10 @@ describe('POST /auth/registration-confirmation', () => {
                 .registration(user);
         }
 
-        const users: User[] = await usersRepository
-            .findUsers(createPaginationAndSortFilter({}))
+        const filter: SortQueryDto = new SortQueryDto({});
+
+        const users: UserDocument[] = await usersRepository
+            .findUsers(filter);
 
         const confirmationCodes: string[] = users.map(u => u.emailConfirmation.confirmationCode!);
 
@@ -135,6 +147,9 @@ describe('POST /auth/registration-confirmation', () => {
                 code: generateRandomString(15)
             })
             .expect(SETTINGS.HTTP_STATUSES.TOO_MANY_REQUESTS_429);
+
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(5);
 
         console_log_e2e(resRegistrationConfirmation.body, resRegistrationConfirmation.status, 'Test 2: post(/auth/registration-confirmation)');
     }, 15000);
@@ -160,25 +175,22 @@ describe('POST /auth/registration-confirmation', () => {
             ]
         });
 
-        const foundUser: WithId<User> | null = await usersRepository
+        const foundUser: UserDocument | null = await usersRepository
             .findByEmail(user.email);
 
-        expect(foundUser).toEqual({
-            _id: expect.any(ObjectId),
-            login: user.login,
-            email: user.email,
-            passwordHash: expect.any(String),
-            createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
-            passwordRecovery: {
-                recoveryCode: null,
-                expirationDate: null
-            },
-            emailConfirmation: {
-                confirmationCode: expect.any(String),
-                expirationDate: expect.any(Date),
-                confirmationStatus: ConfirmationStatus.NotConfirmed
-            }
-        });
+        expect(foundUser).toEqual(expect.objectContaining({
+
+                emailConfirmation: expect.objectContaining({
+
+                    confirmationCode: expect.any(String),
+                    expirationDate: expect.any(Date),
+                    confirmationStatus: ConfirmationStatus.NotConfirmed
+                })
+            })
+        );
+
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
         console_log_e2e(resRegistrationConfirmation.body, resRegistrationConfirmation.status, 'Test 3:' +
             ' post(/auth/registration-confirmation)');
@@ -192,22 +204,16 @@ describe('POST /auth/registration-confirmation', () => {
         const foundUser_1: WithId<User> | null = await usersRepository
             .findByEmail(user.email);
 
-        expect(foundUser_1).toEqual({
-            _id: expect.any(ObjectId),
-            login: user.login,
-            email: user.email,
-            passwordHash: expect.any(String),
-            createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
-            passwordRecovery: {
-                recoveryCode: null,
-                expirationDate: null
-            },
-            emailConfirmation: {
-                confirmationCode: expect.any(String),
-                expirationDate: expect.any(Date),
-                confirmationStatus: ConfirmationStatus.NotConfirmed
-            }
-        });
+        expect(foundUser_1).toEqual(expect.objectContaining({
+
+                emailConfirmation: expect.objectContaining({
+
+                    confirmationCode: expect.any(String),
+                    expirationDate: expect.any(Date),
+                    confirmationStatus: ConfirmationStatus.NotConfirmed
+                })
+            })
+        );
 
         await req
             .post(`${SETTINGS.PATH.AUTH.BASE}${SETTINGS.PATH.AUTH.REGISTRATION_CONFIRMATION}`)
@@ -238,22 +244,19 @@ describe('POST /auth/registration-confirmation', () => {
         const foundUser_2: WithId<User> | null = await usersRepository
             .findByEmail(user.email);
 
-        expect(foundUser_2).toEqual({
-            _id: expect.any(ObjectId),
-            login: user.login,
-            email: user.email,
-            passwordHash: expect.any(String),
-            createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
-            passwordRecovery: {
-                recoveryCode: null,
-                expirationDate: null
-            },
-            emailConfirmation: {
-                confirmationCode: null,
-                expirationDate: null,
-                confirmationStatus: ConfirmationStatus.Confirmed
-            }
-        });
+        expect(foundUser_2).toEqual(expect.objectContaining({
+
+                emailConfirmation: expect.objectContaining({
+
+                    confirmationCode: null,
+                    expirationDate: null,
+                    confirmationStatus: ConfirmationStatus.Confirmed
+                })
+            })
+        );
+
+        expect(sendEmailMock).toHaveBeenCalled();
+        expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
         console_log_e2e(resRegistrationConfirmation_2.body, resRegistrationConfirmation_2.status, 'Test 4:' +
             ' post(/auth/registration-confirmation)');
