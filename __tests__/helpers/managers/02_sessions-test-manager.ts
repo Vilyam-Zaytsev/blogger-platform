@@ -3,7 +3,7 @@ import {req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";
 import {LoginSuccessViewModel} from "../../../src/01-auth/types/login-success-view-model";
 import {presets} from "../datasets-for-tests";
-import {UserInputModel} from "../../../src/04-users/types/input-output-types";
+import {UserInputModel} from "../../../src/03-users/types/input-output-types";
 
 const sessionsTestManager = {
 

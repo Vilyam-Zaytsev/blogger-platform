@@ -1,7 +1,7 @@
 import {encodingAdminDataInBase64, req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";
 import {Response} from "supertest";
-import {UserInputModel, UserViewModel} from "../../../src/04-users/types/input-output-types";
+import {UserInputModel, UserViewModel} from "../../../src/03-users/types/input-output-types";
 import {Paginator,} from "../../../src/common/types/input-output-types/pagination-sort-types";
 import {presets, userLogins} from "../datasets-for-tests";
 import {SortDirection} from "../../../src/common/helpers/sort-query-dto";

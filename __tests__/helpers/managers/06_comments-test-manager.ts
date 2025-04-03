@@ -2,7 +2,7 @@ import {Response} from "supertest";
 import {comments, presets} from "../datasets-for-tests";
 import {req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";
-import {CommentInputModel, CommentViewModel} from "../../../src/07-comments/types/input-output-types";
+import {CommentInputModel, CommentViewModel} from "../../../src/06-comments/types/input-output-types";
 import {Paginator,} from "../../../src/common/types/input-output-types/pagination-sort-types";
 import {SortDirection} from "../../../src/common/helpers/sort-query-dto";
 

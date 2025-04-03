@@ -1,11 +1,11 @@
-import {UserInputModel, UserViewModel} from "../../src/04-users/types/input-output-types";
-import {BlogViewModel} from "../../src/05-blogs/types/input-output-types";
-import {PostViewModel} from "../../src/06-posts/types/input-output-types";
-import {CommentViewModel} from "../../src/07-comments/types/input-output-types";
+import {UserInputModel, UserViewModel} from "../../src/03-users/types/input-output-types";
+import {BlogViewModel} from "../../src/04-blogs/types/input-output-types";
+import {PostViewModel} from "../../src/05-posts/types/input-output-types";
+import {CommentViewModel} from "../../src/06-comments/types/input-output-types";
 import {AuthTokens} from "../../src/01-auth/types/auth-tokens-type";
 import {DeviceViewModel} from "../../src/02-sessions/types/input-output-types";
-import {Blog} from "../../src/05-blogs/domain/blog-entity";
-import {Post} from "../../src/06-posts/domain/post-entity";
+import {Blog} from "../../src/04-blogs/domain/blog-entity";
+import {Post} from "../../src/05-posts/domain/post-entity";
 
 const blog: Blog = {
     name: 'BLOG',

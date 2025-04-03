@@ -1,11 +1,11 @@
 import {BcryptService} from "../adapters/bcrypt-service";
 import {LoginInputModel} from "../types/login-input-model";
-import {UsersRepository} from "../../04-users/repositoryes/users-repository";
+import {UsersRepository} from "../../03-users/repositoryes/users-repository";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {JwtService} from "../adapters/jwt-service";
 import {ObjectId} from "mongodb";
-import {UsersService} from "../../04-users/application/users-service";
-import {ConfirmationStatus, PasswordRecovery, UserDocument, UserModel} from "../../04-users/domain/user-entity";
+import {UsersService} from "../../03-users/application/users-service";
+import {ConfirmationStatus, PasswordRecovery, UserDocument, UserModel} from "../../03-users/domain/user-entity";
 import {NodemailerService} from "../adapters/nodemailer-service";
 import {EmailTemplates} from "../adapters/email-templates";
 import {randomUUID} from "node:crypto";
@@ -18,7 +18,7 @@ import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-t
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
 import {injectable} from "inversify";
 import {SessionDocument} from "../../02-sessions/domain/session-entity";
-import {UserDto} from "../../04-users/domain/user-dto";
+import {UserDto} from "../../03-users/domain/user-dto";
 import {isSuccess, isSuccessfulResult} from "../../common/helpers/type-guards";
 
 @injectable()
