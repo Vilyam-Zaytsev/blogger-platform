@@ -15,6 +15,8 @@ import {injectable} from "inversify";
 import {UserDocument} from "../../03-users/domain/user-entity";
 import {Post} from "../../05-posts/domain/post-entity";
 import {CommentDocument, CommentModel} from "../domain/comment-entity";
+import {Like, LikeDocument} from "../../07-likes/like-entity";
+import {LikeRepository} from "../../07-likes/repositoryes/like-repository";
 
 @injectable()
 class CommentsService {
@@ -22,7 +24,8 @@ class CommentsService {
     constructor(
         private usersRepository: UsersRepository,
         private postsService: PostsService,
-        private commentRepository: CommentRepository
+        private commentRepository: CommentRepository,
+        private likeRepository: LikeRepository
     ) {
     };
 
@@ -78,6 +81,27 @@ class CommentsService {
 
         return SuccessResult
             .create(null);
+    }
+
+    async updateCommentReaction(commentId: string, userId: string, reaction: string) {
+
+        const comment: CommentDocument | null = await this.commentRepository
+            .findComment(commentId);
+
+        if (!comment) {
+
+            return BadRequestResult
+                .create(
+                    'commentId',
+                    'Comment not found.',
+                    'Failed to update user\'s reaction to the comment.'
+                );
+        }
+
+        const like: LikeDocument | null = await this.likeRepository
+            .findLikeByUserIdAndParentId(userId, commentId);
+
+        return true;
     }
 
     async deleteComment(commentId: string, userId: string): Promise<ResultType> {

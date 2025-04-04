@@ -16,6 +16,7 @@ import {Paginator,} from "../common/types/input-output-types/pagination-sort-typ
 import {injectable} from "inversify";
 import {SortingAndPaginationParamsType, SortQueryDto} from "../common/helpers/sort-query-dto";
 import {isSuccessfulResult} from "../common/helpers/type-guards";
+import {LikeInputModel} from "../07-likes/types/input-output-types";
 
 @injectable()
 class CommentsController {
@@ -23,7 +24,8 @@ class CommentsController {
     constructor(
         private commentsService: CommentsService,
         private commentQueryRepository: CommentQueryRepository
-    ) {};
+    ) {
+    };
 
     async getComments(
         req: RequestWithParamsAndQuery<IdType, SortingAndPaginationParamsType>,
@@ -148,6 +150,18 @@ class CommentsController {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+    }
+
+    async updateCommentReaction(
+        req: RequestWithParamsAndBody<IdType, LikeInputModel>,
+        res: Response
+    ) {
+        const {id: commentId} = req.params;
+        const {likeStatus} = req.body;
+        const {id: userId} = req.user!;
+
+        const resultUpdateCommentReaction = await this.commentsService
+            .updateCommentReaction(userId, commentId, likeStatus);
     }
 
     async deleteComment(

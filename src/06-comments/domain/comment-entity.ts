@@ -5,10 +5,16 @@ type CommentatorInfo = {
     userLogin: string
 };
 
+type Reactions = {
+    likeCount: number,
+    dislikeCount: number
+}
+
 type Comment = {
     postId: string,
     content: string,
     commentatorInfo: CommentatorInfo,
+    reactions: Reactions,
     createdAt: string
 };
 
@@ -27,7 +33,20 @@ const commentatorInfoSchema = new Schema<CommentatorInfo>({
         type: String,
         required: true
     }
-}, { _id: false });
+}, {_id: false});
+
+const reactionSchema = new Schema<Reactions>({
+    likeCount: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    dislikeCount: {
+        type: Number,
+        required: true,
+        default: 0
+    }
+}, {_id: false});
 
 const commentSchema = new Schema<Comment, CommentModel>({
 
@@ -43,6 +62,10 @@ const commentSchema = new Schema<Comment, CommentModel>({
         type: commentatorInfoSchema,
         required: true
 
+    },
+    reactions: {
+        type: reactionSchema,
+        required: true
     },
     createdAt: {
         type: String,
@@ -68,6 +91,10 @@ const commentStatics: any = {
             postId,
             content,
             commentatorInfo,
+            reactions: {
+              likeCount: 0,
+              dislikeCount: 0
+            },
             createdAt: new Date().toISOString()
         };
 
@@ -82,6 +109,7 @@ const CommentModel: CommentModel = mongoose.model<Comment, CommentModel>('Commen
 export {
     Comment,
     CommentatorInfo,
+    Reactions,
     CommentModel,
     CommentDocument
 };
