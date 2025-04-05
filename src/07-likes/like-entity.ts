@@ -36,12 +36,12 @@ const likeSchema = new Schema<Like, LikeModel, LikeMethods>({
     }
 });
 
-const likeMethods = {
+const likeMethods: any = {
 
 
 };
 
-const likeStatics = {
+const likeStatics: any = {
 
 
 };
