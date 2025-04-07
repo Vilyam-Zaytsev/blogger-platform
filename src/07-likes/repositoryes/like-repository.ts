@@ -9,6 +9,22 @@ class LikeRepository {
         return LikeModel
             .findOne({userId, parentId})
     }
+
+    async saveLike(likeDocument: LikeDocument): Promise<string> {
+
+        const result = await likeDocument
+            .save();
+
+        return String(result._id);
+    }
+
+    async deleteLike(id: string): Promise<boolean> {
+
+        const result: LikeDocument | null = await LikeModel
+            .findByIdAndDelete(id);
+
+        return !!result;
+    }
 }
 
 export {LikeRepository};

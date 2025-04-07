@@ -1,8 +1,11 @@
 import jwt from 'jsonwebtoken';
 import {SETTINGS} from "../../common/settings";
-import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
+import {PayloadRefreshTokenType} from "../types/payload-refresh-token-type";
 import {ObjectId} from "mongodb";
 import {injectable} from "inversify";
+import {PayloadAccessTokenType} from "../types/payload-access-token-type";
+import {TypesTokens} from "../types/auth-tokens-type";
+import {isAccessToken, isRefreshToken} from "../../common/helpers/type-guards";
 
 @injectable()
 class JwtService {
@@ -31,11 +34,25 @@ class JwtService {
         );
     }
 
-    async decodeToken(token: string): Promise<any> {
+    decodeToken(token: string, type: TypesTokens.Access): Promise<PayloadAccessTokenType | null>;
+    decodeToken(token: string, type: TypesTokens.Refresh): Promise<PayloadRefreshTokenType | null>;
+    async decodeToken(
+        token: string,
+        type: TypesTokens
+    ): Promise<PayloadAccessTokenType | PayloadRefreshTokenType | null> {
 
         try {
 
-            return jwt.decode(token);
+            // return jwt.decode(token) as PayloadAccessTokenType | PayloadRefreshTokenType | null;
+            const payload = jwt.decode(token);
+
+            if (typeof payload !== 'object' || payload === null) return null;
+
+            if (type === TypesTokens.Access && isAccessToken(payload)) return payload;
+
+            if (type === TypesTokens.Refresh && isRefreshToken(payload)) return payload;
+
+            return null;
         } catch (error: unknown) {
 
             console.error("Can't decode token", error);
@@ -44,11 +61,11 @@ class JwtService {
         }
     }
 
-    async verifyAccessToken(token: string): Promise<{ userId: string } | null> {
+    async verifyAccessToken(token: string): Promise<PayloadAccessTokenType | null> {
 
         try {
 
-            return jwt.verify(token, SETTINGS.JWT_SECRET_AT!) as { userId: string };
+            return jwt.verify(token, SETTINGS.JWT_SECRET_AT!) as PayloadAccessTokenType;
         } catch (error) {
             console.error(error);
 

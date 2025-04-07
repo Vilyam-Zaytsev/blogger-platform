@@ -1,7 +1,6 @@
-import {ObjectId, WithId} from "mongodb";
-import {CommentInputModel} from "../types/input-output-types";
+import {ObjectId} from "mongodb";
 import {injectable} from "inversify";
-import {CommentDocument, CommentModel} from "../domain/comment-entity";
+import {CommentDocument, CommentInputModel, CommentModel} from "../domain/comment-entity";
 
 @injectable()
 class CommentRepository {

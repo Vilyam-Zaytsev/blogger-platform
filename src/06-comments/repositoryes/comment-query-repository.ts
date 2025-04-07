@@ -1,9 +1,8 @@
 import {WithId} from "mongodb";
-import {CommentViewModel} from "../types/input-output-types";
 import {Paginator} from "../../common/types/input-output-types/pagination-sort-types";
 import {SortOptionsType} from "../../common/types/sort-options-type";
 import {SortDirection, SortQueryDto} from "../../common/helpers/sort-query-dto";
-import {Comment, CommentModel} from "../domain/comment-entity";
+import {Comment, CommentModel, CommentViewModel} from "../domain/comment-entity";
 
 class CommentQueryRepository {
 

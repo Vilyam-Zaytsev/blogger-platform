@@ -12,6 +12,16 @@ type Like = {
     parentId: string
 };
 
+type LikeInputModel = {
+    likeStatus: LikeStatus
+};
+
+type LikeInfoViewModel = {
+    likesCount: number,
+    dislikesCount: number,
+    myStatus: LikeStatus
+};
+
 type LikeMethods = typeof likeMethods;
 type LikeStatics = typeof likeStatics;
 
@@ -43,7 +53,20 @@ const likeMethods: any = {
 
 const likeStatics: any = {
 
+    createLike(
+        reaction: LikeStatus,
+        userId: string,
+        parentId: string
+    ): LikeDocument {
 
+        const like: Like = {
+            status: reaction,
+            userId,
+            parentId
+        };
+
+        return new LikeModel(like);
+    }
 };
 
 likeSchema.methods = likeMethods;
@@ -54,6 +77,8 @@ const LikeModel: LikeModel = mongoose.model<Like, LikeModel>('Like', likeSchema)
 export {
     Like,
     LikeStatus,
+    LikeInputModel,
+    LikeInfoViewModel,
     LikeModel,
     LikeDocument,
 };

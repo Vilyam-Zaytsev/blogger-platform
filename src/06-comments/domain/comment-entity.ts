@@ -1,4 +1,5 @@
 import mongoose, {HydratedDocument, Model, Schema} from "mongoose";
+import {LikeInfoViewModel, LikeStatus} from "../../07-likes/like-entity";
 
 type CommentatorInfo = {
     userId: string,
@@ -7,8 +8,9 @@ type CommentatorInfo = {
 
 type Reactions = {
     likeCount: number,
-    dislikeCount: number
-}
+    dislikeCount: number,
+    [key: string]: number;
+};
 
 type Comment = {
     postId: string,
@@ -18,10 +20,23 @@ type Comment = {
     createdAt: string
 };
 
+type CommentInputModel = {
+    content: string
+};
+
+type CommentViewModel = {
+    id: string,
+    content: string,
+    commentatorInfo: CommentatorInfo,
+    likesInfo: LikeInfoViewModel,
+    createdAt: string
+};
+
+type CommentMethods = typeof commentMethods;
 type CommentStatics = typeof commentStatics;
 
-type CommentModel = Model<Comment, {}> & CommentStatics;
-type CommentDocument = HydratedDocument<Comment>;
+type CommentModel = Model<Comment, {}, CommentMethods> & CommentStatics;
+type CommentDocument = HydratedDocument<Comment, CommentMethods>;
 
 const commentatorInfoSchema = new Schema<CommentatorInfo>({
 
@@ -73,6 +88,34 @@ const commentSchema = new Schema<Comment, CommentModel>({
     }
 });
 
+const commentMethods = {
+
+    updateReactionsCount(currentReaction: LikeStatus, reaction: LikeStatus) {
+
+        const currentReactionKey: string = `${currentReaction.toLowerCase()}Count`;
+
+        (this as CommentDocument).reactions[currentReactionKey] -= 1;
+
+        switch (reaction) {
+
+            case LikeStatus.None:
+
+                return;
+
+            case LikeStatus.Dislike:
+                (this as CommentDocument).reactions.dislikeCount += 1;
+
+                return;
+            case LikeStatus.Like:
+                (this as CommentDocument).reactions.likeCount += 1;
+
+                return;
+        }
+
+
+    }
+};
+
 const commentStatics: any = {
 
     createComment(
@@ -92,8 +135,8 @@ const commentStatics: any = {
             content,
             commentatorInfo,
             reactions: {
-              likeCount: 0,
-              dislikeCount: 0
+                likeCount: 0,
+                dislikeCount: 0
             },
             createdAt: new Date().toISOString()
         };
@@ -102,6 +145,7 @@ const commentStatics: any = {
     }
 };
 
+commentSchema.methods = commentMethods;
 commentSchema.statics = commentStatics;
 
 const CommentModel: CommentModel = mongoose.model<Comment, CommentModel>('Comment', commentSchema);
@@ -110,6 +154,8 @@ export {
     Comment,
     CommentatorInfo,
     Reactions,
+    CommentInputModel,
+    CommentViewModel,
     CommentModel,
     CommentDocument
 };

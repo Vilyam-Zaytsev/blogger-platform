@@ -5,14 +5,12 @@ import {ResultType} from "../../common/types/result-types/result-type";
 import {JwtService} from "../adapters/jwt-service";
 import {ObjectId} from "mongodb";
 import {UsersService} from "../../03-users/application/users-service";
-import {ConfirmationStatus, PasswordRecovery, UserDocument, UserModel} from "../../03-users/domain/user-entity";
+import {ConfirmationStatus, UserDocument, UserModel} from "../../03-users/domain/user-entity";
 import {NodemailerService} from "../adapters/nodemailer-service";
 import {EmailTemplates} from "../adapters/email-templates";
-import {randomUUID} from "node:crypto";
-import {add} from "date-fns";
 import {BadRequestResult, NotFoundResult, SuccessResult, UnauthorizedResult} from "../../common/helpers/result-object";
-import {AuthTokens} from "../types/auth-tokens-type";
-import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
+import {AuthTokens, TypesTokens} from "../types/auth-tokens-type";
+import {PayloadRefreshTokenType} from "../types/payload-refresh-token-type";
 import {SessionsRepository} from "../../02-sessions/repositories/sessions-repository";
 import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-type";
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
@@ -83,13 +81,23 @@ class AuthService {
         ]);
 
         //TODO: как правильно написать типизацию???
+        // const [
+        //     payloadRefreshToken,
+        //     session
+        // ] = await Promise.all([
+        //     this.jwtService.decodeToken(refreshToken, TypesTokens.Refresh),
+        //     this.sessionsRepository.findSessionByDeviceId(deviceId)
+        // ]);
+
+        const promises: Promise<any>[] = [
+            this.jwtService.decodeToken(refreshToken, TypesTokens.Refresh),
+            this.sessionsRepository.findSessionByDeviceId(deviceId)
+        ];
+
         const [
             payloadRefreshToken,
             session
-        ] = await Promise.all([
-            this.jwtService.decodeToken(refreshToken),
-            this.sessionsRepository.findSessionByDeviceId(deviceId)
-        ]);
+        ] = await Promise.all(promises);
 
         const timestamps: SessionTimestampsType = {
             iat: new Date(payloadRefreshToken!.iat * 1000),

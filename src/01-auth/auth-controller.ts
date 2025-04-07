@@ -14,7 +14,7 @@ import {SETTINGS} from "../common/settings";
 import {RegistrationConfirmationCodeModel} from "./types/registration-confirmation-code-model";
 import {RegistrationEmailResendingType} from "./types/registration-email-resending-type";
 import {UsersQueryRepository} from "../03-users/repositoryes/users-query-repository";
-import {AuthTokens} from "./types/auth-tokens-type";
+import {AuthTokens, TypesTokens} from "./types/auth-tokens-type";
 import {JwtService} from "./adapters/jwt-service";
 import {SessionsService} from "../02-sessions/application/sessions-service";
 import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";

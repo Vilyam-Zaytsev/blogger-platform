@@ -3,7 +3,7 @@ import {ResultType} from "../../../common/types/result-types/result-type";
 import {AuthService} from "../../application/auth-service";
 import {ResultStatus} from "../../../common/types/result-types/result-status";
 import {SETTINGS} from "../../../common/settings";
-import {PayloadRefreshTokenType} from "../../types/payload.refresh.token.type";
+import {PayloadRefreshTokenType} from "../../types/payload-refresh-token-type";
 import {container} from "../../../composition-root";
 
 const activeSessionGuard = async (

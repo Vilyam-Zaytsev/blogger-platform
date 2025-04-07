@@ -5,7 +5,6 @@ import {
     RequestWithParamsAndQuery
 } from "../common/types/input-output-types/request-types";
 import {IdType} from "../common/types/input-output-types/id-type";
-import {CommentInputModel, CommentViewModel} from "./types/input-output-types";
 import {ResultType} from "../common/types/result-types/result-type";
 import {CommentsService} from "./application/comments-service";
 import {ResultStatus} from "../common/types/result-types/result-status";
@@ -16,7 +15,8 @@ import {Paginator,} from "../common/types/input-output-types/pagination-sort-typ
 import {injectable} from "inversify";
 import {SortingAndPaginationParamsType, SortQueryDto} from "../common/helpers/sort-query-dto";
 import {isSuccessfulResult} from "../common/helpers/type-guards";
-import {LikeInputModel} from "../07-likes/types/input-output-types";
+import {CommentInputModel, CommentViewModel} from "./domain/comment-entity";
+import {LikeInputModel} from "../07-likes/like-entity";
 
 @injectable()
 class CommentsController {
@@ -156,12 +156,22 @@ class CommentsController {
         req: RequestWithParamsAndBody<IdType, LikeInputModel>,
         res: Response
     ) {
+
         const {id: commentId} = req.params;
         const {likeStatus} = req.body;
         const {id: userId} = req.user!;
 
-        const resultUpdateCommentReaction = await this.commentsService
+        const {status: reactionUpdateStatus}: ResultType = await this.commentsService
             .updateCommentReaction(userId, commentId, likeStatus);
+
+        if (reactionUpdateStatus !== ResultStatus.Success) {
+
+            res
+                .sendStatus(mapResultStatusToHttpStatus(reactionUpdateStatus));
+        }
+
+        res
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     }
 
     async deleteComment(

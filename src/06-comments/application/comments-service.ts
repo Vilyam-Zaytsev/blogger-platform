@@ -1,21 +1,15 @@
-import {CommentInputModel} from "../types/input-output-types";
 import {ObjectId, WithId} from "mongodb";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {ResultStatus} from "../../common/types/result-types/result-status";
 import {PostsService} from "../../05-posts/application/posts-service";
 import {CommentRepository} from "../repositoryes/comment-repository";
 import {UsersRepository} from "../../03-users/repositoryes/users-repository";
-import {
-    BadRequestResult,
-    ForbiddenResult,
-    NotFoundResult,
-    SuccessResult
-} from "../../common/helpers/result-object";
+import {BadRequestResult, ForbiddenResult, NotFoundResult, SuccessResult} from "../../common/helpers/result-object";
 import {injectable} from "inversify";
 import {UserDocument} from "../../03-users/domain/user-entity";
 import {Post} from "../../05-posts/domain/post-entity";
-import {CommentDocument, CommentModel} from "../domain/comment-entity";
-import {Like, LikeDocument} from "../../07-likes/like-entity";
+import {CommentDocument, CommentInputModel, CommentModel} from "../domain/comment-entity";
+import {LikeDocument, LikeModel, LikeStatus} from "../../07-likes/like-entity";
 import {LikeRepository} from "../../07-likes/repositoryes/like-repository";
 
 @injectable()
@@ -54,11 +48,11 @@ class CommentsService {
 
         const commentDocument: CommentDocument = CommentModel
             .createComment(
-            content,
+                content,
                 postId,
                 commentatorId,
                 commentator!.login
-        );
+            );
 
         const resultSaveComment: string = await this.commentRepository
             .saveComment(commentDocument);
@@ -83,14 +77,14 @@ class CommentsService {
             .create(null);
     }
 
-    async updateCommentReaction(commentId: string, userId: string, reaction: string) {
+    async updateCommentReaction(commentId: string, userId: string, reaction: LikeStatus): Promise<ResultType> {
 
-        const comment: CommentDocument | null = await this.commentRepository
+        const commentDocument: CommentDocument | null = await this.commentRepository
             .findComment(commentId);
 
-        if (!comment) {
+        if (!commentDocument) {
 
-            return BadRequestResult
+            return NotFoundResult
                 .create(
                     'commentId',
                     'Comment not found.',
@@ -98,10 +92,56 @@ class CommentsService {
                 );
         }
 
-        const like: LikeDocument | null = await this.likeRepository
+        const likeDocument: LikeDocument | null = await this.likeRepository
             .findLikeByUserIdAndParentId(userId, commentId);
 
-        return true;
+        if (likeDocument) {
+
+            const currentReaction: LikeStatus = likeDocument.status;
+
+            if (reaction === LikeStatus.None) {
+
+                commentDocument
+                    .updateReactionsCount(currentReaction, reaction);
+
+                await this.commentRepository
+                    .saveComment(commentDocument);
+
+                await this.likeRepository
+                    .deleteLike(String(likeDocument._id));
+
+                return SuccessResult
+                    .create(null);
+            }
+
+
+            commentDocument
+                .updateReactionsCount(currentReaction, reaction);
+
+            likeDocument.status = reaction
+
+            await this.commentRepository
+                .saveComment(commentDocument);
+
+            await this.likeRepository
+                .saveLike(likeDocument);
+
+            return SuccessResult
+                .create(null);
+        }
+
+        const newLikeDocument: LikeDocument = LikeModel
+            .createLike(
+                reaction,
+                userId,
+                String(commentDocument._id)
+            );
+
+        await this.likeRepository
+            .saveLike(newLikeDocument);
+
+        return SuccessResult
+            .create(null);
     }
 
     async deleteComment(commentId: string, userId: string): Promise<ResultType> {
