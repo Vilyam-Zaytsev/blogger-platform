@@ -166,12 +166,14 @@ class CommentsController {
         const {id: userId} = req.user!;
 
         const {status: reactionUpdateStatus}: ResultType = await this.commentsService
-            .updateCommentReaction(userId, commentId, likeStatus);
+            .updateCommentReaction(commentId, userId, likeStatus);
 
         if (reactionUpdateStatus !== ResultStatus.Success) {
 
             res
                 .sendStatus(mapResultStatusToHttpStatus(reactionUpdateStatus));
+
+            return;
         }
 
         res

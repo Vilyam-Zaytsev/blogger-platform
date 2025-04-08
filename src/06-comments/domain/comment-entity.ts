@@ -90,19 +90,23 @@ const commentSchema = new Schema<Comment, CommentModel>({
 
 const commentMethods = {
 
-    updateReactionsCount(currentReaction: LikeStatus, reaction: LikeStatus) {
+    updateReactionsCount(reaction: LikeStatus, currentReaction: LikeStatus | null) {
 
-        const currentReactionKey: string = `${currentReaction.toLowerCase()}Count`;
+        if (currentReaction) {
 
-        (this as CommentDocument).reactions[currentReactionKey] -= 1;
+            const currentReactionKey: string = `${currentReaction.toLowerCase()}Count`;
+
+            (this as CommentDocument).reactions[currentReactionKey] -= 1;
+
+        }
 
         switch (reaction) {
 
             case LikeStatus.None:
 
                 return;
-
             case LikeStatus.Dislike:
+
                 (this as CommentDocument).reactions.dislikeCount += 1;
 
                 return;

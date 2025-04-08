@@ -60,11 +60,15 @@ const commentsTestManager = {
         return res.body;
     },
 
-    async getComment(id: string): Promise<CommentViewModel> {
+    async getComment(id: string, accessToken?: string): Promise<CommentViewModel> {
 
-        const res: Response = await req
-            .get(`${SETTINGS.PATH.COMMENTS}/${id}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        let request = req.get(`${SETTINGS.PATH.COMMENTS}/${id}`);
+
+        if (accessToken) {
+            request = request.set('Authorization', `Bearer ${accessToken}`);
+        }
+
+        const res = await request.expect(SETTINGS.HTTP_STATUSES.OK_200);
 
         return res.body;
     },

@@ -20,7 +20,8 @@ class CommentsService {
         private postsService: PostsService,
         private commentRepository: CommentRepository,
         private likeRepository: LikeRepository
-    ) {};
+    ) {
+    };
 
     async createComment(
         content: string,
@@ -91,53 +92,49 @@ class CommentsService {
                 );
         }
 
-        const likeDocument: LikeDocument | null = await this.likeRepository
+        let likeDocument: LikeDocument | null = await this.likeRepository
             .findLikeByUserIdAndParentId(userId, commentId);
 
-        if (likeDocument) {
+        const currentReaction: LikeStatus | null = likeDocument ? likeDocument.status : null;
 
-            const currentReaction: LikeStatus = likeDocument.status;
+        if (!currentReaction) {
 
-            if (reaction === LikeStatus.None) {
+            likeDocument = LikeModel
+                .createLike(
+                    reaction,
+                    userId,
+                    commentId
+                );
 
-                commentDocument
-                    .updateReactionsCount(currentReaction, reaction);
+            await this.likeRepository
+                .saveLike(likeDocument!);
+        }
 
-                await this.commentRepository
-                    .saveComment(commentDocument);
-
-                await this.likeRepository
-                    .deleteLike(String(likeDocument._id));
-
-                return SuccessResult
-                    .create(null);
-            }
-
+        if (reaction === LikeStatus.None) {
 
             commentDocument
-                .updateReactionsCount(currentReaction, reaction);
-
-            likeDocument.status = reaction
+                .updateReactionsCount(reaction, currentReaction);
 
             await this.commentRepository
                 .saveComment(commentDocument);
 
             await this.likeRepository
-                .saveLike(likeDocument);
+                .deleteLike(String(likeDocument!._id));
 
             return SuccessResult
                 .create(null);
         }
 
-        const newLikeDocument: LikeDocument = LikeModel
-            .createLike(
-                reaction,
-                userId,
-                String(commentDocument._id)
-            );
+        commentDocument
+            .updateReactionsCount(reaction, currentReaction);
+
+        await this.commentRepository
+            .saveComment(commentDocument);
+
+        likeDocument!.status = reaction;
 
         await this.likeRepository
-            .saveLike(newLikeDocument);
+            .saveLike(likeDocument!);
 
         return SuccessResult
             .create(null);
