@@ -77,8 +77,8 @@ class CommentsController {
         res: Response<CommentViewModel>
     ) {
 
-        const {id: userId} = req.user?.id;
-        const {id: commentId} = req.params;
+        const userId: string | null = req.user ? req.user.id : null;
+        const commentId: string = req.params.id;
 
 
         const foundComment: CommentViewModel | null = await this.commentQueryRepository
@@ -121,7 +121,7 @@ class CommentsController {
         }
 
         const createdComment: CommentViewModel | null = await this.commentQueryRepository
-            .findComment(idCreatedComment);
+            .findComment(idCreatedComment, commentatorId);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)

@@ -30,18 +30,19 @@ class CommentQueryRepository {
             .limit(pageSize)
             .exec();
 
-        return comments.map(c => this._mapDBCommentToViewModel(c));
+        //TODO: дописать определение myStatus!!!
+        return comments.map(c => this._mapDBCommentToViewModel(c, LikeStatus.None));
     }
 
-    async findComment(commentId: string, userId?: string): Promise<CommentViewModel | null> {
-
-        let like: LikeDocument | null;
+    async findComment(commentId: string, userId: string | null): Promise<CommentViewModel | null> {
 
         const comment: WithId<Comment> | null = await CommentModel
             .findById(commentId)
             .exec();
 
         if (!comment) return null;
+
+        let like: LikeDocument | null = null;
 
         if (userId) {
 

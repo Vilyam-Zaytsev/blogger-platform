@@ -7,11 +7,12 @@ import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {Response} from "supertest";
 import {console_log_e2e, generateRandomString, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
-import {CommentViewModel} from "../../src/06-comments/types/input-output-types";
 import {ApiErrorResult} from "../../src/common/types/input-output-types/api-error-result";
 import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import mongoose from "mongoose";
+import {CommentViewModel} from "../../src/06-comments/domain/comment-entity";
+import {LikeStatus} from "../../src/07-likes/like-entity";
 
 beforeAll(async () => {
 
@@ -90,6 +91,11 @@ describe('PUT /comments', () => {
             commentatorInfo: {
                 userId: presets.users[0].id,
                 userLogin: presets.users[0].login
+            },
+            likesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: LikeStatus.None
             },
             createdAt: presets.comments[0].createdAt
         });

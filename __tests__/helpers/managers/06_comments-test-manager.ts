@@ -2,9 +2,10 @@ import {Response} from "supertest";
 import {comments, presets} from "../datasets-for-tests";
 import {req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";
-import {CommentInputModel, CommentViewModel} from "../../../src/06-comments/types/input-output-types";
 import {Paginator,} from "../../../src/common/types/input-output-types/pagination-sort-types";
 import {SortDirection} from "../../../src/common/helpers/sort-query-dto";
+import {CommentInputModel, CommentViewModel} from "../../../src/06-comments/domain/comment-entity";
+import {LikeStatus} from "../../../src/07-likes/like-entity";
 
 const commentsTestManager = {
 
@@ -32,6 +33,11 @@ const commentsTestManager = {
                 commentatorInfo: {
                     userId: presets.users[i < numberOfCommentator ? i : 0].id,
                     userLogin: presets.users[i < numberOfCommentator ? i : 0].login
+                },
+                likesInfo: {
+                    likesCount: 0,
+                    dislikesCount: 0,
+                    myStatus: LikeStatus.None
                 },
                 createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
             });

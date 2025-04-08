@@ -5,13 +5,14 @@ import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {Response} from "supertest";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
-import {CommentViewModel} from "../../src/06-comments/types/input-output-types";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {ApiErrorResult} from "../../src/common/types/input-output-types/api-error-result";
 import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import mongoose from "mongoose";
+import {CommentViewModel} from "../../src/06-comments/domain/comment-entity";
+import {LikeStatus} from "../../src/07-likes/like-entity";
 
 beforeAll(async () => {
 
@@ -83,6 +84,11 @@ describe('POST /posts/{postId}/comments', () => {
             commentatorInfo: {
                 userId: presets.users[0].id,
                 userLogin: presets.users[0].login
+            },
+            likesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: LikeStatus.None
             },
             createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
         });

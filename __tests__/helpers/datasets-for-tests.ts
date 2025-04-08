@@ -1,11 +1,11 @@
 import {UserInputModel, UserViewModel} from "../../src/03-users/types/input-output-types";
 import {BlogViewModel} from "../../src/04-blogs/types/input-output-types";
 import {PostViewModel} from "../../src/05-posts/types/input-output-types";
-import {CommentViewModel} from "../../src/06-comments/types/input-output-types";
 import {AuthTokens} from "../../src/01-auth/types/auth-tokens-type";
 import {DeviceViewModel} from "../../src/02-sessions/types/input-output-types";
 import {Blog} from "../../src/04-blogs/domain/blog-entity";
 import {Post} from "../../src/05-posts/domain/post-entity";
+import {CommentViewModel} from "../../src/06-comments/domain/comment-entity";
 
 const blog: Blog = {
     name: 'BLOG',
