@@ -1,8 +1,3 @@
-enum TypesTokens {
-    Access = 'Access',
-    Refresh = 'Refresh'
-}
-
 type AuthTokens = {
     accessToken: string;
     refreshToken: string;
@@ -10,5 +5,4 @@ type AuthTokens = {
 
 export {
     AuthTokens,
-    TypesTokens
 };

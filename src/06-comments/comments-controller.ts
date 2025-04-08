@@ -77,8 +77,12 @@ class CommentsController {
         res: Response<CommentViewModel>
     ) {
 
+        const {id: userId} = req.user?.id;
+        const {id: commentId} = req.params;
+
+
         const foundComment: CommentViewModel | null = await this.commentQueryRepository
-            .findComment(req.params.id);
+            .findComment(commentId, userId);
 
         if (!foundComment) {
 

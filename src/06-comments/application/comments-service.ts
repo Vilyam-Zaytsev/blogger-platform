@@ -20,8 +20,7 @@ class CommentsService {
         private postsService: PostsService,
         private commentRepository: CommentRepository,
         private likeRepository: LikeRepository
-    ) {
-    };
+    ) {};
 
     async createComment(
         content: string,

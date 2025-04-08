@@ -3,8 +3,16 @@ import {Paginator} from "../../common/types/input-output-types/pagination-sort-t
 import {SortOptionsType} from "../../common/types/sort-options-type";
 import {SortDirection, SortQueryDto} from "../../common/helpers/sort-query-dto";
 import {Comment, CommentModel, CommentViewModel} from "../domain/comment-entity";
+import {LikeDocument, LikeStatus} from "../../07-likes/like-entity";
+import {LikeRepository} from "../../07-likes/repositoryes/like-repository";
+import {injectable} from "inversify";
 
+@injectable()
 class CommentQueryRepository {
+
+    constructor(
+        private likeRepository: LikeRepository
+    ) {};
 
     async findComments(sortQueryDto: SortQueryDto, postId: string): Promise<CommentViewModel[]> {
 
@@ -25,15 +33,25 @@ class CommentQueryRepository {
         return comments.map(c => this._mapDBCommentToViewModel(c));
     }
 
-    async findComment(id: string): Promise<CommentViewModel | null> {
+    async findComment(commentId: string, userId?: string): Promise<CommentViewModel | null> {
+
+        let like: LikeDocument | null;
 
         const comment: WithId<Comment> | null = await CommentModel
-            .findById(id)
+            .findById(commentId)
             .exec();
 
         if (!comment) return null;
 
-        return this._mapDBCommentToViewModel(comment);
+        if (userId) {
+
+            like = await this.likeRepository
+                .findLikeByUserIdAndParentId(userId, commentId)
+        }
+
+        const userReaction: LikeStatus = like ? like.status : LikeStatus.None;
+
+        return this._mapDBCommentToViewModel(comment, userReaction);
     }
 
     async getCommentsCount(postId: string): Promise<number> {
@@ -42,7 +60,10 @@ class CommentQueryRepository {
             .countDocuments({postId})
     }
 
-    _mapDBCommentToViewModel(comment: WithId<Comment>): CommentViewModel {
+    _mapDBCommentToViewModel(
+        comment: WithId<Comment>,
+        userReaction: LikeStatus
+    ): CommentViewModel {
 
         return {
             id: String(comment._id),
@@ -50,6 +71,11 @@ class CommentQueryRepository {
             commentatorInfo: {
                 userId: comment.commentatorInfo.userId,
                 userLogin: comment.commentatorInfo.userLogin
+            },
+            likesInfo: {
+                likesCount: comment.reactions.likeCount,
+                dislikesCount: comment.reactions.dislikeCount,
+                myStatus: userReaction
             },
             createdAt: comment.createdAt
         };

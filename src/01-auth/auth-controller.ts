@@ -14,7 +14,7 @@ import {SETTINGS} from "../common/settings";
 import {RegistrationConfirmationCodeModel} from "./types/registration-confirmation-code-model";
 import {RegistrationEmailResendingType} from "./types/registration-email-resending-type";
 import {UsersQueryRepository} from "../03-users/repositoryes/users-query-repository";
-import {AuthTokens, TypesTokens} from "./types/auth-tokens-type";
+import {AuthTokens} from "./types/auth-tokens-type";
 import {JwtService} from "./adapters/jwt-service";
 import {SessionsService} from "../02-sessions/application/sessions-service";
 import {TokenSessionDataType} from "../02-sessions/types/token-session-data-type";
@@ -27,6 +27,7 @@ import {isSuccess, isSuccessfulResult} from "../common/helpers/type-guards";
 import {SessionDto} from "../02-sessions/domain/session-dto";
 import {UserDto} from "../03-users/domain/user-dto";
 import {SessionDocument} from "../02-sessions/domain/session-entity";
+import {PayloadRefreshTokenType} from "./types/payload-refresh-token-type";
 
 const jwtService: JwtService = new JwtService();
 
@@ -67,22 +68,24 @@ class AuthController {
             return;
         }
 
+        const {
+            accessToken,
+            refreshToken
+        } = authTokens;
+
         const deviceName: string = req.headers['user-agent'] || 'Unknown device';
 
         const ip: string = req.headers['x-forwarded-for']?.toString().split(',')[0]
             || req.socket.remoteAddress
             || '0.0.0.0';
 
-        //TODO: как правильно протипизировать payload???
-        //1. разбить на два метода 'decodeRefreshToken' и 'decodeRefreshToken'
-        //2. написать typeGard
         const {
             userId,
             deviceId,
             iat,
             exp
         } = await jwtService
-            .decodeToken(authTokens.refreshToken);
+            .decodeToken<PayloadRefreshTokenType>(refreshToken);
 
         const sessionDto: SessionDto = new SessionDto(
             userId,
@@ -95,11 +98,6 @@ class AuthController {
 
         await this.sessionsService
             .createSession(sessionDto);
-
-        const {
-            accessToken,
-            refreshToken
-        } = authTokens;
 
         res
             .status(mapResultStatusToHttpStatus(loginResultStatus))

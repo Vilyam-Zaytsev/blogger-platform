@@ -13,21 +13,7 @@ const isSuccessfulResult = <T>(status: ResultStatus, data: T | null): data is T 
     return status === ResultStatus.Success;
 };
 
-function isAccessToken(payload: any): payload is PayloadAccessTokenType {
-    return typeof payload?.userId === 'string' &&
-        typeof payload?.deviceId === 'undefined';
-}
-
-function isRefreshToken(payload: any): payload is PayloadRefreshTokenType {
-    return typeof payload?.userId === 'string' &&
-        typeof payload?.deviceId === 'string' &&
-        typeof payload?.iat === 'number' &&
-        typeof payload?.exp === 'number';
-}
-
 export {
     isSuccess,
     isSuccessfulResult,
-    isAccessToken,
-    isRefreshToken
 };

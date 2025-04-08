@@ -9,7 +9,7 @@ import {ConfirmationStatus, UserDocument, UserModel} from "../../03-users/domain
 import {NodemailerService} from "../adapters/nodemailer-service";
 import {EmailTemplates} from "../adapters/email-templates";
 import {BadRequestResult, NotFoundResult, SuccessResult, UnauthorizedResult} from "../../common/helpers/result-object";
-import {AuthTokens, TypesTokens} from "../types/auth-tokens-type";
+import {AuthTokens} from "../types/auth-tokens-type";
 import {PayloadRefreshTokenType} from "../types/payload-refresh-token-type";
 import {SessionsRepository} from "../../02-sessions/repositories/sessions-repository";
 import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-type";
@@ -80,28 +80,15 @@ class AuthService {
             this.jwtService.createRefreshToken(userId, deviceId)
         ]);
 
-        //TODO: как правильно написать типизацию???
-        // const [
-        //     payloadRefreshToken,
-        //     session
-        // ] = await Promise.all([
-        //     this.jwtService.decodeToken(refreshToken, TypesTokens.Refresh),
-        //     this.sessionsRepository.findSessionByDeviceId(deviceId)
-        // ]);
+        const payloadRefreshToken: PayloadRefreshTokenType = await this.jwtService
+            .decodeToken<PayloadRefreshTokenType>(refreshToken)
 
-        const promises: Promise<any>[] = [
-            this.jwtService.decodeToken(refreshToken, TypesTokens.Refresh),
-            this.sessionsRepository.findSessionByDeviceId(deviceId)
-        ];
-
-        const [
-            payloadRefreshToken,
-            session
-        ] = await Promise.all(promises);
+        const session: SessionDocument | null = await this.sessionsRepository
+            .findSessionByDeviceId(deviceId);
 
         const timestamps: SessionTimestampsType = {
-            iat: new Date(payloadRefreshToken!.iat * 1000),
-            exp: new Date(payloadRefreshToken!.exp * 1000)
+            iat: new Date(payloadRefreshToken.iat * 1000),
+            exp: new Date(payloadRefreshToken.exp * 1000)
         };
 
         session!.updateTimestamps(timestamps);

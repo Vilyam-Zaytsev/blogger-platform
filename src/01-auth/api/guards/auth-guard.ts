@@ -1,7 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {container} from "../../../composition-root";
 import {JwtService} from "../../adapters/jwt-service";
-import {TypesTokens} from "../../types/auth-tokens-type";
 import {PayloadAccessTokenType} from "../../types/payload-access-token-type";
 
 const authGuard = async (
@@ -16,13 +15,10 @@ const authGuard = async (
 
         const token: string = req.headers.authorization.split(' ')[1];
 
-        const payload: PayloadAccessTokenType | null = await jwtService
-            .decodeToken(token, TypesTokens.Access);
-
-        if (payload) {
+        const payload: PayloadAccessTokenType = await jwtService
+            .decodeToken<PayloadAccessTokenType>(token);
 
             req.user = {id: payload.userId};
-        }
     }
 
     return next();

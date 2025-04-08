@@ -6,11 +6,13 @@ import {accessTokenGuard} from "../../01-auth/api/guards/access-token-guard";
 import {container} from "../../composition-root";
 import {SETTINGS} from "../../common/settings";
 import {likeStatusInputValidator} from "../../07-likes/middlewares/like-validators";
+import {authGuard} from "../../01-auth/api/guards/auth-guard";
 
 const commentsRouter = Router();
 const commentsController: CommentsController = container.get(CommentsController);
 
 commentsRouter.get('/:id',
+    authGuard,
     commentsController.getComment.bind(commentsController)
 );
 commentsRouter.put('/:id',

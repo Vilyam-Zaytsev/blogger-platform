@@ -4,8 +4,6 @@ import {PayloadRefreshTokenType} from "../types/payload-refresh-token-type";
 import {ObjectId} from "mongodb";
 import {injectable} from "inversify";
 import {PayloadAccessTokenType} from "../types/payload-access-token-type";
-import {TypesTokens} from "../types/auth-tokens-type";
-import {isAccessToken, isRefreshToken} from "../../common/helpers/type-guards";
 
 @injectable()
 class JwtService {
@@ -34,30 +32,16 @@ class JwtService {
         );
     }
 
-    decodeToken(token: string, type: TypesTokens.Access): Promise<PayloadAccessTokenType | null>;
-    decodeToken(token: string, type: TypesTokens.Refresh): Promise<PayloadRefreshTokenType | null>;
-    async decodeToken(
-        token: string,
-        type: TypesTokens
-    ): Promise<PayloadAccessTokenType | PayloadRefreshTokenType | null> {
+    async decodeToken<T>(token: string): Promise<T> {
 
         try {
 
-            // return jwt.decode(token) as PayloadAccessTokenType | PayloadRefreshTokenType | null;
-            const payload = jwt.decode(token);
-
-            if (typeof payload !== 'object' || payload === null) return null;
-
-            if (type === TypesTokens.Access && isAccessToken(payload)) return payload;
-
-            if (type === TypesTokens.Refresh && isRefreshToken(payload)) return payload;
-
-            return null;
+            return jwt.decode(token) as T;
         } catch (error: unknown) {
-
+            //TODO: throw error!!!
             console.error("Can't decode token", error);
 
-            return null;
+            throw new Error("Failed to decode token");
         }
     }
 
