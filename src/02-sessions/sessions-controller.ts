@@ -94,5 +94,4 @@ class SessionsController {
     }
 }
 
-
 export {SessionsController};
