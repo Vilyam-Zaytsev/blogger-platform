@@ -10,6 +10,12 @@ class LikeRepository {
             .find({userId});
     }
 
+    async findLikesByParentId(parentId: string):Promise<LikeDocument[]> {
+
+        return LikeModel
+            .find({parentId});
+    }
+
     async findLikeByUserIdAndParentId(userId: string, parentId: string): Promise<LikeDocument | null> {
 
         return LikeModel

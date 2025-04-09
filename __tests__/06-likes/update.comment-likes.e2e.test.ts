@@ -10,8 +10,13 @@ import {commentsTestManager} from "../helpers/managers/06_comments-test-manager"
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import mongoose from "mongoose";
 import {CommentViewModel} from "../../src/06-comments/domain/comment-entity";
-import {LikeStatus} from "../../src/07-likes/like-entity";
+import {LikeDocument, LikeStatus} from "../../src/07-likes/like-entity";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
+import {LikeRepository} from "../../src/07-likes/repositoryes/like-repository";
+import {container} from "../../src/composition-root";
+import {ObjectId} from "mongodb";
+
+const likeRepository: LikeRepository = container.get(LikeRepository);
 
 beforeAll(async () => {
 
@@ -468,4 +473,177 @@ describe('PUT /comments/:id/likeStatus', () => {
 
         console_log_e2e({}, 0, 'Test 5: put(/comments/:id/likeStatus)');
     }, 30000);
+
+    it('it should return a 401 if the user is not logged in.', async () => {
+
+        await blogsTestManager
+            .createBlog(1);
+
+        await postsTestManager
+            .createPost(1);
+
+        await usersTestManager
+            .createUser(1);
+
+        await authTestManager
+            .login(presets.users.map(u => u.login));
+
+        await commentsTestManager
+            .createComments(1);
+
+        const resPutLikes: Response = await req
+            .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
+            .set(
+                'Authorization',
+                `Bearer incorrect token`
+            )
+            .send({
+                likeStatus: LikeStatus.Like
+            })
+            .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+
+        const foundComment: CommentViewModel = await commentsTestManager
+            .getComment(presets.comments[0].id);
+
+        expect(foundComment.likesInfo).toEqual({
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: LikeStatus.None
+        });
+
+        const foundLike: LikeDocument[] = await likeRepository
+            .findLikesByParentId(presets.comments[0].id)
+
+        expect(foundLike.length).toEqual(0);
+
+        console_log_e2e(resPutLikes.body, resPutLikes.status, 'Test 6: put(/comments/:id/likeStatus)');
+    });
+
+    it('it should return a 404 if the comment for which the user is trying to leave a reaction does not exist.', async () => {
+
+        await usersTestManager
+            .createUser(1);
+
+        await authTestManager
+            .login(presets.users.map(u => u.login));
+
+        const resPutLikes: Response = await req
+            .put(`${SETTINGS.PATH.COMMENTS}/${new ObjectId()}${SETTINGS.PATH.LIKE_STATUS}`)
+            .set(
+                'Authorization',
+                `Bearer ${presets.authTokens[0].accessToken}`
+            )
+            .send({
+                likeStatus: LikeStatus.Like
+            })
+            .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
+
+        console_log_e2e(resPutLikes.body, resPutLikes.status, 'Test 7: put(/comments/:id/likeStatus)');
+    });
+
+    it('should return 400 if the input data is not valid (an empty object is passed).', async () => {
+
+        await blogsTestManager
+            .createBlog(1);
+
+        await postsTestManager
+            .createPost(1);
+
+        await usersTestManager
+            .createUser(1);
+
+        await authTestManager
+            .login(presets.users.map(u => u.login));
+
+        await commentsTestManager
+            .createComments(1);
+
+        const resPutLikes: Response = await req
+            .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
+            .set(
+                'Authorization',
+                `Bearer ${presets.authTokens[0].accessToken}`
+            )
+            .send({})
+            .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
+
+        expect(resPutLikes.body).toEqual({
+            errorsMessages: [
+                {
+                    field: 'likeStatus',
+                    message: 'The "likeStatus" field should be a string.'
+                }
+            ]
+        });
+
+        const foundComment: CommentViewModel = await commentsTestManager
+            .getComment(presets.comments[0].id);
+
+        expect(foundComment.likesInfo).toEqual({
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: LikeStatus.None
+        });
+
+        const foundLike: LikeDocument[] = await likeRepository
+            .findLikesByParentId(presets.comments[0].id)
+
+        expect(foundLike.length).toEqual(0);
+
+        console_log_e2e(resPutLikes.body, resPutLikes.status, 'Test 8: put(/comments/:id/likeStatus)');
+    });
+
+    it('should return 400 if the input data is not valid (likeStatus differs from other values ).', async () => {
+
+        await blogsTestManager
+            .createBlog(1);
+
+        await postsTestManager
+            .createPost(1);
+
+        await usersTestManager
+            .createUser(1);
+
+        await authTestManager
+            .login(presets.users.map(u => u.login));
+
+        await commentsTestManager
+            .createComments(1);
+
+        const resPutLikes: Response = await req
+            .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
+            .set(
+                'Authorization',
+                `Bearer ${presets.authTokens[0].accessToken}`
+            )
+            .send({
+                likeStatus: 'Likes'
+            })
+            .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
+
+        expect(resPutLikes.body).toEqual({
+            errorsMessages: [
+                {
+                    field: 'likeStatus',
+                    message: `The "likeStatus" field must contain one of the values: ${Object.values(LikeStatus).join(', ')}`
+                }
+            ]
+        });
+
+        const foundComment: CommentViewModel = await commentsTestManager
+            .getComment(presets.comments[0].id);
+
+        expect(foundComment.likesInfo).toEqual({
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: LikeStatus.None
+        });
+
+        const foundLike: LikeDocument[] = await likeRepository
+            .findLikesByParentId(presets.comments[0].id)
+
+        expect(foundLike.length).toEqual(0);
+
+        console_log_e2e(resPutLikes.body, resPutLikes.status, 'Test 9: put(/comments/:id/likeStatus)');
+    });
 });
