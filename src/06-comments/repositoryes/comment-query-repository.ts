@@ -14,7 +14,11 @@ class CommentQueryRepository {
         private likeRepository: LikeRepository
     ) {};
 
-    async findComments(sortQueryDto: SortQueryDto, postId: string): Promise<CommentViewModel[]> {
+    async findComments(
+        sortQueryDto: SortQueryDto,
+        postId: string,
+        userId: string | null
+    ): Promise<CommentViewModel[]> {
 
         const {
             pageNumber,
@@ -30,8 +34,22 @@ class CommentQueryRepository {
             .limit(pageSize)
             .exec();
 
-        //TODO: дописать определение myStatus!!!
-        return comments.map(c => this._mapDBCommentToViewModel(c, LikeStatus.None));
+        let likes: LikeDocument[] = [];
+
+        if (userId) {
+
+            likes = await this.likeRepository
+                .findLikesByUserId(userId)
+        }
+
+        return comments.map((c) => {
+
+            const foundLike: LikeDocument | undefined = likes.find(l => l.parentId === String(c._id));
+
+            const userReaction: LikeStatus = foundLike ? foundLike.status : LikeStatus.None;
+
+            return this._mapDBCommentToViewModel(c, userReaction);
+        });
     }
 
     async findComment(commentId: string, userId: string | null): Promise<CommentViewModel | null> {

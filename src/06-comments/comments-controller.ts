@@ -33,6 +33,7 @@ class CommentsController {
     ) {
 
         const {id: postId} = req.params;
+        const userId: string | null = req.user ? req.user.id : null;
 
         const resultCheckPostId: ResultType = await this.commentsService
             ._checkPostId(postId);
@@ -55,7 +56,7 @@ class CommentsController {
         const sortQueryDto: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
 
         const foundComments: CommentViewModel[] = await this.commentQueryRepository
-            .findComments(sortQueryDto, postId);
+            .findComments(sortQueryDto, postId, userId);
 
         const commentsCount: number = await this.commentQueryRepository
             .getCommentsCount(postId);

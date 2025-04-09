@@ -4,10 +4,16 @@ import {LikeDocument, LikeModel} from "../like-entity";
 @injectable()
 class LikeRepository {
 
+    async findLikesByUserId(userId: string): Promise<LikeDocument[]> {
+
+        return LikeModel
+            .find({userId});
+    }
+
     async findLikeByUserIdAndParentId(userId: string, parentId: string): Promise<LikeDocument | null> {
 
         return LikeModel
-            .findOne({userId, parentId})
+            .findOne({userId, parentId});
     }
 
     async saveLike(likeDocument: LikeDocument): Promise<string> {

@@ -1,18 +1,17 @@
-import {ObjectId} from "mongodb";
-import {clearPresets, comments, presets} from "../helpers/datasets-for-tests";
+import {clearPresets, presets} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
 import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {usersTestManager} from "../helpers/managers/03_users-test-manager";
 import {authTestManager} from "../helpers/managers/01_auth-test-manager";
 import {Response} from "supertest";
-import {console_log_e2e, generateRandomString, req} from "../helpers/test-helpers";
+import {console_log_e2e, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
-import {ApiErrorResult} from "../../src/common/types/input-output-types/api-error-result";
 import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import mongoose from "mongoose";
 import {CommentViewModel} from "../../src/06-comments/domain/comment-entity";
 import {LikeStatus} from "../../src/07-likes/like-entity";
+import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 
 beforeAll(async () => {
 
@@ -332,97 +331,7 @@ describe('PUT /comments/:id/likeStatus', () => {
         console_log_e2e(resPutLikes_1.body, resPutLikes_1.status, 'Test 4: put(/comments/:id/likeStatus)');
     }, 10000);
 
-    it('should not update the comment if the data in the request body is incorrect (the content field is less than 20 characters long).', async () => {
-
-        await blogsTestManager
-            .createBlog(1);
-
-        await postsTestManager
-            .createPost(1);
-
-        await usersTestManager
-            .createUser(1);
-
-        await authTestManager
-            .login(presets.users.map(u => u.login));
-
-        await commentsTestManager
-            .createComments(1);
-
-        const resPutComment: Response = await req
-            .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
-            .set(
-                'Authorization',
-                `Bearer ${presets.authTokens[0].accessToken}`
-            )
-            .send({
-                content: generateRandomString(19)
-            })
-            .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
-
-        expect(resPutComment.body).toEqual<ApiErrorResult>({
-            errorsMessages: [
-                {
-                    field: 'content',
-                    message: 'The length of the "content" field should be from 20 to 300.'
-                }
-            ]
-        });
-
-        const foundComment: CommentViewModel = await commentsTestManager
-            .getComment(presets.comments[0].id);
-
-        expect(foundComment).toEqual<CommentViewModel>(presets.comments[0]);
-
-        console_log_e2e(resPutComment.body, resPutComment.status, 'Test 5: put(/comments/:id)');
-    });
-
-    it('should not update the comment if the data in the request body is incorrect (the content field is more than 300 characters long).', async () => {
-
-        await blogsTestManager
-            .createBlog(1);
-
-        await postsTestManager
-            .createPost(1);
-
-        await usersTestManager
-            .createUser(1);
-
-        await authTestManager
-            .login(presets.users.map(u => u.login));
-
-        await commentsTestManager
-            .createComments(1);
-
-        const resPutComment: Response = await req
-            .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
-            .set(
-                'Authorization',
-                `Bearer ${presets.authTokens[0].accessToken}`
-            )
-            .send({
-                content: generateRandomString(301)
-            })
-            .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
-
-        expect(resPutComment.body).toEqual<ApiErrorResult>({
-            errorsMessages: [
-                {
-                    field: 'content',
-                    message: 'The length of the "content" field should be from 20 to 300.'
-                }
-            ]
-        });
-
-        const foundComment: CommentViewModel = await commentsTestManager
-            .getComment(presets.comments[0].id);
-
-        expect(foundComment).toEqual<CommentViewModel>(presets.comments[0]);
-
-        console_log_e2e(resPutComment.body, resPutComment.status, 'Test 6: put(/comments/:id)');
-    });
-
-    it('should not update comments if the user in question is not the owner of the comment.', async () => {
+    it('---------------------------', async () => {
 
         await blogsTestManager
             .createBlog(1);
@@ -437,66 +346,126 @@ describe('PUT /comments/:id/likeStatus', () => {
             .login(presets.users.map(u => u.login));
 
         await commentsTestManager
-            .createComments(1);
+            .createComments(10);
 
-        const resPutComment: Response = await req
-            .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
-            .set(
-                'Authorization',
-                `Bearer ${presets.authTokens[1].accessToken}`
-            )
-            .send({
-                content: comments[1]
-            })
-            .expect(SETTINGS.HTTP_STATUSES.FORBIDDEN_403);
+        for (let i = 0; i < presets.users.length; i++) {
 
-        await req
-            .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}`)
-            .set(
-                'Authorization',
-                `Bearer ${presets.authTokens[0].accessToken}`
-            )
-            .send({
-                content: comments[1]
-            })
-            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+            for (let j = 0; j < presets.comments.length; j++) {
 
-        console_log_e2e(resPutComment.body, resPutComment.status, 'Test 7: put(/comments/:id)');
-    });
+                if (presets.users.length / 2 > i) {
 
-    it('should not update comments if the comment does not exist.', async () => {
+                    if (presets.comments.length / 2 > j) {
 
-        await blogsTestManager
-            .createBlog(1);
+                        await req
+                            .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[j].id}${SETTINGS.PATH.LIKE_STATUS}`)
+                            .set(
+                                'Authorization',
+                                `Bearer ${presets.authTokens[i].accessToken}`
+                            )
+                            .send({
+                                likeStatus: LikeStatus.Like
+                            })
+                            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+                    } else {
 
-        await postsTestManager
-            .createPost(1);
+                        await req
+                            .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[j].id}${SETTINGS.PATH.LIKE_STATUS}`)
+                            .set(
+                                'Authorization',
+                                `Bearer ${presets.authTokens[i].accessToken}`
+                            )
+                            .send({
+                                likeStatus: LikeStatus.Dislike
+                            })
+                            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+                    }
+                } else {
 
-        await usersTestManager
-            .createUser(1);
+                    if (presets.comments.length / 2 > j) {
 
-        await authTestManager
-            .login(presets.users.map(u => u.login));
+                        await req
+                            .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[j].id}${SETTINGS.PATH.LIKE_STATUS}`)
+                            .set(
+                                'Authorization',
+                                `Bearer ${presets.authTokens[i].accessToken}`
+                            )
+                            .send({
+                                likeStatus: LikeStatus.Dislike
+                            })
+                            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+                    } else {
 
-        await commentsTestManager
-            .createComments(1);
+                        await req
+                            .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[j].id}${SETTINGS.PATH.LIKE_STATUS}`)
+                            .set(
+                                'Authorization',
+                                `Bearer ${presets.authTokens[i].accessToken}`
+                            )
+                            .send({
+                                likeStatus: LikeStatus.Like
+                            })
+                            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+                    }
+                }
+            }
+        }
 
-        const resPutComment: Response = await req
-            .put(`${SETTINGS.PATH.COMMENTS}/${new ObjectId()}`)
-            .set(
-                'Authorization',
-                `Bearer ${presets.authTokens[0].accessToken}`
-            )
-            .send({
-                content: comments[1]
-            })
-            .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
+        const foundComments_1: Paginator<CommentViewModel> = await commentsTestManager
+            .getComments(presets.posts[0].id, presets.authTokens[0].accessToken);
 
-        const foundComment: CommentViewModel = await commentsTestManager
-            .getComment(presets.comments[0].id);
+        for (let i = 0; i < foundComments_1.items.length; i++) {
 
-        expect(foundComment).toEqual<CommentViewModel>(presets.comments[0]);
+            if (foundComments_1.items.length / 2 > i) {
 
-        console_log_e2e(resPutComment.body, resPutComment.status, 'Test 8: put(/comments/:id)');
-    });
+                expect(foundComments_1.items[i].likesInfo).toEqual({
+                    likesCount: 1,
+                    dislikesCount: 1,
+                    myStatus: LikeStatus.Dislike
+                });
+            } else {
+
+                expect(foundComments_1.items[i].likesInfo).toEqual({
+                    likesCount: 1,
+                    dislikesCount: 1,
+                    myStatus: LikeStatus.Like
+                });
+            }
+        }
+
+        const foundComments_2: Paginator<CommentViewModel> = await commentsTestManager
+            .getComments(presets.posts[0].id, presets.authTokens[1].accessToken);
+
+        for (let i = 0; i < foundComments_2.items.length; i++) {
+
+            if (foundComments_2.items.length / 2 > i) {
+
+                expect(foundComments_2.items[i].likesInfo).toEqual({
+                    likesCount: 1,
+                    dislikesCount: 1,
+                    myStatus: LikeStatus.Like
+                });
+            } else {
+
+                expect(foundComments_2.items[i].likesInfo).toEqual({
+                    likesCount: 1,
+                    dislikesCount: 1,
+                    myStatus: LikeStatus.Dislike
+                });
+            }
+        }
+
+        const foundComments_3: Paginator<CommentViewModel> = await commentsTestManager
+            .getComments(presets.posts[0].id);
+
+        for (let i = 0; i < foundComments_3.items.length; i++) {
+
+                expect(foundComments_3.items[i].likesInfo).toEqual({
+                    likesCount: 1,
+                    dislikesCount: 1,
+                    myStatus: LikeStatus.None
+                });
+        }
+
+        console_log_e2e({}, 0, 'Test 5: put(/comments/:id/likeStatus)');
+    }, 30000);
 });

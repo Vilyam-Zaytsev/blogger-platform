@@ -9,11 +9,11 @@ import {LikeStatus} from "../../../src/07-likes/like-entity";
 
 const commentsTestManager = {
 
-    async createComments(numberOfPosts: number, numberOfCommentator: number = 1) {
+    async createComments(numberOfComments: number, numberOfCommentator: number = 1) {
 
         const responses: Response[] = [];
 
-        for (let i = 0; i < numberOfPosts; i++) {
+        for (let i = 0; i < numberOfComments; i++) {
             const comment: CommentInputModel = {
                 content: comments[i]
             }
@@ -51,11 +51,19 @@ const commentsTestManager = {
         return responses;
     },
 
-    async getComments(postId: string): Promise<Paginator<CommentViewModel>> {
+    async getComments(postId: string, accessToken?: string): Promise<Paginator<CommentViewModel>> {
 
-        const res: Response = await req
-            .get(`${SETTINGS.PATH.POSTS}/${postId}${SETTINGS.PATH.COMMENTS}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        let request = req.get(`${SETTINGS.PATH.POSTS}/${postId}${SETTINGS.PATH.COMMENTS}`);
+
+        if (accessToken) {
+            request = request.set('Authorization', `Bearer ${accessToken}`);
+        }
+
+        // const res: Response = await req
+        //     .get(`${SETTINGS.PATH.POSTS}/${postId}${SETTINGS.PATH.COMMENTS}`)
+        //     .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        const res = await request.expect(SETTINGS.HTTP_STATUSES.OK_200);
 
         return res.body;
     },

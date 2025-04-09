@@ -17,6 +17,7 @@ import {CommentsController} from "../../06-comments/comments-controller";
 import {accessTokenGuard} from "../../01-auth/api/guards/access-token-guard";
 import {commentContentInputValidator} from "../../06-comments/api/middlewares/comment-validators";
 import {container} from "../../composition-root";
+import {authGuard} from "../../01-auth/api/guards/auth-guard";
 
 const postsRouter = Router();
 const postsController: PostsController = container.get(PostsController);
@@ -34,6 +35,7 @@ postsRouter.get('/:id',
     postsController.getPost.bind(postsController)
 );
 postsRouter.get(`/:id${SETTINGS.PATH.COMMENTS}`,
+    authGuard,
     pageNumberInputValidator,
     pageSizeInputValidator,
     sortByInputValidator,
