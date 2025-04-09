@@ -1,24 +1,22 @@
 import {BcryptService} from "../adapters/bcrypt-service";
 import {LoginInputModel} from "../types/login-input-model";
-import {UsersRepository} from "../../04-users/repositoryes/users-repository";
+import {UsersRepository} from "../../03-users/repositoryes/users-repository";
 import {ResultType} from "../../common/types/result-types/result-type";
 import {JwtService} from "../adapters/jwt-service";
 import {ObjectId} from "mongodb";
-import {UsersService} from "../../04-users/application/users-service";
-import {ConfirmationStatus, PasswordRecovery, UserDocument, UserModel} from "../../04-users/domain/user-entity";
+import {UsersService} from "../../03-users/application/users-service";
+import {ConfirmationStatus, UserDocument, UserModel} from "../../03-users/domain/user-entity";
 import {NodemailerService} from "../adapters/nodemailer-service";
 import {EmailTemplates} from "../adapters/email-templates";
-import {randomUUID} from "node:crypto";
-import {add} from "date-fns";
 import {BadRequestResult, NotFoundResult, SuccessResult, UnauthorizedResult} from "../../common/helpers/result-object";
 import {AuthTokens} from "../types/auth-tokens-type";
-import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
+import {PayloadRefreshTokenType} from "../types/payload-refresh-token-type";
 import {SessionsRepository} from "../../02-sessions/repositories/sessions-repository";
 import {TokenSessionDataType} from "../../02-sessions/types/token-session-data-type";
 import {SessionTimestampsType} from "../../02-sessions/types/session-timestamps-type";
 import {injectable} from "inversify";
 import {SessionDocument} from "../../02-sessions/domain/session-entity";
-import {UserDto} from "../../04-users/domain/user-dto";
+import {UserDto} from "../../03-users/domain/user-dto";
 import {isSuccess, isSuccessfulResult} from "../../common/helpers/type-guards";
 
 @injectable()
@@ -82,18 +80,15 @@ class AuthService {
             this.jwtService.createRefreshToken(userId, deviceId)
         ]);
 
-        //TODO: как правильно написать типизацию???
-        const [
-            payloadRefreshToken,
-            session
-        ] = await Promise.all([
-            this.jwtService.decodeToken(refreshToken),
-            this.sessionsRepository.findSessionByDeviceId(deviceId)
-        ]);
+        const payloadRefreshToken: PayloadRefreshTokenType = await this.jwtService
+            .decodeToken<PayloadRefreshTokenType>(refreshToken)
+
+        const session: SessionDocument | null = await this.sessionsRepository
+            .findSessionByDeviceId(deviceId);
 
         const timestamps: SessionTimestampsType = {
-            iat: new Date(payloadRefreshToken!.iat * 1000),
-            exp: new Date(payloadRefreshToken!.exp * 1000)
+            iat: new Date(payloadRefreshToken.iat * 1000),
+            exp: new Date(payloadRefreshToken.exp * 1000)
         };
 
         session!.updateTimestamps(timestamps);
@@ -199,14 +194,8 @@ class AuthService {
                 );
         }
 
-        const confirmationCode: string = randomUUID();
-        const expirationDate: Date = add(
-            new Date(),
-            {hours: 1, minutes: 1}
-        );
-
-        userDocument
-            .refreshConfirmationCode(confirmationCode, expirationDate);
+        const newConfirmationCode: string = userDocument
+            .refreshConfirmationCode();
 
         await this.usersRepository
             .saveUser(userDocument);
@@ -215,7 +204,7 @@ class AuthService {
             .sendEmail(
                 userDocument.email,
                 this.emailTemplates
-                    .registrationEmail(confirmationCode)
+                    .registrationEmail(newConfirmationCode)
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 
@@ -354,15 +343,8 @@ class AuthService {
                 .create(null);
         }
 
-        const passwordRecovery: PasswordRecovery = {
-            recoveryCode: randomUUID(),
-            expirationDate: add(
-                new Date(),
-                {hours: 1, minutes: 1}
-            )
-        }
-
-        userDocument.passwordRecovery = passwordRecovery;
+        const recoveryCode: string = userDocument
+            .recoverPassword();
 
         await this.usersRepository
             .saveUser(userDocument);
@@ -371,7 +353,7 @@ class AuthService {
             .sendEmail(
                 userDocument.email,
                 this.emailTemplates
-                    .passwordRecoveryEmail(passwordRecovery.recoveryCode)
+                    .passwordRecoveryEmail(recoveryCode)
             )
             .catch(error => console.error('ERROR IN SEND EMAIL:', error));
 
@@ -409,10 +391,8 @@ class AuthService {
                 );
         }
 
-        userDocument.passwordHash = await this.bcryptService
-            .generateHash(newPassword);
-
-        userDocument.passwordRecovery = null;
+        await userDocument
+            .updatePassword(newPassword);
 
         await this.usersRepository
             .saveUser(userDocument);

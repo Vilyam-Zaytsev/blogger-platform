@@ -1,11 +1,11 @@
 import express, {Response, Request} from 'express';
 import {SETTINGS} from "./common/settings";
-import {blogsRouter} from "./05-blogs/api/blogs-router";
-import {postsRouter} from "./06-posts/api/posts-router";
+import {blogsRouter} from "./04-blogs/api/blogs-router";
+import {postsRouter} from "./05-posts/api/posts-router";
 import {testsRouter} from "./autotest/tests-router";
 import {authRouter} from "./01-auth/api/auth-router";
-import {usersRouter} from "./04-users/api/users-router";
-import {commentsRouter} from "./07-comments/api/comments-router";
+import {usersRouter} from "./03-users/api/users-router";
+import {commentsRouter} from "./06-comments/api/comments-router";
 import cookieParser from "cookie-parser";
 import {sessionsRouter} from "./02-sessions/api/sessions-router";
 

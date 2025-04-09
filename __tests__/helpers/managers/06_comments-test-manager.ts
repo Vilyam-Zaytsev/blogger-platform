@@ -2,17 +2,18 @@ import {Response} from "supertest";
 import {comments, presets} from "../datasets-for-tests";
 import {req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";
-import {CommentInputModel, CommentViewModel} from "../../../src/07-comments/types/input-output-types";
 import {Paginator,} from "../../../src/common/types/input-output-types/pagination-sort-types";
 import {SortDirection} from "../../../src/common/helpers/sort-query-dto";
+import {CommentInputModel, CommentViewModel} from "../../../src/06-comments/domain/comment-entity";
+import {LikeStatus} from "../../../src/07-likes/like-entity";
 
 const commentsTestManager = {
 
-    async createComments(numberOfPosts: number, numberOfCommentator: number = 1) {
+    async createComments(numberOfComments: number, numberOfCommentator: number = 1) {
 
         const responses: Response[] = [];
 
-        for (let i = 0; i < numberOfPosts; i++) {
+        for (let i = 0; i < numberOfComments; i++) {
             const comment: CommentInputModel = {
                 content: comments[i]
             }
@@ -33,6 +34,11 @@ const commentsTestManager = {
                     userId: presets.users[i < numberOfCommentator ? i : 0].id,
                     userLogin: presets.users[i < numberOfCommentator ? i : 0].login
                 },
+                likesInfo: {
+                    likesCount: 0,
+                    dislikesCount: 0,
+                    myStatus: LikeStatus.None
+                },
                 createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
             });
 
@@ -45,20 +51,32 @@ const commentsTestManager = {
         return responses;
     },
 
-    async getComments(postId: string): Promise<Paginator<CommentViewModel>> {
+    async getComments(postId: string, accessToken?: string): Promise<Paginator<CommentViewModel>> {
 
-        const res: Response = await req
-            .get(`${SETTINGS.PATH.POSTS}/${postId}${SETTINGS.PATH.COMMENTS}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        let request = req.get(`${SETTINGS.PATH.POSTS}/${postId}${SETTINGS.PATH.COMMENTS}`);
+
+        if (accessToken) {
+            request = request.set('Authorization', `Bearer ${accessToken}`);
+        }
+
+        // const res: Response = await req
+        //     .get(`${SETTINGS.PATH.POSTS}/${postId}${SETTINGS.PATH.COMMENTS}`)
+        //     .expect(SETTINGS.HTTP_STATUSES.OK_200);
+
+        const res = await request.expect(SETTINGS.HTTP_STATUSES.OK_200);
 
         return res.body;
     },
 
-    async getComment(id: string): Promise<CommentViewModel> {
+    async getComment(id: string, accessToken?: string): Promise<CommentViewModel> {
 
-        const res: Response = await req
-            .get(`${SETTINGS.PATH.COMMENTS}/${id}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        let request = req.get(`${SETTINGS.PATH.COMMENTS}/${id}`);
+
+        if (accessToken) {
+            request = request.set('Authorization', `Bearer ${accessToken}`);
+        }
+
+        const res = await request.expect(SETTINGS.HTTP_STATUSES.OK_200);
 
         return res.body;
     },

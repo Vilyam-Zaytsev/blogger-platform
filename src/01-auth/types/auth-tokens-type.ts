@@ -3,4 +3,6 @@ type AuthTokens = {
     refreshToken: string;
 };
 
-export {AuthTokens};
+export {
+    AuthTokens,
+};

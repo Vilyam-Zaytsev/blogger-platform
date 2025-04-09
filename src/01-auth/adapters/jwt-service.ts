@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken';
 import {SETTINGS} from "../../common/settings";
-import {PayloadRefreshTokenType} from "../types/payload.refresh.token.type";
+import {PayloadRefreshTokenType} from "../types/payload-refresh-token-type";
 import {ObjectId} from "mongodb";
 import {injectable} from "inversify";
+import {PayloadAccessTokenType} from "../types/payload-access-token-type";
 
 @injectable()
 class JwtService {
@@ -31,24 +32,24 @@ class JwtService {
         );
     }
 
-    async decodeToken(token: string): Promise<any> {
+    async decodeToken<T>(token: string): Promise<T> {
 
         try {
 
-            return jwt.decode(token);
+            return jwt.decode(token) as T;
         } catch (error: unknown) {
-
+            //TODO: throw error!!!
             console.error("Can't decode token", error);
 
-            return null;
+            throw new Error("Failed to decode token");
         }
     }
 
-    async verifyAccessToken(token: string): Promise<{ userId: string } | null> {
+    async verifyAccessToken(token: string): Promise<PayloadAccessTokenType | null> {
 
         try {
 
-            return jwt.verify(token, SETTINGS.JWT_SECRET_AT!) as { userId: string };
+            return jwt.verify(token, SETTINGS.JWT_SECRET_AT!) as PayloadAccessTokenType;
         } catch (error) {
             console.error(error);
 

@@ -21,6 +21,7 @@ const SETTINGS = {
         BLOGS: '/blogs',
         POSTS: '/posts',
         COMMENTS: '/comments',
+        LIKE_STATUS: '/like-status',
         SECURITY_DEVICES: {
             BASE: '/security',
             DEVICES: '/devices',

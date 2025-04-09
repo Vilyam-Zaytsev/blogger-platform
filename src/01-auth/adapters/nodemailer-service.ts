@@ -2,11 +2,6 @@ import nodemailer from 'nodemailer';
 import {EmailTemplateType} from "../../common/types/input-output-types/email-template-type";
 import {injectable} from "inversify";
 
-
-
-// export interface INodeMailerService {
-//     sendEmail: (email: string, template: EmailTemplateType) => Promise<boolean>
-// }
 @injectable()
 class NodemailerService {
 

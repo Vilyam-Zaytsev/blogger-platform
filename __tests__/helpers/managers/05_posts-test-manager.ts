@@ -1,5 +1,5 @@
 import {Response} from "supertest";
-import {PostInputModel, PostViewModel} from "../../../src/06-posts/types/input-output-types";
+import {PostInputModel, PostViewModel} from "../../../src/05-posts/types/input-output-types";
 import {blogNames, postContents, postShortDescriptions, postTitles, presets} from "../datasets-for-tests";
 import {encodingAdminDataInBase64, req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";

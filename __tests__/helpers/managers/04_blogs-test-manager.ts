@@ -1,7 +1,7 @@
 import {encodingAdminDataInBase64, req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";
 import {Response} from "supertest";
-import {BlogInputModel, BlogViewModel} from "../../../src/05-blogs/types/input-output-types";
+import {BlogInputModel, BlogViewModel} from "../../../src/04-blogs/types/input-output-types";
 import {blogDescriptions, blogNames, presets} from "../datasets-for-tests";
 import {Paginator,} from "../../../src/common/types/input-output-types/pagination-sort-types";
 import {SortDirection} from "../../../src/common/helpers/sort-query-dto";

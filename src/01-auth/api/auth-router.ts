@@ -4,7 +4,7 @@ import {
     userLoginInputValidator,
     userLoginOrEmailInputValidator, userNewPasswordInputValidator,
     userPasswordInputValidator
-} from "../../04-users/api/middlewares/user-validators";
+} from "../../03-users/api/middlewares/user-validators";
 import {inputCheckErrorsMiddleware} from "../../common/middlewares/input-check-errors-middleware";
 import {SETTINGS} from "../../common/settings";
 import {accessTokenGuard} from "./guards/access-token-guard";
