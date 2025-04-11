@@ -157,7 +157,7 @@ class CommentsController {
             .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     }
 
-    async updateCommentReaction(
+    async updateCommentReactions(
         req: RequestWithParamsAndBody<IdType, LikeInputModel>,
         res: Response
     ) {

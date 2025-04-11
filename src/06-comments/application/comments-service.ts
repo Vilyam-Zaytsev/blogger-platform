@@ -10,7 +10,7 @@ import {UserDocument} from "../../03-users/domain/user-entity";
 import {Post} from "../../05-posts/domain/post-entity";
 import {CommentDocument, CommentInputModel, CommentModel} from "../domain/comment-entity";
 import {LikeDocument, LikeModel, LikeStatus} from "../../07-likes/like-entity";
-import {LikeRepository} from "../../07-likes/repositoryes/like-repository";
+import {LikesRepository} from "../../07-likes/repositoryes/likes-repository";
 
 @injectable()
 class CommentsService {
@@ -19,7 +19,7 @@ class CommentsService {
         private usersRepository: UsersRepository,
         private postsService: PostsService,
         private commentRepository: CommentRepository,
-        private likeRepository: LikeRepository
+        private likeRepository: LikesRepository
     ) {
     };
 
@@ -77,7 +77,11 @@ class CommentsService {
             .create(null);
     }
 
-    async updateCommentReaction(commentId: string, userId: string, reaction: LikeStatus): Promise<ResultType> {
+    async updateCommentReaction(
+        commentId: string,
+        userId: string,
+        reaction: LikeStatus
+    ): Promise<ResultType> {
 
         const commentDocument: CommentDocument | null = await this.commentRepository
             .findComment(commentId);
@@ -95,7 +99,9 @@ class CommentsService {
         let likeDocument: LikeDocument | null = await this.likeRepository
             .findLikeByUserIdAndParentId(userId, commentId);
 
-        const currentReaction: LikeStatus | null = likeDocument ? likeDocument.status : null;
+        const currentReaction: LikeStatus | null = likeDocument
+            ? likeDocument.status
+            : null;
 
         if (!currentReaction) {
 

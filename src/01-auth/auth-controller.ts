@@ -149,7 +149,7 @@ class AuthController {
 
         const dataForRefreshToken: TokenSessionDataType = {
             userId: req.session!.userId,
-            deviceId: req.session!.deviceId
+            deviceId: req.session!.deviceId,
         };
 
         const {

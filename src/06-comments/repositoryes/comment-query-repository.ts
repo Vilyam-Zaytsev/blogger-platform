@@ -4,14 +4,14 @@ import {SortOptionsType} from "../../common/types/sort-options-type";
 import {SortDirection, SortQueryDto} from "../../common/helpers/sort-query-dto";
 import {Comment, CommentModel, CommentViewModel} from "../domain/comment-entity";
 import {LikeDocument, LikeStatus} from "../../07-likes/like-entity";
-import {LikeRepository} from "../../07-likes/repositoryes/like-repository";
+import {LikesRepository} from "../../07-likes/repositoryes/likes-repository";
 import {injectable} from "inversify";
 
 @injectable()
 class CommentQueryRepository {
 
     constructor(
-        private likeRepository: LikeRepository
+        private likesRepository: LikesRepository
     ) {};
 
     async findComments(
@@ -38,7 +38,7 @@ class CommentQueryRepository {
 
         if (userId) {
 
-            likes = await this.likeRepository
+            likes = await this.likesRepository
                 .findLikesByUserId(userId)
         }
 
@@ -64,7 +64,7 @@ class CommentQueryRepository {
 
         if (userId) {
 
-            like = await this.likeRepository
+            like = await this.likesRepository
                 .findLikeByUserIdAndParentId(userId, commentId)
         }
 

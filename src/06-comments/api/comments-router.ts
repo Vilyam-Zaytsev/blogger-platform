@@ -25,7 +25,7 @@ commentsRouter.put(`/:id${SETTINGS.PATH.LIKE_STATUS}`,
     accessTokenGuard,
     likeStatusInputValidator,
     inputCheckErrorsMiddleware,
-    commentsController.updateCommentReaction.bind(commentsController)
+    commentsController.updateCommentReactions.bind(commentsController)
 );
 commentsRouter.delete('/:id',
     accessTokenGuard,

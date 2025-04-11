@@ -85,11 +85,7 @@ const postSchema = new Schema<Post, PostModel>({
 
 const postMethods = {
 
-    updateReactionsCount,
-
-    updateNewestLikes() {
-
-    }
+    updateReactionsCount
 };
 
 const postStatics: any = {

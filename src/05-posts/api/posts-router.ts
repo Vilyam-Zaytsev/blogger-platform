@@ -25,6 +25,7 @@ const postsController: PostsController = container.get(PostsController);
 const commentsController: CommentsController = container.get(CommentsController);
 
 postsRouter.get('/',
+    authGuard,
     pageNumberInputValidator,
     pageSizeInputValidator,
     sortByInputValidator,
@@ -33,6 +34,7 @@ postsRouter.get('/',
     postsController.getPosts.bind(postsController)
 );
 postsRouter.get('/:id',
+    authGuard,
     postsController.getPost.bind(postsController)
 );
 postsRouter.get(`/:id${SETTINGS.PATH.COMMENTS}`,
@@ -45,6 +47,7 @@ postsRouter.get(`/:id${SETTINGS.PATH.COMMENTS}`,
     commentsController.getComments.bind(commentsController)
 );
 postsRouter.post('/',
+    authGuard,
     baseAuthGuard,
     postTitleInputValidator,
     postShortDescriptionInputValidator,
@@ -72,7 +75,7 @@ postsRouter.put(`/:id${SETTINGS.PATH.LIKE_STATUS}`,
     accessTokenGuard,
     likeStatusInputValidator,
     inputCheckErrorsMiddleware,
-    postsController.updatePostReaction.bind(postsController)
+    postsController.updatePostReactions.bind(postsController)
 );
 postsRouter.delete('/:id',
     baseAuthGuard,

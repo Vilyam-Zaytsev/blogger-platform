@@ -210,6 +210,8 @@ class BlogsController {
         res: Response<PostViewModel>
     ){
 
+        const userId: string | null = req.user ? req.user.id : null;
+
         const blogId: string = req.params.id;
 
         const {
@@ -240,7 +242,7 @@ class BlogsController {
         }
 
         const createdPost: PostViewModel | null = await this.postsQueryRepository
-            .findPost(idCreatedPost);
+            .findPost(idCreatedPost, userId);
 
         res
             .status(SETTINGS.HTTP_STATUSES.CREATED_201)

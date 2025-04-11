@@ -9,7 +9,8 @@ enum LikeStatus {
 type Like = {
     status: LikeStatus,
     userId: string,
-    parentId: string
+    parentId: string,
+    createdAt: Date
 };
 
 type LikeInputModel = {
@@ -43,10 +44,14 @@ const likeSchema = new Schema<Like, LikeModel, LikeMethods>({
     parentId: {
         type: String,
         required: true
+    },
+    createdAt: {
+        type: Date,
+        required: true
     }
 });
 
-const likeMethods: any = {
+const likeMethods = {
 
 
 };
@@ -62,7 +67,8 @@ const likeStatics: any = {
         const like: Like = {
             status: reaction,
             userId,
-            parentId
+            parentId,
+            createdAt: new Date()
         };
 
         return new LikeModel(like);

@@ -21,6 +21,7 @@ import {
     postTitleInputValidator
 } from "../../05-posts/api/middlewares/post-validators";
 import {container} from "../../composition-root";
+import {authGuard} from "../../01-auth/api/guards/auth-guard";
 
 const blogsRouter = Router();
 const blogsController: BlogsController = container.get(BlogsController);
@@ -66,6 +67,7 @@ blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
     blogsController.getPosts.bind(blogsController)
 );
 blogsRouter.post(`/:id${SETTINGS.PATH.POSTS}`,
+    authGuard,
     baseAuthGuard,
     postTitleInputValidator,
     postShortDescriptionInputValidator,

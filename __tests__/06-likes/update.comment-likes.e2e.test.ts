@@ -12,11 +12,11 @@ import mongoose from "mongoose";
 import {CommentViewModel} from "../../src/06-comments/domain/comment-entity";
 import {LikeDocument, LikeStatus} from "../../src/07-likes/like-entity";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
-import {LikeRepository} from "../../src/07-likes/repositoryes/like-repository";
+import {LikesRepository} from "../../src/07-likes/repositoryes/likes-repository";
 import {container} from "../../src/composition-root";
 import {ObjectId} from "mongodb";
 
-const likeRepository: LikeRepository = container.get(LikeRepository);
+const likeRepository: LikesRepository = container.get(LikesRepository);
 
 beforeAll(async () => {
 

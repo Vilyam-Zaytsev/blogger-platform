@@ -4,6 +4,7 @@ import {ResultType} from "../../../common/types/result-types/result-type";
 import {AuthService} from "../../application/auth-service";
 import {ResultStatus} from "../../../common/types/result-types/result-status";
 import {container} from "../../../composition-root";
+import {isSuccessfulResult} from "../../../common/helpers/type-guards";
 
 const accessTokenGuard = async (
     req: Request,
@@ -23,10 +24,13 @@ const accessTokenGuard = async (
 
     const token: string = req.headers.authorization.split(' ')[1];
 
-    const resultCheckAccessToken: ResultType<string | null> = await authService
+    const {
+        status: accessTokenVerificationStatus,
+        data: userId
+    }: ResultType<string | null> = await authService
         .checkAccessToken(token);
 
-    if (resultCheckAccessToken.status !== ResultStatus.Success) {
+    if (!isSuccessfulResult(accessTokenVerificationStatus, userId)) {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
@@ -34,7 +38,7 @@ const accessTokenGuard = async (
         return;
     }
 
-    req.user = {id: resultCheckAccessToken.data!};
+    req.user = {id: userId};
 
     return next();
 };
