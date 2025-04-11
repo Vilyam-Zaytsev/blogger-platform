@@ -18,6 +18,7 @@ import {accessTokenGuard} from "../../01-auth/api/guards/access-token-guard";
 import {commentContentInputValidator} from "../../06-comments/api/middlewares/comment-validators";
 import {container} from "../../composition-root";
 import {authGuard} from "../../01-auth/api/guards/auth-guard";
+import {likeStatusInputValidator} from "../../07-likes/middlewares/like-validators";
 
 const postsRouter = Router();
 const postsController: PostsController = container.get(PostsController);
@@ -66,6 +67,12 @@ postsRouter.put('/:id',
     postBlogIdInputValidator,
     inputCheckErrorsMiddleware,
     postsController.updatePost.bind(postsController)
+);
+postsRouter.put(`/:id${SETTINGS.PATH.LIKE_STATUS}`,
+    accessTokenGuard,
+    likeStatusInputValidator,
+    inputCheckErrorsMiddleware,
+    postsController.updatePostReaction.bind(postsController)
 );
 postsRouter.delete('/:id',
     baseAuthGuard,
