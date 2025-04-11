@@ -18,7 +18,7 @@ const authGuard = async (
         const payload: PayloadAccessTokenType = await jwtService
             .decodeToken<PayloadAccessTokenType>(token);
 
-            req.user = {id: payload.userId};
+            req.user = payload ? {id: payload.userId} : undefined;
     }
 
     return next();

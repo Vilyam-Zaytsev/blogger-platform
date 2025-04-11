@@ -16,6 +16,8 @@ import {PostDto} from "./domain/post-dto";
 import {PostInputModel, PostViewModel} from "./domain/post-entity";
 import {LikeInputModel} from "../07-likes/like-entity";
 import {ResultType} from "../common/types/result-types/result-type";
+import {ResultStatus} from "../common/types/result-types/result-status";
+import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
 
 @injectable()
 class PostsController {
@@ -73,6 +75,7 @@ class PostsController {
             .findPost(postId, userId);
 
         if (!foundPost) {
+
             res
                 .sendStatus(SETTINGS.HTTP_STATUSES.NOT_FOUND_404)
 
@@ -160,6 +163,17 @@ class PostsController {
 
         const {status: reactionUpdateStatus}: ResultType = await this.postsService
             .updatePostReaction(postId, userId, likeStatus);
+
+        if (reactionUpdateStatus !== ResultStatus.Success) {
+
+            res
+                .sendStatus(mapResultStatusToHttpStatus(reactionUpdateStatus));
+
+            return;
+        }
+
+        res
+            .sendStatus(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
     }
 
     async deletePost(

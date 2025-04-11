@@ -1,10 +1,11 @@
 import {Response} from "supertest";
-import {PostInputModel, PostViewModel} from "../../../src/05-posts/types/input-output-types";
 import {blogNames, postContents, postShortDescriptions, postTitles, presets} from "../datasets-for-tests";
 import {encodingAdminDataInBase64, req} from "../test-helpers";
 import {SETTINGS} from "../../../src/common/settings";
 import {Paginator} from "../../../src/common/types/input-output-types/pagination-sort-types";
 import {SortDirection} from "../../../src/common/helpers/sort-query-dto";
+import {LikeStatus} from "../../../src/07-likes/like-entity";
+import {PostInputModel, PostViewModel} from "../../../src/05-posts/domain/post-entity";
 
 const postsTestManager = {
 
@@ -32,13 +33,19 @@ const postsTestManager = {
                     ))
                 .expect(SETTINGS.HTTP_STATUSES.CREATED_201);
 
-            expect(res.body).toEqual<PostViewModel>({
+            expect(res.body).toEqual({
                 id: expect.any(String),
                 title: postTitles[i],
                 shortDescription: postShortDescriptions[i],
                 content: postContents[i],
                 blogId: presets.blogs[0].id,
                 blogName: blogNames[0],
+                extendedLikesInfo: {
+                    likesCount: 0,
+                    dislikesCount: 0,
+                    myStatus: LikeStatus.None,
+                    newestLikes: []
+                },
                 createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
             });
 
@@ -60,11 +67,15 @@ const postsTestManager = {
         return res.body;
     },
 
-    async getPost(id: string): Promise<Paginator<PostViewModel>> {
+    async getPost(id: string, accessToken?: string): Promise<PostViewModel> {
 
-        const res: Response = await req
-            .get(`${SETTINGS.PATH.POSTS}/${id}`)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        let request = req.get(`${SETTINGS.PATH.POSTS}/${id}`);
+
+        if (accessToken) {
+            request = request.set('Authorization', `Bearer ${accessToken}`);
+        }
+
+        const res = await request.expect(SETTINGS.HTTP_STATUSES.OK_200);
 
         return res.body;
     },

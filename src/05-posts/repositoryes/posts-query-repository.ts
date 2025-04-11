@@ -103,7 +103,7 @@ class PostsQueryRepository {
 
     async findPost(postId: string, userId: string | null): Promise<PostViewModel | null> {
 
-        const post: WithId<Post> | null = await PostModel
+        const post: PostDocument | null = await PostModel
             .findById(postId)
             .exec();
 
@@ -153,6 +153,39 @@ class PostsQueryRepository {
         recentUsersWhoHaveLiked: UserDocument[],
         newestLikes: LikeDocument[]
     ): PostViewModel {
+
+        if (!newestLikes || newestLikes.length < 1) {
+
+            return {
+                id: String(post._id),
+                title: post.title,
+                shortDescription: post.shortDescription,
+                content: post.content,
+                blogId: post.blogId,
+                blogName: post.blogName,
+                extendedLikesInfo: {
+                    likesCount: post.reactions.likeCount,
+                    dislikesCount: post.reactions.dislikeCount,
+                    myStatus: userReaction,
+                    newestLikes: []
+                },
+                createdAt: post.createdAt
+            };
+        }
+
+        const newestLikesInfo = [];
+
+        for (let i = 0; i < newestLikes.length; i++) {
+
+            const result = {
+                addedAt: newestLikes[i].createdAt.toISOString(),
+                userId: String(recentUsersWhoHaveLiked[i]._id),
+                login: recentUsersWhoHaveLiked[i].login
+            }
+
+            newestLikesInfo.push(result);
+        }
+
         return {
             id: String(post._id),
             title: post.title,
@@ -164,29 +197,31 @@ class PostsQueryRepository {
                 likesCount: post.reactions.likeCount,
                 dislikesCount: post.reactions.dislikeCount,
                 myStatus: userReaction,
-                newestLikes: [
-                    {
-                        addedAt: newestLikes[0].createdAt.toISOString(),
-                        userId: recentUsersWhoHaveLiked[0].id,
-                        login: recentUsersWhoHaveLiked[0].login
-                    },
-                    {
-                        addedAt: newestLikes[1].createdAt.toISOString(),
-                        userId: recentUsersWhoHaveLiked[1].id,
-                        login: recentUsersWhoHaveLiked[1].login
-                    },
-                    {
-                        addedAt: newestLikes[2].createdAt.toISOString(),
-                        userId: recentUsersWhoHaveLiked[2].id,
-                        login: recentUsersWhoHaveLiked[2].login
-                    }
-                ]
+                newestLikes: newestLikesInfo
             },
             createdAt: post.createdAt
         };
     }
 
-    // _mapDbPostToViewModel(
+
+// {
+//     addedAt: newestLikes[0].createdAt.toISOString(),
+//     userId: recentUsersWhoHaveLiked[0].id,
+//     login: recentUsersWhoHaveLiked[0].login
+// },
+// {
+//     addedAt: newestLikes[1].createdAt.toISOString(),
+//         userId: recentUsersWhoHaveLiked[1].id,
+//     login: recentUsersWhoHaveLiked[1].login
+// },
+// {
+//     addedAt: newestLikes[2].createdAt.toISOString(),
+//         userId: recentUsersWhoHaveLiked[2].id,
+//     login: recentUsersWhoHaveLiked[2].login
+// }
+
+
+// _mapDbPostToViewModel(
     //     post: WithId<Post>,
     //     userReaction: LikeStatus,
     //     recentUsersWhoHaveLiked: UserDocument[],
