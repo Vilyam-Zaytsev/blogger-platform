@@ -1,10 +1,9 @@
-import {PostInputModel} from "../types/input-output-types";
 import {WithId} from "mongodb";
 import {PostsRepository} from "../repositoryes/posts-repository";
 import {BlogsRepository} from "../../04-blogs/repositoryes/blogs-repository";
 import {injectable} from "inversify";
 import {PostDto} from "../domain/post-dto";
-import {Post, PostDocument, PostModel} from "../domain/post-entity";
+import {Post, PostDocument, PostInputModel, PostModel} from "../domain/post-entity";
 
 @injectable()
 class PostsService {

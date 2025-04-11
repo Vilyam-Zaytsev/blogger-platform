@@ -24,9 +24,15 @@ class SortQueryDto {
 
     constructor(queryParams: SortingAndPaginationParamsType) {
 
-        this.pageNumber = queryParams.pageNumber ? Number(queryParams.pageNumber) : 1;
-        this.pageSize = queryParams.pageSize ? Number(queryParams.pageSize) : 10;
-        this.sortBy = queryParams.sortBy ? String(queryParams.sortBy) : 'createdAt';
+        this.pageNumber = queryParams.pageNumber
+            ? Number(queryParams.pageNumber)
+            : 1;
+        this.pageSize = queryParams.pageSize
+            ? Number(queryParams.pageSize)
+            : 10;
+        this.sortBy = queryParams.sortBy
+            ? String(queryParams.sortBy)
+            : 'createdAt';
         this.sortDirection = queryParams.sortDirection === 'asc'
             ? SortDirection.Ascending
             : SortDirection.Descending;

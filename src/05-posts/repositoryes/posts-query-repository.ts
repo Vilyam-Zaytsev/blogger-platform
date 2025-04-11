@@ -1,10 +1,10 @@
-import {ObjectId, WithId} from "mongodb";
+import {WithId} from "mongodb";
 import {Paginator} from "../../common/types/input-output-types/pagination-sort-types";
-import {PostViewModel} from "../types/input-output-types";
 import {injectable} from "inversify";
 import {SortOptionsType} from "../../common/types/sort-options-type";
 import {SortQueryDto} from "../../common/helpers/sort-query-dto";
-import {Post, PostModel} from "../domain/post-entity";
+import {Post, PostModel, PostViewModel} from "../domain/post-entity";
+import {LikeStatus} from "../../07-likes/like-entity";
 
 @injectable()
 class PostsQueryRepository {
@@ -66,6 +66,18 @@ class PostsQueryRepository {
             content: post.content,
             blogId: post.blogId,
             blogName: post.blogName,
+            extendedLikesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: LikeStatus.None,
+                newestLikes: [
+                    {
+                        addedAt: 'aaa',
+                        userId: '111',
+                        login: 'aaa'
+                    }
+                ]
+            },
             createdAt: post.createdAt
         };
     }

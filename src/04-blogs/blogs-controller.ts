@@ -12,7 +12,6 @@ import {BlogsService} from "./application/blogs-service";
 import {Paginator,} from "../common/types/input-output-types/pagination-sort-types";
 import {IdType} from "../common/types/input-output-types/id-type";
 import {BlogsQueryRepository} from "./repositoryes/blogs-query-repository";
-import {PostViewModel} from "../05-posts/types/input-output-types";
 import {ResultType} from "../common/types/result-types/result-type";
 import {ResultStatus} from "../common/types/result-types/result-status";
 import {mapResultStatusToHttpStatus} from "../common/helpers/map-result-status-to-http-status";
@@ -22,7 +21,8 @@ import {SortingAndPaginationParamsType, SortQueryDto} from "../common/helpers/so
 import {BlogDto} from "./domain/blog-dto";
 import {Blog} from "./domain/blog-entity";
 import {PostDto} from "../05-posts/domain/post-dto";
-import {isSuccess, isSuccessfulResult} from "../common/helpers/type-guards";
+import {isSuccessfulResult} from "../common/helpers/type-guards";
+import {PostViewModel} from "../05-posts/domain/post-entity";
 
 @injectable()
 class BlogsController {

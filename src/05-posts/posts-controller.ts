@@ -1,5 +1,4 @@
 import {Response} from "express";
-import {PostInputModel, PostViewModel} from "./types/input-output-types";
 import {
     RequestWithBody,
     RequestWithParams,
@@ -14,6 +13,7 @@ import {PostsQueryRepository} from "./repositoryes/posts-query-repository";
 import {injectable} from "inversify";
 import {SortingAndPaginationParamsType, SortQueryDto} from "../common/helpers/sort-query-dto";
 import {PostDto} from "./domain/post-dto";
+import {PostInputModel, PostViewModel} from "./domain/post-entity";
 
 @injectable()
 class PostsController {

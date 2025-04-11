@@ -1,6 +1,5 @@
 import {ObjectId, WithId} from "mongodb";
 import {
-    MatchMode,
     Paginator
 } from "../../common/types/input-output-types/pagination-sort-types";
 import {UserMeViewModel, UserViewModel} from "../types/input-output-types";
