@@ -66,7 +66,7 @@ class PostsQueryRepository {
                 likesGroupedByPostId[postId] = [];
             }
 
-            if (likesGroupedByPostId[postId].length < 3) {
+            if (likesGroupedByPostId[postId].length < 3 && like.status === LikeStatus.Like) {
 
                 likesGroupedByPostId[postId].push(like);
 
@@ -101,7 +101,10 @@ class PostsQueryRepository {
         })
     }
 
-    async findPost(postId: string, userId: string | null): Promise<PostViewModel | null> {
+    async findPost(
+        postId: string,
+        userId: string | null
+    ): Promise<PostViewModel | null> {
 
         const post: PostDocument | null = await PostModel
             .findById(postId)

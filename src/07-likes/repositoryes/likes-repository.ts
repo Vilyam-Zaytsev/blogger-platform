@@ -1,5 +1,5 @@
 import {injectable} from "inversify";
-import {Like, LikeDocument, LikeModel} from "../like-entity";
+import {Like, LikeDocument, LikeModel, LikeStatus} from "../like-entity";
 import {WithId} from "mongodb";
 
 @injectable()
@@ -25,8 +25,13 @@ class LikesRepository {
 
     async findNewestLikes(parentId: string): Promise<LikeDocument[]> {
 
+        const filter: any = {
+            status: LikeStatus.Like,
+            parentId
+        };
+
         return await LikeModel
-            .find({parentId})
+            .find(filter)
             .sort({createdAt: -1})
             .limit(3)
             .exec();

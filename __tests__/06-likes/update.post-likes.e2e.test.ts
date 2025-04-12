@@ -14,6 +14,9 @@ import {container} from "../../src/composition-root";
 import {PostViewModel} from "../../src/05-posts/domain/post-entity";
 import {UserViewModel} from "../../src/03-users/types/input-output-types";
 import {SortDirection} from "../../src/common/helpers/sort-query-dto";
+import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
+import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
+import {CommentViewModel} from "../../src/06-comments/domain/comment-entity";
 
 const likeRepository: LikesRepository = container.get(LikesRepository);
 
@@ -134,11 +137,11 @@ describe('PUT /posts/:id/likeStatus', () => {
         await authTestManager
             .login(presets.users.map(u => u.login));
 
-        const resPutLikes = [];
+        const resPutLikes: Response[] = [];
 
         for (let i = 0; i < presets.users.length; i++) {
 
-            const res = req
+            const res: Response = await req
                 .put(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
                 .set(
                     'Authorization',
@@ -152,8 +155,6 @@ describe('PUT /posts/:id/likeStatus', () => {
             resPutLikes.push(res);
         }
 
-        await Promise.all(resPutLikes);
-
         //The 'myStatus' field must be 'None' because the user requesting the comment is not authenticated.
         //The 'newestLikes' field should contain information about two like.
         const foundPost_1: PostViewModel = await postsTestManager
@@ -163,7 +164,7 @@ describe('PUT /posts/:id/likeStatus', () => {
             pageNumber: 1,
             pageSize: 10,
             sortBy: 'createdAt',
-            sortDirection: SortDirection.Ascending
+            sortDirection: SortDirection.Descending
         };
 
         const sortedUsers = usersTestManager
@@ -172,8 +173,6 @@ describe('PUT /posts/:id/likeStatus', () => {
                 filter,
                 userPropertyMap
             );
-
-        console.dir(foundPost_1.extendedLikesInfo)
 
         expect(foundPost_1.extendedLikesInfo).toEqual({
             likesCount: 2,
@@ -192,563 +191,667 @@ describe('PUT /posts/:id/likeStatus', () => {
                 }
             ]
         });
-        //
-        // // The 'myStatus' field must be 'Like' because the user requesting the comment is authenticated.
-        // const foundPost_2: PostViewModel = await postsTestManager
-        //     .getPost(presets.posts[0].id, presets.authTokens[0].accessToken);
-        //
-        // expect(foundPost_2.extendedLikesInfo).toEqual({
-        //     likesCount: 1,
-        //     dislikesCount: 0,
-        //     myStatus: LikeStatus.Like,
-        //     newestLikes: [
-        //         {
-        //             addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
-        //             userId: presets.users[0].id,
-        //             login: presets.users[0].login
-        //         }
-        //     ]
-        // });
-        //
-        // console_log_e2e(resPutLikes.body, resPutLikes.status, 'Test 1: put(/comments/:id/likeStatus)');
+
+        // The 'myStatus' field must be 'Like' because the user requesting the comment is authenticated.
+        //The 'newestLikes' field should contain information about two like.
+        for (let i = 0; i < presets.users.length; i++) {
+
+            const foundPost: PostViewModel = await postsTestManager
+                .getPost(presets.posts[0].id, presets.authTokens[i].accessToken);
+
+            expect(foundPost.extendedLikesInfo).toEqual({
+                likesCount: 2,
+                dislikesCount: 0,
+                myStatus: LikeStatus.Like,
+                newestLikes: [
+                    {
+                        addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                        userId: sortedUsers[0].id,
+                        login: sortedUsers[0].login
+                    },
+                    {
+                        addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                        userId: sortedUsers[1].id,
+                        login: sortedUsers[1].login
+                    }
+                ]
+            });
+        }
+
+        console_log_e2e(resPutLikes[0].body, resPutLikes[0].status, 'Test 2: put(/post/:id/likeStatus)');
+    }, 10000);
+
+    it('should update the user\'s "like" reaction and increase the number of similar reactions(№3).', async () => {
+
+        await blogsTestManager
+            .createBlog(1);
+
+        await postsTestManager
+            .createPost(1);
+
+        await usersTestManager
+            .createUser(3);
+
+        await authTestManager
+            .login(presets.users.map(u => u.login));
+
+        const resPutLikes: Response[] = [];
+
+        for (let i = 0; i < presets.users.length; i++) {
+
+            const res: Response = await req
+                .put(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
+                .set(
+                    'Authorization',
+                    `Bearer ${presets.authTokens[i].accessToken}`
+                )
+                .send({
+                    likeStatus: LikeStatus.Like
+                })
+                .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+
+            resPutLikes.push(res);
+        }
+
+        //The 'myStatus' field must be 'None' because the user requesting the comment is not authenticated.
+        //The 'newestLikes' field should contain information about three like.
+        const foundPost_1: PostViewModel = await postsTestManager
+            .getPost(presets.posts[0].id);
+
+        const filter = {
+            pageNumber: 1,
+            pageSize: 10,
+            sortBy: 'createdAt',
+            sortDirection: SortDirection.Descending
+        };
+
+        const sortedUsers = usersTestManager
+            .filterAndSort<UserViewModel>(
+                presets.users,
+                filter,
+                userPropertyMap
+            );
+
+        expect(foundPost_1.extendedLikesInfo).toEqual({
+            likesCount: 3,
+            dislikesCount: 0,
+            myStatus: LikeStatus.None,
+            newestLikes: [
+                {
+                    addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                    userId: sortedUsers[0].id,
+                    login: sortedUsers[0].login
+                },
+                {
+                    addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                    userId: sortedUsers[1].id,
+                    login: sortedUsers[1].login
+                },
+                {
+                    addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                    userId: sortedUsers[2].id,
+                    login: sortedUsers[2].login
+                }
+            ]
+        });
+
+        // The 'myStatus' field must be 'Like' because the user requesting the comment is authenticated.
+        //The 'newestLikes' field should contain information about three like.
+        for (let i = 0; i < presets.users.length; i++) {
+
+            const foundPost: PostViewModel = await postsTestManager
+                .getPost(presets.posts[0].id, presets.authTokens[i].accessToken);
+
+            expect(foundPost.extendedLikesInfo).toEqual({
+                likesCount: 3,
+                dislikesCount: 0,
+                myStatus: LikeStatus.Like,
+                newestLikes: [
+                    {
+                        addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                        userId: sortedUsers[0].id,
+                        login: sortedUsers[0].login
+                    },
+                    {
+                        addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                        userId: sortedUsers[1].id,
+                        login: sortedUsers[1].login
+                    },
+                    {
+                        addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                        userId: sortedUsers[2].id,
+                        login: sortedUsers[2].login
+                    }
+                ]
+            });
+        }
+
+        console_log_e2e(resPutLikes[0].body, resPutLikes[0].status, 'Test 3: put(/post/:id/likeStatus)');
+    }, 10000);
+
+    it('should update the user\'s "like" reaction and increase the number of similar reactions(№4).', async () => {
+
+        await blogsTestManager
+            .createBlog(1);
+
+        await postsTestManager
+            .createPost(1);
+
+        await usersTestManager
+            .createUser(4);
+
+        await authTestManager
+            .login(presets.users.map(u => u.login));
+
+        const resPutLikes: Response[] = [];
+
+        for (let i = 0; i < presets.users.length; i++) {
+
+            const res: Response = await req
+                .put(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
+                .set(
+                    'Authorization',
+                    `Bearer ${presets.authTokens[i].accessToken}`
+                )
+                .send({
+                    likeStatus: LikeStatus.Like
+                })
+                .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+
+            resPutLikes.push(res);
+        }
+
+        //The 'myStatus' field must be 'None' because the user requesting the comment is not authenticated.
+        //The 'newestLikes' field should contain information about three like.
+        const foundPost_1: PostViewModel = await postsTestManager
+            .getPost(presets.posts[0].id);
+
+        const filter = {
+            pageNumber: 1,
+            pageSize: 10,
+            sortBy: 'createdAt',
+            sortDirection: SortDirection.Descending
+        };
+
+        const sortedUsers = usersTestManager
+            .filterAndSort<UserViewModel>(
+                presets.users,
+                filter,
+                userPropertyMap
+            );
+
+        expect(foundPost_1.extendedLikesInfo).toEqual({
+            likesCount: 4,
+            dislikesCount: 0,
+            myStatus: LikeStatus.None,
+            newestLikes: [
+                {
+                    addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                    userId: sortedUsers[0].id,
+                    login: sortedUsers[0].login
+                },
+                {
+                    addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                    userId: sortedUsers[1].id,
+                    login: sortedUsers[1].login
+                },
+                {
+                    addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                    userId: sortedUsers[2].id,
+                    login: sortedUsers[2].login
+                }
+            ]
+        });
+
+        // The 'myStatus' field must be 'Like' because the user requesting the comment is authenticated.
+        //The 'newestLikes' field should contain information about three like.
+        for (let i = 0; i < presets.users.length; i++) {
+
+            const foundPost: PostViewModel = await postsTestManager
+                .getPost(presets.posts[0].id, presets.authTokens[i].accessToken);
+
+            expect(foundPost.extendedLikesInfo).toEqual({
+                likesCount: 4,
+                dislikesCount: 0,
+                myStatus: LikeStatus.Like,
+                newestLikes: [
+                    {
+                        addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                        userId: sortedUsers[0].id,
+                        login: sortedUsers[0].login
+                    },
+                    {
+                        addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                        userId: sortedUsers[1].id,
+                        login: sortedUsers[1].login
+                    },
+                    {
+                        addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                        userId: sortedUsers[2].id,
+                        login: sortedUsers[2].login
+                    }
+                ]
+            });
+        }
+
+        console_log_e2e(resPutLikes[0].body, resPutLikes[0].status, 'Test 4: put(/post/:id/likeStatus)');
+    }, 10000);
+
+    it('should update the user\'s "dislike" reaction and increase the number of similar reactions(№1).', async () => {
+
+        await blogsTestManager
+            .createBlog(1);
+
+        await postsTestManager
+            .createPost(1);
+
+        await usersTestManager
+            .createUser(1);
+
+        await authTestManager
+            .login(presets.users.map(u => u.login));
+
+        const resPutLikes: Response = await req
+            .put(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
+            .set(
+                'Authorization',
+                `Bearer ${presets.authTokens[0].accessToken}`
+            )
+            .send({
+                likeStatus: LikeStatus.Dislike
+            })
+            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+
+        //The 'myStatus' field must be 'None' because the user requesting the comment is not authenticated.
+        const foundPost_1: PostViewModel = await postsTestManager
+            .getPost(presets.posts[0].id);
+
+        expect(foundPost_1.extendedLikesInfo).toEqual({
+            likesCount: 0,
+            dislikesCount: 1,
+            myStatus: LikeStatus.None,
+            newestLikes: []
+        });
+
+        // The 'myStatus' field must be 'Dislike' because the user requesting the comment is authenticated.
+        const foundPost_2: PostViewModel = await postsTestManager
+            .getPost(presets.posts[0].id, presets.authTokens[0].accessToken);
+
+        expect(foundPost_2.extendedLikesInfo).toEqual({
+            likesCount: 0,
+            dislikesCount: 1,
+            myStatus: LikeStatus.Dislike,
+            newestLikes: []
+        });
+
+        console_log_e2e(resPutLikes.body, resPutLikes.status, 'Test 5: put(/posts/:id/likeStatus)');
     });
 
-    // it('should update the user\'s "dislike" reaction and increase the number of similar reactions.', async () => {
-    //
-    //     await blogsTestManager
-    //         .createBlog(1);
-    //
-    //     await postsTestManager
-    //         .createPost(1);
-    //
-    //     await usersTestManager
-    //         .createUser(1);
-    //
-    //     await authTestManager
-    //         .login(presets.users.map(u => u.login));
-    //
-    //     await commentsTestManager
-    //         .createComments(1);
-    //
-    //     const resPutLikes: Response = await req
-    //         .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
-    //         .set(
-    //             'Authorization',
-    //             `Bearer ${presets.authTokens[0].accessToken}`
-    //         )
-    //         .send({
-    //             likeStatus: LikeStatus.Dislike
-    //         })
-    //         .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    //
-    //     //The 'myStatus' field must be 'None' because the user requesting the comment is not authenticated.
-    //     const foundComment_1: CommentViewModel = await commentsTestManager
-    //         .getComment(presets.comments[0].id);
-    //
-    //     expect(foundComment_1.likesInfo).toEqual({
-    //         likesCount: 0,
-    //         dislikesCount: 1,
-    //         myStatus: LikeStatus.None
-    //     });
-    //
-    //     // The 'myStatus' field must be 'Like' because the user requesting the comment is authenticated.
-    //     const foundComment_2: CommentViewModel = await commentsTestManager
-    //         .getComment(presets.comments[0].id, presets.authTokens[0].accessToken);
-    //
-    //     expect(foundComment_2.likesInfo).toEqual({
-    //         likesCount: 0,
-    //         dislikesCount: 1,
-    //         myStatus: LikeStatus.Dislike
-    //     });
-    //
-    //     console_log_e2e(resPutLikes.body, resPutLikes.status, 'Test 2: put(/comments/:id/likeStatus)');
-    // });
-    //
-    // it('one user should set the reaction to \'Like\', the second to \'Dislike\', and the corresponding counters should also be disabled in the comment.).', async () => {
-    //
-    //     await blogsTestManager
-    //         .createBlog(1);
-    //
-    //     await postsTestManager
-    //         .createPost(1);
-    //
-    //     await usersTestManager
-    //         .createUser(2);
-    //
-    //     await authTestManager
-    //         .login(presets.users.map(u => u.login));
-    //
-    //     await commentsTestManager
-    //         .createComments(1);
-    //
-    //     const resPutLikes_1: Response = await req
-    //         .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
-    //         .set(
-    //             'Authorization',
-    //             `Bearer ${presets.authTokens[0].accessToken}`
-    //         )
-    //         .send({
-    //             likeStatus: LikeStatus.Like
-    //         })
-    //         .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    //
-    //     const resPutLikes_2: Response = await req
-    //         .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
-    //         .set(
-    //             'Authorization',
-    //             `Bearer ${presets.authTokens[1].accessToken}`
-    //         )
-    //         .send({
-    //             likeStatus: LikeStatus.Dislike
-    //         })
-    //         .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    //
-    //     //The 'myStatus' field must be 'None' because the user requesting the comment is not authenticated.
-    //     const foundComment_1: CommentViewModel = await commentsTestManager
-    //         .getComment(presets.comments[0].id);
-    //
-    //     expect(foundComment_1.likesInfo).toEqual({
-    //         likesCount: 1,
-    //         dislikesCount: 1,
-    //         myStatus: LikeStatus.None
-    //     });
-    //
-    //     // The "my status" field should have "Like" because the user requesting the comment has left a corresponding reaction.
-    //     const foundComment_2: CommentViewModel = await commentsTestManager
-    //         .getComment(presets.comments[0].id, presets.authTokens[0].accessToken);
-    //
-    //     expect(foundComment_2.likesInfo).toEqual({
-    //         likesCount: 1,
-    //         dislikesCount: 1,
-    //         myStatus: LikeStatus.Like
-    //     });
-    //
-    //     // The "my status" field should have "Dislike" because the user requesting the comment has left a
-    //     // corresponding reaction.
-    //     const foundComment_3: CommentViewModel = await commentsTestManager
-    //         .getComment(presets.comments[0].id, presets.authTokens[1].accessToken);
-    //
-    //     expect(foundComment_3.likesInfo).toEqual({
-    //         likesCount: 1,
-    //         dislikesCount: 1,
-    //         myStatus: LikeStatus.Dislike
-    //     });
-    //
-    //     console_log_e2e(resPutLikes_1.body, resPutLikes_1.status, 'Test 3: put(/comments/:id/likeStatus)');
-    // }, 10000);
-    //
-    // it('should update "Like" to "Dislike", "Dislike to "Like", "Like" to "None".', async () => {
-    //
-    //     await blogsTestManager
-    //         .createBlog(1);
-    //
-    //     await postsTestManager
-    //         .createPost(1);
-    //
-    //     await usersTestManager
-    //         .createUser(1);
-    //
-    //     await authTestManager
-    //         .login(presets.users.map(u => u.login));
-    //
-    //     await commentsTestManager
-    //         .createComments(1);
-    //
-    //     //None to Like
-    //     const resPutLikes_1 = await req
-    //         .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
-    //         .set(
-    //             'Authorization',
-    //             `Bearer ${presets.authTokens[0].accessToken}`
-    //         )
-    //         .send({
-    //             likeStatus: LikeStatus.Like
-    //         })
-    //         .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    //
-    //     const foundComment_1: CommentViewModel = await commentsTestManager
-    //         .getComment(presets.comments[0].id, presets.authTokens[0].accessToken);
-    //
-    //     expect(foundComment_1.likesInfo).toEqual({
-    //         likesCount: 1,
-    //         dislikesCount: 0,
-    //         myStatus: LikeStatus.Like
-    //     });
-    //
-    //     //Like to Dislike
-    //     await req
-    //         .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
-    //         .set(
-    //             'Authorization',
-    //             `Bearer ${presets.authTokens[0].accessToken}`
-    //         )
-    //         .send({
-    //             likeStatus: LikeStatus.Dislike
-    //         })
-    //         .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    //
-    //     const foundComment_2: CommentViewModel = await commentsTestManager
-    //         .getComment(presets.comments[0].id, presets.authTokens[0].accessToken);
-    //
-    //     expect(foundComment_2.likesInfo).toEqual({
-    //         likesCount: 0,
-    //         dislikesCount: 1,
-    //         myStatus: LikeStatus.Dislike
-    //     });
-    //
-    //     //Dislike to Like
-    //     await req
-    //         .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
-    //         .set(
-    //             'Authorization',
-    //             `Bearer ${presets.authTokens[0].accessToken}`
-    //         )
-    //         .send({
-    //             likeStatus: LikeStatus.Like
-    //         })
-    //         .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    //
-    //     const foundComment_3: CommentViewModel = await commentsTestManager
-    //         .getComment(presets.comments[0].id, presets.authTokens[0].accessToken);
-    //
-    //     expect(foundComment_3.likesInfo).toEqual({
-    //         likesCount: 1,
-    //         dislikesCount: 0,
-    //         myStatus: LikeStatus.Like
-    //     });
-    //
-    //     //Like to None
-    //     await req
-    //         .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
-    //         .set(
-    //             'Authorization',
-    //             `Bearer ${presets.authTokens[0].accessToken}`
-    //         )
-    //         .send({
-    //             likeStatus: LikeStatus.None
-    //         })
-    //         .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    //
-    //     const foundComment_4: CommentViewModel = await commentsTestManager
-    //         .getComment(presets.comments[0].id, presets.authTokens[0].accessToken);
-    //
-    //     expect(foundComment_4.likesInfo).toEqual({
-    //         likesCount: 0,
-    //         dislikesCount: 0,
-    //         myStatus: LikeStatus.None
-    //     });
-    //
-    //     console_log_e2e(resPutLikes_1.body, resPutLikes_1.status, 'Test 4: put(/comments/:id/likeStatus)');
-    // }, 10000);
-    //
-    // it('---------------------------', async () => {
-    //
-    //     await blogsTestManager
-    //         .createBlog(1);
-    //
-    //     await postsTestManager
-    //         .createPost(1);
-    //
-    //     await usersTestManager
-    //         .createUser(2);
-    //
-    //     await authTestManager
-    //         .login(presets.users.map(u => u.login));
-    //
-    //     await commentsTestManager
-    //         .createComments(10);
-    //
-    //     for (let i = 0; i < presets.users.length; i++) {
-    //
-    //         for (let j = 0; j < presets.comments.length; j++) {
-    //
-    //             if (presets.users.length / 2 > i) {
-    //
-    //                 if (presets.comments.length / 2 > j) {
-    //
-    //                     await req
-    //                         .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[j].id}${SETTINGS.PATH.LIKE_STATUS}`)
-    //                         .set(
-    //                             'Authorization',
-    //                             `Bearer ${presets.authTokens[i].accessToken}`
-    //                         )
-    //                         .send({
-    //                             likeStatus: LikeStatus.Like
-    //                         })
-    //                         .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    //                 } else {
-    //
-    //                     await req
-    //                         .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[j].id}${SETTINGS.PATH.LIKE_STATUS}`)
-    //                         .set(
-    //                             'Authorization',
-    //                             `Bearer ${presets.authTokens[i].accessToken}`
-    //                         )
-    //                         .send({
-    //                             likeStatus: LikeStatus.Dislike
-    //                         })
-    //                         .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    //                 }
-    //             } else {
-    //
-    //                 if (presets.comments.length / 2 > j) {
-    //
-    //                     await req
-    //                         .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[j].id}${SETTINGS.PATH.LIKE_STATUS}`)
-    //                         .set(
-    //                             'Authorization',
-    //                             `Bearer ${presets.authTokens[i].accessToken}`
-    //                         )
-    //                         .send({
-    //                             likeStatus: LikeStatus.Dislike
-    //                         })
-    //                         .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    //                 } else {
-    //
-    //                     await req
-    //                         .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[j].id}${SETTINGS.PATH.LIKE_STATUS}`)
-    //                         .set(
-    //                             'Authorization',
-    //                             `Bearer ${presets.authTokens[i].accessToken}`
-    //                         )
-    //                         .send({
-    //                             likeStatus: LikeStatus.Like
-    //                         })
-    //                         .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
-    //                 }
-    //             }
-    //         }
-    //     }
-    //
-    //     const foundComments_1: Paginator<CommentViewModel> = await commentsTestManager
-    //         .getComments(presets.posts[0].id, presets.authTokens[0].accessToken);
-    //
-    //     for (let i = 0; i < foundComments_1.items.length; i++) {
-    //
-    //         if (foundComments_1.items.length / 2 > i) {
-    //
-    //             expect(foundComments_1.items[i].likesInfo).toEqual({
-    //                 likesCount: 1,
-    //                 dislikesCount: 1,
-    //                 myStatus: LikeStatus.Dislike
-    //             });
-    //         } else {
-    //
-    //             expect(foundComments_1.items[i].likesInfo).toEqual({
-    //                 likesCount: 1,
-    //                 dislikesCount: 1,
-    //                 myStatus: LikeStatus.Like
-    //             });
-    //         }
-    //     }
-    //
-    //     const foundComments_2: Paginator<CommentViewModel> = await commentsTestManager
-    //         .getComments(presets.posts[0].id, presets.authTokens[1].accessToken);
-    //
-    //     for (let i = 0; i < foundComments_2.items.length; i++) {
-    //
-    //         if (foundComments_2.items.length / 2 > i) {
-    //
-    //             expect(foundComments_2.items[i].likesInfo).toEqual({
-    //                 likesCount: 1,
-    //                 dislikesCount: 1,
-    //                 myStatus: LikeStatus.Like
-    //             });
-    //         } else {
-    //
-    //             expect(foundComments_2.items[i].likesInfo).toEqual({
-    //                 likesCount: 1,
-    //                 dislikesCount: 1,
-    //                 myStatus: LikeStatus.Dislike
-    //             });
-    //         }
-    //     }
-    //
-    //     const foundComments_3: Paginator<CommentViewModel> = await commentsTestManager
-    //         .getComments(presets.posts[0].id);
-    //
-    //     for (let i = 0; i < foundComments_3.items.length; i++) {
-    //
-    //             expect(foundComments_3.items[i].likesInfo).toEqual({
-    //                 likesCount: 1,
-    //                 dislikesCount: 1,
-    //                 myStatus: LikeStatus.None
-    //             });
-    //     }
-    //
-    //     console_log_e2e({}, 0, 'Test 5: put(/comments/:id/likeStatus)');
-    // }, 30000);
-    //
-    // it('it should return a 401 if the user is not logged in.', async () => {
-    //
-    //     await blogsTestManager
-    //         .createBlog(1);
-    //
-    //     await postsTestManager
-    //         .createPost(1);
-    //
-    //     await usersTestManager
-    //         .createUser(1);
-    //
-    //     await authTestManager
-    //         .login(presets.users.map(u => u.login));
-    //
-    //     await commentsTestManager
-    //         .createComments(1);
-    //
-    //     const resPutLikes: Response = await req
-    //         .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
-    //         .set(
-    //             'Authorization',
-    //             `Bearer incorrect token`
-    //         )
-    //         .send({
-    //             likeStatus: LikeStatus.Like
-    //         })
-    //         .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
-    //
-    //     const foundComment: CommentViewModel = await commentsTestManager
-    //         .getComment(presets.comments[0].id);
-    //
-    //     expect(foundComment.likesInfo).toEqual({
-    //         likesCount: 0,
-    //         dislikesCount: 0,
-    //         myStatus: LikeStatus.None
-    //     });
-    //
-    //     const foundLike: LikeDocument[] = await likeRepository
-    //         .findLikesByParentId(presets.comments[0].id)
-    //
-    //     expect(foundLike.length).toEqual(0);
-    //
-    //     console_log_e2e(resPutLikes.body, resPutLikes.status, 'Test 6: put(/comments/:id/likeStatus)');
-    // });
-    //
-    // it('it should return a 404 if the comment for which the user is trying to leave a reaction does not exist.', async () => {
-    //
-    //     await usersTestManager
-    //         .createUser(1);
-    //
-    //     await authTestManager
-    //         .login(presets.users.map(u => u.login));
-    //
-    //     const resPutLikes: Response = await req
-    //         .put(`${SETTINGS.PATH.COMMENTS}/${new ObjectId()}${SETTINGS.PATH.LIKE_STATUS}`)
-    //         .set(
-    //             'Authorization',
-    //             `Bearer ${presets.authTokens[0].accessToken}`
-    //         )
-    //         .send({
-    //             likeStatus: LikeStatus.Like
-    //         })
-    //         .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
-    //
-    //     console_log_e2e(resPutLikes.body, resPutLikes.status, 'Test 7: put(/comments/:id/likeStatus)');
-    // });
-    //
-    // it('should return 400 if the input data is not valid (an empty object is passed).', async () => {
-    //
-    //     await blogsTestManager
-    //         .createBlog(1);
-    //
-    //     await postsTestManager
-    //         .createPost(1);
-    //
-    //     await usersTestManager
-    //         .createUser(1);
-    //
-    //     await authTestManager
-    //         .login(presets.users.map(u => u.login));
-    //
-    //     await commentsTestManager
-    //         .createComments(1);
-    //
-    //     const resPutLikes: Response = await req
-    //         .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
-    //         .set(
-    //             'Authorization',
-    //             `Bearer ${presets.authTokens[0].accessToken}`
-    //         )
-    //         .send({})
-    //         .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
-    //
-    //     expect(resPutLikes.body).toEqual({
-    //         errorsMessages: [
-    //             {
-    //                 field: 'likeStatus',
-    //                 message: 'The "likeStatus" field should be a string.'
-    //             }
-    //         ]
-    //     });
-    //
-    //     const foundComment: CommentViewModel = await commentsTestManager
-    //         .getComment(presets.comments[0].id);
-    //
-    //     expect(foundComment.likesInfo).toEqual({
-    //         likesCount: 0,
-    //         dislikesCount: 0,
-    //         myStatus: LikeStatus.None
-    //     });
-    //
-    //     const foundLike: LikeDocument[] = await likeRepository
-    //         .findLikesByParentId(presets.comments[0].id)
-    //
-    //     expect(foundLike.length).toEqual(0);
-    //
-    //     console_log_e2e(resPutLikes.body, resPutLikes.status, 'Test 8: put(/comments/:id/likeStatus)');
-    // });
-    //
-    // it('should return 400 if the input data is not valid (likeStatus differs from other values ).', async () => {
-    //
-    //     await blogsTestManager
-    //         .createBlog(1);
-    //
-    //     await postsTestManager
-    //         .createPost(1);
-    //
-    //     await usersTestManager
-    //         .createUser(1);
-    //
-    //     await authTestManager
-    //         .login(presets.users.map(u => u.login));
-    //
-    //     await commentsTestManager
-    //         .createComments(1);
-    //
-    //     const resPutLikes: Response = await req
-    //         .put(`${SETTINGS.PATH.COMMENTS}/${presets.comments[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
-    //         .set(
-    //             'Authorization',
-    //             `Bearer ${presets.authTokens[0].accessToken}`
-    //         )
-    //         .send({
-    //             likeStatus: 'Likes'
-    //         })
-    //         .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
-    //
-    //     expect(resPutLikes.body).toEqual({
-    //         errorsMessages: [
-    //             {
-    //                 field: 'likeStatus',
-    //                 message: `The "likeStatus" field must contain one of the values: ${Object.values(LikeStatus).join(', ')}`
-    //             }
-    //         ]
-    //     });
-    //
-    //     const foundComment: CommentViewModel = await commentsTestManager
-    //         .getComment(presets.comments[0].id);
-    //
-    //     expect(foundComment.likesInfo).toEqual({
-    //         likesCount: 0,
-    //         dislikesCount: 0,
-    //         myStatus: LikeStatus.None
-    //     });
-    //
-    //     const foundLike: LikeDocument[] = await likeRepository
-    //         .findLikesByParentId(presets.comments[0].id)
-    //
-    //     expect(foundLike.length).toEqual(0);
-    //
-    //     console_log_e2e(resPutLikes.body, resPutLikes.status, 'Test 9: put(/comments/:id/likeStatus)');
-    // });
+    it('should update the user\'s "dislike" reaction and increase the number of similar reactions(№2).', async () => {
+
+        await blogsTestManager
+            .createBlog(1);
+
+        await postsTestManager
+            .createPost(1);
+
+        await usersTestManager
+            .createUser(2);
+
+        await authTestManager
+            .login(presets.users.map(u => u.login));
+
+        const resPutLikes: Response[] = [];
+
+        for (let i = 0; i < presets.users.length; i++) {
+
+            const res: Response = await req
+                .put(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
+                .set(
+                    'Authorization',
+                    `Bearer ${presets.authTokens[i].accessToken}`
+                )
+                .send({
+                    likeStatus: LikeStatus.Dislike
+                })
+                .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+
+            resPutLikes.push(res);
+        }
+
+        //The 'myStatus' field must be 'None' because the user requesting the comment is not authenticated.
+        const foundPost_1: PostViewModel = await postsTestManager
+            .getPost(presets.posts[0].id);
+
+        expect(foundPost_1.extendedLikesInfo).toEqual({
+            likesCount: 0,
+            dislikesCount: 2,
+            myStatus: LikeStatus.None,
+            newestLikes: []
+        });
+
+        // The 'myStatus' field must be 'Dislike' because the user requesting the comment is authenticated.
+        for (let i = 0; i < presets.users.length; i++) {
+
+            const foundPost: PostViewModel = await postsTestManager
+                .getPost(presets.posts[0].id, presets.authTokens[i].accessToken);
+
+            expect(foundPost.extendedLikesInfo).toEqual({
+                likesCount: 0,
+                dislikesCount: 2,
+                myStatus: LikeStatus.Dislike,
+                newestLikes: []
+            });
+        }
+
+        console_log_e2e(resPutLikes[0].body, resPutLikes[0].status, 'Test 6: put(/post/:id/likeStatus)');
+    }, 10000);
+
+    it('should update "None" to "Like", "Like" to "Dislike", "Dislike to "Like", "Like" to "None".', async () => {
+
+        await blogsTestManager
+            .createBlog(1);
+
+        await postsTestManager
+            .createPost(1);
+
+        await usersTestManager
+            .createUser(1);
+
+        await authTestManager
+            .login(presets.users.map(u => u.login));
+
+        //None to Like
+        const resPutLikes_1: Response = await req
+            .put(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
+            .set(
+                'Authorization',
+                `Bearer ${presets.authTokens[0].accessToken}`
+            )
+            .send({
+                likeStatus: LikeStatus.Like
+            })
+            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+
+        const foundPost_1: PostViewModel = await postsTestManager
+            .getPost(presets.posts[0].id, presets.authTokens[0].accessToken);
+
+        expect(foundPost_1.extendedLikesInfo).toEqual({
+            likesCount: 1,
+            dislikesCount: 0,
+            myStatus: LikeStatus.Like,
+            newestLikes: [
+                {
+                    addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                    userId: presets.users[0].id,
+                    login: presets.users[0].login
+                }
+            ]
+        });
+
+        // Like to Dislike
+        const resPutLikes_2: Response = await req
+            .put(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
+            .set(
+                'Authorization',
+                `Bearer ${presets.authTokens[0].accessToken}`
+            )
+            .send({
+                likeStatus: LikeStatus.Dislike
+            })
+            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+
+        const foundPost_2: PostViewModel = await postsTestManager
+            .getPost(presets.posts[0].id, presets.authTokens[0].accessToken);
+
+        expect(foundPost_2.extendedLikesInfo).toEqual({
+            likesCount: 0,
+            dislikesCount: 1,
+            myStatus: LikeStatus.Dislike,
+            newestLikes: []
+        });
+
+        //Dislike to Like
+        const resPutLikes_3: Response = await req
+            .put(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
+            .set(
+                'Authorization',
+                `Bearer ${presets.authTokens[0].accessToken}`
+            )
+            .send({
+                likeStatus: LikeStatus.Like
+            })
+            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+
+        const foundPost_3: PostViewModel = await postsTestManager
+            .getPost(presets.posts[0].id, presets.authTokens[0].accessToken);
+
+        expect(foundPost_3.extendedLikesInfo).toEqual({
+            likesCount: 1,
+            dislikesCount: 0,
+            myStatus: LikeStatus.Like,
+            newestLikes: [
+                {
+                    addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                    userId: presets.users[0].id,
+                    login: presets.users[0].login
+                }
+            ]
+        });
+
+        //Like to None
+        const resPutLikes_4: Response = await req
+            .put(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
+            .set(
+                'Authorization',
+                `Bearer ${presets.authTokens[0].accessToken}`
+            )
+            .send({
+                likeStatus: LikeStatus.None
+            })
+            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+
+        const foundPost_4: PostViewModel = await postsTestManager
+            .getPost(presets.posts[0].id, presets.authTokens[0].accessToken);
+
+        expect(foundPost_4.extendedLikesInfo).toEqual({
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: LikeStatus.None,
+            newestLikes: []
+        });
+
+        console_log_e2e(resPutLikes_1.body, resPutLikes_1.status, 'Test 7: put(/post/:id/likeStatus)');
+    }, 10000);
+
+    it('---------------------------', async () => {
+
+        await blogsTestManager
+            .createBlog(1);
+
+        await postsTestManager
+            .createPost(10);
+
+        await usersTestManager
+            .createUser(2);
+
+        await authTestManager
+            .login(presets.users.map(u => u.login));
+
+        for (let i = 0; i < presets.users.length; i++) {
+
+            for (let j = 0; j < presets.posts.length; j++) {
+
+                if (presets.users.length / 2 > i) {
+
+                    if (presets.posts.length / 2 > j) {
+
+                        await req
+                            .put(`${SETTINGS.PATH.POSTS}/${presets.posts[j].id}${SETTINGS.PATH.LIKE_STATUS}`)
+                            .set(
+                                'Authorization',
+                                `Bearer ${presets.authTokens[i].accessToken}`
+                            )
+                            .send({
+                                likeStatus: LikeStatus.Like
+                            })
+                            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+                    } else {
+
+                        await req
+                            .put(`${SETTINGS.PATH.POSTS}/${presets.posts[j].id}${SETTINGS.PATH.LIKE_STATUS}`)
+                            .set(
+                                'Authorization',
+                                `Bearer ${presets.authTokens[i].accessToken}`
+                            )
+                            .send({
+                                likeStatus: LikeStatus.Dislike
+                            })
+                            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+                    }
+                } else {
+
+                    if (presets.posts.length / 2 > j) {
+
+                        await req
+                            .put(`${SETTINGS.PATH.POSTS}/${presets.posts[j].id}${SETTINGS.PATH.LIKE_STATUS}`)
+                            .set(
+                                'Authorization',
+                                `Bearer ${presets.authTokens[i].accessToken}`
+                            )
+                            .send({
+                                likeStatus: LikeStatus.Dislike
+                            })
+                            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+                    } else {
+
+                        await req
+                            .put(`${SETTINGS.PATH.POSTS}/${presets.posts[j].id}${SETTINGS.PATH.LIKE_STATUS}`)
+                            .set(
+                                'Authorization',
+                                `Bearer ${presets.authTokens[i].accessToken}`
+                            )
+                            .send({
+                                likeStatus: LikeStatus.Like
+                            })
+                            .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+                    }
+                }
+            }
+        }
+
+        //The first five posts after 'myStatus' should have 'Dislike', the second half after 'myStatus' should have 'Like'.
+        const foundPosts_1: Paginator<PostViewModel> = await postsTestManager
+            .getPosts(presets.authTokens[0].accessToken);
+
+        for (let i = 0; i < foundPosts_1.items.length; i++) {
+
+            if (foundPosts_1.items.length / 2 > i) {
+
+                expect(foundPosts_1.items[i].extendedLikesInfo).toEqual({
+                    likesCount: 1,
+                    dislikesCount: 1,
+                    myStatus: LikeStatus.Dislike,
+                    newestLikes: [
+                        {
+                            addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                            userId: presets.users[1].id,
+                            login: presets.users[1].login
+                        }
+                    ]
+                });
+            }
+            else {
+
+                expect(foundPosts_1.items[i].extendedLikesInfo).toEqual({
+                    likesCount: 1,
+                    dislikesCount: 1,
+                    myStatus: LikeStatus.Like,
+                    newestLikes: [
+                        {
+                            addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                            userId: presets.users[0].id,
+                            login: presets.users[0].login
+                        }
+                    ]
+                });
+            }
+        }
+
+        //The first five posts after 'myStatus' should have 'Like', the second half after 'myStatus' should have 'Dislike'.
+        const foundPosts_2: Paginator<PostViewModel> = await postsTestManager
+            .getPosts(presets.authTokens[1].accessToken);
+
+        for (let i = 0; i < foundPosts_2.items.length; i++) {
+
+            if (foundPosts_2.items.length / 2 > i) {
+
+                expect(foundPosts_2.items[i].extendedLikesInfo).toEqual({
+                    likesCount: 1,
+                    dislikesCount: 1,
+                    myStatus: LikeStatus.Like,
+                    newestLikes: [
+                        {
+                            addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                            userId: presets.users[1].id,
+                            login: presets.users[1].login
+                        }
+                    ]
+                });
+            } else {
+
+                expect(foundPosts_2.items[i].extendedLikesInfo).toEqual({
+                    likesCount: 1,
+                    dislikesCount: 1,
+                    myStatus: LikeStatus.Dislike,
+                    newestLikes: [
+                        {
+                            addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                            userId: presets.users[0].id,
+                            login: presets.users[0].login
+                        }
+                    ]
+                });
+            }
+        }
+
+        //All posts after 'myStatus' should have 'None'.
+        const foundPosts_3: Paginator<PostViewModel> = await postsTestManager
+            .getPosts();
+
+        for (let i = 0; i < foundPosts_3.items.length; i++) {
+
+            if (foundPosts_3.items.length / 2 > i) {
+
+                expect(foundPosts_3.items[i].extendedLikesInfo).toEqual({
+                    likesCount: 1,
+                    dislikesCount: 1,
+                    myStatus: LikeStatus.None,
+                    newestLikes: [
+                        {
+                            addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                            userId: presets.users[1].id,
+                            login: presets.users[1].login
+                        }
+                    ]
+                });
+            } else {
+
+                expect(foundPosts_3.items[i].extendedLikesInfo).toEqual({
+                    likesCount: 1,
+                    dislikesCount: 1,
+                    myStatus: LikeStatus.None,
+                    newestLikes: [
+                        {
+                            addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                            userId: presets.users[0].id,
+                            login: presets.users[0].login
+                        }
+                    ]
+                });
+            }
+        }
+
+        console_log_e2e({}, 0, 'Test 8: put(/post/:id/likeStatus)');
+    }, 25000);
 });

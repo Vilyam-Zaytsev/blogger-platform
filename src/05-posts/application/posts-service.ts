@@ -45,7 +45,7 @@ class PostsService {
     async updatePostReaction(
         postId: string,
         userId: string,
-        reaction: LikeStatus
+        newReaction: LikeStatus
     ): Promise<ResultType> {
 
         const postDocument: PostDocument | null = await this.postsRepository
@@ -72,7 +72,7 @@ class PostsService {
 
             likeDocument = LikeModel
                 .createLike(
-                    reaction,
+                    newReaction,
                     userId,
                     postId
                 );
@@ -81,10 +81,10 @@ class PostsService {
                 .saveLike(likeDocument!);
         }
 
-        if (reaction === LikeStatus.None) {
+        if (newReaction === LikeStatus.None) {
 
             postDocument
-                .updateReactionsCount(reaction, currentReaction);
+                .updateReactionsCount(newReaction, currentReaction);
 
             await this.postsRepository
                 .savePost(postDocument);
@@ -97,12 +97,12 @@ class PostsService {
         }
 
         postDocument
-            .updateReactionsCount(reaction, currentReaction);
+            .updateReactionsCount(newReaction, currentReaction);
 
         await this.postsRepository
             .savePost(postDocument);
 
-        likeDocument!.status = reaction;
+        likeDocument!.status = newReaction;
 
         await this.likeRepository
             .saveLike(likeDocument!);

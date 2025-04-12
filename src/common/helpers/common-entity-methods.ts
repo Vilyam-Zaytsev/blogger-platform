@@ -1,6 +1,6 @@
 import {LikeStatus} from "../../07-likes/like-entity";
 
-export type ReactionsHolder = {
+type ReactionsHolder = {
     reactions: {
         likeCount: number;
         dislikeCount: number;
@@ -8,7 +8,7 @@ export type ReactionsHolder = {
     };
 };
 
-function updateReactionsCount(this: ReactionsHolder, reaction: LikeStatus, currentReaction: LikeStatus | null) {
+function updateReactionsCount(this: ReactionsHolder, newReaction: LikeStatus, currentReaction: LikeStatus | null) {
 
     if (currentReaction) {
 
@@ -18,7 +18,7 @@ function updateReactionsCount(this: ReactionsHolder, reaction: LikeStatus, curre
 
     }
 
-    switch (reaction) {
+    switch (newReaction) {
 
         case LikeStatus.None:
 

@@ -58,11 +58,15 @@ const postsTestManager = {
         return responses;
     },
 
-    async getPosts(): Promise<Paginator<PostViewModel>> {
+    async getPosts(accessToken?: string): Promise<Paginator<PostViewModel>> {
 
-        const res: Response = await req
-            .get(SETTINGS.PATH.POSTS)
-            .expect(SETTINGS.HTTP_STATUSES.OK_200);
+        let request = req.get(`${SETTINGS.PATH.POSTS}`);
+
+        if (accessToken) {
+            request = request.set('Authorization', `Bearer ${accessToken}`);
+        }
+
+        const res = await request.expect(SETTINGS.HTTP_STATUSES.OK_200);
 
         return res.body;
     },
