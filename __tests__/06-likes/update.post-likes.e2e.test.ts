@@ -8,15 +8,19 @@ import {console_log_e2e, req} from "../helpers/test-helpers";
 import {SETTINGS} from "../../src/common/settings";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import mongoose from "mongoose";
-import {LikeStatus} from "../../src/07-likes/like-entity";
+import {LikeDocument, LikeStatus} from "../../src/07-likes/like-entity";
 import {LikesRepository} from "../../src/07-likes/repositoryes/likes-repository";
 import {container} from "../../src/composition-root";
 import {PostViewModel} from "../../src/05-posts/domain/post-entity";
 import {UserViewModel} from "../../src/03-users/types/input-output-types";
 import {SortDirection} from "../../src/common/helpers/sort-query-dto";
-import {commentsTestManager} from "../helpers/managers/06_comments-test-manager";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
-import {CommentViewModel} from "../../src/06-comments/domain/comment-entity";
+import {NextFunction} from "express";
+import {ObjectId} from "mongodb";
+
+jest.mock('../../src/common/middlewares/rate-limits-guard', () => ({
+    rateLimitsGuard: (req: Request, res: Response, next: NextFunction) => next()
+}));
 
 const likeRepository: LikesRepository = container.get(LikesRepository);
 
@@ -760,8 +764,7 @@ describe('PUT /posts/:id/likeStatus', () => {
                         }
                     ]
                 });
-            }
-            else {
+            } else {
 
                 expect(foundPosts_1.items[i].extendedLikesInfo).toEqual({
                     likesCount: 1,
@@ -854,4 +857,306 @@ describe('PUT /posts/:id/likeStatus', () => {
 
         console_log_e2e({}, 0, 'Test 8: put(/post/:id/likeStatus)');
     }, 25000);
+
+    it('----------------------------------', async () => {
+
+        await blogsTestManager
+            .createBlog(1);
+
+        await postsTestManager
+            .createPost(1);
+
+        await usersTestManager
+            .createUser(10);
+
+        await authTestManager
+            .login(presets.users.map(u => u.login));
+
+        for (let i = 0; i < presets.users.length; i++) {
+
+            await req
+                .put(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
+                .set(
+                    'Authorization',
+                    `Bearer ${presets.authTokens[i].accessToken}`
+                )
+                .send({
+                    likeStatus: LikeStatus.Like
+                })
+                .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+        }
+
+        const foundPosts_1: Paginator<PostViewModel> = await postsTestManager
+            .getPosts(presets.authTokens[0].accessToken);
+
+        expect(foundPosts_1.items[0].extendedLikesInfo).toEqual({
+            likesCount: 10,
+            dislikesCount: 0,
+            myStatus: LikeStatus.Like,
+            newestLikes: [
+                {
+                    addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                    userId: presets.users[9].id,
+                    login: presets.users[9].login
+                },
+                {
+                    addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                    userId: presets.users[8].id,
+                    login: presets.users[8].login
+                },
+                {
+                    addedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+                    userId: presets.users[7].id,
+                    login: presets.users[7].login
+                }
+            ]
+        });
+
+        let likesCount: number = 10;
+        let dislikesCount: number = 0;
+
+        let p1 = 9;
+        let p2 = 8;
+        let p3 = 7;
+
+        for (let i = 9; i >= 0; i--) {
+
+            await req
+                .put(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
+                .set(
+                    'Authorization',
+                    `Bearer ${presets.authTokens[i].accessToken}`
+                )
+                .send({
+                    likeStatus: LikeStatus.Dislike
+                })
+                .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
+
+            likesCount -= 1;
+            dislikesCount += 1;
+
+            p1 -= 1;
+            p2 -= 1;
+            p3 -= 1;
+
+            const foundPosts: Paginator<PostViewModel> = await postsTestManager
+                .getPosts(presets.authTokens[i].accessToken);
+
+            expect(foundPosts.items[0].extendedLikesInfo).toEqual({
+                likesCount,
+                dislikesCount,
+                myStatus: LikeStatus.Dislike,
+                newestLikes: (() => {
+                    if (((presets.users.length - 1) - i) <= 6) {
+                        return [
+                            {
+                                addedAt: expect.any(String),
+                                userId: presets.users[p1].id,
+                                login: presets.users[p1].login
+                            },
+                            {
+                                addedAt: expect.any(String),
+                                userId: presets.users[p2].id,
+                                login: presets.users[p2].login
+                            },
+                            {
+                                addedAt: expect.any(String),
+                                userId: presets.users[p3].id,
+                                login: presets.users[p3].login
+                            }
+                        ];
+                    }
+
+                    if ((presets.users.length - i) === 8) {
+                        return [
+                            {
+                                addedAt: expect.any(String),
+                                userId: presets.users[p1].id,
+                                login: presets.users[p1].login
+                            },
+                            {
+                                addedAt: expect.any(String),
+                                userId: presets.users[p2].id,
+                                login: presets.users[p2].login
+                            }
+                        ];
+                    }
+
+                    if ((presets.users.length - i) === 9) {
+                        return [
+                            {
+                                addedAt: expect.any(String),
+                                userId: presets.users[p1].id,
+                                login: presets.users[p1].login
+                            }
+                        ];
+                    }
+
+                    return [];
+                })()
+            });
+        }
+        console_log_e2e({}, 0, 'Test 9: put(/post/:id/likeStatus)');
+    }, 30000);
+
+    it('should return a 401 if the user is not logged in.', async () => {
+
+        await blogsTestManager
+            .createBlog(1);
+
+        await postsTestManager
+            .createPost(1);
+
+        const resPutLikes: Response = await req
+            .put(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
+            .set(
+                'Authorization',
+                `Bearer incorrect token`
+            )
+            .send({
+                likeStatus: LikeStatus.Like
+            })
+            .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
+
+        const foundPost: PostViewModel = await postsTestManager
+            .getPost(presets.posts[0].id);
+
+        expect(foundPost.extendedLikesInfo).toEqual({
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: LikeStatus.None,
+            newestLikes: []
+        });
+
+        const foundLike: LikeDocument[] = await likeRepository
+            .findLikesByParentId(presets.posts[0].id)
+
+        expect(foundLike.length).toEqual(0);
+
+        console_log_e2e(resPutLikes.body, resPutLikes.status, 'Test 10: put(/post/:id/likeStatus)');
+    });
+
+    it('should return the value 404 if the post the user is trying to review does not exist.', async () => {
+
+        await usersTestManager
+            .createUser(1);
+
+        await authTestManager
+            .login(presets.users.map(u => u.login));
+
+        const resPutLikes: Response = await req
+            .put(`${SETTINGS.PATH.POSTS}/${new ObjectId()}${SETTINGS.PATH.LIKE_STATUS}`)
+            .set(
+                'Authorization',
+                `Bearer ${presets.authTokens[0].accessToken}`
+            )
+            .send({
+                likeStatus: LikeStatus.Like
+            })
+            .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
+
+        console_log_e2e(resPutLikes.body, resPutLikes.status, 'Test 11: put(/post/:id/likeStatus)');
+    });
+
+    it('should return 400 if the input data is not valid (an empty object is passed).', async () => {
+
+        await blogsTestManager
+            .createBlog(1);
+
+        await postsTestManager
+            .createPost(1);
+
+        await usersTestManager
+            .createUser(1);
+
+        await authTestManager
+            .login(presets.users.map(u => u.login));
+
+        const resPutLikes: Response = await req
+            .put(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
+            .set(
+                'Authorization',
+                `Bearer ${presets.authTokens[0].accessToken}`
+            )
+            .send({})
+            .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
+
+        expect(resPutLikes.body).toEqual({
+            errorsMessages: [
+                {
+                    field: 'likeStatus',
+                    message: 'The "likeStatus" field should be a string.'
+                }
+            ]
+        });
+
+        const foundPost: PostViewModel = await postsTestManager
+            .getPost(presets.posts[0].id);
+
+        expect(foundPost.extendedLikesInfo).toEqual({
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: LikeStatus.None,
+            newestLikes: []
+        });
+
+        const foundLike: LikeDocument[] = await likeRepository
+            .findLikesByParentId(presets.posts[0].id);
+
+        expect(foundLike.length).toEqual(0);
+
+        console_log_e2e(resPutLikes.body, resPutLikes.status, 'Test 12: put(/post/:id/likeStatus)');
+    });
+
+    it('should return 400 if the input data is not valid (likeStatus differs from other values).', async () => {
+
+        await blogsTestManager
+            .createBlog(1);
+
+        await postsTestManager
+            .createPost(1);
+
+        await usersTestManager
+            .createUser(1);
+
+        await authTestManager
+            .login(presets.users.map(u => u.login));
+
+        const resPutLikes: Response = await req
+            .put(`${SETTINGS.PATH.POSTS}/${presets.posts[0].id}${SETTINGS.PATH.LIKE_STATUS}`)
+            .set(
+                'Authorization',
+                `Bearer ${presets.authTokens[0].accessToken}`
+            )
+            .send({
+                likeStatus: 'Likes'
+            })
+            .expect(SETTINGS.HTTP_STATUSES.BAD_REQUEST_400);
+
+        expect(resPutLikes.body).toEqual({
+            errorsMessages: [
+                {
+                    field: 'likeStatus',
+                    message: `The "likeStatus" field must contain one of the values: ${Object.values(LikeStatus).join(', ')}`
+                }
+            ]
+        });
+
+        const foundPost: PostViewModel = await postsTestManager
+            .getPost(presets.posts[0].id);
+
+        expect(foundPost.extendedLikesInfo).toEqual({
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: LikeStatus.None,
+            newestLikes: []
+        });
+
+        const foundLike: LikeDocument[] = await likeRepository
+            .findLikesByParentId(presets.posts[0].id);
+
+        expect(foundLike.length).toEqual(0);
+
+        console_log_e2e(resPutLikes.body, resPutLikes.status, 'Test 13: put(/post/:id/likeStatus)');
+    });
 });

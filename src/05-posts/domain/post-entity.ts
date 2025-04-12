@@ -127,6 +127,7 @@ export {
     Post,
     PostViewModel,
     PostInputModel,
+    LikeDetailsViewModel,
     PostModel,
     PostDocument
 };
