@@ -4,10 +4,11 @@ import {clearPresets, postContents, postShortDescriptions, postTitles, presets} 
 import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
 import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {Response} from "supertest";
-import {PostViewModel} from "../../src/05-posts/types/input-output-types";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import mongoose from "mongoose";
+import {PostViewModel} from "../../src/05-posts/domain/post-entity";
+import {LikeStatus} from "../../src/07-likes/like-entity";
 
 beforeAll(async () => {
 
@@ -76,14 +77,20 @@ beforeEach(async () => {
                 content: postContents[0],
                 blogId: presets.blogs[0].id,
                 blogName: presets.blogs[0].name,
+                extendedLikesInfo: {
+                    likesCount: 0,
+                    dislikesCount: 0,
+                    myStatus: LikeStatus.None,
+                    newestLikes: []
+                },
                 createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
             });
 
-                const resGetPosts: Paginator<PostViewModel> = await postsTestManager
-                    .getPosts();
+            const foundPosts: Paginator<PostViewModel> = await postsTestManager
+                .getPosts();
 
-                expect(resCreatePost.body).toEqual(resGetPosts.items[0]);
-                expect(resGetPosts.items.length).toEqual(1);
+                expect(resCreatePost.body).toEqual(foundPosts.items[0]);
+                expect(foundPosts.items.length).toEqual(1);
 
             console_log_e2e(resCreatePost.body, resCreatePost.status, 'Test 1: post(/posts)');
         });

@@ -92,10 +92,15 @@ class PostsQueryRepository {
                 ? usersReactionsForPosts[postId]
                 : LikeStatus.None;
 
-            const newestLikeUsers: UserDocument[] = newestLikes.map((like) => {
+            let newestLikeUsers: UserDocument[] = [];
 
-                return recentUsersWhoHaveLiked.find(user => user._id.toString() === like.userId)!;
-            });
+            if (userId) {
+
+                newestLikeUsers = newestLikes.map((like) => {
+
+                    return recentUsersWhoHaveLiked.find(user => user._id.toString() === like.userId)!;
+                });
+            }
 
             return this._mapDbPostToViewModel(post, userReaction, newestLikeUsers, newestLikes);
         })

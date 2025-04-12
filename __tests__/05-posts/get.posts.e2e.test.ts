@@ -2,7 +2,7 @@ import {console_log_e2e, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
 import {clearPresets, postPropertyMap, presets} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
-import {MongoClient, ObjectId} from "mongodb";
+import {ObjectId} from "mongodb";
 import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {Response} from "supertest";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
