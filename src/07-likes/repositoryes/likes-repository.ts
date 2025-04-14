@@ -1,5 +1,5 @@
 import {injectable} from "inversify";
-import {Like, LikeDocument, LikeModel, LikeStatus} from "../like-entity";
+import {GroupedLikesByPostId, Like, LikeDocument, LikeModel, LikeStatus} from "../like-entity";
 import {WithId} from "mongodb";
 
 @injectable()
@@ -11,7 +11,7 @@ class LikesRepository {
             .find({userId});
     }
 
-    async findLikesByParentId(parentId: string):Promise<LikeDocument[]> {
+    async findLikesByParentId(parentId: string): Promise<LikeDocument[]> {
 
         return LikeModel
             .find({parentId});
@@ -23,7 +23,7 @@ class LikesRepository {
             .findOne({userId, parentId});
     }
 
-    async findNewestLikes(parentId: string): Promise<LikeDocument[]> {
+    async findRecentLikesForOnePost(parentId: string): Promise<LikeDocument[]> {
 
         const filter: any = {
             status: LikeStatus.Like,
@@ -37,13 +37,56 @@ class LikesRepository {
             .exec();
     }
 
-    async findAllLikes(parentsIds: string[]): Promise<LikeDocument[]> {
+    async findRecentLikesForAllPosts(parentsIds: string[]): Promise<GroupedLikesByPostId[]> {
 
         return await LikeModel
-            .find({parentId: {$in: parentsIds}})
-            .sort({createdAt: -1})
+            .aggregate([
+                {
+                    $match: {
+                        parentId: {$in: parentsIds},
+                        status: LikeStatus.Like
+                    }
+                },
+                {
+                    $sort: {
+                        createdAt: -1
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$parentId',
+                        recentLikes: {$push: '$$ROOT'}
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        postId: '$_id',
+                        recentLikes: {$slice: ['$recentLikes', 3]}
+                    }
+                }
+            ])
             .exec();
     }
+
+    //TODO: Как тут сформировать запрос без агрегации!?????
+
+    // async findRecentLikesForAllPosts(parentsIds: string[]): Promise<LikeDocument[]> {
+    //
+    //     const filter = {
+    //         parentId: {$in: parentsIds},
+    //         status: LikeStatus.Like
+    //     };
+    //
+    //     return await LikeModel
+    //         .find({
+    //     //         parentId: {$in: parentsIds},
+    //     //         status: LikeStatus.Like
+    //     //     })
+    //         .sort({createdAt: -1})
+    //         .limit(3)
+    //         .exec();
+    // }
 
     async saveLike(likeDocument: LikeDocument): Promise<string> {
 

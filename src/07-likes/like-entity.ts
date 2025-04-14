@@ -1,4 +1,5 @@
 import mongoose, {HydratedDocument, Model, Schema} from "mongoose";
+import {ObjectId} from "mongodb";
 
 enum LikeStatus {
     None = 'None',
@@ -21,6 +22,16 @@ type LikeInfoViewModel = {
     likesCount: number,
     dislikesCount: number,
     myStatus: LikeStatus
+};
+
+type GroupedLikesByPostId = {
+    postId: ObjectId,
+    recentLikes: LikeDocument[]
+};
+
+type MapLikerInfo = {
+    likerReaction: LikeStatus,
+    likerId: string | null
 };
 
 type LikeMethods = typeof likeMethods;
@@ -85,6 +96,8 @@ export {
     LikeStatus,
     LikeInputModel,
     LikeInfoViewModel,
+    GroupedLikesByPostId,
+    MapLikerInfo,
     LikeModel,
     LikeDocument,
 };

@@ -30,7 +30,8 @@ class PostsController {
 
     async getPosts(
         req: RequestWithQuery<SortingAndPaginationParamsType>,
-        res: Response<Paginator<PostViewModel>>
+        res: Response
+        // res: Response<Paginator<PostViewModel>>
     ) {
 
         const userId: string | null = req.user ? req.user.id : null;
@@ -44,22 +45,24 @@ class PostsController {
 
         const sortQueryDto: SortQueryDto = new SortQueryDto(sortingAndPaginationParams)
 
-        const foundPosts: PostViewModel[] = await this.postsQueryRepository
+        // const foundPosts: PostViewModel[] = await this.postsQueryRepository
+        const foundPosts: number = await this.postsQueryRepository
             .findPosts(sortQueryDto, userId);
 
         const postsCount: number = await this.postsQueryRepository
             .getPostsCount();
 
-        const paginationResponse: Paginator<PostViewModel> = await this.postsQueryRepository
-            ._mapPostsViewModelToPaginationResponse(
-                foundPosts,
-                postsCount,
-                sortQueryDto
-            );
+        // const paginationResponse: Paginator<PostViewModel> = await this.postsQueryRepository
+        //     ._mapPostsViewModelToPaginationResponse(
+        //         foundPosts,
+        //         postsCount,
+        //         sortQueryDto
+        //     );
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(paginationResponse);
+            .json({});
+            // .json(paginationResponse);
     }
 
     async getPost(

@@ -4,7 +4,7 @@ import {injectable} from "inversify";
 import {SortOptionsType} from "../../common/types/sort-options-type";
 import {SortQueryDto} from "../../common/helpers/sort-query-dto";
 import {Post, PostDocument, PostModel, PostViewModel} from "../domain/post-entity";
-import {LikeDocument, LikeStatus} from "../../07-likes/like-entity";
+import {GroupedLikesByPostId, LikeDocument, LikeStatus, MapLikerInfo} from "../../07-likes/like-entity";
 import {LikesRepository} from "../../07-likes/repositoryes/likes-repository";
 import {UserDocument} from "../../03-users/domain/user-entity";
 import {UsersRepository} from "../../03-users/repositoryes/users-repository";
@@ -22,7 +22,8 @@ class PostsQueryRepository {
         sortQueryDto: SortQueryDto,
         userId: string | null,
         blogId?: string
-    ): Promise<PostViewModel[]> {
+    ): Promise<number> {
+        // ): Promise<PostViewModel[]> {
 
         const {
             pageNumber,
@@ -46,70 +47,156 @@ class PostsQueryRepository {
 
         const postsIds: string[] = posts.map(p => String(p._id));
 
-        const allLikesPosts: LikeDocument[] = await this.likesRepository
-            .findAllLikes(postsIds);
+        const groupsOfRecentLikes: GroupedLikesByPostId[] = await this.likesRepository
+            .findRecentLikesForAllPosts(postsIds);
 
-        const idsOfRecentUsersWhoHaveLiked: string[] = [];
+        //1. достать id всех лайкеров и сложить в массив usersIds
+        // (для того чтобы запросить из бд лайкеров и взять у них логины)
 
-        let recentLikers: UserDocument[] = [];
+        const usersIds: string[] = groupsOfRecentLikes.reduce<string[]>(
+            (
+                acc: string[],
+                groupRecentLikes: GroupedLikesByPostId
+            ): string[] => {
 
-        const usersReactionsForPosts: Record<string, LikeStatus> = {};
+                groupRecentLikes.recentLikes.forEach(like => {
 
-        const likesGroupedByPostId: Record<string, LikeDocument[]> = {};
+                    if (!acc.includes(like.userId)) {
 
-        for (const like of allLikesPosts) {
+                        acc.push(like.userId);
+                    }
+                })
 
-            const postId = like.parentId;
+                return acc;
+            },
+            []
+        );
 
-            if (!likesGroupedByPostId[postId]) {
+        const users: UserDocument[] = await this.usersRepository
+            .findUsersByIds(usersIds);
 
-                likesGroupedByPostId[postId] = [];
-            }
+        //2. вычислить myStatus пользователя который делает запрос за постоми.
 
-            if (likesGroupedByPostId[postId].length < 3 && like.status === LikeStatus.Like) {
 
-                likesGroupedByPostId[postId].push(like);
+        // const informationAboutPostsForViewModel = posts.reduce(
+        //     (
+        //         acc,
+        //         groupRecentLikes: GroupedLikesByPostId
+        //     ) => {
+        //
+        //
+        //     },
+        //     []
+        // )
 
-                if (!idsOfRecentUsersWhoHaveLiked.includes(like.userId)) {
+        // вариант 1
+        // const postsViewModel: any[] = posts.map((post) => {
+        //
+        //     const informationAboutPostsForViewModel: any = {
+        //         likersInfo: {
+        //             id: userId ? userId : null,
+        //             login: userId ? users.find(user => String(user._id) === userId)?.login : null,
+        //             status: userId ? groupsOfRecentLikes
+        //                 .find((g) => g.postId === String(post._id))
+        //                 ?.recentLikes
+        //                 .find(l => l.userId === userId)
+        //         }
+        //     }
+        // })
 
-                    idsOfRecentUsersWhoHaveLiked.push(like.userId);
-                }
-            }
+        // const informationAboutPostsForViewModel =
 
-            if (userId && userId === like.userId) {
 
-                usersReactionsForPosts[postId] = like.status;
-            }
-        }
+        // {depth: null}
+        console.dir(groupsOfRecentLikes, {depth: null})
+        console.dir(usersIds, {depth: null})
 
-        recentLikers = await this.usersRepository
-            .findUsersByIds(idsOfRecentUsersWhoHaveLiked);
 
-        return posts.map((post): PostViewModel => {
+        // const mapUsersReactionsForPosts: Map<string, MapLikerInfo> = new Map();
+        //
+        // const mapGroupsOfLikersPosts: Map<string, string[]> = new Map();
+        //
+        // groupsOfRecentLikes.reduce<Map<string, MapLikerInfo>>(
+        //     (
+        //         acc: Map<string, MapLikerInfo>,
+        //         groupRecentLikes: GroupedLikesByPostId
+        //     ): Map<string, MapLikerInfo> => {
+        //
+        //
+        //         groupRecentLikes.recentLikes.forEach((like) => {
+        //
+        //             if (!likersIds.includes(like.userId)) {
+        //
+        //                 likersIds.push(like.userId);
+        //             }
+        //         });
+        //
+        //         //2. определить LikeStatus пользователя
+        //         let likerReaction: LikeStatus = LikeStatus.None;
+        //         let likerId: string | null = null;
+        //
+        //         if (userId) {
+        //
+        //             likerId = userId;
+        //
+        //             const like: LikeDocument | undefined = groupRecentLikes.recentLikes.find(like => like.userId === userId);
+        //
+        //             likerReaction = like ? like.status : LikeStatus.None;
+        //         }
+        //
+        //         acc.set(
+        //             String(groupRecentLikes.postId),
+        //             {
+        //                 likerReaction,
+        //                 likerId
+        //             }
+        //         );
+//=========================
+        // groupRecentLikes.recentLikes.forEach((like) => {
+        //
+        //     if (!likersIds.includes(like.userId)) {
+        //
+        //         likersIds.push(like.userId);
+        //     }
+        //
+        //     if (mapGroupsOfLikersPosts.has(like.parentId)) {
+        //
+        //         if (!mapGroupsOfLikersPosts.get(like.parentId)?.includes(like.userId)) {
+        //
+        //             mapGroupsOfLikersPosts.get(like.parentId)?.push(like.userId);
+        //         }
+        //     } else {
+        //
+        //         mapGroupsOfLikersPosts.set(like.parentId, [like.userId]);
+        //     }
+        // });
 
-            const postId = String(post._id);
+        // return acc;
+        // },
+        // mapUsersReactionsForPosts
+        // );
 
-            const userReaction: LikeStatus = usersReactionsForPosts[postId]
-                ? usersReactionsForPosts[postId]
-                : LikeStatus.None;
-
-            let recentLikersThisPost: UserDocument[] = [];
-
-            if (likesGroupedByPostId[postId]) {
-
-                recentLikersThisPost = likesGroupedByPostId[postId].map((like) => {
-
-                    return recentLikers.find(user => String(user._id) === like.userId)!;
-                });
-            }
-
-            return this._mapDbPostToViewModel(
-                post,
-                userReaction,
-                recentLikersThisPost,
-                likesGroupedByPostId[postId]
-            );
-        })
+        // const allLikers: UserDocument[] = await this.usersRepository
+        //     .findUsersByIds(likersIds);
+        //
+        // console.log(mapGroupsOfLikersPosts)
+        //
+        return 0;
+        //
+        // const postsViewModel: PostViewModel[] = posts.map((post): PostViewModel => {
+        //
+        //     const postId: string = String(post._id);
+        //
+        //     const userReaction: LikeStatus = mapUsersReactionsForPosts.get(postId)?.myStatus ?? LikeStatus.None;
+        //
+        //     const idsRecantLikers: string[] = mapGroupsOfLikersPosts.get(postId) ?? [];
+        //
+        //     return this._mapDbPostToViewModel(
+        //         post,
+        //         userReaction,
+        //
+        //     );
+        // })
     }
 
     async findPost(
@@ -134,7 +221,7 @@ class PostsQueryRepository {
         const userReaction: LikeStatus = like ? like.status : LikeStatus.None;
 
         const newestLikes: LikeDocument[] = await this.likesRepository
-            .findNewestLikes(postId);
+            .findRecentLikesForOnePost(postId);
 
         const usersIds: string[] = newestLikes.map(l => l.userId);
 

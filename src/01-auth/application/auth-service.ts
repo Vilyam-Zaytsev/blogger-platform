@@ -18,6 +18,7 @@ import {injectable} from "inversify";
 import {SessionDocument} from "../../02-sessions/domain/session-entity";
 import {UserDto} from "../../03-users/domain/user-dto";
 import {isSuccess, isSuccessfulResult} from "../../common/helpers/type-guards";
+import {PayloadAccessTokenType} from "../types/payload-access-token-type";
 
 @injectable()
 class AuthService {
@@ -250,10 +251,31 @@ class AuthService {
 
     async checkAccessToken(token: string): Promise<ResultType<string | null>> {
 
-        const payload = await this.jwtService
-            .verifyAccessToken(token);
+        try {
 
-        if (!payload) {
+            const payload: PayloadAccessTokenType = await this.jwtService
+                .verifyToken<PayloadAccessTokenType>(token);
+
+            const {userId} = payload;
+
+            const isUser: UserDocument | null = await this.usersRepository
+                .findUserById(userId);
+
+            if (!isUser) {
+
+                return NotFoundResult
+                    .create(
+                        'userId',
+                        'A user with this ID was not found.',
+                        'Access token failed verification.'
+                    );
+            }
+
+            return SuccessResult
+                .create<string>(userId);
+        } catch (error) {
+
+            console.error(error);
 
             return BadRequestResult
                 .create(
@@ -262,30 +284,42 @@ class AuthService {
                     'Access token failed verification.'
                 );
         }
+        // const payload: PayloadAccessTokenType = await this.jwtService
+        //     .verifyToken<PayloadAccessTokenType>(token);
 
-        const {userId} = payload;
+        // if (!payload) {
+        //
+        //     return BadRequestResult
+        //         .create(
+        //             'token',
+        //             'Payload incorrect.',
+        //             'Access token failed verification.'
+        //         );
+        // }
 
-        const isUser: UserDocument | null = await this.usersRepository
-            .findUserById(userId);
-
-        if (!isUser) {
-
-            return NotFoundResult
-                .create(
-                    'userId',
-                    'A user with this ID was not found.',
-                    'Access token failed verification.'
-                );
-        }
-
-        return SuccessResult
-            .create<string>(userId);
+        // const {userId} = payload;
+        //
+        // const isUser: UserDocument | null = await this.usersRepository
+        //     .findUserById(userId);
+        //
+        // if (!isUser) {
+        //
+        //     return NotFoundResult
+        //         .create(
+        //             'userId',
+        //             'A user with this ID was not found.',
+        //             'Access token failed verification.'
+        //         );
+        // }
+        //
+        // return SuccessResult
+        //     .create<string>(userId);
     }
 
     async checkRefreshToken(refreshToken: string): Promise<ResultType<PayloadRefreshTokenType | null>> {
 
-        const payload: PayloadRefreshTokenType | null = await this.jwtService
-            .verifyRefreshToken(refreshToken);
+        const payload: PayloadRefreshTokenType = await this.jwtService
+            .verifyToken<PayloadRefreshTokenType>(refreshToken);
 
         if (!payload) {
 

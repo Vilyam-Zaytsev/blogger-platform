@@ -9,19 +9,36 @@ const authGuard = async (
     next: NextFunction
 ) => {
 
-    const jwtService: JwtService = container.get(JwtService);
+    try {
 
-    if (req.headers.authorization) {
+        const jwtService: JwtService = container.get(JwtService);
 
-        const token: string = req.headers.authorization.split(' ')[1];
+        if (req.headers.authorization) {
 
-        const payload: PayloadAccessTokenType = await jwtService
-            .decodeToken<PayloadAccessTokenType>(token);
+            const [
+                format,
+                token
+            ] = req.headers.authorization.split(' ');
 
-            req.user = payload ? {id: payload.userId} : undefined;
+            if (format === 'Bearer') {
+
+                const payload: PayloadAccessTokenType = await jwtService
+                    .verifyToken<PayloadAccessTokenType>(token);
+
+                req.user = {id: payload.userId};
+            }
+
+        }
+
+        return next();
+    } catch (error) {
+
+        console.error(error);
+
+        return next();
     }
 
-    return next();
+
 };
 
 export {authGuard};

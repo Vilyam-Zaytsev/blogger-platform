@@ -38,36 +38,51 @@ class JwtService {
 
             return jwt.decode(token) as T;
         } catch (error: unknown) {
-            //TODO: throw error!!!
-            console.error("Can't decode token", error);
+
+            console.error("Can't decode token.\n", error);
 
             throw new Error("Failed to decode token");
         }
     }
 
-    async verifyAccessToken(token: string): Promise<PayloadAccessTokenType | null> {
+    async verifyToken<T>(token: string): Promise<T> {
 
         try {
 
-            return jwt.verify(token, SETTINGS.JWT_SECRET_AT!) as PayloadAccessTokenType;
+            return jwt.verify(token, SETTINGS.JWT_SECRET_AT!) as T;
         } catch (error) {
-            console.error(error);
 
-            return null;
+            console.error('Access token invalid.\n', error);
+
+            throw new Error("Access token invalid.");
         }
     }
 
-    async verifyRefreshToken(token: string): Promise<PayloadRefreshTokenType | null> {
+    // async verifyAccessToken(token: string): Promise<PayloadAccessTokenType | null> {
+    //
+    //     try {
+    //
+    //         return jwt.verify(token, SETTINGS.JWT_SECRET_AT!) as PayloadAccessTokenType;
+    //     } catch (error) {
+    //
+    //         console.error('Access token invalid.\n', error);
+    //
+    //         return null;
+    //     }
+    // }
 
-        try {
-
-            return jwt.verify(token, SETTINGS.JWT_SECRET_RT!) as PayloadRefreshTokenType;
-        } catch (error) {
-            console.error((error as Error).message);
-
-            return null;
-        }
-    }
+    // async verifyRefreshToken(token: string): Promise<PayloadRefreshTokenType | null> {
+    //
+    //     try {
+    //
+    //         return jwt.verify(token, SETTINGS.JWT_SECRET_RT!) as PayloadRefreshTokenType;
+    //     } catch (error) {
+    //
+    //         console.error('Refresh token invalid.\n', error);
+    //
+    //         return null;
+    //     }
+    // }
 }
 
 export {JwtService};
