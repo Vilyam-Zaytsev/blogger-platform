@@ -59,6 +59,7 @@ blogsRouter.delete('/:id',
     blogsController.deleteBlog.bind(blogsController)
 );
 blogsRouter.get(`/:id${SETTINGS.PATH.POSTS}`,
+    authGuard,
     pageNumberInputValidator,
     pageSizeInputValidator,
     sortByInputValidator,

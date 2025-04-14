@@ -165,6 +165,8 @@ class BlogsController {
         res: Response<Paginator<PostViewModel>>
     ){
 
+        const userId: string | null = req.user ? req.user.id : null;
+
         const { id: blogId } = req.params;
 
         const resultCheckBlogId: ResultType = await this.blogsService
@@ -188,7 +190,7 @@ class BlogsController {
         const sortQueryDto: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
 
         const foundPosts: PostViewModel[] = await this.postsQueryRepository
-            .findPosts(sortQueryDto, blogId);
+            .findPosts(sortQueryDto, userId, blogId);
 
         const postsCount: number = await this.postsQueryRepository
             .getPostsCount(blogId);

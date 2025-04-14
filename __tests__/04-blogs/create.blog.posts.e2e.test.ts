@@ -1,25 +1,15 @@
 import {Response} from "supertest";
-import {
-    console_log_e2e,
-    encodingAdminDataInBase64,
-    generateRandomString,
-    req
-} from '../helpers/test-helpers';
+import {console_log_e2e, encodingAdminDataInBase64, generateRandomString, req} from '../helpers/test-helpers';
 import {SETTINGS} from "../../src/common/settings";
-import {
-    clearPresets,
-    postContents,
-    postShortDescriptions,
-    postTitles,
-    presets
-} from "../helpers/datasets-for-tests";
+import {clearPresets, postContents, postShortDescriptions, postTitles, presets} from "../helpers/datasets-for-tests";
 import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
-import {MongoClient, ObjectId} from "mongodb";
+import {ObjectId} from "mongodb";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
 import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
-import {PostViewModel} from "../../src/05-posts/types/input-output-types";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import mongoose from "mongoose";
+import {PostViewModel} from "../../src/05-posts/domain/post-entity";
+import {LikeStatus} from "../../src/07-likes/like-entity";
 
 beforeAll(async () => {
 
@@ -87,6 +77,12 @@ describe('POST /blogs/{blogId}/posts', () => {
             content: postContents[0],
             blogId: presets.blogs[0].id,
             blogName: presets.blogs[0].name,
+            extendedLikesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: LikeStatus.None,
+                newestLikes: []
+            },
             createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
         });
 
