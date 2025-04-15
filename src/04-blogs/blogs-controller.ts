@@ -162,8 +162,7 @@ class BlogsController {
 
     async getPosts(
         req: RequestWithParamsAndQuery<IdType, SortingAndPaginationParamsType>,
-        res: Response
-        // res: Response<Paginator<PostViewModel>>
+        res: Response<Paginator<PostViewModel>>
     ){
 
         const userId: string | null = req.user ? req.user.id : null;
@@ -190,24 +189,12 @@ class BlogsController {
 
         const sortQueryDto: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
 
-        // const foundPosts: PostViewModel[] = await this.postsQueryRepository
-        const foundPosts: number = await this.postsQueryRepository
+        const foundPosts: Paginator<PostViewModel> = await this.postsQueryRepository
             .findPosts(sortQueryDto, userId, blogId);
-
-        const postsCount: number = await this.postsQueryRepository
-            .getPostsCount(blogId);
-
-        // const paginationResponse: Paginator<PostViewModel> = await this.postsQueryRepository
-        //     ._mapPostsViewModelToPaginationResponse(
-        //         foundPosts,
-        //         postsCount,
-        //         sortQueryDto
-        //     );
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json({});
-            // .json(paginationResponse);
+            .json(foundPosts);
     }
 
     async createPost(

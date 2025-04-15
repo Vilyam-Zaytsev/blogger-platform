@@ -254,7 +254,7 @@ class AuthService {
         try {
 
             const payload: PayloadAccessTokenType = await this.jwtService
-                .verifyToken<PayloadAccessTokenType>(token);
+                .verifyAccessToken<PayloadAccessTokenType>(token);
 
             const {userId} = payload;
 
@@ -284,44 +284,51 @@ class AuthService {
                     'Access token failed verification.'
                 );
         }
-        // const payload: PayloadAccessTokenType = await this.jwtService
-        //     .verifyToken<PayloadAccessTokenType>(token);
-
-        // if (!payload) {
-        //
-        //     return BadRequestResult
-        //         .create(
-        //             'token',
-        //             'Payload incorrect.',
-        //             'Access token failed verification.'
-        //         );
-        // }
-
-        // const {userId} = payload;
-        //
-        // const isUser: UserDocument | null = await this.usersRepository
-        //     .findUserById(userId);
-        //
-        // if (!isUser) {
-        //
-        //     return NotFoundResult
-        //         .create(
-        //             'userId',
-        //             'A user with this ID was not found.',
-        //             'Access token failed verification.'
-        //         );
-        // }
-        //
-        // return SuccessResult
-        //     .create<string>(userId);
     }
 
     async checkRefreshToken(refreshToken: string): Promise<ResultType<PayloadRefreshTokenType | null>> {
 
-        const payload: PayloadRefreshTokenType = await this.jwtService
-            .verifyToken<PayloadRefreshTokenType>(refreshToken);
+        try {
 
-        if (!payload) {
+            const payload: PayloadRefreshTokenType = await this.jwtService
+                .verifyRefreshToken<PayloadRefreshTokenType>(refreshToken);
+
+            const {
+                userId,
+                deviceId,
+            } = payload;
+
+            const isUser: UserDocument | null = await this.usersRepository
+                .findUserById(userId);
+
+            if (!isUser) {
+
+                return BadRequestResult
+                    .create(
+                        'token',
+                        'Payload incorrect.',
+                        'Refresh token failed verification.'
+                    );
+            }
+
+            const isSessionActive: SessionDocument | null = await this.sessionsRepository
+                .findSessionByDeviceId(new ObjectId(deviceId));
+
+            if (!isSessionActive) {
+
+                return BadRequestResult
+                    .create(
+                        'token',
+                        'Payload incorrect.',
+                        'Refresh token failed verification.'
+                    );
+            }
+
+            return SuccessResult
+                .create<PayloadRefreshTokenType>(payload);
+        } catch (error) {
+
+            console.error(error);
 
             return BadRequestResult
                 .create(
@@ -330,40 +337,6 @@ class AuthService {
                     'Refresh token failed verification.'
                 );
         }
-
-        const {
-            userId,
-            deviceId,
-        } = payload;
-
-        const isUser: UserDocument | null = await this.usersRepository
-            .findUserById(userId);
-
-        if (!isUser) {
-
-            return BadRequestResult
-                .create(
-                    'token',
-                    'Payload incorrect.',
-                    'Refresh token failed verification.'
-                );
-        }
-
-        const isSessionActive: SessionDocument | null = await this.sessionsRepository
-            .findSessionByDeviceId(new ObjectId(deviceId));
-
-        if (!isSessionActive) {
-
-            return BadRequestResult
-                .create(
-                    'token',
-                    'Payload incorrect.',
-                    'Refresh token failed verification.'
-                );
-        }
-
-        return SuccessResult
-            .create<PayloadRefreshTokenType>(payload);
     }
 
     async passwordRecovery(email: string): Promise<ResultType> {

@@ -45,7 +45,7 @@ class JwtService {
         }
     }
 
-    async verifyToken<T>(token: string): Promise<T> {
+    async verifyAccessToken<T>(token: string): Promise<T> {
 
         try {
 
@@ -54,35 +54,22 @@ class JwtService {
 
             console.error('Access token invalid.\n', error);
 
-            throw new Error("Access token invalid.");
+            throw new Error('Access token invalid.');
         }
     }
 
-    // async verifyAccessToken(token: string): Promise<PayloadAccessTokenType | null> {
-    //
-    //     try {
-    //
-    //         return jwt.verify(token, SETTINGS.JWT_SECRET_AT!) as PayloadAccessTokenType;
-    //     } catch (error) {
-    //
-    //         console.error('Access token invalid.\n', error);
-    //
-    //         return null;
-    //     }
-    // }
+    async verifyRefreshToken<T>(token: string): Promise<T> {
 
-    // async verifyRefreshToken(token: string): Promise<PayloadRefreshTokenType | null> {
-    //
-    //     try {
-    //
-    //         return jwt.verify(token, SETTINGS.JWT_SECRET_RT!) as PayloadRefreshTokenType;
-    //     } catch (error) {
-    //
-    //         console.error('Refresh token invalid.\n', error);
-    //
-    //         return null;
-    //     }
-    // }
+        try {
+
+            return jwt.verify(token, SETTINGS.JWT_SECRET_RT!) as T;
+        } catch (error) {
+
+            console.error('Refresh token invalid.\n', error);
+
+            throw new Error('Refresh token invalid.');
+        }
+    }
 }
 
 export {JwtService};

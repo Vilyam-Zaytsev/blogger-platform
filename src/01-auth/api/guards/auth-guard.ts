@@ -23,7 +23,7 @@ const authGuard = async (
             if (format === 'Bearer') {
 
                 const payload: PayloadAccessTokenType = await jwtService
-                    .verifyToken<PayloadAccessTokenType>(token);
+                    .verifyAccessToken<PayloadAccessTokenType>(token);
 
                 req.user = {id: payload.userId};
             }

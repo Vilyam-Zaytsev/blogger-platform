@@ -23,6 +23,15 @@ class LikesRepository {
             .findOne({userId, parentId});
     }
 
+    async findLikesByUserIdAndParentsIds(userId: string, parentsIds: string[]): Promise<LikeDocument[]> {
+
+        return LikeModel
+            .find({
+                userId,
+                parentId: {$in: parentsIds}
+            });
+    }
+
     async findRecentLikesForOnePost(parentId: string): Promise<LikeDocument[]> {
 
         const filter: any = {
