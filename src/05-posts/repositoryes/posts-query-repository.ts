@@ -50,28 +50,24 @@ class PostsQueryRepository {
 
         //1. достать id всех лайкеров и сложить в массив usersIds
         // (для того чтобы запросить из бд лайкеров и взять у них логины)
-
-        const usersIds: string[] = groupsOfRecentLikes.reduce<string[]>(
+        const setUsersIds: Set<string> = groupsOfRecentLikes.reduce<Set<string>>(
             (
-                acc: string[],
+                acc: Set<string>,
                 groupRecentLikes: GroupedLikesByPostId
-            ): string[] => {
+            ): Set<string> => {
 
                 groupRecentLikes.recentLikes.forEach(like => {
 
-                    if (!acc.includes(like.userId)) {
-
-                        acc.push(like.userId);
-                    }
+                        acc.add(like.userId);
                 })
 
                 return acc;
             },
-            []
+            new Set<string>()
         );
 
         const users: UserDocument[] = await this.usersRepository
-            .findUsersByIds(usersIds);
+            .findUsersByIds([...setUsersIds]);
 
         //2. определить myStatus пользователя который делает запрос за постоми.
         const mapUserReactionsForPosts: Map<string, LikeStatus> = new Map();
@@ -145,7 +141,7 @@ class PostsQueryRepository {
         });
 
         //преобразовать все посты во PaginationResponse
-        const postsCount: number = await this.getPostsCount();
+        const postsCount: number = await this.getPostsCount(blogId);
 
         return this._mapPostsViewModelToPaginationResponse(
                 postsViewModel,
