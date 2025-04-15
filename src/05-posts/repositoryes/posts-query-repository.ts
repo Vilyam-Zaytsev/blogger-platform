@@ -43,7 +43,7 @@ class PostsQueryRepository {
             .limit(pageSize)
             .exec();
 
-        const postsIds: string[] = posts.map(p => String(p._id));
+        const postsIds: string[] = posts.map(post => String(post._id));
 
         const groupsOfRecentLikes: GroupedLikesByPostId[] = await this.likesRepository
             .findRecentLikesForAllPosts(postsIds);
