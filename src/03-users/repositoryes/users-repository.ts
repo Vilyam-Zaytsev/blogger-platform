@@ -40,6 +40,13 @@ class UsersRepository {
             .findById(id);
     }
 
+    async findUsersByIds(ids: string[]): Promise<UserDocument[]> {
+
+        return UserModel
+            .find({_id: {$in: ids}})
+            .exec();
+    }
+
     async findByLoginOrEmail(loginOrEmail: string): Promise<UserDocument | null> {
 
         return UserModel

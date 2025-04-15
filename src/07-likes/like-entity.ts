@@ -1,4 +1,5 @@
 import mongoose, {HydratedDocument, Model, Schema} from "mongoose";
+import {ObjectId} from "mongodb";
 
 enum LikeStatus {
     None = 'None',
@@ -9,7 +10,8 @@ enum LikeStatus {
 type Like = {
     status: LikeStatus,
     userId: string,
-    parentId: string
+    parentId: string,
+    createdAt: Date
 };
 
 type LikeInputModel = {
@@ -20,6 +22,16 @@ type LikeInfoViewModel = {
     likesCount: number,
     dislikesCount: number,
     myStatus: LikeStatus
+};
+
+type GroupedLikesByPostId = {
+    postId: ObjectId,
+    recentLikes: LikeDocument[]
+};
+
+type MapLikerInfo = {
+    likerReaction: LikeStatus,
+    likerId: string | null
 };
 
 type LikeMethods = typeof likeMethods;
@@ -43,10 +55,14 @@ const likeSchema = new Schema<Like, LikeModel, LikeMethods>({
     parentId: {
         type: String,
         required: true
+    },
+    createdAt: {
+        type: Date,
+        required: true
     }
 });
 
-const likeMethods: any = {
+const likeMethods = {
 
 
 };
@@ -62,7 +78,8 @@ const likeStatics: any = {
         const like: Like = {
             status: reaction,
             userId,
-            parentId
+            parentId,
+            createdAt: new Date()
         };
 
         return new LikeModel(like);
@@ -79,6 +96,8 @@ export {
     LikeStatus,
     LikeInputModel,
     LikeInfoViewModel,
+    GroupedLikesByPostId,
+    MapLikerInfo,
     LikeModel,
     LikeDocument,
 };

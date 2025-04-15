@@ -2,7 +2,7 @@ import {ObjectId} from "mongodb";
 
 type TokenSessionDataType = {
     userId: string,
-    deviceId: ObjectId
+    deviceId: ObjectId,
 };
 
 export {TokenSessionDataType};

@@ -38,34 +38,36 @@ class JwtService {
 
             return jwt.decode(token) as T;
         } catch (error: unknown) {
-            //TODO: throw error!!!
-            console.error("Can't decode token", error);
+
+            console.error("Can't decode token.\n", error);
 
             throw new Error("Failed to decode token");
         }
     }
 
-    async verifyAccessToken(token: string): Promise<PayloadAccessTokenType | null> {
+    async verifyAccessToken<T>(token: string): Promise<T> {
 
         try {
 
-            return jwt.verify(token, SETTINGS.JWT_SECRET_AT!) as PayloadAccessTokenType;
+            return jwt.verify(token, SETTINGS.JWT_SECRET_AT!) as T;
         } catch (error) {
-            console.error(error);
 
-            return null;
+            console.error('Access token invalid.\n', error);
+
+            throw new Error('Access token invalid.');
         }
     }
 
-    async verifyRefreshToken(token: string): Promise<PayloadRefreshTokenType | null> {
+    async verifyRefreshToken<T>(token: string): Promise<T> {
 
         try {
 
-            return jwt.verify(token, SETTINGS.JWT_SECRET_RT!) as PayloadRefreshTokenType;
+            return jwt.verify(token, SETTINGS.JWT_SECRET_RT!) as T;
         } catch (error) {
-            console.error((error as Error).message);
 
-            return null;
+            console.error('Refresh token invalid.\n', error);
+
+            throw new Error('Refresh token invalid.');
         }
     }
 }

@@ -1,16 +1,13 @@
 import mongoose, {HydratedDocument, Model, Schema} from "mongoose";
 import {LikeInfoViewModel, LikeStatus} from "../../07-likes/like-entity";
+import {Reactions, reactionsSchema} from "../../common/reactions-schema";
+import {updateReactionsCount} from "../../common/helpers/common-entity-methods";
 
 type CommentatorInfo = {
     userId: string,
     userLogin: string
 };
 
-type Reactions = {
-    likeCount: number,
-    dislikeCount: number,
-    [key: string]: number;
-};
 
 type Comment = {
     postId: string,
@@ -50,19 +47,6 @@ const commentatorInfoSchema = new Schema<CommentatorInfo>({
     }
 }, {_id: false});
 
-const reactionSchema = new Schema<Reactions>({
-    likeCount: {
-        type: Number,
-        required: true,
-        default: 0
-    },
-    dislikeCount: {
-        type: Number,
-        required: true,
-        default: 0
-    }
-}, {_id: false});
-
 const commentSchema = new Schema<Comment, CommentModel>({
 
     postId: {
@@ -79,7 +63,7 @@ const commentSchema = new Schema<Comment, CommentModel>({
 
     },
     reactions: {
-        type: reactionSchema,
+        type: reactionsSchema,
         required: true
     },
     createdAt: {
@@ -90,34 +74,7 @@ const commentSchema = new Schema<Comment, CommentModel>({
 
 const commentMethods = {
 
-    updateReactionsCount(reaction: LikeStatus, currentReaction: LikeStatus | null) {
-
-        if (currentReaction) {
-
-            const currentReactionKey: string = `${currentReaction.toLowerCase()}Count`;
-
-            (this as CommentDocument).reactions[currentReactionKey] -= 1;
-
-        }
-
-        switch (reaction) {
-
-            case LikeStatus.None:
-
-                return;
-            case LikeStatus.Dislike:
-
-                (this as CommentDocument).reactions.dislikeCount += 1;
-
-                return;
-            case LikeStatus.Like:
-                (this as CommentDocument).reactions.likeCount += 1;
-
-                return;
-        }
-
-
-    }
+   updateReactionsCount
 };
 
 const commentStatics: any = {
@@ -157,7 +114,6 @@ const CommentModel: CommentModel = mongoose.model<Comment, CommentModel>('Commen
 export {
     Comment,
     CommentatorInfo,
-    Reactions,
     CommentInputModel,
     CommentViewModel,
     CommentModel,

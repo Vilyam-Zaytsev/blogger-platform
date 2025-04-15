@@ -44,25 +44,12 @@ class UsersController {
 
         const sortQueryDto: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
 
-        const foundUsers: UserViewModel[] = await this.usersQueryRepository
+        const foundUsers: Paginator<UserViewModel> = await this.usersQueryRepository
             .findUsers(sortQueryDto);
-
-        const usersCount: number = await this.usersQueryRepository
-            .getUsersCount(
-                sortQueryDto.searchLoginTerm,
-                sortQueryDto.searchEmailTerm
-                );
-
-        const paginationResponse: Paginator<UserViewModel> = await this.usersQueryRepository
-            ._mapUsersViewModelToPaginationResponse(
-                foundUsers,
-                usersCount,
-                sortQueryDto
-            );
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(paginationResponse);
+            .json(foundUsers);
     }
 
     async createUser(

@@ -6,6 +6,7 @@ import {ResultStatus} from "../../../common/types/result-types/result-status";
 import {PayloadRefreshTokenType} from "../../types/payload-refresh-token-type";
 import {ObjectId} from "mongodb";
 import {container} from "../../../composition-root";
+import {isSuccessfulResult} from "../../../common/helpers/type-guards";
 
 const refreshTokenGuard = async (
     req: Request,
@@ -31,7 +32,7 @@ const refreshTokenGuard = async (
     }: ResultType<PayloadRefreshTokenType | null> = await authService
         .checkRefreshToken(token);
 
-    if (refreshTokenVerificationStatus !== ResultStatus.Success) {
+    if (!isSuccessfulResult(refreshTokenVerificationStatus, payload)) {
 
         res
             .sendStatus(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
@@ -40,8 +41,8 @@ const refreshTokenGuard = async (
     }
 
     req.session = {
-        userId: payload!.userId,
-        deviceId: new ObjectId(payload!.deviceId)
+        userId: payload.userId,
+        deviceId: new ObjectId(payload.deviceId),
     };
 
     return next();

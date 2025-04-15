@@ -5,10 +5,10 @@ import {blogsTestManager} from "../helpers/managers/04_blogs-test-manager";
 import {ObjectId} from "mongodb";
 import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {Response} from "supertest";
-import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
-import {PostViewModel} from "../../src/05-posts/types/input-output-types";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import mongoose from "mongoose";
+import {PostViewModel} from "../../src/05-posts/domain/post-entity";
+import {LikeStatus} from "../../src/07-likes/like-entity";
 
 beforeAll(async () => {
 
@@ -75,7 +75,7 @@ beforeEach(async () => {
                 )
                 .expect(SETTINGS.HTTP_STATUSES.NO_CONTENT_204);
 
-            const foundPost: Paginator<PostViewModel> = await postsTestManager
+            const foundPost: PostViewModel = await postsTestManager
                 .getPost(presets.posts[0].id);
 
             expect(foundPost).toEqual(
@@ -86,6 +86,12 @@ beforeEach(async () => {
                     content: postContents[1],
                     blogId: presets.blogs[0].id,
                     blogName: presets.blogs[0].name,
+                    extendedLikesInfo: {
+                        likesCount: 0,
+                        dislikesCount: 0,
+                        myStatus: LikeStatus.None,
+                        newestLikes: []
+                    },
                     createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
                 }
             )
@@ -119,7 +125,7 @@ beforeEach(async () => {
                 )
                 .expect(SETTINGS.HTTP_STATUSES.UNAUTHORIZED_401);
 
-            const foundPost: Paginator<PostViewModel> = await postsTestManager
+            const foundPost: PostViewModel = await postsTestManager
                 .getPost(presets.posts[0].id);
 
             expect(foundPost).toEqual(presets.posts[0]);
@@ -168,7 +174,7 @@ beforeEach(async () => {
                 ]
             });
 
-            const foundPost: Paginator<PostViewModel> = await postsTestManager
+            const foundPost: PostViewModel = await postsTestManager
                 .getPost(presets.posts[0].id);
 
             expect(foundPost).toEqual(presets.posts[0]);
@@ -221,7 +227,7 @@ beforeEach(async () => {
                 ]
             });
 
-            const foundPost: Paginator<PostViewModel> = await postsTestManager
+            const foundPost: PostViewModel = await postsTestManager
                 .getPost(presets.posts[0].id);
 
             expect(foundPost).toEqual(presets.posts[0]);
@@ -274,7 +280,7 @@ beforeEach(async () => {
                 ]
             });
 
-            const foundPost: Paginator<PostViewModel> = await postsTestManager
+            const foundPost: PostViewModel = await postsTestManager
                 .getPost(presets.posts[0].id);
 
             expect(foundPost).toEqual(presets.posts[0]);
@@ -327,7 +333,7 @@ beforeEach(async () => {
                 ]
             });
 
-            const foundPost: Paginator<PostViewModel> = await postsTestManager
+            const foundPost: PostViewModel = await postsTestManager
                 .getPost(presets.posts[0].id);
 
             expect(foundPost).toEqual(presets.posts[0]);
@@ -359,7 +365,7 @@ beforeEach(async () => {
                 })
                 .expect(SETTINGS.HTTP_STATUSES.NOT_FOUND_404);
 
-            const foundPost: Paginator<PostViewModel> = await postsTestManager
+            const foundPost: PostViewModel = await postsTestManager
                 .getPost(presets.posts[0].id);
 
             expect(foundPost).toEqual(presets.posts[0]);

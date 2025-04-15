@@ -6,9 +6,9 @@ import {ObjectId} from "mongodb";
 import {postsTestManager} from "../helpers/managers/05_posts-test-manager";
 import {Response} from "supertest";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
-import {PostViewModel} from "../../src/05-posts/types/input-output-types";
 import {runDb} from "../../src/db/mongo-db/mongoDb";
 import mongoose from "mongoose";
+import {PostViewModel} from "../../src/05-posts/domain/post-entity";
 
 
 beforeAll(async () => {

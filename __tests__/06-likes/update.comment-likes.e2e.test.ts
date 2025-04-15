@@ -12,11 +12,11 @@ import mongoose from "mongoose";
 import {CommentViewModel} from "../../src/06-comments/domain/comment-entity";
 import {LikeDocument, LikeStatus} from "../../src/07-likes/like-entity";
 import {Paginator} from "../../src/common/types/input-output-types/pagination-sort-types";
-import {LikeRepository} from "../../src/07-likes/repositoryes/like-repository";
+import {LikesRepository} from "../../src/07-likes/repositoryes/likes-repository";
 import {container} from "../../src/composition-root";
 import {ObjectId} from "mongodb";
 
-const likeRepository: LikeRepository = container.get(LikeRepository);
+const likeRepository: LikesRepository = container.get(LikesRepository);
 
 beforeAll(async () => {
 
@@ -474,7 +474,7 @@ describe('PUT /comments/:id/likeStatus', () => {
         console_log_e2e({}, 0, 'Test 5: put(/comments/:id/likeStatus)');
     }, 30000);
 
-    it('it should return a 401 if the user is not logged in.', async () => {
+    it('should return a 401 if the user is not logged in.', async () => {
 
         await blogsTestManager
             .createBlog(1);
@@ -519,7 +519,7 @@ describe('PUT /comments/:id/likeStatus', () => {
         console_log_e2e(resPutLikes.body, resPutLikes.status, 'Test 6: put(/comments/:id/likeStatus)');
     });
 
-    it('it should return a 404 if the comment for which the user is trying to leave a reaction does not exist.', async () => {
+    it('should return a 404 if the comment for which the user is trying to leave a reaction does not exist.', async () => {
 
         await usersTestManager
             .createUser(1);

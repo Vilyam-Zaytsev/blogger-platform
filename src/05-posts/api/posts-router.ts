@@ -18,12 +18,14 @@ import {accessTokenGuard} from "../../01-auth/api/guards/access-token-guard";
 import {commentContentInputValidator} from "../../06-comments/api/middlewares/comment-validators";
 import {container} from "../../composition-root";
 import {authGuard} from "../../01-auth/api/guards/auth-guard";
+import {likeStatusInputValidator} from "../../07-likes/middlewares/like-validators";
 
 const postsRouter = Router();
 const postsController: PostsController = container.get(PostsController);
 const commentsController: CommentsController = container.get(CommentsController);
 
 postsRouter.get('/',
+    authGuard,
     pageNumberInputValidator,
     pageSizeInputValidator,
     sortByInputValidator,
@@ -32,6 +34,7 @@ postsRouter.get('/',
     postsController.getPosts.bind(postsController)
 );
 postsRouter.get('/:id',
+    authGuard,
     postsController.getPost.bind(postsController)
 );
 postsRouter.get(`/:id${SETTINGS.PATH.COMMENTS}`,
@@ -44,6 +47,7 @@ postsRouter.get(`/:id${SETTINGS.PATH.COMMENTS}`,
     commentsController.getComments.bind(commentsController)
 );
 postsRouter.post('/',
+    authGuard,
     baseAuthGuard,
     postTitleInputValidator,
     postShortDescriptionInputValidator,
@@ -66,6 +70,12 @@ postsRouter.put('/:id',
     postBlogIdInputValidator,
     inputCheckErrorsMiddleware,
     postsController.updatePost.bind(postsController)
+);
+postsRouter.put(`/:id${SETTINGS.PATH.LIKE_STATUS}`,
+    accessTokenGuard,
+    likeStatusInputValidator,
+    inputCheckErrorsMiddleware,
+    postsController.updatePostReactions.bind(postsController)
 );
 postsRouter.delete('/:id',
     baseAuthGuard,

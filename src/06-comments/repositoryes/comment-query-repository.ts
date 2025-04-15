@@ -4,21 +4,21 @@ import {SortOptionsType} from "../../common/types/sort-options-type";
 import {SortDirection, SortQueryDto} from "../../common/helpers/sort-query-dto";
 import {Comment, CommentModel, CommentViewModel} from "../domain/comment-entity";
 import {LikeDocument, LikeStatus} from "../../07-likes/like-entity";
-import {LikeRepository} from "../../07-likes/repositoryes/like-repository";
+import {LikesRepository} from "../../07-likes/repositoryes/likes-repository";
 import {injectable} from "inversify";
 
 @injectable()
 class CommentQueryRepository {
 
     constructor(
-        private likeRepository: LikeRepository
+        private likesRepository: LikesRepository
     ) {};
 
     async findComments(
         sortQueryDto: SortQueryDto,
         postId: string,
         userId: string | null
-    ): Promise<CommentViewModel[]> {
+    ): Promise<Paginator<CommentViewModel>> {
 
         const {
             pageNumber,
@@ -38,11 +38,11 @@ class CommentQueryRepository {
 
         if (userId) {
 
-            likes = await this.likeRepository
+            likes = await this.likesRepository
                 .findLikesByUserId(userId)
         }
 
-        return comments.map((c) => {
+        const commentViewModels: CommentViewModel[] = comments.map((c) => {
 
             const foundLike: LikeDocument | undefined = likes.find(l => l.parentId === String(c._id));
 
@@ -50,6 +50,14 @@ class CommentQueryRepository {
 
             return this._mapDBCommentToViewModel(c, userReaction);
         });
+
+        const commentsCount: number = await this.getCommentsCount(postId);
+
+        return this._mapCommentsViewModelToPaginationResponse(
+            commentViewModels,
+            commentsCount,
+            sortQueryDto
+        );
     }
 
     async findComment(commentId: string, userId: string | null): Promise<CommentViewModel | null> {
@@ -64,7 +72,7 @@ class CommentQueryRepository {
 
         if (userId) {
 
-            like = await this.likeRepository
+            like = await this.likesRepository
                 .findLikeByUserIdAndParentId(userId, commentId)
         }
 

@@ -59,10 +59,6 @@ const commentsTestManager = {
             request = request.set('Authorization', `Bearer ${accessToken}`);
         }
 
-        // const res: Response = await req
-        //     .get(`${SETTINGS.PATH.POSTS}/${postId}${SETTINGS.PATH.COMMENTS}`)
-        //     .expect(SETTINGS.HTTP_STATUSES.OK_200);
-
         const res = await request.expect(SETTINGS.HTTP_STATUSES.OK_200);
 
         return res.body;
