@@ -18,7 +18,7 @@ class CommentQueryRepository {
         sortQueryDto: SortQueryDto,
         postId: string,
         userId: string | null
-    ): Promise<CommentViewModel[]> {
+    ): Promise<Paginator<CommentViewModel>> {
 
         const {
             pageNumber,
@@ -42,7 +42,7 @@ class CommentQueryRepository {
                 .findLikesByUserId(userId)
         }
 
-        return comments.map((c) => {
+        const commentViewModels: CommentViewModel[] = comments.map((c) => {
 
             const foundLike: LikeDocument | undefined = likes.find(l => l.parentId === String(c._id));
 
@@ -50,6 +50,14 @@ class CommentQueryRepository {
 
             return this._mapDBCommentToViewModel(c, userReaction);
         });
+
+        const commentsCount: number = await this.getCommentsCount(postId);
+
+        return this._mapCommentsViewModelToPaginationResponse(
+            commentViewModels,
+            commentsCount,
+            sortQueryDto
+        );
     }
 
     async findComment(commentId: string, userId: string | null): Promise<CommentViewModel | null> {

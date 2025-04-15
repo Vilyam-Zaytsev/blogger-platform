@@ -55,22 +55,12 @@ class CommentsController {
 
         const sortQueryDto: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
 
-        const foundComments: CommentViewModel[] = await this.commentQueryRepository
+        const foundComments: Paginator<CommentViewModel> = await this.commentQueryRepository
             .findComments(sortQueryDto, postId, userId);
-
-        const commentsCount: number = await this.commentQueryRepository
-            .getCommentsCount(postId);
-
-        const paginationResponse: Paginator<CommentViewModel> = await this.commentQueryRepository
-            ._mapCommentsViewModelToPaginationResponse(
-                foundComments,
-                commentsCount,
-                sortQueryDto
-            );
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(paginationResponse);
+            .json(foundComments);
     }
 
     async getComment(

@@ -9,8 +9,8 @@ import {Blog, BlogModel} from "../domain/blog-entity";
 @injectable()
 class BlogsQueryRepository {
 
-    async findBlogs(sortQueryDto: SortQueryDto): Promise<BlogViewModel[]> {
-//TODO: зачем мне здесь фильтр???
+    async findBlogs(sortQueryDto: SortQueryDto): Promise<Paginator<BlogViewModel>> {
+
         const {
             pageNumber,
             pageSize,
@@ -25,14 +25,22 @@ class BlogsQueryRepository {
             ? filter = {name: {$regex: searchNameTerm, $options: 'i'}}
             : {};
 
-        const blogs: WithId<Blog>[] = await BlogModel
+        const blogs: BlogModel[] = await BlogModel
             .find(filter)
             .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as SortOptionsType)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
             .exec();
 
-        return blogs.map(b => this._mapDbBlogToViewModel(b));
+       const blogViewModels: BlogViewModel[] = blogs.map(b => this._mapDbBlogToViewModel(b));
+
+        const blogsCount: number = await this.getBlogsCount(searchNameTerm);
+
+       return this._mapBlogsViewModelToPaginationResponse(
+           blogViewModels,
+           blogsCount,
+           sortQueryDto
+       );
     }
 
     async findBlog(id: string): Promise<BlogViewModel | null> {

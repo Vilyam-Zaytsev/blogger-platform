@@ -48,22 +48,12 @@ class BlogsController {
 
         const sortQueryDto: SortQueryDto = new SortQueryDto(sortingAndPaginationParams);
 
-        const foundBlogs: BlogViewModel[] = await this.blogsQueryRepository
+        const foundBlogs: Paginator<BlogViewModel> = await this.blogsQueryRepository
             .findBlogs(sortQueryDto);
-
-        const blogsCount: number = await this.blogsQueryRepository
-            .getBlogsCount(sortQueryDto.searchNameTerm);
-
-        const paginationResponse: Paginator<BlogViewModel> = await this.blogsQueryRepository
-            ._mapBlogsViewModelToPaginationResponse(
-                foundBlogs,
-                blogsCount,
-                sortQueryDto
-            );
 
         res
             .status(SETTINGS.HTTP_STATUSES.OK_200)
-            .json(paginationResponse);
+            .json(foundBlogs);
     }
 
     async getBlog(

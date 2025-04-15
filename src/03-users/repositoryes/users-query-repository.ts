@@ -5,13 +5,13 @@ import {
 import {UserMeViewModel, UserViewModel} from "../types/input-output-types";
 import {injectable} from "inversify";
 import {SortOptionsType} from "../../common/types/sort-options-type";
-import {User, UserModel} from "../domain/user-entity";
+import {User, UserDocument, UserModel} from "../domain/user-entity";
 import {SortQueryDto} from "../../common/helpers/sort-query-dto";
 
 @injectable()
 class UsersQueryRepository {
 
-    async findUsers(sortQueryDto: SortQueryDto): Promise<UserViewModel[]> {
+    async findUsers(sortQueryDto: SortQueryDto): Promise<Paginator<UserViewModel>> {
 
         const {
             pageNumber,
@@ -32,14 +32,25 @@ class UsersQueryRepository {
             ? filter.$or.push({email: {$regex: searchEmailTerm, $options: 'i'}})
             : null;
 
-        const users: WithId<User>[] = await UserModel
+        const users: UserDocument[] = await UserModel
             .find(filter.$or.length > 0 ? filter : {})
             .sort({[sortBy]: sortDirection === 'asc' ? 1 : -1} as SortOptionsType)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
             .exec();
 
-        return users.map(u => this._mapDbUserToViewModel(u));
+        const userViewModels: UserViewModel[] = users.map(u => this._mapDbUserToViewModel(u));
+
+        const usersCount: number = await this.getUsersCount(
+            searchLoginTerm,
+            searchEmailTerm
+        );
+
+        return this._mapUsersViewModelToPaginationResponse(
+            userViewModels,
+            usersCount,
+            sortQueryDto
+        );
     }
 
     async findUser(id: string): Promise<UserViewModel | null> {
