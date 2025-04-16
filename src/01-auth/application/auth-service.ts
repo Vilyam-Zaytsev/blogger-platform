@@ -7,7 +7,7 @@ import {ObjectId} from "mongodb";
 import {UsersService} from "../../03-users/application/users-service";
 import {ConfirmationStatus, UserDocument, UserModel} from "../../03-users/domain/user-entity";
 import {NodemailerService} from "../adapters/nodemailer-service";
-import {EmailTemplates} from "../adapters/email-templates";
+import {EmailTemplates} from "./email-templates";
 import {BadRequestResult, NotFoundResult, SuccessResult, UnauthorizedResult} from "../../common/helpers/result-object";
 import {AuthTokens} from "../types/auth-tokens-type";
 import {PayloadRefreshTokenType} from "../types/payload-refresh-token-type";

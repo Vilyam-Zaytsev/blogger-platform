@@ -6,7 +6,7 @@ import {SessionsRepository} from "./02-sessions/repositories/sessions-repository
 import {UsersQueryRepository} from "./03-users/repositoryes/users-query-repository";
 import {BcryptService} from "./01-auth/adapters/bcrypt-service";
 import {JwtService} from "./01-auth/adapters/jwt-service";
-import {EmailTemplates} from "./01-auth/adapters/email-templates";
+import {EmailTemplates} from "./01-auth/application/email-templates";
 import {UsersService} from "./03-users/application/users-service";
 import {UsersRepository} from "./03-users/repositoryes/users-repository";
 import {SessionsController} from "./02-sessions/sessions-controller";

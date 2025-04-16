@@ -10,9 +10,6 @@ class NodemailerService {
         template: EmailTemplateType
     ): Promise<boolean> {
 
-        //TODO: delete log!!!
-        console.log('sendEmail invoked')
-
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
